@@ -2,7 +2,7 @@ trigger:
   batch: true
   branches:
     include:
-    - dev
+    - dev, master
   paths:
     exclude:
     - README.md
@@ -17,14 +17,12 @@ variables:
   jsonLocation: /site/wwwroot
   
   artifactName: drop
-  coreRepoName: core
-  mailRepoName: email
+  userRepoName: user
   onbootJarName: app.jar
   
   azureSub: GreenCity
   resourceGroup: GreenCity
-  coreServiceName: greencity
-  mailServiceName: greencity-mail
+  userServiceName: greencity-user
 
 stages:
 - stage: Build
@@ -63,7 +61,7 @@ stages:
       displayName: Set GOOGLE_APPLICATION_CREDENTIALS config in Azure Portal
       inputs:
         azureSubscription: '$(azureSub)'
-        appName: '$(coreServiceName)'
+        appName: '$(userServiceName)'
         resourceGroupName: '$(resourceGroup)'
         appSettings: |
           [
@@ -83,11 +81,8 @@ stages:
         mavenVersionOption: 'Default'
         options: '-Dmaven.test.skip=true'
         
-    - script: mv $(coreRepoName)/target/*.jar $(coreRepoName)/target/$(onbootJarName)
-      displayName: Rename core jar to app
-
-    - script: mv $(mailRepoName)/target/*.jar $(mailRepoName)/target/$(onbootJarName) 
-      displayName: Rename email jar to app
+    - script: mv $(userRepoName)/target/*.jar $(userRepoName)/target/$(onbootJarName)
+      displayName: Rename user jar to app
 
     - task: CopyFiles@2
       displayName: Copy Files
@@ -104,8 +99,8 @@ stages:
 
 - stage: Deploy
   jobs:
-    - deployment: DeployCore
-      displayName: Deploy core app service
+    - deployment: DeployUser
+      displayName: Deploy User app service
       pool:
         vmImage: $(agentOS)
       environment: 'prod'
@@ -126,34 +121,7 @@ stages:
               inputs:
                 azureSubscription: '$(azureSub)'
                 appType: 'webAppLinux'
-                WebAppName: '$(coreServiceName)'
+                WebAppName: '$(userServiceName)'
                 deployToSlotOrASE: true
                 ResourceGroupName: '$(resourceGroup)'
-                packageForLinux: '$(System.ArtifactsDirectory)/$(artifactName)/$(coreRepoName)/target/$(onbootJarName)'
-
-    - deployment: DeployMail
-      displayName: Deploy mail app service
-      pool:
-        vmImage: $(agentOS)
-      environment: 'prod'
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - download: none
-            
-            - task: DownloadBuildArtifacts@0
-              inputs:
-                buildType: 'current'
-                downloadType: 'single'
-                artifactName: '$(artifactName)'
-                downloadPath: '$(System.ArtifactsDirectory)'
-                
-            - task: AzureRmWebAppDeployment@4
-              inputs:
-                azureSubscription: '$(azureSub)'
-                appType: 'webAppLinux'
-                WebAppName: '$(mailServiceName)'
-                deployToSlotOrASE: true
-                ResourceGroupName: '$(resourceGroup)'
-                packageForLinux: '$(System.ArtifactsDirectory)/$(artifactName)/$(mailRepoName)/target/$(onbootJarName)'
+                packageForLinux: '$(System.ArtifactsDirectory)/$(artifactName)/$(userRepoName)/target/$(onbootJarName)'
