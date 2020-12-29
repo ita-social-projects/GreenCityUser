@@ -420,9 +420,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId, String accessToken) {
         final HttpEntity<String> entity = setHeader(accessToken);
-        CustomGoalResponseDto[] restTemplateForObject = restClient.getAllAvailableCustomGoals(userId, entity);
-        assert restTemplateForObject != null;
-        return Arrays.asList(restTemplateForObject);
+        return restClient.getAllAvailableCustomGoals(userId, entity);
     }
 
     /**
@@ -631,7 +629,7 @@ public class UserServiceImpl implements UserService {
                 .url(url)
                 .user(user)
                 .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(entity, url),
-                        SocialNetworkImage.class))
+                    SocialNetworkImage.class))
                 .build())
             .collect(Collectors.toList()));
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
