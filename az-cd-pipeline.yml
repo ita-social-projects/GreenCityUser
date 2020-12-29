@@ -61,7 +61,7 @@ stages:
       displayName: Set GOOGLE_APPLICATION_CREDENTIALS config in Azure Portal
       inputs:
         azureSubscription: '$(azureSub)'
-        appName: '$(coreServiceName)'
+        appName: '$(userServiceName)'
         resourceGroupName: '$(resourceGroup)'
         appSettings: |
           [
@@ -81,7 +81,7 @@ stages:
         mavenVersionOption: 'Default'
         options: '-Dmaven.test.skip=true'
         
-    - script: mv $(userRepoName)/target/*.jar $(coreRepoName)/target/$(onbootJarName)
+    - script: mv $(userRepoName)/target/*.jar $(userRepoName)/target/$(onbootJarName)
       displayName: Rename user jar to app
 
     - task: CopyFiles@2
