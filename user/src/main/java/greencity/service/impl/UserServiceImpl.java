@@ -1,16 +1,15 @@
 package greencity.service.impl;
 
 //import greencity.achievement.AchievementCalculation;
+import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
-import greencity.constant.RestTemplateLinks;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.goal.CustomGoalResponseDto;
-import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.user.RecommendedFriendDto;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
@@ -56,11 +55,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
@@ -84,13 +80,11 @@ public class UserServiceImpl implements UserService {
      * Autowired repository.
      */
     private final UserRepo userRepo;
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
     // private final AchievementCalculation achievementCalculation;
     /**
      * Autowired mapper.
      */
-    @Value("${greencity.server.address}")
-    private String greenCityServerAddress;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
     private long timeAfterLastActivity;
@@ -421,12 +415,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId, String accessToken) {
         final HttpEntity<String> entity = setHeader(accessToken);
-        CustomGoalResponseDto[] restTemplateForObject =
-            restTemplate.exchange(greenCityServerAddress
-                + RestTemplateLinks.CUSTOM_GOALS + userId, HttpMethod.GET, entity, CustomGoalResponseDto[].class)
-                .getBody();
-        assert restTemplateForObject != null;
-        return Arrays.asList(restTemplateForObject);
+        return restClient.getAllAvailableCustomGoals(userId, entity);
     }
 
     /**
@@ -469,17 +458,11 @@ public class UserServiceImpl implements UserService {
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         if (userProfilePictureDto.getProfilePicturePath() != null) {
-            image = restTemplate.exchange(greenCityServerAddress
-                + RestTemplateLinks.FILES_CONVERT + RestTemplateLinks.IMAGE
-                + userProfilePictureDto.getProfilePicturePath(),
-                HttpMethod.POST, entity, MultipartFile.class).getBody();
+            image = restClient.convertToMultipartImage(userProfilePictureDto.getProfilePicturePath(), entity);
         }
         if (image != null) {
-            LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-            map.add("images", image);
-            HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
-            user.setProfilePicturePath(restTemplate.postForObject(greenCityServerAddress
-                + RestTemplateLinks.FILES_IMAGE, requestEntity, String.class));
+            String profilePicturePath = restClient.uploadImage(image, headers);
+            user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
         }
@@ -633,19 +616,14 @@ public class UserServiceImpl implements UserService {
         user.setCity(userProfileDtoRequest.getCity());
         user.setUserCredo(userProfileDtoRequest.getUserCredo());
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
-        socialNetworks.forEach(socialNetwork -> restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS + RestTemplateLinks.ID + socialNetwork.getId(),
-            HttpMethod.DELETE, entity, Long.class).getBody());
+        socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(entity, socialNetwork.getId()));
         user.getSocialNetworks().clear();
         user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
             .stream()
             .map(url -> SocialNetwork.builder()
                 .url(url)
                 .user(user)
-                .socialNetworkImage(modelMapper.map(
-                    Objects.requireNonNull(restTemplate.exchange(greenCityServerAddress
-                        + RestTemplateLinks.SOCIAL_NETWORKS_IMAGE + RestTemplateLinks.URL + url,
-                        HttpMethod.GET, entity, SocialNetworkImageVO.class).getBody()),
+                .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(entity, url),
                     SocialNetworkImage.class))
                 .build())
             .collect(Collectors.toList()));
@@ -719,18 +697,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId, String accessToken) {
         final HttpEntity<String> entity = setHeader(accessToken);
-        Long amountOfPublishedNewsByUserId = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.ECONEWS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class)
-            .getBody();
-        Long amountOfWrittenTipsAndTrickByUserId = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.TIPSANDTRICKS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity,
-            Long.class).getBody();
-        Long amountOfAcquiredHabitsByUserId = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.HABIT_STATISTIC_ACQUIRED_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
-            entity, Long.class).getBody();
-        Long amountOfHabitsInProgressByUserId = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
-            entity, Long.class).getBody();
+        Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId, entity);
+        Long amountOfWrittenTipsAndTrickByUserId = restClient.findAmountOfWrittenTipsAndTrick(userId, entity);
+        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId, entity);
+        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId, entity);
 
         return UserProfileStatisticsDto.builder()
             .amountWrittenTipsAndTrick(amountOfWrittenTipsAndTrickByUserId)
