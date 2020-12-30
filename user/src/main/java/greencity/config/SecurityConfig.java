@@ -42,10 +42,6 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private static final String ECONEWS_COMMENTS = "/econews/comments";
-    private static final String TIPS_AND_TRICKS_COMMENTS = "/tipsandtricks/comments";
-    private static final String USER_CUSTOM_GOALS = "/user/{userId}/customGoals";
-    private static final String HABIT_ASSIGN_ID = "/habit/assign/{habitId}";
     private final JwtTool jwtTool;
     private final UserService userService;
 
@@ -92,9 +88,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/img/**")
             .permitAll()
             .antMatchers(HttpMethod.GET,
-                ECONEWS_COMMENTS)
-            .hasRole(ADMIN)
-            .antMatchers(HttpMethod.GET,
                 "/ownSecurity/verifyEmail",
                 "/ownSecurity/updateAccessToken",
                 "/ownSecurity/restorePassword",
@@ -115,7 +108,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.GET,
                 "/user",
                 "/user/goals/habits/{habitId}/shopping-list",
-                USER_CUSTOM_GOALS,
                 "/user/{userId}/customGoals/available",
                 "/user/{userId}/sixUserFriends/",
                 "/user/{userId}/profile/",
@@ -127,7 +119,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{userId}/friends/")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
-                USER_CUSTOM_GOALS,
                 "/user/goals",
                 "/user/{userId}/habit",
                 "/user/{userId}/userFriend/{friendId}")
@@ -137,13 +128,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/profile")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PATCH,
-                USER_CUSTOM_GOALS,
                 "/user/goals/{userGoalId}",
                 "/user/profilePicture",
                 "/user/deleteProfilePicture")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.DELETE,
-                USER_CUSTOM_GOALS,
                 "/user/goals/user-goals",
                 "/user/goals",
                 "/user/{userId}/userFriend/{friendId}")
