@@ -1,6 +1,5 @@
 package greencity.security.controller;
 
-import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import greencity.security.service.FacebookSecurityService;
 import greencity.security.dto.SuccessSignInDto;

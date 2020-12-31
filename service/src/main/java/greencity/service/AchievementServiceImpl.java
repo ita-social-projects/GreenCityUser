@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.constant.CacheConstants;
 import greencity.dto.achievement.AchievementVO;
 import greencity.repository.AchievementRepo;
-import greencity.service.AchievementService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
