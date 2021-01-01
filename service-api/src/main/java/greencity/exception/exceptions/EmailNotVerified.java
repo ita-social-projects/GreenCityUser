@@ -7,20 +7,7 @@ public class EmailNotVerified extends RuntimeException {
     /**
      * Constructor.
      */
-    public EmailNotVerified() {
-    }
-
-    /**
-     * Constructor.
-     */
     public EmailNotVerified(String message) {
         super(message);
-    }
-
-    /**
-     * Constructor.
-     */
-    public EmailNotVerified(String message, Throwable cause) {
-        super(message, cause);
     }
 }

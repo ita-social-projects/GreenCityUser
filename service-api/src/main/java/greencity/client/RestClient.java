@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -35,9 +36,9 @@ public class RestClient {
      * @author Orest Mamchuk
      */
     public List<CustomGoalResponseDto> getAllAvailableCustomGoals(Long userId, HttpEntity<String> entity) {
-        CustomGoalResponseDto[] responseDtos = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_GOALS + userId, HttpMethod.GET, entity, CustomGoalResponseDto[].class)
-            .getBody();
+        ResponseEntity<CustomGoalResponseDto[]> exchange = restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.CUSTOM_GOALS + userId, HttpMethod.GET, entity, CustomGoalResponseDto[].class);
+        CustomGoalResponseDto[] responseDtos = exchange.getBody();
         assert responseDtos != null;
         return Arrays.asList(responseDtos);
     }
@@ -155,5 +156,17 @@ public class RestClient {
         return restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
             entity, Long.class).getBody();
+    }
+
+    /**
+     * Method for finding all language code.
+     *
+     * @return list of {@link String}
+     */
+    public List<String> getAllLanguageCodes() {
+        String[] restTemplateForObject = restTemplate.getForObject(greenCityServerAddress
+            + RestTemplateLinks.LANGUAGE, String[].class);
+        assert restTemplateForObject != null;
+        return Arrays.asList(restTemplateForObject);
     }
 }

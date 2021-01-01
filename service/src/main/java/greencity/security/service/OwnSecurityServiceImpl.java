@@ -355,7 +355,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .concat(specialChar)
             .concat(totalChars);
         List<Character> pwdChars = combinedChars.chars()
-            .mapToObj(char.class::cast)
+            .mapToObj(c -> (char) c)
             .collect(Collectors.toList());
         Collections.shuffle(pwdChars);
         return pwdChars.stream()
