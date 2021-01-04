@@ -17,7 +17,7 @@ variables:
   jsonLocation: /site/wwwroot
   
   artifactName: drop
-  userRepoName: user
+  userRepoName: core
   onbootJarName: app.jar
   
   azureSub: GreenCity
