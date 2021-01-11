@@ -22,7 +22,6 @@
         <module>service</module>
         <module>service-api</module>
         <module>dao</module>
-        <module>email</module>
     </modules>
 
     <properties>
