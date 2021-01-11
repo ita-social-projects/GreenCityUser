@@ -62,7 +62,7 @@ class EmailServiceImplTest {
     @CsvSource(value = {"1, Test, test@gmail.com, token, ru",
         "1, Test, test@gmail.com, token, ua",
         "1, Test, test@gmail.com, token, en"})
-    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language) {
+    void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language) {
         service.sendRestoreEmail(userId, userName, userEmail, token, language);
 
         verify(javaMailSender).createMimeMessage();
