@@ -22,6 +22,10 @@
     <artifactId>core</artifactId>
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <dependency>
             <groupId>greencity</groupId>
             <artifactId>service-api</artifactId>
             <version>${project.version}</version>
