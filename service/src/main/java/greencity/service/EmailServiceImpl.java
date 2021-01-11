@@ -146,5 +146,4 @@ public class EmailServiceImpl implements EmailService {
         }
         executor.execute(() -> javaMailSender.send(mimeMessage));
     }
-
 }

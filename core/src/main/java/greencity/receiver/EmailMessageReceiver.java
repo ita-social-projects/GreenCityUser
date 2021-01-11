@@ -64,5 +64,4 @@ public class EmailMessageReceiver {
     public void sendRegistrationApprovalEmail(UserApprovalMessage message) {
         emailService.sendApprovalEmail(message.getId(), message.getName(), message.getEmail(), message.getToken());
     }
-
 }

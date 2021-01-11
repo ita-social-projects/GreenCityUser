@@ -4,7 +4,6 @@ package greencity.service;
  * Provides the interface to manage sending emails to {@code User}.
  */
 public interface EmailService {
-
     /**
      * Method for sending verification email to {@link User}.
      *
@@ -36,5 +35,4 @@ public interface EmailService {
      * @param token        password recovery token.
      */
     void sendRestoreEmail(Long userId, String userFistName, String userEmail, String token, String language);
-
 }
