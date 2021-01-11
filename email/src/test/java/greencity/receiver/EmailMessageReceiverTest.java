@@ -42,7 +42,7 @@ class EmailMessageReceiverTest {
         receiver.sendVerifyEmail(vem);
         verify(service)
             .sendVerificationEmail(vem.getId(), vem.getName(), vem.getEmail(),
-                 vem.getToken(), vem.getLanguage());
+                vem.getToken(), vem.getLanguage());
     }
 
     @Test
