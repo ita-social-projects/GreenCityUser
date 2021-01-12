@@ -509,4 +509,21 @@ public class UserController {
         Long userId, Pageable pageable) {
         return userService.getAllFriendsWithTheOnlineStatus(userId, pageable);
     }
+
+    /**
+     * Method find user by principal.
+     *
+     * @return {@link ResponseEntity}.
+     * @author Orest Mamchuk
+     */
+    @ApiOperation(value = "Find current user by principal")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/findByEmail")
+    public ResponseEntity<UserVO> findByEmail(@RequestParam String email) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findByEmail(email));
+    }
 }
