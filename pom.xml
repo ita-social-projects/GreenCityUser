@@ -18,7 +18,10 @@
     <description>Project named Green City User by SoftServe ITA</description>
 
     <modules>
-        <module>user</module>
+        <module>core</module>
+        <module>service</module>
+        <module>service-api</module>
+        <module>dao</module>
     </modules>
 
     <properties>
