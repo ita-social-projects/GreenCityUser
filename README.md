@@ -1,4 +1,4 @@
-# GreenCityUser [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects-green-city-user&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects-green-city-user)
+# GreenCityUser [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects-green-city-user&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects-green-city-user) [![Github Issues](https://img.shields.io/github/issues/ita-social-projects/GreenCity?style=flat-square)](https://github.com/ita-social-projects/GreenCity/issues) [![Pending Pull-Requests](https://img.shields.io/github/issues-pr/ita-social-projects/GreenCityUser?style=flat-square)](https://github.com/ita-social-projects/GreenCityUser/pulls)
 
 ## 1. About the project
 
