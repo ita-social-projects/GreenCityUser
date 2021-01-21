@@ -144,10 +144,10 @@ class UserControllerTest {
         int pageNumber = 0;
         int pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/friends/", 1))
+        mockMvc.perform(get(userLink + "/{userId}/findAll/friends/", 1))
             .andExpect(status().isOk());
 
-        verify(userService).findAllUsersFriends(eq(pageable), eq(1L));
+        verify(userService).findAllUsersFriends(pageable, 1L);
     }
 
     @Test

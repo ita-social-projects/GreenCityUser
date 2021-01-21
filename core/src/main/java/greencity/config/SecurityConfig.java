@@ -117,7 +117,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/userAndSixFriendsWithOnlineStatus",
                 "/user/userAndAllFriendsWithOnlineStatus",
                 "/user/{userId}/recommendedFriends/",
-                "/user/{userId}/friends/",
+                "/user/{userId}/findAll/friends/",
                 "/user/{userId}/friendRequests/",
                 "/user/findByIdForAchievement",
                 "/user/findNotDeactivatedByEmail",
