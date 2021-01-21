@@ -3,6 +3,7 @@ package greencity.security.controller;
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
 import greencity.constant.HttpStatuses;
+import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
@@ -194,6 +195,25 @@ public class OwnSecurityController {
         @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
         service.updateCurrentPassword(updateDto, email);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Register new user from admin panel.
+     *
+     * @param userDto - dto with info for registering user.
+     * @return - {@link ResponseEntity}
+     * @author Orest Mamchuk
+     */
+    @ApiOperation("Register new user.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @PostMapping("/register")
+    public ResponseEntity<Object> managementRegisterUser(@Valid @RequestBody UserManagementDto userDto) {
+        service.managementRegisterUser(userDto);
         return ResponseEntity.ok().build();
     }
 }

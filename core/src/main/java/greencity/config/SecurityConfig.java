@@ -118,7 +118,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/userAndAllFriendsWithOnlineStatus",
                 "/user/{userId}/recommendedFriends/",
                 "/user/{userId}/friends/",
-                "/user/{userId}/friendRequests/")
+                "/user/{userId}/friendRequests/",
+                "/user/findByIdForAchievement",
+                "/user/findNotDeactivatedByEmail",
+                "/user/findIdByEmail")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
                 "/user/goals",
@@ -129,7 +132,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PUT,
                 "/ownSecurity",
-                "/user/profile")
+                "/user/profile",
+                "/user/{id}/updateUserLastActivityTime/{date}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PATCH,
                 "/user/goals/{userGoalId}",
@@ -143,10 +147,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.GET,
                 "/user/all",
-                "/user/roles")
+                "/user/roles",
+                "/user/findById",
+                "/user/findUserForManagement",
+                "/user/searchBy",
+                "/user/findAll",
+                "/user/{id}/friends")
             .hasAnyRole(ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
-                "/user/filter")
+                "/user/filter",
+                "/ownSecurity/register")
+            .hasRole(ADMIN)
+            .antMatchers(HttpMethod.PUT,
+                "/user")
             .hasRole(ADMIN)
             .antMatchers(HttpMethod.PATCH,
                 "/user",

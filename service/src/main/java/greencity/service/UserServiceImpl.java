@@ -304,7 +304,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Optional<UserVO> findNotDeactivatedByEmail(String email) {
-        return Optional.of(modelMapper.map(userRepo.findNotDeactivatedByEmail(email), UserVO.class));
+        Optional<User> notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email);
+        Optional<UserVO> map = Optional.of(modelMapper.map(notDeactivatedByEmail, UserVO.class));
+        return map;
     }
 
     /**
