@@ -18,6 +18,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
@@ -29,7 +30,8 @@ import static org.mockito.Mockito.when;
 class RestClientTest {
     @Mock
     private RestTemplate restTemplate;
-
+    @Mock
+    private HttpServletRequest httpServletRequest;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
     @InjectMocks
@@ -45,11 +47,12 @@ class RestClientTest {
         CustomGoalResponseDto customGoalResponseDto = new CustomGoalResponseDto(1L, "test");
         CustomGoalResponseDto[] customGoalResponseDtos = new CustomGoalResponseDto[1];
         customGoalResponseDtos[0] = customGoalResponseDto;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.CUSTOM_GOALS + userId, HttpMethod.GET, entity, CustomGoalResponseDto[].class))
                 .thenReturn(ResponseEntity.ok(customGoalResponseDtos));
 
-        assertEquals(Arrays.asList(customGoalResponseDtos), restClient.getAllAvailableCustomGoals(userId, entity));
+        assertEquals(Arrays.asList(customGoalResponseDtos), restClient.getAllAvailableCustomGoals(userId));
     }
 
     @Test
@@ -60,12 +63,13 @@ class RestClientTest {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         when(restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.FILES_CONVERT + RestTemplateLinks.IMAGE
             + profilePicturePath, HttpMethod.POST, entity, MultipartFile.class))
                 .thenReturn(ResponseEntity.ok(image));
-        assertEquals(image, restClient.convertToMultipartImage(profilePicturePath, entity));
+        assertEquals(image, restClient.convertToMultipartImage(profilePicturePath));
     }
 
     @Test
@@ -79,9 +83,10 @@ class RestClientTest {
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
         map.add(IMAGES, image);
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.postForObject(greenCityServerAddress
             + RestTemplateLinks.FILES_IMAGE, requestEntity, String.class)).thenReturn(imagePath);
-        assertEquals(imagePath, restClient.uploadImage(image, headers));
+        assertEquals(imagePath, restClient.uploadImage(image));
     }
 
     @Test
@@ -91,10 +96,11 @@ class RestClientTest {
         headers.set(AUTHORIZATION, accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long socialNetworkId = 1L;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.SOCIAL_NETWORKS + RestTemplateLinks.ID + socialNetworkId,
             HttpMethod.DELETE, entity, Long.class)).thenReturn(ResponseEntity.ok(socialNetworkId));
-        assertEquals(socialNetworkId, restClient.deleteSocialNetwork(entity, socialNetworkId));
+        assertEquals(socialNetworkId, restClient.deleteSocialNetwork(socialNetworkId));
     }
 
     @Test
@@ -108,10 +114,11 @@ class RestClientTest {
         socialNetworkImageVO.setId(1L);
         socialNetworkImageVO.setHostPath("test");
         socialNetworkImageVO.setImagePath("http:");
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.SOCIAL_NETWORKS_IMAGE + RestTemplateLinks.URL + url,
             HttpMethod.GET, entity, SocialNetworkImageVO.class)).thenReturn(ResponseEntity.ok(socialNetworkImageVO));
-        assertEquals(socialNetworkImageVO, restClient.getSocialNetworkImageByUrl(entity, url));
+        assertEquals(socialNetworkImageVO, restClient.getSocialNetworkImageByUrl(url));
     }
 
     @Test
@@ -122,10 +129,11 @@ class RestClientTest {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long publishedNews = 5L;
         Long userId = 1L;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.ECONEWS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class))
                 .thenReturn(ResponseEntity.ok(publishedNews));
-        assertEquals(publishedNews, restClient.findAmountOfPublishedNews(userId, entity));
+        assertEquals(publishedNews, restClient.findAmountOfPublishedNews(userId));
     }
 
     @Test
@@ -136,10 +144,11 @@ class RestClientTest {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long writtenTipsAndTrick = 5L;
         Long userId = 1L;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.TIPSANDTRICKS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity,
             Long.class)).thenReturn(ResponseEntity.ok(writtenTipsAndTrick));
-        assertEquals(writtenTipsAndTrick, restClient.findAmountOfWrittenTipsAndTrick(userId, entity));
+        assertEquals(writtenTipsAndTrick, restClient.findAmountOfWrittenTipsAndTrick(userId));
     }
 
     @Test
@@ -150,10 +159,11 @@ class RestClientTest {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long acquiredHabits = 5L;
         Long userId = 1L;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.HABIT_STATISTIC_ACQUIRED_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
             entity, Long.class)).thenReturn(ResponseEntity.ok(acquiredHabits));
-        assertEquals(acquiredHabits, restClient.findAmountOfAcquiredHabits(userId, entity));
+        assertEquals(acquiredHabits, restClient.findAmountOfAcquiredHabits(userId));
     }
 
     @Test
@@ -164,10 +174,11 @@ class RestClientTest {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long habitsInProgress = 5L;
         Long userId = 1L;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
             entity, Long.class)).thenReturn(ResponseEntity.ok(habitsInProgress));
-        assertEquals(habitsInProgress, restClient.findAmountOfHabitsInProgress(userId, entity));
+        assertEquals(habitsInProgress, restClient.findAmountOfHabitsInProgress(userId));
     }
 
     @Test

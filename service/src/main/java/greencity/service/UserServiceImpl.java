@@ -33,14 +33,7 @@ import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadUpdateRequestException;
-import greencity.exception.exceptions.CheckRepeatingValueException;
-import greencity.exception.exceptions.LowRoleLevelException;
-import greencity.exception.exceptions.NotDeletedException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongIdException;
+import greencity.exception.exceptions.*;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -52,8 +45,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -65,8 +56,6 @@ import java.time.ZonedDateTime;
 import java.util.*;
 //import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static greencity.constant.AppConstant.AUTHORIZATION;
 
 /**
  * The class provides implementation of the {@code UserService}.
@@ -214,7 +203,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<UserManagementDto> findUserFriendsByUserId(Long id) {
-        return modelMapper.map(userRepo.findUsersFriendsById(id),
+        return modelMapper.map(userRepo.getAllUserFriends(id),
             new TypeToken<List<UserManagementDto>>() {
             }.getType());
     }
@@ -252,8 +241,67 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
+    public void acceptFriendRequest(Long userId, Long friendId) {
+        checkFriendRequest(userId, friendId);
+        userRepo.acceptFriendRequest(userId, friendId);
+    }
+
+    private void checkFriendRequest(Long userId, Long friendId) {
+        if (userId.equals(friendId)) {
+            throw new CheckRepeatingValueException(ErrorMessage.OWN_USER_ID + friendId);
+        }
+        UserVO friend = findById(friendId);
+        List<UserVO> users = getAllUserFriendRequests(userId);
+        if (!users.contains(friend)) {
+            throw new UserHasNoRequestException(ErrorMessage.NOT_FOUND_REQUEST + friendId);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public void declineFriendRequest(Long userId, Long friendId) {
+        checkFriendRequest(userId, friendId);
+        userRepo.declineFriendRequest(userId, friendId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public PageableDto<RecommendedFriendDto> getAllUserFriendRequests(Long userId, Pageable pageable) {
+        Page<User> friendsRequests = userRepo.getAllUserFriendRequests(userId, pageable);
+        List<RecommendedFriendDto> friendDtos = modelMapper.map(friendsRequests.getContent(),
+            new TypeToken<List<RecommendedFriendDto>>() {
+            }.getType());
+        return new PageableDto<>(
+            friendDtos,
+            friendsRequests.getTotalElements(),
+            friendsRequests.getPageable().getPageNumber(),
+            friendsRequests.getTotalPages());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserVO> getAllUserFriendRequests(Long userId) {
+        List<User> allUserFriends = userRepo.getAllUserFriendRequests(userId);
+        return modelMapper.map(allUserFriends, new TypeToken<List<UserVO>>() {
+        }.getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Optional<UserVO> findNotDeactivatedByEmail(String email) {
-        return Optional.of(modelMapper.map(userRepo.findNotDeactivatedByEmail(email), UserVO.class));
+        Optional<User> notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email);
+        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVO.class));
     }
 
     /**
@@ -412,9 +460,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId, String accessToken) {
-        final HttpEntity<String> entity = setHeader(accessToken);
-        return restClient.getAllAvailableCustomGoals(userId, entity);
+    public List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId) {
+        return restClient.getAllAvailableCustomGoals(userId);
     }
 
     /**
@@ -449,18 +496,15 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserVO updateUserProfilePicture(MultipartFile image, String email,
-        UserProfilePictureDto userProfilePictureDto, String accessToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        final HttpEntity<String> entity = new HttpEntity<>(headers);
+        UserProfilePictureDto userProfilePictureDto) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         if (userProfilePictureDto.getProfilePicturePath() != null) {
-            image = restClient.convertToMultipartImage(userProfilePictureDto.getProfilePicturePath(), entity);
+            image = restClient.convertToMultipartImage(userProfilePictureDto.getProfilePicturePath());
         }
         if (image != null) {
-            String profilePicturePath = restClient.uploadImage(image, headers);
+            String profilePicturePath = restClient.uploadImage(image);
             user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
@@ -605,9 +649,7 @@ public class UserServiceImpl implements UserService {
      * @author Marian Datsko
      */
     @Override
-    public UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String email,
-        String accessToken) {
-        final HttpEntity<String> entity = setHeader(accessToken);
+    public UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String email) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
@@ -615,14 +657,14 @@ public class UserServiceImpl implements UserService {
         user.setCity(userProfileDtoRequest.getCity());
         user.setUserCredo(userProfileDtoRequest.getUserCredo());
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
-        socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(entity, socialNetwork.getId()));
+        socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
         user.getSocialNetworks().clear();
         user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
             .stream()
             .map(url -> SocialNetwork.builder()
                 .url(url)
                 .user(user)
-                .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(entity, url),
+                .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
                     SocialNetworkImage.class))
                 .build())
             .collect(Collectors.toList()));
@@ -694,12 +736,11 @@ public class UserServiceImpl implements UserService {
      * @author Marian Datsko
      */
     @Override
-    public UserProfileStatisticsDto getUserProfileStatistics(Long userId, String accessToken) {
-        final HttpEntity<String> entity = setHeader(accessToken);
-        Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId, entity);
-        Long amountOfWrittenTipsAndTrickByUserId = restClient.findAmountOfWrittenTipsAndTrick(userId, entity);
-        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId, entity);
-        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId, entity);
+    public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
+        Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
+        Long amountOfWrittenTipsAndTrickByUserId = restClient.findAmountOfWrittenTipsAndTrick(userId);
+        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
+        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountWrittenTipsAndTrick(amountOfWrittenTipsAndTrickByUserId)
@@ -829,17 +870,5 @@ public class UserServiceImpl implements UserService {
             page.hasNext(),
             page.isFirst(),
             page.isLast());
-    }
-
-    /**
-     * Method makes headers for RestTemplate.
-     *
-     * @param accessToken for authorization
-     * @return {@link HttpEntity}
-     */
-    private HttpEntity<String> setHeader(String accessToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        return new HttpEntity<>(headers);
     }
 }
