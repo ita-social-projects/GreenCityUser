@@ -144,10 +144,10 @@ class UserControllerTest {
         int pageNumber = 0;
         int pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/friends/", 1))
+        mockMvc.perform(get(userLink + "/{userId}/findAll/friends/", 1))
             .andExpect(status().isOk());
 
-        verify(userService).findAllUsersFriends(eq(pageable), eq(1L));
+        verify(userService).findAllUsersFriends(pageable, 1L);
     }
 
     @Test
@@ -243,7 +243,7 @@ class UserControllerTest {
             .headers(headers))
             .andExpect(status().isOk());
 
-        verify(userService).getAvailableCustomGoals(eq(1L), eq("accessToken"));
+        verify(userService).getAvailableCustomGoals(1L);
     }
 
     @Test
@@ -271,7 +271,7 @@ class UserControllerTest {
 
         when(principal.getName()).thenReturn("testmail@gmail.com");
         when(userService.updateUserProfilePicture(null, "testmail@gmail.com",
-            ModelUtils.getUserProfilePictureDto(), "accessToken")).thenReturn(user);
+            ModelUtils.getUserProfilePictureDto())).thenReturn(user);
 
         MockMultipartHttpServletRequestBuilder builder =
             MockMvcRequestBuilders.multipart(userLink + "/profilePicture");
@@ -351,7 +351,7 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/{userId}/profileStatistics/", 1)
             .headers(headers))
             .andExpect(status().isOk());
-        verify(userService).getUserProfileStatistics(eq(1L), eq("accessToken"));
+        verify(userService).getUserProfileStatistics((1L));
     }
 
     @Test
@@ -383,6 +383,6 @@ class UserControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         UserProfileDtoRequest dto = mapper.readValue(json, UserProfileDtoRequest.class);
 
-        verify(userService).saveUserProfile(eq(dto), eq("testmail@gmail.com"), eq("accessToken"));
+        verify(userService).saveUserProfile(eq(dto), eq("testmail@gmail.com"));
     }
 }

@@ -413,7 +413,7 @@ class UserServiceImplTest {
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         assertThrows(BadRequestException.class,
             () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
-                userProfilePictureDto, "accessToken"));
+                userProfilePictureDto));
     }
 
     @Test
@@ -806,15 +806,11 @@ class UserServiceImplTest {
 
     @Test
     void getAvailableCustomGoals() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
         CustomGoalResponseDto customGoalResponseDto = new CustomGoalResponseDto(1L, "test");
-        when(restClient.getAllAvailableCustomGoals(userId, entity))
+        when(restClient.getAllAvailableCustomGoals(userId))
             .thenReturn(Collections.singletonList(customGoalResponseDto));
 
         assertEquals(Collections.singletonList(customGoalResponseDto),
-            userService.getAvailableCustomGoals(userId, accessToken));
+            userService.getAvailableCustomGoals(userId));
     }
 }
