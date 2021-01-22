@@ -45,8 +45,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,8 +56,6 @@ import java.time.ZonedDateTime;
 import java.util.*;
 //import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static greencity.constant.AppConstant.AUTHORIZATION;
 
 /**
  * The class provides implementation of the {@code UserService}.
