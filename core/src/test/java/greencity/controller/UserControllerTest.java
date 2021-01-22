@@ -243,7 +243,7 @@ class UserControllerTest {
             .headers(headers))
             .andExpect(status().isOk());
 
-        verify(userService).getAvailableCustomGoals(eq(1L));
+        verify(userService).getAvailableCustomGoals(1L);
     }
 
     @Test
@@ -351,7 +351,7 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/{userId}/profileStatistics/", 1)
             .headers(headers))
             .andExpect(status().isOk());
-        verify(userService).getUserProfileStatistics(eq(1L));
+        verify(userService).getUserProfileStatistics((1L));
     }
 
     @Test

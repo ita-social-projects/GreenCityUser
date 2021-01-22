@@ -44,6 +44,7 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTool jwtTool;
     private final UserService userService;
+    private static final String USER_LINK = "/user";
 
     /**
      * Constructor.
@@ -106,7 +107,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/ownSecurity/changePassword")
             .permitAll()
             .antMatchers(HttpMethod.GET,
-                "/user",
+                USER_LINK,
                 "/user/goals/habits/{habitId}/shopping-list",
                 "/user/{userId}/customGoals/available",
                 "/user/{userId}/sixUserFriends/",
@@ -159,10 +160,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/ownSecurity/register")
             .hasRole(ADMIN)
             .antMatchers(HttpMethod.PUT,
-                "/user")
+                USER_LINK)
             .hasRole(ADMIN)
             .antMatchers(HttpMethod.PATCH,
-                "/user",
+                USER_LINK,
                 "/user/status",
                 "/user/role",
                 "/user/update/role")

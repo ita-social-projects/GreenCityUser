@@ -875,16 +875,4 @@ public class UserServiceImpl implements UserService {
             page.isFirst(),
             page.isLast());
     }
-
-    /**
-     * Method makes headers for RestTemplate.
-     *
-     * @param accessToken for authorization
-     * @return {@link HttpEntity}
-     */
-    private HttpEntity<String> setHeader(String accessToken) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        return new HttpEntity<>(headers);
-    }
 }
