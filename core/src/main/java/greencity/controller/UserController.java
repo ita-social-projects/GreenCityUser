@@ -35,10 +35,8 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
 
@@ -230,11 +228,10 @@ public class UserController {
     })
     @GetMapping("/{userId}/customGoals/available")
     public ResponseEntity<List<CustomGoalResponseDto>> getAvailableCustomGoals(
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId,
-        @ApiIgnore @RequestHeader(AUTHORIZATION) String accessToken) {
+        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(userService.getAvailableCustomGoals(userId, accessToken));
+            .body(userService.getAvailableCustomGoals(userId));
     }
 
     /**
@@ -275,10 +272,9 @@ public class UserController {
         @ApiParam(value = SwaggerExampleModel.USER_PROFILE_PICTURE_DTO,
             required = true) @RequestPart UserProfilePictureDto userProfilePictureDto,
         @ApiParam(value = "Profile picture") @ImageValidation @RequestPart(required = false) MultipartFile image,
-        @ApiIgnore @AuthenticationPrincipal Principal principal,
-        @ApiIgnore @RequestHeader(AUTHORIZATION) String accessToken) {
+        @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
-        userService.updateUserProfilePicture(image, email, userProfilePictureDto, accessToken);
+        userService.updateUserProfilePicture(image, email, userProfilePictureDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -485,9 +481,9 @@ public class UserController {
     @PutMapping(path = "/profile")
     public ResponseEntity<UserProfileDtoResponse> save(
         @ApiParam(required = true) @RequestBody @Valid UserProfileDtoRequest userProfileDtoRequest,
-        @ApiIgnore Principal principal, @ApiIgnore @RequestHeader(AUTHORIZATION) String accessToken) {
+        @ApiIgnore Principal principal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-            userService.saveUserProfile(userProfileDtoRequest, principal.getName(), accessToken));
+            userService.saveUserProfile(userProfileDtoRequest, principal.getName()));
     }
 
     /**
@@ -544,10 +540,9 @@ public class UserController {
     })
     @GetMapping("/{userId}/profileStatistics/")
     public ResponseEntity<UserProfileStatisticsDto> getUserProfileStatistics(
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId,
-        @ApiIgnore @RequestHeader(AUTHORIZATION) String accessToken) {
+        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.getUserProfileStatistics(userId, accessToken));
+            .body(userService.getUserProfileStatistics(userId));
     }
 
     /**
@@ -728,8 +723,8 @@ public class UserController {
     })
     @GetMapping("/findNotDeactivatedByEmail")
     public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
-        UserVO t = userService.findNotDeactivatedByEmail(email).get();
-        return ResponseEntity.status(HttpStatus.OK).body(t);
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(userService.findNotDeactivatedByEmail(email).orElse(null));
     }
 
     /**

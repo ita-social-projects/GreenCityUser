@@ -196,7 +196,7 @@ public interface UserService {
      * @return List of {@link CustomGoalResponseDto}
      * @author Bogdan Kuzenko
      */
-    List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId, String accessToken);
+    List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId);
 
     /**
      * Counts all users by user {@link UserStatus} ACTIVATED.
@@ -224,7 +224,7 @@ public interface UserService {
      * @author Marian Datsko
      */
     UserVO updateUserProfilePicture(MultipartFile image, String email,
-        UserProfilePictureDto userProfilePictureDto, String accessToken);
+        UserProfilePictureDto userProfilePictureDto);
 
     /**
      * Delete user profile picture {@link UserVO}.
@@ -282,8 +282,7 @@ public interface UserService {
      *
      * @author Marian Datsko
      */
-    UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name,
-        String accessToken);
+    UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
 
     /**
      * Updates last activity time for a given user.
@@ -316,7 +315,7 @@ public interface UserService {
      * @param userId - {@link UserVO}'s id
      * @author Marian Datsko
      */
-    UserProfileStatisticsDto getUserProfileStatistics(Long userId, String accessToken);
+    UserProfileStatisticsDto getUserProfileStatistics(Long userId);
 
     /**
      * Get user and six friends with the online status {@link UserVO}.

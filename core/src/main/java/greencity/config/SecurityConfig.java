@@ -98,8 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/activatedUsersAmount",
                 "/user/{userId}/habit/assign",
                 "/token",
-                "/socket/**",
-                "/user/findByEmail")
+                "/socket/**")
             .permitAll()
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
@@ -121,6 +120,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{userId}/friendRequests/",
                 "/user/findByIdForAchievement",
                 "/user/findNotDeactivatedByEmail",
+                "/user/findByEmail",
                 "/user/findIdByEmail")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
