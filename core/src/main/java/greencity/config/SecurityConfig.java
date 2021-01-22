@@ -117,15 +117,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/userAndSixFriendsWithOnlineStatus",
                 "/user/userAndAllFriendsWithOnlineStatus",
                 "/user/{userId}/recommendedFriends/",
-                "/user/{userId}/friends/",
-                "/user/{userId}/friendRequests/")
+                "/user/{userId}/friends/")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
                 "/user/goals",
                 "/user/{userId}/habit",
-                "/user/{userId}/userFriend/{friendId}",
-                "/user/{userId}/declineFriend/{friendId}",
-                "/user/{userId}/acceptFriend/{friendId}")
+                "/user/{userId}/userFriend/{friendId}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PUT,
                 "/ownSecurity",
