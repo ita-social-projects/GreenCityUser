@@ -38,8 +38,6 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 
-import static greencity.constant.AppConstant.AUTHORIZATION;
-
 @RestController
 @RequestMapping("/user")
 @AllArgsConstructor
