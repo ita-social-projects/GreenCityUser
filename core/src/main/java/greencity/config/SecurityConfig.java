@@ -44,6 +44,7 @@ import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTool jwtTool;
     private final UserService userService;
+    private static final String USER_LINK = "/user";
 
     /**
      * Constructor.
@@ -98,8 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/activatedUsersAmount",
                 "/user/{userId}/habit/assign",
                 "/token",
-                "/socket/**",
-                "/user/findByEmail")
+                "/socket/**")
             .permitAll()
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
@@ -107,7 +107,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/ownSecurity/changePassword")
             .permitAll()
             .antMatchers(HttpMethod.GET,
-                "/user",
+                USER_LINK,
                 "/user/goals/habits/{habitId}/shopping-list",
                 "/user/{userId}/customGoals/available",
                 "/user/{userId}/sixUserFriends/",
@@ -117,16 +117,24 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/userAndSixFriendsWithOnlineStatus",
                 "/user/userAndAllFriendsWithOnlineStatus",
                 "/user/{userId}/recommendedFriends/",
-                "/user/{userId}/friends/")
+                "/user/{userId}/findAll/friends/",
+                "/user/{userId}/friendRequests/",
+                "/user/findByIdForAchievement",
+                "/user/findNotDeactivatedByEmail",
+                "/user/findByEmail",
+                "/user/findIdByEmail")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
                 "/user/goals",
                 "/user/{userId}/habit",
-                "/user/{userId}/userFriend/{friendId}")
+                "/user/{userId}/userFriend/{friendId}",
+                "/user/{userId}/declineFriend/{friendId}",
+                "/user/{userId}/acceptFriend/{friendId}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PUT,
                 "/ownSecurity",
-                "/user/profile")
+                "/user/profile",
+                "/user/{id}/updateUserLastActivityTime/{date}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PATCH,
                 "/user/goals/{userGoalId}",
@@ -140,13 +148,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.GET,
                 "/user/all",
-                "/user/roles")
+                "/user/roles",
+                "/user/findById",
+                "/user/findUserForManagement",
+                "/user/searchBy",
+                "/user/findAll",
+                "/user/{id}/friends")
             .hasAnyRole(ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
-                "/user/filter")
+                "/user/filter",
+                "/ownSecurity/register")
+            .hasRole(ADMIN)
+            .antMatchers(HttpMethod.PUT,
+                USER_LINK)
             .hasRole(ADMIN)
             .antMatchers(HttpMethod.PATCH,
-                "/user",
+                USER_LINK,
                 "/user/status",
                 "/user/role",
                 "/user/update/role")

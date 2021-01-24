@@ -58,7 +58,7 @@ import java.util.List;
 @Table(name = "users")
 @EqualsAndHashCode(
     exclude = {"lastVisit", "verifyEmail", "ownSecurity",
-        "refreshTokenKey", "restorePasswordEmail"})
+        "refreshTokenKey", "restorePasswordEmail", "userFriends"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

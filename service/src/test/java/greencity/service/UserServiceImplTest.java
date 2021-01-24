@@ -25,14 +25,7 @@ import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadUpdateRequestException;
-import greencity.exception.exceptions.CheckRepeatingValueException;
-import greencity.exception.exceptions.LowRoleLevelException;
-import greencity.exception.exceptions.NotDeletedException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongIdException;
+import greencity.exception.exceptions.*;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -420,7 +413,7 @@ class UserServiceImplTest {
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         assertThrows(BadRequestException.class,
             () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
-                userProfilePictureDto, "accessToken"));
+                userProfilePictureDto));
     }
 
     @Test
@@ -493,8 +486,74 @@ class UserServiceImplTest {
     }
 
     @Test
+    void acceptFriendRequestTest() {
+        List<User> users = Collections.singletonList(user2);
+        List<UserVO> usersVO = Collections.singletonList(userVO);
+        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
+        when(userRepo.getAllUserFriendRequests(1L))
+            .thenReturn(users);
+        when(modelMapper.map(users,
+            new TypeToken<List<UserVO>>() {
+            }.getType())).thenReturn(usersVO);
+
+        userService.acceptFriendRequest(1L, 2L);
+        verify(userRepo).acceptFriendRequest(1L, 2L);
+    }
+
+    @Test
+    void acceptFriendRequestUserHasNoRequestExceptionTest() {
+        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
+        when(userRepo.getAllUserFriendRequests(any())).thenReturn(Collections.emptyList());
+        when(modelMapper.map(Collections.emptyList(),
+            new TypeToken<List<UserVO>>() {
+            }.getType())).thenReturn(Collections.emptyList());
+        assertThrows(UserHasNoRequestException.class, () -> userService.acceptFriendRequest(1L, 2L));
+    }
+
+    @Test
+    void declineFriendRequestTest() {
+        List<User> users = Collections.singletonList(user2);
+        List<UserVO> usersVO = Collections.singletonList(userVO);
+        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
+        when(userRepo.getAllUserFriendRequests(1L))
+            .thenReturn(users);
+        when(modelMapper.map(users,
+            new TypeToken<List<UserVO>>() {
+            }.getType())).thenReturn(usersVO);
+
+        userService.declineFriendRequest(1L, 2L);
+        verify(userRepo).declineFriendRequest(1L, 2L);
+    }
+
+    @Test
+    void acceptFriendRequestCheckRepeatingValueExceptionWithSameIdTest() {
+        assertThrows(CheckRepeatingValueException.class, () -> userService.acceptFriendRequest(1L, 1L));
+    }
+
+    @Test
     void getSixFriendsWithTheHighestRatingExceptionTest() {
         assertThrows(NotFoundException.class, () -> userService.getSixFriendsWithTheHighestRating(1L));
+    }
+
+    @Test
+    void getAllUserFriendRequestsTest() {
+        List<User> singletonList = Collections.singletonList(ModelUtils.getUser());
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
+        List<RecommendedFriendDto> dtoList =
+            Collections.singletonList(ModelUtils.getRecommendedFriendDto());
+        PageableDto<RecommendedFriendDto> pageableDto =
+            new PageableDto<>(dtoList, dtoList.size(), 0, 1);
+
+        when(userRepo.getAllUserFriendRequests(userId, pageRequest)).thenReturn(page);
+        when(modelMapper.map(singletonList, new TypeToken<List<RecommendedFriendDto>>() {
+        }.getType())).thenReturn(dtoList);
+        PageableDto<RecommendedFriendDto> actual = userService.getAllUserFriendRequests(1L, pageRequest);
+
+        assertEquals(pageableDto, actual);
     }
 
     @Test
@@ -747,15 +806,11 @@ class UserServiceImplTest {
 
     @Test
     void getAvailableCustomGoals() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
         CustomGoalResponseDto customGoalResponseDto = new CustomGoalResponseDto(1L, "test");
-        when(restClient.getAllAvailableCustomGoals(userId, entity))
+        when(restClient.getAllAvailableCustomGoals(userId))
             .thenReturn(Collections.singletonList(customGoalResponseDto));
 
         assertEquals(Collections.singletonList(customGoalResponseDto),
-            userService.getAvailableCustomGoals(userId, accessToken));
+            userService.getAvailableCustomGoals(userId));
     }
 }
