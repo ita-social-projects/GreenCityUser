@@ -1,4 +1,5 @@
 # GreenCityUser    [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ita-social-projects/GreenCityUser/blob/dev/LICENSE)  [![Build Status](https://travis-ci.com/ita-social-projects/GreenCity.svg?branch=master)](https://travis-ci.com/ita-social-projects/GreenCity) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects-green-city-user&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects-green-city-user)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects-green-city-user&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects-green-city-user) [![Github Issues](https://img.shields.io/github/issues/ita-social-projects/GreenCity?style=flat-square)](https://github.com/ita-social-projects/GreenCity/issues) [![Pending Pull-Requests](https://img.shields.io/github/issues-pr/ita-social-projects/GreenCityUser?style=flat-square)](https://github.com/ita-social-projects/GreenCityUser/pulls)
 
 
 
@@ -11,9 +12,10 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
+
 ## 1. About the project
 
-The main aim of “GreenCity” project is to teach people in a playful and challenging way to have an eco-friendly lifestyle. A user can view on the map places that have some eco-initiatives or suggest discounts for being environmentally aware (for instance, coffee shops that give a discount if a customer comes with their own cup). А user can start doing an environment-friendly habit and track their progress with a habit tracker.
+The main aim of “GreenCity” project is to teach people in a playful and challenging way to have an eco-friendly lifestyle. A user can view on the map places that have some eco-initiatives or suggest discounts for being environmentally aware (for instance, coffee shops that give a discount if a customer comes with their own cup). А user can start doing an environment-friendly habit and track their progress with a habit tracker. "GreenCityUser" is a microservice which contains information about users.
 
 ## 2. Where to find front-end part of the project
 
@@ -27,7 +29,7 @@ You're encouraged to contribute to our project if you've found any issues or mis
 
 Before sending any pull request, please discuss requirements/changes to be implemented using an existing issue or by creating a new one. All pull requests should be done into `dev` branch.
 
-Though there are two GitHub projects ([GreenCity](https://github.com/ita-social-projects/GreenCity) for back-end part and [GreenCityClient](https://github.com/ita-social-projects/GreenCityClient) for front-end part) all of the issues are listed in the first one - [GreenCity](https://github.com/ita-social-projects/GreenCity).
+Though there are three GitHub projects ([GreenCity](https://github.com/ita-social-projects/GreenCity) and [GreenCityUser](https://github.com/ita-social-projects/GreenCityUser) for back-end part and [GreenCityClient](https://github.com/ita-social-projects/GreenCityClient) for front-end part) all of the issues are listed in the first one - [GreenCity](https://github.com/ita-social-projects/GreenCity).
 
 **NOTE: make sure that your code passes checkstyle. Otherwise your pull request will be declined**. See paragraph [Setup Checkstyle](#5-setup-checkstyle).
 
@@ -35,7 +37,7 @@ Though there are two GitHub projects ([GreenCity](https://github.com/ita-social-
 
 ### 4.1. Required to install
 
-* Java 8
+* Java 11
 * PostgreSQL 9.5 or higher
 
 ### 4.2. How to run
@@ -69,13 +71,13 @@ greencity.server.address = ${GREENCITY_SERVER_ADDRESS}
 
 ![env-vars](./docs-photos/env-example.png)
 
-3. If you did everything correctly, you should be able access swagger by this URL: http://localhost:8080/swagger-ui.html#/
+3. If you did everything correctly, you should be able access swagger by this URL: http://localhost:8060/swagger-ui.html#/
 
 ### 4.3. How to work with swagger UI in our project
 
 1. Run GreenCity project (look up paragraph [How to run](#42-how-to-run)).
 
-2. Use the following link to open Swagger UI: http://localhost:8080/swagger-ui.html#/
+2. Use the following link to open Swagger UI: http://localhost:8060/swagger-ui.html#/
 
 3. Use POST method with `/ownSecurity/signUp` to create an account. If you set a valid email credentials, you should receive an email with verification link. Verify the registration by following that link. We highly recommend to use gmail, it's free of charge and easy to get going: [how to allow email sending from gmail](https://support.google.com/accounts/answer/6010255?authuser=2&p=less-secure-apps&hl=en&authuser=2&visit_id=637098532320915318-4087823934&rd=1),  [Google client id](https://developers.google.com/adwords/api/docs/guides/authentication). Alternatively you can drop a record in `verify_email` table on your local database.
 
