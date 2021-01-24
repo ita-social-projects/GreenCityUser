@@ -1,4 +1,4 @@
-# GreenCityUser    [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ita-social-projects/GreenCity/blob/master/LICENSE)  [![Build Status](https://travis-ci.com/ita-social-projects/GreenCity.svg?branch=master)](https://travis-ci.com/ita-social-projects/GreenCity) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects-green-city-user&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects-green-city-user)
+# GreenCityUser    [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/ita-social-projects/GreenCityUser/blob/master/LICENSE)  [![Build Status](https://travis-ci.com/ita-social-projects/GreenCity.svg?branch=master)](https://travis-ci.com/ita-social-projects/GreenCity) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ita-social-projects-green-city-user&metric=coverage)](https://sonarcloud.io/dashboard?id=ita-social-projects-green-city-user)
 
 
 
