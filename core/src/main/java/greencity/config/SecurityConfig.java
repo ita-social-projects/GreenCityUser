@@ -125,6 +125,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findIdByEmail")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
+                USER_LINK,
                 "/user/goals",
                 "/user/{userId}/habit",
                 "/user/{userId}/userFriend/{friendId}",
@@ -163,7 +164,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 USER_LINK)
             .hasRole(ADMIN)
             .antMatchers(HttpMethod.PATCH,
-                USER_LINK,
                 "/user/status",
                 "/user/role",
                 "/user/update/role")
