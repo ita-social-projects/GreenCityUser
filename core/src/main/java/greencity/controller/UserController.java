@@ -1,6 +1,7 @@
 package greencity.controller;
 
 import greencity.annotations.ApiPageable;
+import greencity.annotations.CurrentUser;
 import greencity.annotations.CurrentUserId;
 import greencity.annotations.ImageValidation;
 import greencity.constant.HttpStatuses;
@@ -831,7 +832,7 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
     })
     @PostMapping()
-    public ResponseEntity<UserVO> saveUser(@RequestBody UserVO userVO) {
+    public ResponseEntity<UserVO> saveUser(@RequestBody @CurrentUser UserVO userVO) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.save(userVO));
     }
 }
