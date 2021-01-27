@@ -1,14 +1,17 @@
-package greencity.service.impl;
+package greencity.service;
 
 import greencity.constant.EmailConstants;
 import greencity.constant.LogMessage;
-import greencity.service.EmailService;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
+import greencity.message.PasswordRecoveryMessage;
+import greencity.message.UserApprovalMessage;
+import greencity.message.VerifyEmailMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -66,6 +69,20 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email, EmailConstants.VERIFY_EMAIL, template);
     }
 
+    @Override
+    public void sendVerificationEmail(VerifyEmailMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, message.getName());
+        model.put(EmailConstants.VERIFY_ADDRESS, clientLink + "#/?token="
+                + message.getToken() + PARAM_USER_ID + message.getId());
+        changeLocale(message.getLanguage());
+        log.info(Locale.getDefault().toString());
+        String template = createEmailTemplate(model, EmailConstants.VERIFY_EMAIL_PAGE);
+        sendEmail(message.getEmail(), EmailConstants.VERIFY_EMAIL, template);
+    }
+
+
     /**
      * {@inheritDoc}
      *
@@ -82,6 +99,17 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email, EmailConstants.APPROVE_REGISTRATION_SUBJECT, template);
     }
 
+
+    @Override
+    public void sendApprovalEmail(UserApprovalMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, message.getName());
+        model.put(EmailConstants.APPROVE_REGISTRATION, clientLink + "#/auth/restore?" + "token=" + message.getToken()
+                + PARAM_USER_ID + message.getId());
+        String template = createEmailTemplate(model, EmailConstants.USER_APPROVAL_EMAIL_PAGE);
+        sendEmail(message.getEmail(), EmailConstants.APPROVE_REGISTRATION_SUBJECT, template);
+    }
     /**
      * Sends password recovery email using separated user parameters.
      *
@@ -103,6 +131,18 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(userEmail, EmailConstants.CONFIRM_RESTORING_PASS, template);
     }
 
+    @Override
+    public void sendRestoreEmail(PasswordRecoveryMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, message.getUserFirstName());
+        model.put(EmailConstants.RESTORE_PASS, clientLink + "/#/auth/restore?" + "token=" + message.getRecoveryToken()
+                + PARAM_USER_ID + message.getUserId());
+        changeLocale(message.getLanguage());
+        log.info(Locale.getDefault().toString());
+        String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
+        sendEmail(message.getUserEmail(), EmailConstants.CONFIRM_RESTORING_PASS, template);
+    }
     /**
      * {@inheritDoc}
      *

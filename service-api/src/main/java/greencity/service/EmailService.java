@@ -1,5 +1,9 @@
 package greencity.service;
 
+import greencity.message.PasswordRecoveryMessage;
+import greencity.message.UserApprovalMessage;
+import greencity.message.VerifyEmailMessage;
+
 /**
  * Provides the interface to manage sending emails to {@code User}.
  */
@@ -14,6 +18,8 @@ public interface EmailService {
      */
     void sendVerificationEmail(Long userId, String userName, String userEmail, String token, String language);
 
+        void sendVerificationEmail(VerifyEmailMessage message);
+
     /**
      * Method for sending user approval email to User, when Admin adds the User from
      * admin panel.
@@ -25,6 +31,7 @@ public interface EmailService {
      */
     void sendApprovalEmail(Long userId, String userName, String userEmail, String token);
 
+    void sendApprovalEmail(UserApprovalMessage message);
     /**
      * Sends password recovery email using separated user parameters.
      *
@@ -35,4 +42,6 @@ public interface EmailService {
      * @param token        password recovery token.
      */
     void sendRestoreEmail(Long userId, String userFistName, String userEmail, String token, String language);
+
+    void sendRestoreEmail(PasswordRecoveryMessage message);
 }

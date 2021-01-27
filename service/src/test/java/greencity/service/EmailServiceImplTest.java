@@ -1,4 +1,4 @@
-package greencity.service.impl;
+package greencity.service;
 
 import greencity.service.EmailService;
 import java.util.concurrent.Executors;
