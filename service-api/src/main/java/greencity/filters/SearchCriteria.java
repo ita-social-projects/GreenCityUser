@@ -2,9 +2,6 @@ package greencity.filters;
 
 import lombok.*;
 
-import java.util.Arrays;
-import java.util.Objects;
-
 @Builder
 @Getter
 @Setter
