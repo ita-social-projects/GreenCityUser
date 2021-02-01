@@ -2,6 +2,7 @@ package greencity.service;
 
 //import greencity.achievement.AchievementCalculation;
 
+import greencity.dto.user.*;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -12,7 +13,6 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.goal.CustomGoalResponseDto;
-import greencity.dto.user.*;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
