@@ -442,4 +442,9 @@ public interface UserService {
      * @return {@link List} of {@link UserVO} instances.
      */
     List<UserVO> getAllUserFriendRequests(Long userId);
+
+    /**
+     * {@inheritDoc}
+     */
+    PageableAdvancedDto<UserManagementVO> search(Pageable pageable, UserManagementViewDto userManagementViewDto);
 }

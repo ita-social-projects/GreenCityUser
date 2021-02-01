@@ -710,8 +710,9 @@ public class UserController {
     /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
      *
-     * @return {@link UserVO}.
      * @param email - {@link UserVO}'s email
+     * @return {@link UserVO}.
+     *
      * @author Orest Mamchuk
      */
     @ApiOperation(value = "Get find not 'DEACTIVATED' User by email")
@@ -834,5 +835,25 @@ public class UserController {
     @PostMapping()
     public ResponseEntity<UserVO> saveUser(@RequestBody @CurrentUser UserVO userVO) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.save(userVO));
+    }
+
+    /**
+     * Method that allow to search users by several values.
+     *
+     * @param pageable    {@link Pageable}
+     * @param userViewDto {@link UserManagementViewDto} - stores values.
+     *
+     */
+    @ApiOperation(value = "Search Users")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+    })
+    @PostMapping("/search")
+    public ResponseEntity<PageableAdvancedDto<UserManagementVO>> search(@ApiIgnore Pageable pageable,
+        @RequestBody UserManagementViewDto userViewDto) {
+        PageableAdvancedDto<UserManagementVO> found = userService.search(pageable, userViewDto);
+        return ResponseEntity.status(HttpStatus.OK).body(found);
     }
 }

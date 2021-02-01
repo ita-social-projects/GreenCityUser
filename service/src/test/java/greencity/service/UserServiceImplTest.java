@@ -7,25 +7,14 @@ import greencity.dto.PageableDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.goal.CustomGoalResponseDto;
-import greencity.dto.user.RecommendedFriendDto;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.dto.user.UsersFriendDto;
+import greencity.dto.user.*;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
+import greencity.filters.UserSpecification;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,9 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -812,5 +799,37 @@ class UserServiceImplTest {
 
         assertEquals(Collections.singletonList(customGoalResponseDto),
             userService.getAvailableCustomGoals(userId));
+    }
+
+    @Test
+    void searchTest() {
+        Pageable pageable = PageRequest.of(0, 20);
+        UserManagementViewDto userViewDto =
+            UserManagementViewDto.builder()
+                .id("1L")
+                .name("vivo")
+                .email("test@ukr.net")
+                .userCredo("Hello")
+                .role("1")
+                .userStatus("1")
+                .build();
+        UserManagementVO userManagementVO =
+            UserManagementVO.builder()
+                .id(1L)
+                .name("vivo")
+                .email("test@ukr.net")
+                .userCredo("Hello")
+                .role(Role.ROLE_USER)
+                .userStatus(ACTIVATED)
+                .build();
+        List<UserManagementVO> userManagementVOS = Collections.singletonList(userManagementVO);
+        List<User> users = Collections.singletonList(new User());
+        Page<User> pageUsers = new PageImpl<>(users, pageable, 0);
+        when(userRepo.findAll(any(UserSpecification.class), eq(pageable))).thenReturn(pageUsers);
+        when(modelMapper.map(users.get(0), UserManagementVO.class)).thenReturn(userManagementVO);
+        PageableAdvancedDto<UserManagementVO> actual = new PageableAdvancedDto<>(userManagementVOS, 1, 0, 1, 0,
+            false, false, true, true);
+        PageableAdvancedDto<UserManagementVO> expected = userService.search(pageable, userViewDto);
+        assertEquals(expected, actual);
     }
 }
