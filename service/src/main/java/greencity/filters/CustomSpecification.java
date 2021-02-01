@@ -40,5 +40,4 @@ public interface CustomSpecification<T> extends Specification<T> {
             : criteriaBuilder.equal(root.get(searchCriteria.getKey()).as(Integer.class),
                 searchCriteria.getValue());
     }
-
 }
