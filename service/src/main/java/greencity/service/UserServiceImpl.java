@@ -1,6 +1,9 @@
 package greencity.service;
 
 //import greencity.achievement.AchievementCalculation;
+
+import greencity.dto.user.*;
+import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -10,22 +13,6 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.goal.CustomGoalResponseDto;
-import greencity.dto.user.RecommendedFriendDto;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.dto.user.UsersFriendDto;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
@@ -34,6 +21,7 @@ import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
+import greencity.filters.UserSpecification;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +35,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
@@ -293,6 +282,68 @@ public class UserServiceImpl implements UserService {
         List<User> allUserFriends = userRepo.getAllUserFriendRequests(userId);
         return modelMapper.map(allUserFriends, new TypeToken<List<UserVO>>() {
         }.getType());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PageableAdvancedDto<UserManagementVO> search(Pageable pageable,
+        UserManagementViewDto userManagementViewDto) {
+        Page<User> found = userRepo.findAll(buildSpecification(userManagementViewDto), pageable);
+        return buildPageableAdvanceDtoFromPage(found);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private PageableAdvancedDto<UserManagementVO> buildPageableAdvanceDtoFromPage(Page<User> pageTags) {
+        List<UserManagementVO> usersVOs = pageTags.getContent().stream()
+            .map(t -> modelMapper.map(t, UserManagementVO.class))
+            .collect(Collectors.toList());
+
+        return new PageableAdvancedDto<>(
+            usersVOs,
+            pageTags.getTotalElements(), pageTags.getPageable().getPageNumber(),
+            pageTags.getTotalPages(), pageTags.getNumber(),
+            pageTags.hasPrevious(), pageTags.hasNext(),
+            pageTags.isFirst(), pageTags.isLast());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private UserSpecification buildSpecification(UserManagementViewDto userViewDto) {
+        List<SearchCriteria> searchCriteriaList = buildSearchCriteriaList(userViewDto);
+
+        return new UserSpecification(searchCriteriaList);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private List<SearchCriteria> buildSearchCriteriaList(UserManagementViewDto userViewDto) {
+        List<SearchCriteria> searchCriteriaList = new ArrayList<>();
+        setValueIfNotEmpty(searchCriteriaList, "id", userViewDto.getId());
+        setValueIfNotEmpty(searchCriteriaList, "name", userViewDto.getName());
+        setValueIfNotEmpty(searchCriteriaList, "email", userViewDto.getEmail());
+        setValueIfNotEmpty(searchCriteriaList, "userCredo", userViewDto.getUserCredo());
+        setValueIfNotEmpty(searchCriteriaList, "role", userViewDto.getRole());
+        setValueIfNotEmpty(searchCriteriaList, "userStatus", userViewDto.getUserStatus());
+        return searchCriteriaList;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private void setValueIfNotEmpty(List<SearchCriteria> searchCriteria, String key, String value) {
+        if (!StringUtils.isEmpty(value)) {
+            searchCriteria.add(SearchCriteria.builder()
+                .key(key)
+                .type(key)
+                .value(value)
+                .build());
+        }
     }
 
     /**

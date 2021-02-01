@@ -1,12 +1,11 @@
 package greencity.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
+import greencity.dto.PageableAdvancedDto;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
+import greencity.dto.user.*;
 import greencity.enums.Role;
 import greencity.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +29,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.List;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import static org.mockito.ArgumentMatchers.eq;
@@ -46,6 +47,7 @@ class UserControllerTest {
     private UserController userController;
     @Mock
     private UserService userService;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setup() {
@@ -53,6 +55,7 @@ class UserControllerTest {
             .standaloneSetup(userController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .build();
+        objectMapper = new ObjectMapper();
     }
 
     @Test
@@ -384,5 +387,30 @@ class UserControllerTest {
         UserProfileDtoRequest dto = mapper.readValue(json, UserProfileDtoRequest.class);
 
         verify(userService).saveUserProfile(eq(dto), eq("testmail@gmail.com"));
+    }
+
+    @Test
+    void searchTest() throws Exception {
+        Pageable pageable = PageRequest.of(0, 20);
+        UserManagementViewDto userViewDto =
+            UserManagementViewDto.builder()
+                .id("1L")
+                .name("vivo")
+                .email("test@ukr.net")
+                .userCredo("Hello")
+                .role("1")
+                .userStatus("1")
+                .build();
+        String content = objectMapper.writeValueAsString(userViewDto);
+        List<UserManagementVO> userManagementVOS = Collections.singletonList(new UserManagementVO());
+        PageableAdvancedDto<UserManagementVO> userAdvancedDto =
+            new PageableAdvancedDto<>(userManagementVOS, 20, 0, 0, 0,
+                true, true, true, true);
+        when(userService.search(pageable, userViewDto)).thenReturn(userAdvancedDto);
+        mockMvc.perform(post(userLink + "/search")
+            .content(content)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+        verify(userService).search(pageable, userViewDto);
     }
 }
