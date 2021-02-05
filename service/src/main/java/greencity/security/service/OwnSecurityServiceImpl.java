@@ -76,14 +76,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Autowired
     public OwnSecurityServiceImpl(OwnSecurityRepo ownSecurityRepo,
-                                  UserService userService,
-                                  PasswordEncoder passwordEncoder,
-                                  JwtTool jwtTool,
-                                  @Value("${verifyEmailTimeHour}") Integer expirationTime,
-                                  RestorePasswordEmailRepo restorePasswordEmailRepo,
-                                  ModelMapper modelMapper,
-                                  UserRepo userRepo,
-                                  AchievementService achievementService, EmailService emailService) {
+        UserService userService,
+        PasswordEncoder passwordEncoder,
+        JwtTool jwtTool,
+        @Value("${verifyEmailTimeHour}") Integer expirationTime,
+        RestorePasswordEmailRepo restorePasswordEmailRepo,
+        ModelMapper modelMapper,
+        UserRepo userRepo,
+        AchievementService achievementService, EmailService emailService) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -163,7 +163,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     }
 
     static List<UserAchievement> getUserAchievements(User user, ModelMapper modelMapper,
-                                                     AchievementService achievementService) {
+        AchievementService achievementService) {
         List<Achievement> achievementList =
             modelMapper.map(achievementService.findAll(), new TypeToken<List<Achievement>>() {
             }.getType());
@@ -178,7 +178,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     }
 
     static List<UserAction> getUserActions(User user, ModelMapper modelMapper,
-                                           AchievementService achievementService) {
+        AchievementService achievementService) {
         List<Achievement> achievementList =
             modelMapper.map(achievementService.findAll(), new TypeToken<List<Achievement>>() {
             }.getType());

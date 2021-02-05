@@ -30,7 +30,6 @@ public final class EmailConstants {
     public static final String NEWS_RECEIVE_EMAIL_PAGE = "news-receive-email-page";
     public static final String NEW_PLACES_REPORT_EMAIL_PAGE = "new-places-report-email-page";
 
-
     private EmailConstants() {
     }
 }

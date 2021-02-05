@@ -7,6 +7,7 @@ public final class LogMessage {
     public static final String IN_CREATE_TEMPLATE_NAME = "in createEmailTemplate(), vars: {}, templateName: {}";
     public static final String IN_SEND_ADDED_NEW_PLACES_REPORT_EMAIL =
         "in sendAddedNewPlacesReportEmail(), subscribers: {}, categories: {}, notificationType: {}";
+
     private LogMessage() {
     }
 }

@@ -22,14 +22,14 @@ public interface EmailService {
      * @param notification         type of notification.
      */
     void sendAddedNewPlacesReportEmail(List<PlaceAuthorDto> subscribers,
-                                       Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlaces,
-                                       String notification);
+        Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlaces,
+        String notification);
 
     /**
      * Method for sending news for users who subscribed for updates.
      */
     void sendNewNewsForSubscriber(List<NewsSubscriberResponseDto> subscribers,
-                                  AddEcoNewsDtoResponse newsDto);
+        AddEcoNewsDtoResponse newsDto);
 
     /**
      * Method for sending simple notification to {@code User} about change status.
@@ -40,7 +40,7 @@ public interface EmailService {
      * @param authorEmail     author's email.
      */
     void sendChangePlaceStatusEmail(String authorFirstName, String placeName,
-                                    String placeStatus, String authorEmail);
+        String placeStatus, String authorEmail);
 
     /**
      * Method for sending verification email to {@link User}.

@@ -38,7 +38,6 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     @Value("${verifyEmailTimeHour}")
     private Integer tokenExpirationTimeInHours;
 
-
     /**
      * Constructor with all essentials beans for password recovery functionality.
      *
