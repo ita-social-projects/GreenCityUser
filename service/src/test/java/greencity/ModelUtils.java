@@ -4,11 +4,10 @@ import greencity.constant.AppConstant;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
+import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.ownsecurity.OwnSecurityVO;
-import greencity.dto.user.RecommendedFriendDto;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UsersFriendDto;
+import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.Achievement;
@@ -24,6 +23,7 @@ import greencity.enums.Role;
 import greencity.enums.UserStatus;
 
 import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -171,5 +171,25 @@ public class ModelUtils {
 
     public static UserAchievement getUserAchievement() {
         return new UserAchievement(1L, getUser(), getAchievement(), AchievementStatus.ACTIVE, false);
+    }
+
+    public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
+        return EcoNewsAuthorDto.builder()
+            .id(1L)
+            .name("taras")
+            .build();
+    }
+
+    public static AddEcoNewsDtoResponse getAddEcoNewsDtoResponse() {
+        return AddEcoNewsDtoResponse.builder()
+            .id(1L)
+            .title("title")
+            .text("texttexttexttext")
+            .ecoNewsAuthorDto(getEcoNewsAuthorDto())
+            .creationDate(ZonedDateTime.now())
+            .imagePath("/imagePath")
+            .source("source")
+            .tags(Collections.singletonList("tag"))
+            .build();
     }
 }
