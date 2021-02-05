@@ -1,23 +1,24 @@
 package greencity.service;
 
-import greencity.service.EmailService;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import java.util.concurrent.Executors;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
 
 class EmailServiceImplTest {
     private EmailService service;
+
     @Mock
     private JavaMailSender javaMailSender;
     @Mock
@@ -27,7 +28,10 @@ class EmailServiceImplTest {
     public void setup() {
         initMocks(this);
         service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
-            "http://localhost:4200", "http://localhost:4200");
+            "http://localhost:4200",
+            "http://localhost:4200/welcome",
+            "http://localhost:8080",
+            "http://localhost:4200");
 
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
     }

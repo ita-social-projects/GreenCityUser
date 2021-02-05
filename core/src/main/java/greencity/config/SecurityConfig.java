@@ -104,7 +104,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
                 "/ownSecurity/signIn",
-                "/ownSecurity/changePassword")
+                "/ownSecurity/changePassword",
+                "/email/addEcoNews",
+                "/email/sendReport",
+                "/email/changePlaceStatus",
+                "/email/sendHabitNotification")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 USER_LINK,

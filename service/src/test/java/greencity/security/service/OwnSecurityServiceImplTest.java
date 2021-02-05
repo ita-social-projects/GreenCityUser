@@ -1,5 +1,10 @@
 package greencity.security.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import greencity.ModelUtils;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
@@ -12,9 +17,14 @@ import greencity.entity.UserAchievement;
 import greencity.entity.VerifyEmail;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
-import greencity.message.UserApprovalMessage;
-import greencity.message.VerifyEmailMessage;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserBlockedException;
+import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
@@ -23,8 +33,11 @@ import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.AchievementService;
+import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,24 +47,8 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.Collections;
-import java.util.List;
-
-import static greencity.constant.RabbitConstants.SEND_USER_APPROVAL_ROUTING_KEY;
-import static greencity.constant.RabbitConstants.VERIFY_EMAIL_ROUTING_KEY;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -70,9 +67,6 @@ class OwnSecurityServiceImplTest {
     JwtTool jwtTool;
 
     @Mock
-    RabbitTemplate rabbitTemplate;
-
-    @Mock
     RestorePasswordEmailRepo restorePasswordEmailRepo;
 
     @Mock
@@ -84,6 +78,9 @@ class OwnSecurityServiceImplTest {
     @Mock
     AchievementService achievementService;
 
+    @Mock
+    EmailService emailService;
+
     private OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -92,15 +89,12 @@ class OwnSecurityServiceImplTest {
     private UpdatePasswordDto updatePasswordDto;
     private UserManagementDto userManagementDto;
 
-    @Value("${messaging.rabbit.email.topic}")
-    private String sendEmailTopic;
-
     @BeforeEach
     public void init() {
         initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, userService, passwordEncoder,
-            jwtTool, 1, rabbitTemplate, restorePasswordEmailRepo, modelMapper,
-            userRepo, achievementService);
+            jwtTool, 1, restorePasswordEmailRepo, modelMapper,
+            userRepo, achievementService, emailService);
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")
@@ -149,14 +143,12 @@ class OwnSecurityServiceImplTest {
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
         ownSecurityService.signUp(new OwnSignUpDto(), "en");
-        verify(rabbitTemplate, times(1)).convertAndSend(
-            refEq(sendEmailTopic),
-            refEq(VERIFY_EMAIL_ROUTING_KEY),
-            refEq(new VerifyEmailMessage(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                user.getVerifyEmail().getToken(), "en")));
+        verify(emailService, times(1)).sendVerificationEmail(
+            refEq(user.getId()),
+            refEq(user.getName()),
+            refEq(user.getEmail()),
+            refEq(user.getVerifyEmail().getToken()),
+            refEq("en"));
         verify(jwtTool, times(2)).generateTokenKey();
     }
 
@@ -318,10 +310,8 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void managementRegisterUserTest() {
-        UserApprovalMessage message =
-            new UserApprovalMessage(null, "Tester", "test@gmail.com", "token-key");
         when(jwtTool.generateTokenKey()).thenReturn("token-key");
         ownSecurityService.managementRegisterUser(userManagementDto);
-        verify(rabbitTemplate).convertAndSend(sendEmailTopic, SEND_USER_APPROVAL_ROUTING_KEY, message);
+        verify(emailService).sendApprovalEmail(null, "Tester", "test@gmail.com", "token-key");
     }
 }

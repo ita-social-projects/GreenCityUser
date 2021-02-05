@@ -22,8 +22,6 @@ import greencity.exception.exceptions.UserBlockedException;
 import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
-import greencity.message.UserApprovalMessage;
-import greencity.message.VerifyEmailMessage;
 import greencity.repository.UserRepo;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
@@ -35,28 +33,24 @@ import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.AchievementService;
+import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static greencity.constant.RabbitConstants.SEND_USER_APPROVAL_ROUTING_KEY;
-import static greencity.constant.RabbitConstants.VERIFY_EMAIL_ROUTING_KEY;
 
 /**
  * {@inheritDoc}
@@ -69,40 +63,37 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTool jwtTool;
     private final Integer expirationTime;
-    private final RabbitTemplate rabbitTemplate;
     private final RestorePasswordEmailRepo restorePasswordEmailRepo;
-    @Value("${messaging.rabbit.email.topic}")
-    private String sendEmailTopic;
     private final ModelMapper modelMapper;
     private final UserRepo userRepo;
     private static final String VALID_PW_CHARS =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final AchievementService achievementService;
+    private final EmailService emailService;
 
     /**
      * Constructor.
      */
     @Autowired
     public OwnSecurityServiceImpl(OwnSecurityRepo ownSecurityRepo,
-        UserService userService,
-        PasswordEncoder passwordEncoder,
-        JwtTool jwtTool,
-        @Value("${verifyEmailTimeHour}") Integer expirationTime,
-        RabbitTemplate rabbitTemplate,
-        RestorePasswordEmailRepo restorePasswordEmailRepo,
-        ModelMapper modelMapper,
-        UserRepo userRepo,
-        AchievementService achievementService) {
+                                  UserService userService,
+                                  PasswordEncoder passwordEncoder,
+                                  JwtTool jwtTool,
+                                  @Value("${verifyEmailTimeHour}") Integer expirationTime,
+                                  RestorePasswordEmailRepo restorePasswordEmailRepo,
+                                  ModelMapper modelMapper,
+                                  UserRepo userRepo,
+                                  AchievementService achievementService, EmailService emailService) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTool = jwtTool;
         this.expirationTime = expirationTime;
-        this.rabbitTemplate = rabbitTemplate;
         this.restorePasswordEmailRepo = restorePasswordEmailRepo;
         this.modelMapper = modelMapper;
         this.userRepo = userRepo;
         this.achievementService = achievementService;
+        this.emailService = emailService;
     }
 
     /**
@@ -125,11 +116,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
-            rabbitTemplate.convertAndSend(
-                sendEmailTopic,
-                VERIFY_EMAIL_ROUTING_KEY,
-                new VerifyEmailMessage(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
-                    savedUser.getVerifyEmail().getToken(), language));
+            emailService.sendVerificationEmail(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
+                savedUser.getVerifyEmail().getToken(), language);
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
@@ -175,7 +163,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     }
 
     static List<UserAchievement> getUserAchievements(User user, ModelMapper modelMapper,
-        AchievementService achievementService) {
+                                                     AchievementService achievementService) {
         List<Achievement> achievementList =
             modelMapper.map(achievementService.findAll(), new TypeToken<List<Achievement>>() {
             }.getType());
@@ -190,7 +178,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     }
 
     static List<UserAction> getUserActions(User user, ModelMapper modelMapper,
-        AchievementService achievementService) {
+                                           AchievementService achievementService) {
         List<Achievement> achievementList =
             modelMapper.map(achievementService.findAll(), new TypeToken<List<Achievement>>() {
             }.getType());
@@ -379,11 +367,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
         userService.save(modelMapper.map(user, UserVO.class));
-        rabbitTemplate.convertAndSend(
-            sendEmailTopic,
-            SEND_USER_APPROVAL_ROUTING_KEY,
-            new UserApprovalMessage(user.getId(), user.getName(), user.getEmail(),
-                token));
+        emailService.sendApprovalEmail(user.getId(), user.getName(), user.getEmail(), token);
     }
 
     /**
