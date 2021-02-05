@@ -81,5 +81,4 @@ public interface EmailService {
      * @param email letter is sent to this email.
      */
     void sendHabitNotification(String name, String email);
-
 }
