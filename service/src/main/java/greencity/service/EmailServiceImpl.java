@@ -218,5 +218,4 @@ public class EmailServiceImpl implements EmailService {
         String content = "Dear " + name + ", you haven't marked any habit during last 3 days";
         sendEmail(email, subject, content);
     }
-
 }
