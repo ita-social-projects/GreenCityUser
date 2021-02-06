@@ -1,4 +1,4 @@
-package greencity.exception;
+package greencity.exception.handler;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package greencity.exception;
+package greencity.exception.handler;
 
 import greencity.constant.AppConstant;
 import greencity.exception.exceptions.*;

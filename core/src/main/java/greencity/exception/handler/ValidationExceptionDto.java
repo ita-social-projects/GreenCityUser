@@ -1,4 +1,4 @@
-package greencity.exception;
+package greencity.exception.handler;
 
 import lombok.Data;
 import org.springframework.validation.FieldError;
