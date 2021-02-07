@@ -8,9 +8,13 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,11 +26,19 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CustomExceptionHandlerTest {
     @Mock
+    MethodArgumentTypeMismatchException mismatchException;
+    @Mock
     WebRequest webRequest;
     @Mock
     ErrorAttributes errorAttributes;
     Map<String, Object> objectMap;
     CustomExceptionHandler customExceptionHandler;
+    @Mock
+    HttpMessageNotReadableException ex;
+    @Mock
+    HttpHeaders headers;
+    @Mock
+    FieldError fieldError;
 
     @BeforeEach
     void init() {
@@ -43,6 +55,7 @@ class CustomExceptionHandlerTest {
     void handleWrongPasswordException() {
         WrongPasswordException actual = new WrongPasswordException("password");
         ValidationExceptionDto validationDto = new ValidationExceptionDto(actual.getMessage(), "password");
+        ValidationExceptionDto validationDtoField = new ValidationExceptionDto(fieldError);
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
         ResponseEntity<Object> body = status.body(validationDto);
         assertEquals(customExceptionHandler.handleWrongPasswordException(actual), body);
@@ -120,4 +133,25 @@ class CustomExceptionHandlerTest {
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
 
     }
+
+    @Test
+    void handleHttpMessageNotReadable() {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleHttpMessageNotReadable(
+            ex, headers, httpStatus, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
+    void handleConversionFailedException() {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        exceptionResponse.setMessage("Wrong null. Should be 'null'");
+        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleConversionFailedException(mismatchException, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+
+    }
+
 }
