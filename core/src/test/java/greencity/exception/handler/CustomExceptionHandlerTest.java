@@ -12,7 +12,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
@@ -39,6 +41,10 @@ class CustomExceptionHandlerTest {
     HttpHeaders headers;
     @Mock
     FieldError fieldError;
+    @Mock
+    BindingResult bindingResult;
+    @Mock
+    MethodArgumentNotValidException notValidException;
 
     @BeforeEach
     void init() {
@@ -154,4 +160,16 @@ class CustomExceptionHandlerTest {
 
     }
 
+    @Test
+    void handleMethodArgumentNotValid() {
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+        FieldError fieldError = new FieldError("G", "field", "default");
+        ValidationExceptionDto validationExceptionDto = new ValidationExceptionDto(fieldError);
+        when(notValidException.getBindingResult()).thenReturn(bindingResult);
+        when(bindingResult.getFieldErrors()).thenReturn(Collections.singletonList(fieldError));
+        assertEquals(
+            customExceptionHandler.handleMethodArgumentNotValid(notValidException, headers, httpStatus, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonList(validationExceptionDto)));
+
+    }
 }
