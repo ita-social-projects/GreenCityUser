@@ -30,8 +30,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Timestamp;
@@ -40,7 +38,6 @@ import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import static org.junit.jupiter.api.Assertions.assertEquals;

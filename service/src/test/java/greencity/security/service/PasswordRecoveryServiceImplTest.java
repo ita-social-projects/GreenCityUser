@@ -1,5 +1,9 @@
 package greencity.security.service;
 
+import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
 import greencity.enums.UserStatus;
@@ -7,28 +11,21 @@ import greencity.exception.exceptions.BadVerifyEmailTokenException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.exception.exceptions.WrongEmailException;
-import greencity.message.PasswordRecoveryMessage;
 import greencity.repository.UserRepo;
 import greencity.security.events.UpdatePasswordEvent;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.RestorePasswordEmailRepo;
+import greencity.service.EmailService;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.mockito.ArgumentMatchers.refEq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PasswordRecoveryServiceImplTest {
@@ -41,12 +38,9 @@ class PasswordRecoveryServiceImplTest {
     @Mock
     private UserRepo userRepo;
     @Mock
-    private RabbitTemplate rabbitTemplate;
+    private EmailService emailService;
     @InjectMocks
     private PasswordRecoveryServiceImpl passwordRecoveryService;
-    @Value("${messaging.rabbit.email.topic}")
-    private String sendEmailTopic;
-    private static final String PASSWORD_RECOVERY_ROUTING_KEY = "password.recovery";
 
     @Test
     void sendPasswordRecoveryEmailToNonExistentUserTest() {
@@ -85,14 +79,12 @@ class PasswordRecoveryServiceImplTest {
                 .token(token)
                 .build(),
             "expiryDate"));
-        verify(rabbitTemplate).convertAndSend(
-            refEq(sendEmailTopic),
-            refEq(PASSWORD_RECOVERY_ROUTING_KEY),
-            refEq(new PasswordRecoveryMessage(
-                user.getId(),
-                user.getName(),
-                user.getEmail(),
-                token, language)));
+        verify(emailService).sendRestoreEmail(
+            refEq(user.getId()),
+            refEq(user.getName()),
+            refEq(user.getEmail()),
+            refEq(token),
+            refEq(language));
     }
 
     @Test
