@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     /**
-     * Autowired repository.
+     * Autowired greencity.repository.
      */
     private final UserRepo userRepo;
     private final RestClient restClient;

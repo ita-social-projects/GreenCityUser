@@ -3,17 +3,17 @@ package greencity.message;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 /**
- * Message, that is used for sending emails for approving user registration.
+ * Message, that is used for sending emails about not marked habits.
  */
 @Getter
 @ToString
 @AllArgsConstructor
-public class UserApprovalMessage implements Serializable {
-    private Long id;
+@NoArgsConstructor
+public class SendHabitNotification implements Serializable {
     private String name;
     private String email;
-    private String token;
 }

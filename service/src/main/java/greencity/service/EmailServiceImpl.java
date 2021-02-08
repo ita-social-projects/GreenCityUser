@@ -1,9 +1,17 @@
-package greencity.service.impl;
+package greencity.service;
 
 import greencity.constant.EmailConstants;
 import greencity.constant.LogMessage;
-import greencity.service.EmailService;
+import greencity.dto.category.CategoryDto;
+import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
+import greencity.dto.place.PlaceNotificationDto;
+import greencity.dto.user.PlaceAuthorDto;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -29,6 +37,8 @@ public class EmailServiceImpl implements EmailService {
     private final ITemplateEngine templateEngine;
     private final Executor executor;
     private final String clientLink;
+    private final String ecoNewsLink;
+    private final String serverLink;
     private final String senderEmailAddress;
     private static final String PARAM_USER_ID = "&user_id=";
 
@@ -40,12 +50,66 @@ public class EmailServiceImpl implements EmailService {
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
+        @Value("${econews.address}") String ecoNewsLink,
+        @Value("${address}") String serverLink,
         @Value("${sender.email.address}") String senderEmailAddress) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
         this.clientLink = clientLink;
+        this.ecoNewsLink = ecoNewsLink;
+        this.serverLink = serverLink;
         this.senderEmailAddress = senderEmailAddress;
+    }
+
+    @Override
+    public void sendChangePlaceStatusEmail(String authorName, String placeName,
+        String placeStatus, String authorEmail) {
+        log.info(LogMessage.IN_SEND_CHANGE_PLACE_STATUS_EMAIL, placeName);
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, authorName);
+        model.put(EmailConstants.PLACE_NAME, placeName);
+        model.put(EmailConstants.STATUS, placeStatus);
+
+        String template = createEmailTemplate(model, EmailConstants.CHANGE_PLACE_STATUS_EMAIL_PAGE);
+        sendEmail(authorEmail, EmailConstants.GC_CONTRIBUTORS, template);
+    }
+
+    @Override
+    public void sendAddedNewPlacesReportEmail(List<PlaceAuthorDto> subscribers,
+        Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlaces,
+        String notification) {
+        log.info(LogMessage.IN_SEND_ADDED_NEW_PLACES_REPORT_EMAIL, null, null, notification);
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.RESULT, categoriesWithPlaces);
+        model.put(EmailConstants.REPORT_TYPE, notification);
+
+        for (PlaceAuthorDto user : subscribers) {
+            model.put(EmailConstants.USER_NAME, user.getName());
+            String template = createEmailTemplate(model, EmailConstants.NEW_PLACES_REPORT_EMAIL_PAGE);
+            sendEmail(user.getEmail(), EmailConstants.NEW_PLACES, template);
+        }
+    }
+
+    @Override
+    public void sendNewNewsForSubscriber(List<NewsSubscriberResponseDto> subscribers,
+        AddEcoNewsDtoResponse newsDto) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.ECO_NEWS_LINK, ecoNewsLink);
+        model.put(EmailConstants.NEWS_RESULT, newsDto);
+        for (NewsSubscriberResponseDto dto : subscribers) {
+            try {
+                model.put(EmailConstants.UNSUBSCRIBE_LINK, serverLink + "/newsSubscriber/unsubscribe?email="
+                    + URLEncoder.encode(dto.getEmail(), StandardCharsets.UTF_8.toString())
+                    + "&unsubscribeToken=" + dto.getUnsubscribeToken());
+            } catch (UnsupportedEncodingException e) {
+                log.error(e.getMessage());
+            }
+            String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
+            sendEmail(dto.getEmail(), EmailConstants.NEWS, template);
+        }
     }
 
     /**
@@ -146,5 +210,12 @@ public class EmailServiceImpl implements EmailService {
             log.error(e.getMessage());
         }
         executor.execute(() -> javaMailSender.send(mimeMessage));
+    }
+
+    @Override
+    public void sendHabitNotification(String name, String email) {
+        String subject = "Notification about not marked habits";
+        String content = "Dear " + name + ", you haven't marked any habit during last 3 days";
+        sendEmail(email, subject, content);
     }
 }
