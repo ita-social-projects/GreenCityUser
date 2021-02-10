@@ -14,6 +14,7 @@ public final class AppConstant {
     public static final String FACEBOOK_OBJECT_ID = "me";
     public static final String IMAGES = "images";
     public static final String DEFAULT_LANGUAGE_CODE = "en";
+    public static final String PASSWORD = "password";
 
     private AppConstant() {
     }
