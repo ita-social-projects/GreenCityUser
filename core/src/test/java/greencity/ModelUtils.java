@@ -41,10 +41,6 @@ public class ModelUtils {
 
     public static ObjectMapper getObjectMapper() {
         return new ObjectMapper();
-    }
 
-    public static UserProfilePictureDto getUserProfilePictureDto() {
-        return new UserProfilePictureDto(1L, "name", "image");
     }
-
 }
