@@ -3,6 +3,7 @@ package greencity.repository;
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.UsersFriendDto;
 import greencity.entity.User;
+import greencity.entity.UserDeactivationReason;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
 import org.springframework.data.domain.Page;
@@ -194,7 +195,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true,
         value = " SELECT count(id) FROM users_friends "
             + " LEFT JOIN users ON users.id = users_friends.friend_id "
-            + " WHERE users_friends.user_id = :userId ")
+            + " WHERE users_friends.user_id = :userId and users_friends.status=1")
     Integer getAllUserFriendsCount(Long userId);
 
     /**
