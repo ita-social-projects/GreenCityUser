@@ -153,7 +153,7 @@ public class ModelUtils {
     }
 
     public static UserProfilePictureDto getUserProfilePictureDto() {
-        return new UserProfilePictureDto(1L, "name", "Lviv", 20.0, "image");
+        return new UserProfilePictureDto(1L, "name", "image");
     }
 
     public static Achievement getAchievement() {
