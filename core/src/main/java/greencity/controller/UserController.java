@@ -443,7 +443,7 @@ public class UserController {
     }
 
     /**
-     * The method finds {@link RecommendedFriendDto} for the current userId.
+     * The method finds {@link UserAllFriendsDto} for the current userId.
      *
      * @return {@link ResponseEntity}.
      */
@@ -455,7 +455,7 @@ public class UserController {
     })
     @GetMapping("/{userId}/findAll/friends/")
     @ApiPageable
-    public ResponseEntity<PageableDto<RecommendedFriendDto>> findAllUsersFriends(
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findAllUsersFriends(
         @ApiIgnore Pageable page,
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity

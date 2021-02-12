@@ -408,7 +408,7 @@ public interface UserService {
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
 
-    PageableDto<RecommendedFriendDto> findAllUsersFriends(Pageable pageable, Long userId);
+    PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
 
     /**
      * Accept friend request {@link UserVO}.

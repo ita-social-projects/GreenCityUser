@@ -18,11 +18,5 @@ public class UserProfilePictureDto {
     private String name;
 
     @NotNull
-    private String city;
-
-    @NotNull
-    private Double rating;
-
-    @NotNull
     private String profilePicturePath;
 }

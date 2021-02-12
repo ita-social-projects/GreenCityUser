@@ -191,10 +191,9 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param userId - {@link User}'s id
      * @return - {@link Integer} count of user friends
      */
-    @Query(nativeQuery = true,
-        value = " SELECT count(id) FROM users_friends "
-            + " LEFT JOIN users ON users.id = users_friends.friend_id "
-            + " WHERE users_friends.user_id = :userId and users_friends.status=1")
+    @Query(nativeQuery = true, value = "SELECT count(id) FROM users WHERE users.id IN ( "
+        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 1)"
+        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 1))")
     Integer getAllUserFriendsCount(Long userId);
 
     /**
