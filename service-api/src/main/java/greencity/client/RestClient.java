@@ -1,7 +1,7 @@
 package greencity.client;
 
 import greencity.constant.RestTemplateLinks;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.user.UserVO;
 import lombok.RequiredArgsConstructor;
@@ -31,17 +31,18 @@ public class RestClient {
     private final HttpServletRequest httpServletRequest;
 
     /**
-     * Method for finding all custom goals.
+     * Method for finding all custom shopping list items.
      *
      * @param userId of {@link UserVO}
-     * @return list of {@link CustomGoalResponseDto}
+     * @return list of {@link CustomShoppingListItemResponseDto}
      * @author Orest Mamchuk
      */
-    public List<CustomGoalResponseDto> getAllAvailableCustomGoals(Long userId) {
+    public List<CustomShoppingListItemResponseDto> getAllAvailableCustomShoppingListItems(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        ResponseEntity<CustomGoalResponseDto[]> exchange = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_GOALS + userId, HttpMethod.GET, entity, CustomGoalResponseDto[].class);
-        CustomGoalResponseDto[] responseDtos = exchange.getBody();
+        ResponseEntity<CustomShoppingListItemResponseDto[]> exchange = restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId, HttpMethod.GET, entity,
+            CustomShoppingListItemResponseDto[].class);
+        CustomShoppingListItemResponseDto[] responseDtos = exchange.getBody();
         assert responseDtos != null;
         return Arrays.asList(responseDtos);
     }

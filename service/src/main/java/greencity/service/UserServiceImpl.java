@@ -12,7 +12,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
@@ -523,8 +523,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId) {
-        return restClient.getAllAvailableCustomGoals(userId);
+    public List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId) {
+        return restClient.getAllAvailableCustomShoppingListItems(userId);
     }
 
     /**

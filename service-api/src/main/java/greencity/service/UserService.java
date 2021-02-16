@@ -5,7 +5,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -190,13 +190,14 @@ public interface UserService {
     int updateUserRefreshToken(String refreshTokenKey, Long id);
 
     /**
-     * Method returns list of available (not ACTIVE) customGoals for user.
+     * Method returns list of available (not ACTIVE) customShoppingListItem for
+     * user.
      *
      * @param userId id of the {@link UserVO} current user.
-     * @return List of {@link CustomGoalResponseDto}
+     * @return List of {@link CustomShoppingListItemResponseDto}
      * @author Bogdan Kuzenko
      */
-    List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId);
+    List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId);
 
     /**
      * Counts all users by user {@link UserStatus} ACTIVATED.

@@ -1,7 +1,7 @@
 package greencity.constant;
 
 public class RestTemplateLinks {
-    public static final String CUSTOM_GOALS = "/custom/goals/";
+    public static final String CUSTOM_SHOPPING_LIST_ITEMS = "/custom/shopping-list-items/";
     public static final String FILES_CONVERT = "/files/convert";
     public static final String FILES_IMAGE = "/files/image";
     public static final String SOCIAL_NETWORKS_IMAGE = "/social-networks/image";
