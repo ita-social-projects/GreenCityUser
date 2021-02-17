@@ -1,4 +1,4 @@
-package greencity.dto.goal;
+package greencity.dto.shoppinglist;
 
 import lombok.*;
 
@@ -10,7 +10,7 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class CustomGoalResponseDto {
+public class CustomShoppingListItemResponseDto {
     @NonNull
     @Min(1)
     private Long id;

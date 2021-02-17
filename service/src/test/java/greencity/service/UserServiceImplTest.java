@@ -6,7 +6,7 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.user.*;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
@@ -810,13 +810,14 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getAvailableCustomGoals() {
-        CustomGoalResponseDto customGoalResponseDto = new CustomGoalResponseDto(1L, "test");
-        when(restClient.getAllAvailableCustomGoals(userId))
-            .thenReturn(Collections.singletonList(customGoalResponseDto));
+    void getAvailableCustomShoppingListItem() {
+        CustomShoppingListItemResponseDto customShoppingListItemResponseDto =
+            new CustomShoppingListItemResponseDto(1L, "test");
+        when(restClient.getAllAvailableCustomShoppingListItems(userId))
+            .thenReturn(Collections.singletonList(customShoppingListItemResponseDto));
 
-        assertEquals(Collections.singletonList(customGoalResponseDto),
-            userService.getAvailableCustomGoals(userId));
+        assertEquals(Collections.singletonList(customShoppingListItemResponseDto),
+            userService.getAvailableCustomShoppingListItems(userId));
     }
 
     @Test

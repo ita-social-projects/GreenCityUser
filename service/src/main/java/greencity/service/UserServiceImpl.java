@@ -3,7 +3,6 @@ package greencity.service;
 //import greencity.achievement.AchievementCalculation;
 
 import greencity.dto.user.*;
-import greencity.entity.*;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -13,7 +12,11 @@ import greencity.dto.PageableDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.entity.SocialNetwork;
+import greencity.entity.SocialNetworkImage;
+import greencity.entity.User;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -508,8 +511,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId) {
-        return restClient.getAllAvailableCustomGoals(userId);
+    public List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId) {
+        return restClient.getAllAvailableCustomShoppingListItems(userId);
     }
 
     /**

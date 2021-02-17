@@ -1,6 +1,5 @@
 package greencity.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.dto.PageableAdvancedDto;
@@ -78,8 +77,8 @@ class UserControllerTest {
         UserStatusDto userStatusDto =
             mapper.readValue(content, UserStatusDto.class);
 
-        verify(userService).updateStatus(eq(userStatusDto.getId()),
-            eq(userStatusDto.getUserStatus()), eq("testmail@gmail.com"));
+        verify(userService).updateStatus(userStatusDto.getId(),
+            userStatusDto.getUserStatus(), "testmail@gmail.com");
     }
 
     @Test
@@ -108,7 +107,7 @@ class UserControllerTest {
 
         ObjectMapper mapper = new ObjectMapper();
 
-        verify(userService).updateRole(eq(1L), eq(Role.ROLE_USER), eq("testmail@gmail.com"));
+        verify(userService).updateRole(1L, Role.ROLE_USER, "testmail@gmail.com");
     }
 
     @Test
@@ -128,7 +127,7 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/all?page=1"))
             .andExpect(status().isOk());
 
-        verify(userService).findByPage(eq(pageable));
+        verify(userService).findByPage(pageable);
     }
 
     @Test
@@ -139,7 +138,7 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/{userId}/recommendedFriends/", 1))
             .andExpect(status().isOk());
 
-        verify(userService).findUsersRecommendedFriends(eq(pageable), eq(1L));
+        verify(userService).findUsersRecommendedFriends(pageable, 1L);
     }
 
     @Test
@@ -161,7 +160,7 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/{userId}/friendRequests/", 1))
             .andExpect(status().isOk());
 
-        verify(userService).getAllUserFriendRequests(eq(1L), eq(pageable));
+        verify(userService).getAllUserFriendRequests(1L, pageable);
     }
 
     @Test
@@ -199,7 +198,7 @@ class UserControllerTest {
         FilterUserDto filterUserDto =
             mapper.readValue(content, FilterUserDto.class);
 
-        verify(userService).getUsersByFilter(eq(filterUserDto), eq(pageable));
+        verify(userService).getUsersByFilter(filterUserDto, pageable);
     }
 
     @Test
@@ -211,7 +210,7 @@ class UserControllerTest {
             .principal(principal))
             .andExpect(status().isOk());
 
-        verify(userService).getUserUpdateDtoByEmail(eq("testmail@gmail.com"));
+        verify(userService).getUserUpdateDtoByEmail("testmail@gmail.com");
     }
 
     @Test
@@ -234,19 +233,19 @@ class UserControllerTest {
             .content(content))
             .andExpect(status().isOk());
 
-        verify(userService).update(eq(userUpdateDto), eq("testmail@gmail.com"));
+        verify(userService).update(userUpdateDto, "testmail@gmail.com");
     }
 
     @Test
-    void getAvailableCustomGoalsTest() throws Exception {
+    void getAvailableCustomShoppingListItemTest() throws Exception {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
-        mockMvc.perform(get(userLink + "/{userId}/customGoals/available", 1)
+        mockMvc.perform(get(userLink + "/{userId}/custom-shopping-list-items/available", 1)
             .headers(headers))
             .andExpect(status().isOk());
 
-        verify(userService).getAvailableCustomGoals(1L);
+        verify(userService).getAvailableCustomShoppingListItems(1L);
     }
 
     @Test
@@ -297,7 +296,7 @@ class UserControllerTest {
         mockMvc.perform(delete(userLink + "/{userId}/userFriend/{friendId}", 1, 1))
             .andExpect(status().isOk());
 
-        verify(userService).deleteUserFriendById(eq(1L), eq(1L));
+        verify(userService).deleteUserFriendById(1L, 1L);
     }
 
     @Test
@@ -305,7 +304,7 @@ class UserControllerTest {
         mockMvc.perform(post(userLink + "/{userId}/userFriend/{friendId}", 1, 1))
             .andExpect(status().isOk());
 
-        verify(userService).addNewFriend(eq(1L), eq(1L));
+        verify(userService).addNewFriend(1L, 1L);
     }
 
     @Test
@@ -313,7 +312,7 @@ class UserControllerTest {
         mockMvc.perform(post(userLink + "/{userId}/acceptFriend/{friendId}", 1, 2))
             .andExpect(status().isOk());
 
-        verify(userService).acceptFriendRequest(eq(1L), eq(2L));
+        verify(userService).acceptFriendRequest(1L, 2L);
     }
 
     @Test
@@ -321,7 +320,7 @@ class UserControllerTest {
         mockMvc.perform(post(userLink + "/{userId}/declineFriend/{friendId}", 1, 2))
             .andExpect(status().isOk());
 
-        verify(userService).declineFriendRequest(eq(1L), eq(2L));
+        verify(userService).declineFriendRequest(1L, 2L);
     }
 
     @Test
@@ -329,21 +328,21 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/{userId}/sixUserFriends/", 1))
             .andExpect(status().isOk());
 
-        verify(userService).getSixFriendsWithTheHighestRatingPaged(eq(1L));
+        verify(userService).getSixFriendsWithTheHighestRatingPaged(1L);
     }
 
     @Test
     void getUserProfileInformationTest() throws Exception {
         mockMvc.perform(get(userLink + "/{userId}/profile/", 1))
             .andExpect(status().isOk());
-        verify(userService).getUserProfileInformation(eq(1L));
+        verify(userService).getUserProfileInformation(1L);
     }
 
     @Test
     void checkIfTheUserIsOnlineTest() throws Exception {
         mockMvc.perform(get(userLink + "/isOnline/{userId}/", 1))
             .andExpect(status().isOk());
-        verify(userService).checkIfTheUserIsOnline(eq(1L));
+        verify(userService).checkIfTheUserIsOnline(1L);
     }
 
     @Test
@@ -386,7 +385,7 @@ class UserControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         UserProfileDtoRequest dto = mapper.readValue(json, UserProfileDtoRequest.class);
 
-        verify(userService).saveUserProfile(eq(dto), eq("testmail@gmail.com"));
+        verify(userService).saveUserProfile(dto, "testmail@gmail.com");
     }
 
     @Test
