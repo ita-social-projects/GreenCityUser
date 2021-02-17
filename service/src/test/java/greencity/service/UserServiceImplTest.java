@@ -839,9 +839,11 @@ class UserServiceImplTest {
 
     @Test
     void findAllByEmailNotification() {
-        when(userRepo.findAllByEmailNotification(any(EmailNotification.class))).thenReturn(Collections.singletonList(user));
+        when(userRepo.findAllByEmailNotification(any(EmailNotification.class)))
+            .thenReturn(Collections.singletonList(user));
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        assertEquals(Collections.singletonList(userVO), userService.findAllByEmailNotification(EmailNotification.IMMEDIATELY));
+        assertEquals(Collections.singletonList(userVO),
+            userService.findAllByEmailNotification(EmailNotification.IMMEDIATELY));
     }
 
     @Test
