@@ -27,6 +27,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @Sql("classpath:sql/populate_users_for_test.sql")
 class UserRepoTest {
+    @Autowired
+    private UserRepo userRepo;
+
     private final User testUser =
         User.builder()
             .id(1L)
@@ -53,9 +56,6 @@ class UserRepoTest {
             .refreshTokenKey("secret2")
             .city("Kyiv")
             .build();
-
-    @Autowired
-    private UserRepo userRepo;
 
     @Test
     void findByEmailTest() {
