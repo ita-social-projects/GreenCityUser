@@ -398,7 +398,7 @@ public interface UserService {
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
 
-    PageableDto<RecommendedFriendDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
+    PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
 
     /**
      * Method that finds all user's friends.
@@ -433,7 +433,7 @@ public interface UserService {
      * @param userId   {@link Long} -current user's id.
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
-    PageableDto<RecommendedFriendDto> getAllUserFriendRequests(Long userId, Pageable pageable);
+    PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable);
 
     /**
      * Method that finds all friends that send you request.
