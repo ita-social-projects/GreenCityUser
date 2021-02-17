@@ -19,7 +19,6 @@ import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
-import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +53,6 @@ public class UserServiceImpl implements UserService {
     /**
      * Autowired greencity.repository.
      */
-    private final UserDeactivationRepo userDeactivationRepo;
     private final UserRepo userRepo;
     private final RestClient restClient;
     // private final AchievementCalculation achievementCalculation;
