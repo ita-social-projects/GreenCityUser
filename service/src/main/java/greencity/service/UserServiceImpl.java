@@ -3,6 +3,7 @@ package greencity.service;
 //import greencity.achievement.AchievementCalculation;
 
 import greencity.dto.user.*;
+import greencity.entity.*;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -17,6 +18,7 @@ import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
+import greencity.dto.goal.CustomGoalResponseDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -198,13 +200,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageableDto<RecommendedFriendDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
-        Page<UsersFriendDto> friends = userRepo.findUsersRecommendedFriends(pageable, userId);
-        List<RecommendedFriendDto> recommendedFriendDtos = friends.get()
-            .map(user -> new RecommendedFriendDto(user.getId(), user.getName(), user.getProfilePicture()))
-            .collect(Collectors.toList());
+    public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
+        Page<User> friends = userRepo.findUsersRecommendedFriends(pageable, userId);
+        List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
+            new TypeToken<List<UserAllFriendsDto>>() {
+            }.getType());
         return new PageableDto<>(
-            recommendedFriendDtos,
+            listUserWithMutualFriends(friendDtos),
             friends.getTotalElements(),
             friends.getPageable().getPageNumber(),
             friends.getTotalPages());
@@ -219,20 +221,8 @@ public class UserServiceImpl implements UserService {
         List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
-        for (UserAllFriendsDto friendCurrentUser : friendDtos) {
-            long mutualFriends = 0;
-            List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
-            for (User friendUser : allFriendsCurrentUser) {
-                for (UserAllFriendsDto user : friendDtos) {
-                    if (friendUser.getId().equals(user.getId())) {
-                        mutualFriends++;
-                    }
-                }
-            }
-            friendCurrentUser.setMutualFriends(mutualFriends);
-        }
         return new PageableDto<>(
-            friendDtos,
+            listUserWithMutualFriends(friendDtos),
             friends.getTotalElements(),
             friends.getPageable().getPageNumber(),
             friends.getTotalPages());
@@ -274,13 +264,13 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public PageableDto<RecommendedFriendDto> getAllUserFriendRequests(Long userId, Pageable pageable) {
+    public PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable) {
         Page<User> friendsRequests = userRepo.getAllUserFriendRequests(userId, pageable);
-        List<RecommendedFriendDto> friendDtos = modelMapper.map(friendsRequests.getContent(),
-            new TypeToken<List<RecommendedFriendDto>>() {
+        List<UserAllFriendsDto> friendDtos = modelMapper.map(friendsRequests.getContent(),
+            new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
         return new PageableDto<>(
-            friendDtos,
+            listUserWithMutualFriends(friendDtos),
             friendsRequests.getTotalElements(),
             friendsRequests.getPageable().getPageNumber(),
             friendsRequests.getTotalPages());
@@ -933,5 +923,21 @@ public class UserServiceImpl implements UserService {
             page.hasNext(),
             page.isFirst(),
             page.isLast());
+    }
+
+    private List<UserAllFriendsDto> listUserWithMutualFriends(List<UserAllFriendsDto> userAllFriends) {
+        for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
+            long mutualFriends = 0;
+            List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
+            for (User friendUser : allFriendsCurrentUser) {
+                for (UserAllFriendsDto user : userAllFriends) {
+                    if (friendUser.getId().equals(user.getId())) {
+                        mutualFriends++;
+                    }
+                }
+            }
+            friendCurrentUser.setMutualFriends(mutualFriends);
+        }
+        return userAllFriends;
     }
 }
