@@ -836,4 +836,31 @@ class UserServiceImplTest {
         PageableAdvancedDto<UserManagementVO> expected = userService.search(pageable, userViewDto);
         assertEquals(expected, actual);
     }
+
+    @Test
+    void findAllByEmailNotification() {
+        when(userRepo.findAllByEmailNotification(any(EmailNotification.class))).thenReturn(Collections.singletonList(user));
+        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        assertEquals(Collections.singletonList(userVO), userService.findAllByEmailNotification(EmailNotification.IMMEDIATELY));
+    }
+
+    @Test
+    void scheduleDeleteDeactivatedUsers() {
+        when(userRepo.scheduleDeleteDeactivatedUsers()).thenReturn(1);
+        assertEquals(1, userService.scheduleDeleteDeactivatedUsers());
+    }
+
+    @Test
+    void findAllUsersCities() {
+        List<String> expected = Collections.singletonList("city");
+        when(userRepo.findAllUsersCities()).thenReturn(expected);
+        assertEquals(expected, userService.findAllUsersCities());
+    }
+
+    @Test
+    void findAllRegistrationMonthsMap() {
+        Map<Integer, Long> expected = Collections.singletonMap(1, 1L);
+        when(userRepo.findAllRegistrationMonthsMap()).thenReturn(expected);
+        assertEquals(expected, userService.findAllRegistrationMonthsMap());
+    }
 }

@@ -1,13 +1,22 @@
 package greencity.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static greencity.constant.AppConstant.AUTHORIZATION;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.user.*;
+import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.service.UserService;
+import java.security.Principal;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -27,16 +36,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.security.Principal;
-import java.util.Collections;
-import java.util.List;
-
-import static greencity.constant.AppConstant.AUTHORIZATION;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -412,5 +411,34 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         verify(userService).search(pageable, userViewDto);
+    }
+
+    @Test
+    void findAllByEmailNotification() throws Exception {
+        mockMvc.perform(get(userLink + "/findAllByEmailNotification?emailNotification="
+            + EmailNotification.IMMEDIATELY))
+            .andExpect(status().isOk());
+        verify(userService, times(1)).findAllByEmailNotification(EmailNotification.IMMEDIATELY);
+    }
+
+    @Test
+    void scheduleDeleteDeactivatedUsers() throws Exception {
+        mockMvc.perform(post(userLink + "/deleteDeactivatedUsers"))
+            .andExpect(status().isOk());
+        verify(userService, times(1)).scheduleDeleteDeactivatedUsers();
+    }
+
+    @Test
+    void findAllUsersCities() throws Exception {
+        mockMvc.perform(get(userLink + "/findAllUsersCities"))
+            .andExpect(status().isOk());
+        verify(userService, times(1)).findAllUsersCities();
+    }
+
+    @Test
+    void findAllRegistrationMonthsMap() throws Exception {
+        mockMvc.perform(get(userLink + "/findAllRegistrationMonthsMap"))
+            .andExpect(status().isOk());
+        verify(userService, times(1)).findAllRegistrationMonthsMap();
     }
 }
