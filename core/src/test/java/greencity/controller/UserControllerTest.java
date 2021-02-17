@@ -1,6 +1,5 @@
 package greencity.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.dto.PageableAdvancedDto;
@@ -238,15 +237,15 @@ class UserControllerTest {
     }
 
     @Test
-    void getAvailableCustomGoalsTest() throws Exception {
+    void getAvailableCustomShoppingListItemTest() throws Exception {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
-        mockMvc.perform(get(userLink + "/{userId}/customGoals/available", 1)
+        mockMvc.perform(get(userLink + "/{userId}/custom-shopping-list-items/available", 1)
             .headers(headers))
             .andExpect(status().isOk());
 
-        verify(userService).getAvailableCustomGoals(1L);
+        verify(userService).getAvailableCustomShoppingListItems(1L);
     }
 
     @Test
