@@ -99,7 +99,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/activatedUsersAmount",
                 "/user/{userId}/habit/assign",
                 "/token",
-                "/socket/**")
+                "/socket/**",
+                "/user/findAllByEmailNotification")
             .permitAll()
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
@@ -108,7 +109,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/email/addEcoNews",
                 "/email/sendReport",
                 "/email/changePlaceStatus",
-                "/email/sendHabitNotification")
+                "/email/sendHabitNotification",
+                "/user/deleteDeactivatedUsers")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 USER_LINK,

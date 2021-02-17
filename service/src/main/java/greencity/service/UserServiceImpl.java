@@ -309,6 +309,41 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
+        return userRepo.findAllByEmailNotification(emailNotification).stream()
+            .map(user -> modelMapper.map(user, UserVO.class))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public int scheduleDeleteDeactivatedUsers() {
+        return userRepo.scheduleDeleteDeactivatedUsers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> findAllUsersCities() {
+        return userRepo.findAllUsersCities();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<Integer, Long> findAllRegistrationMonthsMap() {
+        return userRepo.findAllRegistrationMonthsMap();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     private PageableAdvancedDto<UserManagementVO> buildPageableAdvanceDtoFromPage(Page<User> pageTags) {
         List<UserManagementVO> usersVOs = pageTags.getContent().stream()
             .map(t -> modelMapper.map(t, UserManagementVO.class))
