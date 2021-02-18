@@ -1,7 +1,7 @@
 package greencity.client;
 
 import greencity.constant.RestTemplateLinks;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,21 +38,25 @@ class RestClientTest {
     private RestClient restClient;
 
     @Test
-    void getAllAvailableCustomGoals() {
+    void getAllAvailableCustomShoppingListItems() {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long userId = 1L;
-        CustomGoalResponseDto customGoalResponseDto = new CustomGoalResponseDto(1L, "test");
-        CustomGoalResponseDto[] customGoalResponseDtos = new CustomGoalResponseDto[1];
-        customGoalResponseDtos[0] = customGoalResponseDto;
+        CustomShoppingListItemResponseDto customShoppingListItemResponseDto =
+            new CustomShoppingListItemResponseDto(1L, "test");
+        CustomShoppingListItemResponseDto[] customShoppingListItemResponseDtos =
+            new CustomShoppingListItemResponseDto[1];
+        customShoppingListItemResponseDtos[0] = customShoppingListItemResponseDto;
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_GOALS + userId, HttpMethod.GET, entity, CustomGoalResponseDto[].class))
-                .thenReturn(ResponseEntity.ok(customGoalResponseDtos));
+            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId, HttpMethod.GET, entity,
+            CustomShoppingListItemResponseDto[].class))
+                .thenReturn(ResponseEntity.ok(customShoppingListItemResponseDtos));
 
-        assertEquals(Arrays.asList(customGoalResponseDtos), restClient.getAllAvailableCustomGoals(userId));
+        assertEquals(Arrays.asList(customShoppingListItemResponseDtos),
+            restClient.getAllAvailableCustomShoppingListItems(userId));
     }
 
     @Test

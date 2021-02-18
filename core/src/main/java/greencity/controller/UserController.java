@@ -11,7 +11,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
@@ -215,23 +215,24 @@ public class UserController {
     }
 
     /**
-     * Method returns list of available (not ACTIVE) custom goals for user.
+     * Method returns list of available (not ACTIVE) custom shopping list items for
+     * user.
      *
      * @return {@link ResponseEntity}.
      * @author Vitalii Skolozdra
      */
-    @ApiOperation(value = "Get available custom goals for current user.")
+    @ApiOperation(value = "Get available custom shopping list items for current user.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @GetMapping("/{userId}/customGoals/available")
-    public ResponseEntity<List<CustomGoalResponseDto>> getAvailableCustomGoals(
+    @GetMapping("/{userId}/custom-shopping-list-items/available")
+    public ResponseEntity<List<CustomShoppingListItemResponseDto>> getAvailableCustomShoppingListItems(
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(userService.getAvailableCustomGoals(userId));
+            .body(userService.getAvailableCustomShoppingListItems(userId));
     }
 
     /**
@@ -402,7 +403,7 @@ public class UserController {
     }
 
     /**
-     * The method finds {@link RecommendedFriendDto} for the current userId.
+     * The method finds {@link UserAllFriendsDto} for the current userId.
      *
      * @return {@link ResponseEntity}.
      */
@@ -414,7 +415,7 @@ public class UserController {
     })
     @GetMapping("/{userId}/recommendedFriends/")
     @ApiPageable
-    public ResponseEntity<PageableDto<RecommendedFriendDto>> findUsersRecommendedFriends(
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findUsersRecommendedFriends(
         @ApiIgnore Pageable page,
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity
@@ -435,7 +436,7 @@ public class UserController {
     })
     @GetMapping("/{userId}/friendRequests/")
     @ApiPageable
-    public ResponseEntity<PageableDto<RecommendedFriendDto>> getAllUserFriendsRequests(
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> getAllUserFriendsRequests(
         @ApiIgnore Pageable page,
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity

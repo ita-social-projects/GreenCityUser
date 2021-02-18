@@ -114,8 +114,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 USER_LINK,
-                "/user/goals/habits/{habitId}/shopping-list",
-                "/user/{userId}/customGoals/available",
+                "/user/shopping-list-items/habits/{habitId}/shopping-list",
+                "/user/{userId}/custom-shopping-list-items/available",
                 "/user/{userId}/sixUserFriends/",
                 "/user/{userId}/profile/",
                 "/user/isOnline/{userId}/",
@@ -132,7 +132,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,
-                "/user/goals",
+                "/user/shopping-list-items",
                 "/user/{userId}/habit",
                 "/user/{userId}/userFriend/{friendId}",
                 "/user/{userId}/declineFriend/{friendId}",
@@ -144,13 +144,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{id}/updateUserLastActivityTime/{date}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PATCH,
-                "/user/goals/{userGoalId}",
+                "/user/shopping-list-items/{userShoppingListItemId}",
                 "/user/profilePicture",
                 "/user/deleteProfilePicture")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.DELETE,
-                "/user/goals/user-goals",
-                "/user/goals",
+                "/user/shopping-list-items/user-shopping-list-items",
+                "/user/shopping-list-items",
                 "/user/{userId}/userFriend/{friendId}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.GET,

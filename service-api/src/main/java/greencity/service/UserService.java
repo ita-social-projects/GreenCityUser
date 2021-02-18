@@ -5,7 +5,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -191,13 +191,14 @@ public interface UserService {
     int updateUserRefreshToken(String refreshTokenKey, Long id);
 
     /**
-     * Method returns list of available (not ACTIVE) customGoals for user.
+     * Method returns list of available (not ACTIVE) customShoppingListItem for
+     * user.
      *
      * @param userId id of the {@link UserVO} current user.
-     * @return List of {@link CustomGoalResponseDto}
+     * @return List of {@link CustomShoppingListItemResponseDto}
      * @author Bogdan Kuzenko
      */
-    List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId);
+    List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId);
 
     /**
      * Counts all users by user {@link UserStatus} ACTIVATED.
@@ -399,7 +400,7 @@ public interface UserService {
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
 
-    PageableDto<RecommendedFriendDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
+    PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
 
     /**
      * Method that finds all user's friends.
@@ -434,7 +435,7 @@ public interface UserService {
      * @param userId   {@link Long} -current user's id.
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
-    PageableDto<RecommendedFriendDto> getAllUserFriendRequests(Long userId, Pageable pageable);
+    PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable);
 
     /**
      * Method that finds all friends that send you request.
