@@ -288,7 +288,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public PageableAdvancedDto<UserManagementVO> search(Pageable pageable,
-                                                        UserManagementViewDto userManagementViewDto) {
+        UserManagementViewDto userManagementViewDto) {
         Page<User> found = userRepo.findAll(buildSpecification(userManagementViewDto), pageable);
         return buildPageableAdvanceDtoFromPage(found);
     }
@@ -546,7 +546,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserVO updateUserProfilePicture(MultipartFile image, String email,
-                                           UserProfilePictureDto userProfilePictureDto) {
+        UserProfilePictureDto userProfilePictureDto) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
