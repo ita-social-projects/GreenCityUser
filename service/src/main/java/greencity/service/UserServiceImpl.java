@@ -934,4 +934,39 @@ public class UserServiceImpl implements UserService {
             page.isFirst(),
             page.isLast());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
+        return userRepo.findAllByEmailNotification(emailNotification).stream()
+            .map(user -> modelMapper.map(user, UserVO.class))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public int scheduleDeleteDeactivatedUsers() {
+        return userRepo.scheduleDeleteDeactivatedUsers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> findAllUsersCities() {
+        return userRepo.findAllUsersCities();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<Integer, Long> findAllRegistrationMonthsMap() {
+        return userRepo.findAllRegistrationMonthsMap();
+    }
 }

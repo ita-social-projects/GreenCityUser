@@ -10,6 +10,7 @@ import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -447,4 +448,34 @@ public interface UserService {
      * {@inheritDoc}
      */
     PageableAdvancedDto<UserManagementVO> search(Pageable pageable, UserManagementViewDto userManagementViewDto);
+
+    /**
+     * Find all {@link UserVO}'s with {@link EmailNotification} type.
+     *
+     * @param emailNotification - type of {@link EmailNotification}
+     * @return list of {@link UserVO}'s
+     */
+    List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
+
+    /**
+     * Delete from the database users that have status 'DEACTIVATED' and last
+     * visited the site 2 years ago.
+     *
+     * @return number of deleted rows.
+     */
+    int scheduleDeleteDeactivatedUsers();
+
+    /**
+     * Find and return all cities for all users.
+     *
+     * @return {@link List} of {@link String} of cities
+     **/
+    List<String> findAllUsersCities();
+
+    /**
+     * Find and return all registration months.
+     *
+     * @return {@link Map} of months
+     **/
+    Map<Integer, Long> findAllRegistrationMonthsMap();
 }

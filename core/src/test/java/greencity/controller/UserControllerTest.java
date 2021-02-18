@@ -6,6 +6,7 @@ import greencity.ModelUtils;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.user.*;
+import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -412,5 +413,34 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         verify(userService).search(pageable, userViewDto);
+    }
+
+    @Test
+    void findAllByEmailNotification() throws Exception {
+        mockMvc.perform(get(userLink + "/findAllByEmailNotification?emailNotification="
+            + EmailNotification.IMMEDIATELY))
+            .andExpect(status().isOk());
+        verify(userService, times(1)).findAllByEmailNotification(EmailNotification.IMMEDIATELY);
+    }
+
+    @Test
+    void scheduleDeleteDeactivatedUsers() throws Exception {
+        mockMvc.perform(post(userLink + "/deleteDeactivatedUsers"))
+            .andExpect(status().isOk());
+        verify(userService, times(1)).scheduleDeleteDeactivatedUsers();
+    }
+
+    @Test
+    void findAllUsersCities() throws Exception {
+        mockMvc.perform(get(userLink + "/findAllUsersCities"))
+            .andExpect(status().isOk());
+        verify(userService, times(1)).findAllUsersCities();
+    }
+
+    @Test
+    void findAllRegistrationMonthsMap() throws Exception {
+        mockMvc.perform(get(userLink + "/findAllRegistrationMonthsMap"))
+            .andExpect(status().isOk());
+        verify(userService, times(1)).findAllRegistrationMonthsMap();
     }
 }
