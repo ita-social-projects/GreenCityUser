@@ -4,6 +4,8 @@ import greencity.constant.RestTemplateLinks;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.user.UserVO;
+import greencity.enums.AchievementCategoryType;
+import greencity.enums.AchievementType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -40,7 +42,7 @@ public class RestClient {
     public List<CustomShoppingListItemResponseDto> getAllAvailableCustomShoppingListItems(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         ResponseEntity<CustomShoppingListItemResponseDto[]> exchange = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId, HttpMethod.GET, entity,
+                + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId, HttpMethod.GET, entity,
             CustomShoppingListItemResponseDto[].class);
         CustomShoppingListItemResponseDto[] responseDtos = exchange.getBody();
         assert responseDtos != null;
@@ -57,8 +59,8 @@ public class RestClient {
     public MultipartFile convertToMultipartImage(String profilePicturePath) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.FILES_CONVERT + RestTemplateLinks.IMAGE
-            + profilePicturePath,
+                + RestTemplateLinks.FILES_CONVERT + RestTemplateLinks.IMAGE
+                + profilePicturePath,
             HttpMethod.POST, entity, MultipartFile.class).getBody();
     }
 
@@ -79,7 +81,7 @@ public class RestClient {
 
     /**
      * Method for delete social network by id.
-     * 
+     *
      * @param socialNetworkId of {@link SocialNetworkImageVO}
      * @return Long
      * @author Orest Mamchuk
@@ -87,7 +89,7 @@ public class RestClient {
     public Long deleteSocialNetwork(Long socialNetworkId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS + RestTemplateLinks.ID + socialNetworkId,
+                + RestTemplateLinks.SOCIAL_NETWORKS + RestTemplateLinks.ID + socialNetworkId,
             HttpMethod.DELETE, entity, Long.class).getBody();
     }
 
@@ -101,7 +103,7 @@ public class RestClient {
     public SocialNetworkImageVO getSocialNetworkImageByUrl(String url) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS_IMAGE + RestTemplateLinks.URL + url,
+                + RestTemplateLinks.SOCIAL_NETWORKS_IMAGE + RestTemplateLinks.URL + url,
             HttpMethod.GET, entity, SocialNetworkImageVO.class).getBody();
     }
 
@@ -129,7 +131,7 @@ public class RestClient {
     public Long findAmountOfWrittenTipsAndTrick(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.TIPSANDTRICKS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity,
+                + RestTemplateLinks.TIPSANDTRICKS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity,
             Long.class).getBody();
     }
 
@@ -143,7 +145,7 @@ public class RestClient {
     public Long findAmountOfAcquiredHabits(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.HABIT_STATISTIC_ACQUIRED_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
+                + RestTemplateLinks.HABIT_STATISTIC_ACQUIRED_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
             entity, Long.class).getBody();
     }
 
@@ -157,8 +159,8 @@ public class RestClient {
     public Long findAmountOfHabitsInProgress(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
-            entity, Long.class).getBody();
+                + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId,
+            HttpMethod.GET, entity, Long.class).getBody();
     }
 
     /**
@@ -183,5 +185,20 @@ public class RestClient {
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
         return headers;
+    }
+
+    /**
+     * m,m,m.
+     */
+    public void calculateAchievement(Long id, AchievementType setter, AchievementCategoryType socialNetwork, int size) {
+        String accessToken = httpServletRequest.getHeader(AUTHORIZATION);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+        restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
+                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + id
+                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + setter
+                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + socialNetwork
+                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + size,
+            HttpMethod.POST, new HttpEntity<>(headers), Object.class);
     }
 }
