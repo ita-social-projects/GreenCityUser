@@ -857,4 +857,24 @@ public class UserController {
         PageableAdvancedDto<UserManagementVO> found = userService.search(pageable, userViewDto);
         return ResponseEntity.status(HttpStatus.OK).body(found);
     }
+
+    /**
+     * Method that change user language.
+     *
+     * @param userId {@link Long } user id
+     * @param languageId {@link Long} language id.
+     *
+     */
+    @ApiOperation(value = "Update user language")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @PutMapping("/{userId}/language/{languageId}")
+    public ResponseEntity<Object> setUserLanguage(@PathVariable @CurrentUserId Long userId,
+        @PathVariable Long languageId) {
+        userService.updateUserLanguage(userId, languageId);
+        return ResponseEntity.ok().build();
+    }
 }
