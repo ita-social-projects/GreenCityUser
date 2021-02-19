@@ -856,7 +856,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void updateUserLanguage() {
+    void updateUserLanguage() {
         Language language = ModelUtils.getLanguage();
         User user = ModelUtils.getUser();
         user.setLanguage(language);
@@ -869,7 +869,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void updateUserLanguageNotFoundExeption() {
+    void updateUserLanguageNotFoundExeption() {
         Language language = ModelUtils.getLanguage();
         User user = ModelUtils.getUser();
         user.setLanguage(language);
@@ -879,7 +879,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void updateUserLanguageUserNotFoundExeption() {
+    void updateUserLanguageUserNotFoundExeption() {
         Language language = ModelUtils.getLanguage();
         User user = ModelUtils.getUser();
         user.setLanguage(language);
