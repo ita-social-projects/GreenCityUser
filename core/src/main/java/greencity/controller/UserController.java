@@ -861,7 +861,7 @@ public class UserController {
     /**
      * Method that change user language.
      *
-     * @param userId {@link Long } user id
+     * @param userId     {@link Long } user id
      * @param languageId {@link Long} language id.
      *
      */
