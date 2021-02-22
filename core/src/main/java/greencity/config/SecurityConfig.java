@@ -128,8 +128,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findNotDeactivatedByEmail",
                 "/user/findByEmail",
                 "/user/findIdByEmail",
-                "/user/findById"
-            )
+                "/user/findById")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,
