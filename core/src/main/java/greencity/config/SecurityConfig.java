@@ -108,7 +108,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/email/addEcoNews",
                 "/email/sendReport",
                 "/email/changePlaceStatus",
-                "/email/sendHabitNotification")
+                "/email/sendHabitNotification",
+                "/")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 USER_LINK,
@@ -126,7 +127,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findByIdForAchievement",
                 "/user/findNotDeactivatedByEmail",
                 "/user/findByEmail",
-                "/user/findIdByEmail")
+                "/user/findIdByEmail",
+                "/user/findById"
+            )
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,
@@ -154,7 +157,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.GET,
                 "/user/all",
                 "/user/roles",
-                "/user/findById",
                 "/user/findUserForManagement",
                 "/user/searchBy",
                 "/user/findAll",
