@@ -108,8 +108,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/email/addEcoNews",
                 "/email/sendReport",
                 "/email/changePlaceStatus",
-                "/email/sendHabitNotification",
-                "/")
+                "/email/sendHabitNotification")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 USER_LINK,
