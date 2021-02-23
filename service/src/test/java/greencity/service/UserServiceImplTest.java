@@ -8,17 +8,20 @@ import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.user.*;
+import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
+import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -45,15 +48,15 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UserServiceImplTest {
     @Mock
     UserRepo userRepo;
+
+    @Mock
+    LanguageRepo languageRepo;
 
     @Mock
     RestClient restClient;
@@ -850,5 +853,39 @@ class UserServiceImplTest {
             false, false, true, true);
         PageableAdvancedDto<UserManagementVO> expected = userService.search(pageable, userViewDto);
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void updateUserLanguage() {
+        Language language = ModelUtils.getLanguage();
+        User user = ModelUtils.getUser();
+        user.setLanguage(language);
+
+        when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        userService.updateUserLanguage(1L, 1L);
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void updateUserLanguageNotFoundExeption() {
+        Language language = ModelUtils.getLanguage();
+        User user = ModelUtils.getUser();
+        user.setLanguage(language);
+
+        when(languageRepo.findById(10L)).thenThrow(NotFoundException.class);
+        assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 10L));
+    }
+
+    @Test
+    void updateUserLanguageUserNotFoundExeption() {
+        Language language = ModelUtils.getLanguage();
+        User user = ModelUtils.getUser();
+        user.setLanguage(language);
+
+        when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
+        when(userRepo.findById(1L)).thenThrow(NotFoundException.class);
+        assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 1L));
     }
 }

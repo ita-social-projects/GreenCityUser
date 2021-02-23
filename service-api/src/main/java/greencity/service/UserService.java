@@ -448,4 +448,12 @@ public interface UserService {
      * {@inheritDoc}
      */
     PageableAdvancedDto<UserManagementVO> search(Pageable pageable, UserManagementViewDto userManagementViewDto);
+
+    /**
+     * Method that update user language column.
+     *
+     * @param userId     {@link Long} -current user's id.
+     * @param languageId {@link Long} - language id.
+     */
+    void updateUserLanguage(Long userId, Long languageId);
 }
