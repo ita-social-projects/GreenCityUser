@@ -32,6 +32,7 @@ public final class ErrorMessage {
     public static final String PASSWORD_DOES_NOT_MATCH = "The password doesn't match";
     public static final String SELECT_CORRECT_LANGUAGE = "Select correct language: 'en', 'ua' or 'ru'";
     public static final String TOKEN_FOR_RESTORE_IS_INVALID = "Token is null or it doesn't exist.";
+    public static final String LANGUAGE_NOT_FOUND_BY_ID = "The language does not exist by this id: ";
 
     private ErrorMessage() {
     }
