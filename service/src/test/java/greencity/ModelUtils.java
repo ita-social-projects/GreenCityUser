@@ -40,6 +40,16 @@ public class ModelUtils {
         }
 
         @Override
+        public String getCity() {
+            return "Test";
+        }
+
+        @Override
+        public Double getRating() {
+            return 20.0;
+        }
+
+        @Override
         public String getProfilePicture() {
             return "profile";
         }

@@ -122,9 +122,11 @@ class UserServiceImplTest {
             .rating(20.0)
             .profilePicturePath("test")
             .build();
-        List<User> singletonList = Collections.singletonList(user);
+        List<User> singletonListUsers = Collections.singletonList(user);
+        UsersFriendDto usersFriendDto = ModelUtils.usersFriendDto;
+        List<UsersFriendDto> singletonList = Collections.singletonList(usersFriendDto);
         PageRequest pageRequest = PageRequest.of(0, 1);
-        Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
+        Page<UsersFriendDto> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
         List<UserAllFriendsDto> dtoList =
             Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test"));
         PageableDto<UserAllFriendsDto> pageableDto =
@@ -132,7 +134,8 @@ class UserServiceImplTest {
         when(userRepo.findUsersRecommendedFriends(pageRequest, userId)).thenReturn(page);
         when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
         }.getType())).thenReturn(dtoList);
-        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonList);
+        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
+        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
         PageableDto<UserAllFriendsDto> actual = userService.findUsersRecommendedFriends(pageRequest, 1L);
         assertEquals(pageableDto, actual);
     }
@@ -556,8 +559,8 @@ class UserServiceImplTest {
         when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
         }.getType())).thenReturn(dtoList);
         when(userRepo.getAllUserFriends(1L)).thenReturn(singletonList);
+        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonList);
         PageableDto<UserAllFriendsDto> actual = userService.getAllUserFriendRequests(1L, pageRequest);
-
         assertEquals(pageableDto, actual);
     }
 

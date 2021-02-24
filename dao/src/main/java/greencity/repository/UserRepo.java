@@ -1,6 +1,7 @@
 package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
+import greencity.dto.user.UsersFriendDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
@@ -299,10 +300,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param pageable {@link Pageable}.
      * @param userId   {@link Long} -current user's id.
-     * @return {@link Page} of {@link User} instances.
+     * @return {@link Page} of {@link UsersFriendDto} instances.
      */
     @Query(nativeQuery = true, value = "select * FROM public.fn_recommended_friends ( :userId )")
-    Page<User> findUsersRecommendedFriends(Pageable pageable,
+    Page<UsersFriendDto> findUsersRecommendedFriends(Pageable pageable,
         @Param("userId") Long userId);
 
     /**

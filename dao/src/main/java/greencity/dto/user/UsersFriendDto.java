@@ -19,6 +19,21 @@ public interface UsersFriendDto {
     String getName();
 
     /**
+     * Get user's city.
+     *
+     * @return city
+     */
+    String getCity();
+
+    /**
+     * Get user's rating.
+     *
+     * @return rating
+     */
+
+    Double getRating();
+
+    /**
      * Get user's profile picture.
      *
      * @return profile_picture
