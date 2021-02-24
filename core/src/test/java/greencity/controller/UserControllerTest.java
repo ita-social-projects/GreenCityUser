@@ -412,4 +412,15 @@ class UserControllerTest {
             .andExpect(status().isOk());
         verify(userService).search(pageable, userViewDto);
     }
+
+    @Test
+    void updateUserLanguageTest() throws Exception {
+        String accessToken = "accessToken";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+        mockMvc.perform(put(userLink + "/{userId}/language/{languageId}", 1, 1)
+            .headers(headers))
+            .andExpect(status().isOk());
+        verify(userService).updateUserLanguage(1L, 1L);
+    }
 }

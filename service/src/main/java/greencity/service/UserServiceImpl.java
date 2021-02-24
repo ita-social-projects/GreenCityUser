@@ -3,6 +3,7 @@ package greencity.service;
 //import greencity.achievement.AchievementCalculation;
 
 import greencity.dto.user.*;
+import greencity.entity.*;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -13,15 +14,12 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
-import greencity.entity.SocialNetwork;
-import greencity.entity.SocialNetworkImage;
-import greencity.entity.User;
-import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
+import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -58,6 +56,7 @@ public class UserServiceImpl implements UserService {
      */
     private final UserRepo userRepo;
     private final RestClient restClient;
+    private final LanguageRepo languageRepo;
     // private final AchievementCalculation achievementCalculation;
     /**
      * Autowired mapper.
@@ -923,6 +922,19 @@ public class UserServiceImpl implements UserService {
             page.isLast());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUserLanguage(Long userId, Long languageId) {
+        Language language = languageRepo.findById(languageId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+        user.setLanguage(language);
+        userRepo.save(user);
+    }
+  
     private List<UserAllFriendsDto> allUsersMutualFriendsMethod(List<UserAllFriendsDto> userAllFriends) {
         for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
             long mutualFriends = 0;
@@ -938,7 +950,7 @@ public class UserServiceImpl implements UserService {
         }
         return userAllFriends;
     }
-
+  
     private List<UserAllFriendsDto> allUsersMutualFriendsRecommendedOrRequest(Long id,
         List<UserAllFriendsDto> userAllFriends) {
         List<User> currentUserFriend = userRepo.getAllUserFriends(id);
@@ -955,5 +967,5 @@ public class UserServiceImpl implements UserService {
             friendCurrentUser.setMutualFriends(mutualFriends);
         }
         return userAllFriends;
-    }
+}   
 }
