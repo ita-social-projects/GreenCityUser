@@ -198,12 +198,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
-        Page<User> friends = userRepo.findUsersRecommendedFriends(pageable, userId);
+        Page<UsersFriendDto> friends = userRepo.findUsersRecommendedFriends(pageable, userId);
         List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
         return new PageableDto<>(
-            listUserWithMutualFriends(friendDtos),
+            allUsersMutualFriendsRecommendedOrRequest(userId, friendDtos),
             friends.getTotalElements(),
             friends.getPageable().getPageNumber(),
             friends.getTotalPages());
@@ -219,7 +219,7 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
         return new PageableDto<>(
-            listUserWithMutualFriends(friendDtos),
+            allUsersMutualFriendsMethod(friendDtos),
             friends.getTotalElements(),
             friends.getPageable().getPageNumber(),
             friends.getTotalPages());
@@ -267,7 +267,7 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
         return new PageableDto<>(
-            listUserWithMutualFriends(friendDtos),
+            allUsersMutualFriendsRecommendedOrRequest(userId, friendDtos),
             friendsRequests.getTotalElements(),
             friendsRequests.getPageable().getPageNumber(),
             friendsRequests.getTotalPages());
@@ -922,12 +922,30 @@ public class UserServiceImpl implements UserService {
             page.isLast());
     }
 
-    private List<UserAllFriendsDto> listUserWithMutualFriends(List<UserAllFriendsDto> userAllFriends) {
+    private List<UserAllFriendsDto> allUsersMutualFriendsMethod(List<UserAllFriendsDto> userAllFriends) {
         for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
             long mutualFriends = 0;
             List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
             for (User friendUser : allFriendsCurrentUser) {
                 for (UserAllFriendsDto user : userAllFriends) {
+                    if (friendUser.getId().equals(user.getId())) {
+                        mutualFriends++;
+                    }
+                }
+            }
+            friendCurrentUser.setMutualFriends(mutualFriends);
+        }
+        return userAllFriends;
+    }
+
+    private List<UserAllFriendsDto> allUsersMutualFriendsRecommendedOrRequest(Long id,
+        List<UserAllFriendsDto> userAllFriends) {
+        List<User> currentUserFriend = userRepo.getAllUserFriends(id);
+        for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
+            long mutualFriends = 0;
+            List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
+            for (User friendUser : allFriendsCurrentUser) {
+                for (User user : currentUserFriend) {
                     if (friendUser.getId().equals(user.getId())) {
                         mutualFriends++;
                     }
