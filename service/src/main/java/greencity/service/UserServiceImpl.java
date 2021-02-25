@@ -722,11 +722,8 @@ public class UserServiceImpl implements UserService {
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
         userRepo.save(user);
-
-        CompletableFuture.runAsync(() -> restClient
-            .calculateAchievement(user.getId(), AchievementType.SETTER,
-                AchievementCategoryType.SOCIAL_NETWORK, user.getSocialNetworks().size()));
-
+        restClient.calculateAchievement(user.getId(), AchievementType.SETTER,
+            AchievementCategoryType.SOCIAL_NETWORK, user.getSocialNetworks().size());
         return modelMapper.map(user, UserProfileDtoResponse.class);
     }
 
