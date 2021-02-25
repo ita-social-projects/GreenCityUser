@@ -1,7 +1,5 @@
 package greencity.service;
 
-//import greencity.achievement.AchievementCalculation;
-
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -12,14 +10,12 @@ import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.user.*;
-import greencity.entity.SocialNetwork;
-import greencity.entity.SocialNetworkImage;
-import greencity.entity.User;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.*;
 import greencity.exception.exceptions.*;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
+import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import java.sql.Timestamp;
@@ -27,7 +23,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-//import java.util.concurrent.CompletableFuture;
-
 /**
  * The class provides implementation of the {@code UserService}.
  */
@@ -57,7 +50,8 @@ public class UserServiceImpl implements UserService {
      */
     private final UserRepo userRepo;
     private final RestClient restClient;
-    // private final AchievementCalculation achievementCalculation;
+    private final LanguageRepo languageRepo;
+
     /**
      * Autowired mapper.
      */
@@ -198,12 +192,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
-        Page<User> friends = userRepo.findUsersRecommendedFriends(pageable, userId);
+        Page<UsersFriendDto> friends = userRepo.findUsersRecommendedFriends(pageable, userId);
         List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
         return new PageableDto<>(
-            listUserWithMutualFriends(friendDtos),
+            allUsersMutualFriendsRecommendedOrRequest(userId, friendDtos),
             friends.getTotalElements(),
             friends.getPageable().getPageNumber(),
             friends.getTotalPages());
@@ -219,7 +213,7 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
         return new PageableDto<>(
-            listUserWithMutualFriends(friendDtos),
+            allUsersMutualFriendsMethod(friendDtos),
             friends.getTotalElements(),
             friends.getPageable().getPageNumber(),
             friends.getTotalPages());
@@ -267,7 +261,7 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
         return new PageableDto<>(
-            listUserWithMutualFriends(friendDtos),
+            allUsersMutualFriendsRecommendedOrRequest(userId, friendDtos),
             friendsRequests.getTotalElements(),
             friendsRequests.getPageable().getPageNumber(),
             friendsRequests.getTotalPages());
@@ -921,7 +915,7 @@ public class UserServiceImpl implements UserService {
             page.isLast());
     }
 
-    private List<UserAllFriendsDto> listUserWithMutualFriends(List<UserAllFriendsDto> userAllFriends) {
+    private List<UserAllFriendsDto> allUsersMutualFriendsMethod(List<UserAllFriendsDto> userAllFriends) {
         for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
             long mutualFriends = 0;
             List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
@@ -935,5 +929,36 @@ public class UserServiceImpl implements UserService {
             friendCurrentUser.setMutualFriends(mutualFriends);
         }
         return userAllFriends;
+    }
+
+    private List<UserAllFriendsDto> allUsersMutualFriendsRecommendedOrRequest(Long id,
+        List<UserAllFriendsDto> userAllFriends) {
+        List<User> currentUserFriend = userRepo.getAllUserFriends(id);
+        for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
+            long mutualFriends = 0;
+            List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
+            for (User friendUser : allFriendsCurrentUser) {
+                for (User user : currentUserFriend) {
+                    if (friendUser.getId().equals(user.getId())) {
+                        mutualFriends++;
+                    }
+                }
+            }
+            friendCurrentUser.setMutualFriends(mutualFriends);
+        }
+        return userAllFriends;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUserLanguage(Long userId, Long languageId) {
+        Language language = languageRepo.findById(languageId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+        user.setLanguage(language);
+        userRepo.save(user);
     }
 }

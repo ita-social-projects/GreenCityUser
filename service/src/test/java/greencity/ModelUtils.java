@@ -40,6 +40,16 @@ public class ModelUtils {
         }
 
         @Override
+        public String getCity() {
+            return "test";
+        }
+
+        @Override
+        public Double getRating() {
+            return 20.0;
+        }
+
+        @Override
         public String getProfilePicture() {
             return "profile";
         }
@@ -149,7 +159,7 @@ public class ModelUtils {
     }
 
     public static Language getLanguage() {
-        return new Language(1L, AppConstant.DEFAULT_LANGUAGE_CODE);
+        return Language.builder().id(1L).code(AppConstant.DEFAULT_LANGUAGE_CODE).build();
     }
 
     public static UserProfilePictureDto getUserProfilePictureDto() {
