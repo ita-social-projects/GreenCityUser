@@ -1,7 +1,7 @@
 trigger:
   branches:
     include:
-    - dev
+    - will_test
   paths:
     exclude:
     - README.md
