@@ -1,5 +1,6 @@
 package greencity.security.service;
 
+import greencity.client.RestClient;
 import greencity.entity.VerifyEmail;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.security.repository.VerifyEmailRepo;
@@ -19,6 +20,8 @@ import static org.mockito.Mockito.*;
 class VerifyEmailServiceImplTest {
     @Mock
     private VerifyEmailRepo verifyEmailRepo;
+    @Mock
+    RestClient restClient;
 
     @InjectMocks
     private VerifyEmailServiceImpl verifyEmailService;
@@ -28,6 +31,7 @@ class VerifyEmailServiceImplTest {
         VerifyEmail verifyEmail = new VerifyEmail();
         verifyEmail.setExpiryDate(LocalDateTime.MAX);
         when(verifyEmailRepo.findByTokenAndUserId(1L, "token")).thenReturn(Optional.of(verifyEmail));
+        doNothing().when(restClient).addUserToSystemChat(1L);
         verifyEmailService.verifyByToken(1L, "token");
         verify(verifyEmailRepo).deleteVerifyEmailByTokenAndUserId(1L, "token");
     }

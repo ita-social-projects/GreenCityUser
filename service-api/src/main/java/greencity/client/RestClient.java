@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +30,8 @@ public class RestClient {
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
     private final HttpServletRequest httpServletRequest;
+    @Value("${greencitychat.server.address}")
+    private String greenCityChatServerAddress;
 
     /**
      * Method for finding all custom shopping list items.
@@ -171,6 +174,13 @@ public class RestClient {
             + RestTemplateLinks.LANGUAGE, String[].class);
         assert restTemplateForObject != null;
         return Arrays.asList(restTemplateForObject);
+    }
+
+    /**
+     * Method for add new user to system chat.
+     */
+    public void addUserToSystemChat(Long userId) {
+        restTemplate.postForEntity(greenCityChatServerAddress + "/chat/user", userId, Long.class);
     }
 
     /**

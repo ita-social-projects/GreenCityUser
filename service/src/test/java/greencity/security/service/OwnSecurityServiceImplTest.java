@@ -1,5 +1,6 @@
 package greencity.security.service;
 
+import greencity.client.RestClient;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
