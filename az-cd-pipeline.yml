@@ -1,13 +1,14 @@
 trigger:
   branches:
     include:
-    - will_test
+    - dev
+    - main
   paths:
     exclude:
     - README.md
     
 pr: none
-# sdfsdf
+
 
 variables:
   agentOS: ubuntu-latest
