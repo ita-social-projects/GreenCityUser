@@ -84,7 +84,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                         .build())
                     .build())
                 .collect(Collectors.toList()) : new ArrayList<>())
-            .languageCode(user.getLanguage().getCode())
             .build();
     }
 }

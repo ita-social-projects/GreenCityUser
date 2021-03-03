@@ -76,6 +76,4 @@ public class UserVO {
     private LocalDateTime lastActivityTime;
 
     private List<UserActionVO> userActions = new ArrayList<>();
-
-    private String languageCode;
 }
