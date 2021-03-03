@@ -127,4 +127,7 @@ public class User {
 
     @ManyToOne
     private Language language;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserDeactivationReason> userDeactivationReasons;
 }

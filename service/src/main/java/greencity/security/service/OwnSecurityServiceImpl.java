@@ -4,13 +4,7 @@ import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
-import greencity.entity.OwnSecurity;
-import greencity.entity.RestorePasswordEmail;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -36,11 +30,13 @@ import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
@@ -104,7 +100,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     @Transactional
     @Override
     public SuccessSignUpDto signUp(OwnSignUpDto dto, String language) {
-        User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey());
+        User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         OwnSecurity ownSecurity = createOwnSecurity(dto, user);
         VerifyEmail verifyEmail = createVerifyEmail(user, jwtTool.generateTokenKey());
         List<UserAchievement> userAchievementList = createUserAchievements(user);
@@ -124,7 +120,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
-    private User createNewRegisteredUser(OwnSignUpDto dto, String refreshTokenKey) {
+    private User createNewRegisteredUser(OwnSignUpDto dto, String refreshTokenKey, String language) {
         return User.builder()
             .name(dto.getName())
             .firstName(dto.getName())
@@ -136,6 +132,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
+            .language(Language.builder()
+                .id(setTheCurrentUserLanguage(language))
+                .build())
             .build();
     }
 
@@ -144,6 +143,19 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .password(passwordEncoder.encode(dto.getPassword()))
             .user(user)
             .build();
+    }
+
+    private Long setTheCurrentUserLanguage(String lang) {
+        switch (lang) {
+            case "ua":
+                return 1L;
+            case "ru":
+                return 3L;
+            case "en":
+                return 2L;
+            default:
+                throw new IllegalStateException("Unexpected value: " + lang);
+        }
     }
 
     private VerifyEmail createVerifyEmail(User user, String emailVerificationToken) {
