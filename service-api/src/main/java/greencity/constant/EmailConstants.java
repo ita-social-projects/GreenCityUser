@@ -9,6 +9,8 @@ public final class EmailConstants {
     public static final String VERIFY_EMAIL = "Verify your email address";
     public static final String CONFIRM_RESTORING_PASS = "Confirm restoring password";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
+    public static final String DEACTIVATION = "Your account was deactivated";
+    public static final String ACTIVATION = "Your account was activated";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
@@ -22,6 +24,7 @@ public final class EmailConstants {
     public static final String ECO_NEWS_LINK = "ecoNewsLink";
     public static final String UNSUBSCRIBE_LINK = "unsubscribeLink";
     public static final String NEWS_RESULT = "news";
+    public static final String REASONS = "reasons";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
@@ -29,6 +32,8 @@ public final class EmailConstants {
     public static final String CHANGE_PLACE_STATUS_EMAIL_PAGE = "change-place-status-email-page";
     public static final String NEWS_RECEIVE_EMAIL_PAGE = "news-receive-email-page";
     public static final String NEW_PLACES_REPORT_EMAIL_PAGE = "new-places-report-email-page";
+    public static final String REASONS_OF_DEACTIVATION_PAGE = "user-reasons-of-deactivation-page";
+    public static final String ACTIVATION_PAGE = "user-activation-page";
 
     private EmailConstants() {
     }
