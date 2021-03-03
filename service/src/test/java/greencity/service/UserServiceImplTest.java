@@ -784,6 +784,33 @@ class UserServiceImplTest {
             .build();
         when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
         assertEquals(test1, userService.getDeactivationReason(1L, "en"));
+        assertEquals(test1, userService.getDeactivationReason(1L, "ua"));
+    }
+
+    @Test
+    void deactivateUser() {
+        List<String> test = List.of();
+        User user = ModelUtils.getUser();
+        user.setLanguage(Language.builder()
+            .id(1L)
+            .code("en")
+            .build());
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        user.setUserStatus(DEACTIVATED);
+        when(userRepo.save(user)).thenReturn(user);
+        UserDeactivationReason userReason = UserDeactivationReason.builder()
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .reason("test")
+            .user(user)
+            .build();
+        when(userDeactivationRepo.save(userReason)).thenReturn(userReason);
+        assertEquals(UserDeactivationReasonDto.builder()
+            .email(user.getEmail())
+            .name(user.getName())
+            .deactivationReasons(test)
+            .lang(user.getLanguage().getCode())
+            .build(), userService.deactivateUser(1L, test));
     }
 
     @Test

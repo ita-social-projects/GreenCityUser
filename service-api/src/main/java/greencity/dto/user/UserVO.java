@@ -1,7 +1,6 @@
 package greencity.dto.user;
 
 import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.useraction.UserActionVO;
