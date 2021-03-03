@@ -465,7 +465,7 @@ class UserControllerTest {
     void getReasonsOfDeactivation() throws Exception {
         List<String> test = List.of("test", "test");
         when(userService.getDeactivationReason(1L, "en")).thenReturn(test);
-        this.mockMvc.perform(get(userLink + "/reasons" + "?id=1" + "&lang=en")
+        this.mockMvc.perform(get(userLink + "/reasons" + "?id=1" + "&admin=en")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         verify(userService).getDeactivationReason(1L, "en");
