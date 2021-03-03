@@ -15,6 +15,7 @@ import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
+import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,6 +46,7 @@ import java.util.List;
 @Validated
 public class UserController {
     private final UserService userService;
+    private final EmailService emailService;
 
     /**
      * The method which update user status. Parameter principal are ignored because
@@ -713,7 +715,6 @@ public class UserController {
      *
      * @param email - {@link UserVO}'s email
      * @return {@link UserVO}.
-     *
      * @author Orest Mamchuk
      */
     @ApiOperation(value = "Get find not 'DEACTIVATED' User by email")
@@ -769,19 +770,63 @@ public class UserController {
      * Method for setting {@link UserVO}'s status to DEACTIVATED, so the user will
      * not be able to log in into the system.
      *
-     * @param id of the searched {@link UserVO}.
+     * @param id          of the searched {@link UserVO}.
+     * @param userReasons {@link List} of {@link String}.
      * @author Orest Mamchuk
      */
-    @ApiOperation(value = "Deactivate User")
+    @ApiOperation(value = "Deactivate user indicating the list of reasons for deactivation")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PutMapping("/deactivate")
-    public ResponseEntity<Object> deactivateUser(@RequestParam Long id) {
-        userService.deactivateUser(id);
+    public ResponseEntity<ResponseEntity.BodyBuilder> deactivateUser(@RequestParam Long id,
+        @RequestBody List<String> userReasons) {
+        UserDeactivationReasonDto userDeactivationDto = userService.deactivateUser(id, userReasons);
+        emailService.sendReasonOfDeactivation(userDeactivationDto);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Method for getting {@link String} user language.
+     *
+     * @param id of the searched {@link UserVO}.
+     * @return current user language {@link String}.
+     * @author Vlad Pikhotskyi
+     */
+    @ApiOperation(value = "Get the current User language")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/lang")
+    public ResponseEntity<String> getUserLang(@RequestParam Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserLang(id));
+    }
+
+    /**
+     * Method for getting a {@link List} of {@link String} - reasons for
+     * deactivation of the current user.
+     *
+     * @param id   {@link Long} - user's id.
+     * @param lang {@link String} - current administrator language.
+     * @return {@link List} of {@link String} - reasons for deactivation of the
+     *         current user.
+     * @author Vlad Pikhotskyi
+     */
+    @ApiOperation(value = "Get list reasons of deactivating the user")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/reasons")
+    public ResponseEntity<List<String>> getReasonsOfDeactivation(
+        @RequestParam("id") Long id, @RequestParam("lang") String lang) {
+        List<String> list = userService.getDeactivationReason(id, lang);
+        return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 
     /**
@@ -798,7 +843,8 @@ public class UserController {
     })
     @PutMapping("/activate")
     public ResponseEntity<Object> activateUser(@RequestParam Long id) {
-        userService.setActivatedStatus(id);
+        UserActivationDto userActivationDto = userService.setActivatedStatus(id);
+        emailService.sendMessageOfActivation(userActivationDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -843,7 +889,6 @@ public class UserController {
      *
      * @param pageable    {@link Pageable}
      * @param userViewDto {@link UserManagementViewDto} - stores values.
-     *
      */
     @ApiOperation(value = "Search Users")
     @ApiResponses(value = {
@@ -863,7 +908,6 @@ public class UserController {
      *
      * @param userId     {@link Long } user id
      * @param languageId {@link Long} language id.
-     *
      */
     @ApiOperation(value = "Update user language")
     @ApiResponses(value = {

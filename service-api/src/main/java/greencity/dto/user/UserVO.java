@@ -1,6 +1,7 @@
 package greencity.dto.user;
 
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.useraction.UserActionVO;
@@ -75,4 +76,6 @@ public class UserVO {
     private LocalDateTime lastActivityTime;
 
     private List<UserActionVO> userActions = new ArrayList<>();
+
+    private String languageCode;
 }
