@@ -810,8 +810,8 @@ public class UserController {
      * Method for getting a {@link List} of {@link String} - reasons for
      * deactivation of the current user.
      *
-     * @param id   {@link Long} - user's id.
-     * @param lang {@link String} - current administrator language.
+     * @param id        {@link Long} - user's id.
+     * @param adminLang {@link String} - current administrator language.
      * @return {@link List} of {@link String} - reasons for deactivation of the
      *         current user.
      * @author Vlad Pikhotskyi
@@ -824,8 +824,8 @@ public class UserController {
     })
     @GetMapping("/reasons")
     public ResponseEntity<List<String>> getReasonsOfDeactivation(
-        @RequestParam("id") Long id, @RequestParam("lang") String lang) {
-        List<String> list = userService.getDeactivationReason(id, lang);
+        @RequestParam("id") Long id, @RequestParam("admin") String adminLang) {
+        List<String> list = userService.getDeactivationReason(id, adminLang);
         return ResponseEntity.status(HttpStatus.OK).body(list);
     }
 

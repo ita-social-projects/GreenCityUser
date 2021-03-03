@@ -347,12 +347,12 @@ public interface UserService {
      * Method for getting a {@link List} of {@link String} - reasons for
      * deactivation of the current user.
      *
-     * @param id   {@link Long} - user's id.
-     * @param lang {@link String} - current administrator language.
+     * @param id        {@link Long} - user's id.
+     * @param adminLang {@link String} - current administrator language.
      * @return {@link List} of {@link String}.
      * @author Vlad Pikhotskyi
      */
-    List<String> getDeactivationReason(Long id, String lang);
+    List<String> getDeactivationReason(Long id, String adminLang);
 
     /**
      * Method for getting {@link String} user language.

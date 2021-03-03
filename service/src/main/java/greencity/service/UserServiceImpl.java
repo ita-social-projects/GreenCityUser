@@ -894,10 +894,13 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> getDeactivationReason(Long id, String lang) {
+    public List<String> getDeactivationReason(Long id, String adminLang) {
         UserDeactivationReason userReason = userDeactivationRepo.getLastDeactivationReasons(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DEACTIVATION_REASON_IS_EMPTY));
-        return filterReasons(userReason.getUser().getLanguage().getCode(),
+        if (adminLang.equals("uk")) {
+            adminLang = "ua";
+        }
+        return filterReasons(adminLang,
             userReason.getReason());
     }
 
