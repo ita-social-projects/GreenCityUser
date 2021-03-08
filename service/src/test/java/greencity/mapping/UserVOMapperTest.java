@@ -1,6 +1,7 @@
 package greencity.mapping;
 
 import greencity.ModelUtils;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.user.UserVO;
 import greencity.entity.*;
 import org.junit.jupiter.api.Test;
@@ -88,6 +89,10 @@ class UserVOMapperTest {
                         .build())
                     .build())
                 .collect(Collectors.toList()) : new ArrayList<>())
+            .language(Language.builder()
+                .id(1L)
+                .code("ua")
+                .build())
             .build();
 
         assertEquals(expected, mapper.convert(userToBeConverted));

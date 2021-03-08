@@ -5,6 +5,7 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.*;
@@ -155,6 +156,10 @@ public class ModelUtils {
                     .id(13L)
                     .build())
                 .build()))
+            .languageVO(LanguageVO.builder()
+                .id(1L)
+                .code("ua")
+                .build())
             .build();
     }
 
