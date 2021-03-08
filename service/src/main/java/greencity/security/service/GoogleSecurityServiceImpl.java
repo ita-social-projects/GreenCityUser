@@ -5,6 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserVO;
+import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
 import greencity.entity.UserAction;
@@ -28,8 +29,7 @@ import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static greencity.constant.AppConstant.GOOGLE_PICTURE;
-import static greencity.constant.AppConstant.USERNAME;
+import static greencity.constant.AppConstant.*;
 import static greencity.security.service.OwnSecurityServiceImpl.getUserAchievements;
 import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 
@@ -75,7 +75,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
      */
     @Transactional
     @Override
-    public SuccessSignInDto authenticate(String idToken) {
+    public SuccessSignInDto authenticate(String idToken, String language) {
         try {
             GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
             if (googleIdToken != null) {
@@ -86,13 +86,14 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                 if (userVO == null) {
                     log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
                     String profilePicture = (String) payload.get(GOOGLE_PICTURE);
-                    User user = createNewUser(email, userName, profilePicture);
+                    User user = createNewUser(email, userName, profilePicture, language);
                     List<UserAchievement> userAchievementList = createUserAchievements(user);
                     List<UserAction> userActionsList = createUserActions(user);
                     user.setUserAchievements(userAchievementList);
                     user.setUserActions(userActionsList);
                     User savedUser = userRepo.save(user);
                     user.setId(savedUser.getId());
+                    achievementService.findUserAchievement(savedUser.getId(), ACHIEVEMENT_ID);
                     userVO = modelMapper.map(user, UserVO.class);
                     log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
                     return getSuccessSignInDto(userVO);
@@ -111,7 +112,8 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         }
     }
 
-    private User createNewUser(String email, String userName, String profilePicture) {
+    private User createNewUser(String email, String userName, String profilePicture,
+        String language) {
         return User.builder()
             .email(email)
             .name(userName)
@@ -124,6 +126,9 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .refreshTokenKey(jwtTool.generateTokenKey())
             .profilePicturePath(profilePicture)
             .rating(AppConstant.DEFAULT_RATING)
+            .language(Language.builder()
+                .id(modelMapper.map(language, Long.class))
+                .build())
             .build();
     }
 

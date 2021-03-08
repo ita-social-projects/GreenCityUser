@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.dto.achievement.AchievementDTO;
 import greencity.dto.achievement.AchievementVO;
+import greencity.dto.achievement.UserAchievementVO;
 
 import java.util.List;
 
@@ -12,4 +13,10 @@ public interface AchievementService {
      * @return list of all{@link AchievementDTO}.
      */
     List<AchievementVO> findAll();
+
+    /**
+     * Method for finding all the achievements.
+     *
+     */
+    void findUserAchievement(Long userId, Long achievementId);
 }
