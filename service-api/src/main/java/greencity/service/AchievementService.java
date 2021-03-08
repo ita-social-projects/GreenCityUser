@@ -2,7 +2,6 @@ package greencity.service;
 
 import greencity.dto.achievement.AchievementDTO;
 import greencity.dto.achievement.AchievementVO;
-import greencity.dto.achievement.UserAchievementVO;
 
 import java.util.List;
 

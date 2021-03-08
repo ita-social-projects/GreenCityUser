@@ -11,6 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +35,8 @@ class AchievementServiceImplTest {
         when(userAchievementRepo.getUserAchievementByIdAndAchievementId(1L, 1L))
             .thenReturn(userAchievement);
         userAchievement.setAchievementStatus(AchievementStatus.ACTIVE);
-        when(userAchievementRepo.save(userAchievement)).thenReturn(userAchievement);
         achievementService.findUserAchievement(1L, 1L);
+        verify(userAchievementRepo).save(userAchievement);
+
     }
 }
