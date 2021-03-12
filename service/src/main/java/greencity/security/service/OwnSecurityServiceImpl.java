@@ -48,6 +48,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static greencity.constant.AppConstant.ACHIEVEMENT_ID;
+
 /**
  * {@inheritDoc}
  */
@@ -112,6 +114,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
+            achievementService.findUserAchievement(savedUser.getId(), ACHIEVEMENT_ID);
             emailService.sendVerificationEmail(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
                 savedUser.getVerifyEmail().getToken(), language);
         } catch (DataIntegrityViolationException e) {
@@ -133,7 +136,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
             .language(Language.builder()
-                .id(setTheCurrentUserLanguage(language))
+                .id(modelMapper.map(language, Long.class))
                 .build())
             .build();
     }
@@ -143,19 +146,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .password(passwordEncoder.encode(dto.getPassword()))
             .user(user)
             .build();
-    }
-
-    private Long setTheCurrentUserLanguage(String lang) {
-        switch (lang) {
-            case "ua":
-                return 1L;
-            case "ru":
-                return 3L;
-            case "en":
-                return 2L;
-            default:
-                throw new IllegalStateException("Unexpected value: " + lang);
-        }
     }
 
     private VerifyEmail createVerifyEmail(User user, String emailVerificationToken) {

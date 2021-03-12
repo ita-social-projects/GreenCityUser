@@ -65,25 +65,32 @@ class GoogleSecurityServiceImplTest {
     GoogleSecurityServiceImpl googleSecurityService;
 
     @Test
-    void authenticateUserNotNullTest() throws GeneralSecurityException, IOException {
+    void authenticateUserNotNullTest() throws GeneralSecurityException,
+        IOException {
         User user = ModelUtils.getUser();
-        UserVO userVO = ModelUtils.getUserVO();
+        UserVO userVO =
+            ModelUtils.getUserVO();
         when(googleIdTokenVerifier.verify("1234")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("test@mail.com");
         when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
-        SuccessSignInDto result = googleSecurityService.authenticate("1234");
+        SuccessSignInDto result = googleSecurityService.authenticate("1234", "ua");
         assertEquals(user.getName(), result.getName());
-        assertEquals(user.getId(), result.getUserId());
+        assertEquals(user.getId(),
+            result.getUserId());
     }
 
     @Test
-    void authenticateNullUserTest() throws GeneralSecurityException, IOException {
+    void authenticateNullUserTest() throws GeneralSecurityException,
+        IOException {
         UserVO userVO = ModelUtils.getUserVO();
-        User user = ModelUtils.getUser();
-        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        User user =
+            ModelUtils.getUser();
+        List<Achievement> achievementList =
+            Collections.singletonList(ModelUtils.getAchievement());
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
-        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        List<UserAchievement> userAchievementList =
+            Collections.singletonList(ModelUtils.getUserAchievement());
         userVO.setId(null);
         userVO.setName(null);
         user.setId(null);
@@ -98,49 +105,40 @@ class GoogleSecurityServiceImplTest {
         when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
-        SuccessSignInDto result = googleSecurityService.authenticate("1234");
+        SuccessSignInDto result =
+            googleSecurityService.authenticate("1234", "ua");
         assertNull(result.getUserId());
         assertNull(result.getName());
     }
 
     @Test
     void authenticationThrowsIllegalArgumentExceptionTest() {
-        assertThrows(IllegalArgumentException.class,
-            () -> googleSecurityService.authenticate("1234"));
+        assertThrows(IllegalArgumentException.class, () -> googleSecurityService.authenticate("1234", "ua"));
     }
 
     @Test
     void authenticationThrowsUserDeactivatedExceptionTest() throws GeneralSecurityException, IOException {
-        User user = User.builder()
-            .id(1L)
-            .email(TestConst.EMAIL)
-            .name(TestConst.NAME)
-            .role(Role.ROLE_USER)
-            .userStatus(UserStatus.DEACTIVATED)
-            .lastVisit(LocalDateTime.now())
-            .dateOfRegistration(LocalDateTime.now())
-            .build();
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .email(TestConst.EMAIL)
-            .name(TestConst.NAME)
-            .role(Role.ROLE_USER)
-            .userStatus(UserStatus.DEACTIVATED)
-            .lastVisit(LocalDateTime.now())
-            .dateOfRegistration(LocalDateTime.now())
-            .build();
+        User user = User.builder().id(1L)
+            .email(TestConst.EMAIL).name(TestConst.NAME).role(Role.ROLE_USER)
+            .userStatus(UserStatus.DEACTIVATED).lastVisit(LocalDateTime.now())
+            .dateOfRegistration(LocalDateTime.now()).build();
+        UserVO userVO =
+            UserVO.builder().id(1L).email(TestConst.EMAIL).name(TestConst.NAME)
+                .role(Role.ROLE_USER).userStatus(UserStatus.DEACTIVATED)
+                .lastVisit(LocalDateTime.now()).dateOfRegistration(LocalDateTime.now())
+                .build();
         when(googleIdTokenVerifier.verify("1234")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("test@mail.com");
         when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
-        assertThrows(UserDeactivatedException.class,
-            () -> googleSecurityService.authenticate("1234"));
+        assertThrows(UserDeactivatedException.class, () -> googleSecurityService.authenticate("1234", "ua"));
     }
 
     @Test
-    void authenticationThrowsIllegalArgumentExceptionInCatchBlockTest() throws GeneralSecurityException, IOException {
+    void authenticationThrowsIllegalArgumentExceptionInCatchBlockTest()
+        throws GeneralSecurityException, IOException {
         when(googleIdTokenVerifier.verify("1234")).thenThrow(GeneralSecurityException.class);
-        assertThrows(IllegalArgumentException.class,
-            () -> googleSecurityService.authenticate("1234"));
+        assertThrows(IllegalArgumentException.class, () -> googleSecurityService.authenticate("1234", "ua"));
     }
+
 }
