@@ -23,4 +23,7 @@ public class UserAchievementVO {
 
     @NotEmpty
     private AchievementStatus achievementStatus;
+
+    @NotEmpty
+    private boolean notified;
 }
