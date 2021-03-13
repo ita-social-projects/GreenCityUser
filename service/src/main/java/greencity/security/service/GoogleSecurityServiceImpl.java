@@ -93,7 +93,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                     user.setUserActions(userActionsList);
                     User savedUser = userRepo.save(user);
                     user.setId(savedUser.getId());
-                    achievementService.findUserAchievement(savedUser.getId(), ACHIEVEMENT_ID);
+                    achievementService.findUserAchievement(savedUser.getId(), DEFAULT_ACHIEVEMENT_ID);
                     userVO = modelMapper.map(user, UserVO.class);
                     log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
                     return getSuccessSignInDto(userVO);
