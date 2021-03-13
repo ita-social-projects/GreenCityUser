@@ -50,7 +50,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import static greencity.constant.AppConstant.ACHIEVEMENT_ID;
+import static greencity.constant.AppConstant.DEFAULT_ACHIEVEMENT_ID;
 
 /**
  * {@inheritDoc}
@@ -117,7 +117,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
-            achievementService.findUserAchievement(savedUser.getId(), ACHIEVEMENT_ID);
+            achievementService.findUserAchievement(savedUser.getId(), DEFAULT_ACHIEVEMENT_ID);
             emailService.sendVerificationEmail(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
                 savedUser.getVerifyEmail().getToken(), language);
         } catch (DataIntegrityViolationException e) {

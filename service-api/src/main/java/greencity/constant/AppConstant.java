@@ -15,7 +15,7 @@ public final class AppConstant {
     public static final String IMAGES = "images";
     public static final String DEFAULT_LANGUAGE_CODE = "en";
     public static final String PASSWORD = "password";
-    public static final Long ACHIEVEMENT_ID = 3L;
+    public static final Long DEFAULT_ACHIEVEMENT_ID = 22L;
 
     private AppConstant() {
     }
