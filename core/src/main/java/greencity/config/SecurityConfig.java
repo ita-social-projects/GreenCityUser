@@ -85,8 +85,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities."))
             .and()
             .authorizeRequests()
-            .antMatchers("/css/**",
-                "/img/**")
+            .antMatchers("/static/css/**",
+                "/static/img/**")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 "/ownSecurity/verifyEmail",
@@ -99,7 +99,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/activatedUsersAmount",
                 "/user/{userId}/habit/assign",
                 "/token",
-                "/socket/**")
+                "/socket/**",
+                "/user/findAllByEmailNotification")
             .permitAll()
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
@@ -108,7 +109,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/email/addEcoNews",
                 "/email/sendReport",
                 "/email/changePlaceStatus",
-                "/email/sendHabitNotification")
+                "/email/sendHabitNotification",
+                "/user/deleteDeactivatedUsers")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 USER_LINK,
@@ -127,7 +129,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findNotDeactivatedByEmail",
                 "/user/findByEmail",
                 "/user/findIdByEmail",
-                "/user/findById")
+                "/user/findById",
+                "/user/findUuidByEmail",
+                "/user/createUbsRecord")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,
@@ -156,6 +160,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.GET,
                 "/user/all",
                 "/user/roles",
+                "/user/findById",
                 "/user/findUserForManagement",
                 "/user/searchBy",
                 "/user/findAll",
@@ -173,6 +178,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/role",
                 "/user/update/role")
             .hasRole(ADMIN)
+            .antMatchers(HttpMethod.POST,
+                "/management/login")
+            .permitAll()
+            .antMatchers(HttpMethod.GET,
+                "/management/login")
+            .permitAll()
+            .antMatchers("/css/**",
+                "/img/**")
+            .permitAll()
             .anyRequest().hasAnyRole(ADMIN);
     }
 

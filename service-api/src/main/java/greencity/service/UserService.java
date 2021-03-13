@@ -6,10 +6,12 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +26,39 @@ import java.util.Optional;
  * @version 1.0
  */
 public interface UserService {
+    /**
+     * Find all {@link User}'s with {@link EmailNotification} type.
+     *
+     * @param emailNotification - type of {@link EmailNotification}
+     * @return list of {@link User}'s
+     */
+    List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
+
+    /**
+     * Delete from the database users that have status 'DEACTIVATED' and last
+     * visited the site 2 years ago.
+     *
+     * @return number of deleted rows.
+     */
+    int scheduleDeleteDeactivatedUsers();
+
+    /**
+     * Find and return all cities for all users.
+     *
+     * @return {@link List} of {@link String} of cities
+     **/
+    List<String> findAllUsersCities();
+
+    /**
+     * Find and return all registration months. Runs an SQL Query which is described
+     * in {@link User} under {@link NamedNativeQuery} annotation. Spring Data JPA
+     * can run a named native query that follows the naming convention
+     * {entityClass.repositoryMethodName}.
+     *
+     * @return {@link List} of {@link RegistrationStatisticsDtoResponse}
+     **/
+    Map<Integer, Long> findAllRegistrationMonthsMap();
+
     /**
      * Method that allow you to save new {@link UserVO}.
      *
@@ -80,6 +115,14 @@ public interface UserService {
      * @author Zakhar Skaletskyi
      */
     Long findIdByEmail(String email);
+
+    /**
+     * Find UserVO's uuid by UserVO email.
+     *
+     * @param email - {@link UserVO} email
+     * @return {@link UserVO} uuid
+     */
+    String findUuIdByEmail(String email);
 
     /**
      * Update {@code ROLE} of user.
@@ -337,31 +380,10 @@ public interface UserService {
     /**
      * change {@link UserVO}'s status to DEACTIVATED.
      *
-     * @param id          {@link UserVO}'s id
-     * @param userReasons {@link List} of {@link String}.
+     * @param id {@link UserVO}'s id
      * @author Vasyl Zhovnir
      */
-    UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons);
-
-    /**
-     * Method for getting a {@link List} of {@link String} - reasons for
-     * deactivation of the current user.
-     *
-     * @param id        {@link Long} - user's id.
-     * @param adminLang {@link String} - current administrator language.
-     * @return {@link List} of {@link String}.
-     * @author Vlad Pikhotskyi
-     */
-    List<String> getDeactivationReason(Long id, String adminLang);
-
-    /**
-     * Method for getting {@link String} user language.
-     *
-     * @param id of the searched {@link UserVO}.
-     * @return current user language {@link String}.
-     * @author Vlad Pikhotskyi
-     */
-    String getUserLang(Long id);
+    void deactivateUser(Long id);
 
     /**
      * Method deactivates all the {@link UserVO} by list of IDs.
@@ -378,7 +400,7 @@ public interface UserService {
      * @param id {@link UserVO}'s id
      * @author Vasyl Zhovnir
      */
-    UserActivationDto setActivatedStatus(Long id);
+    void setActivatedStatus(Long id);
 
     /**
      * Method that allow you to find {@link UserVO} by ID and token.
@@ -417,7 +439,7 @@ public interface UserService {
      *
      * @param pageable {@link Pageable}.
      * @param userId   {@link Long} -current user's id.
-     * @return {@link PageableDto} of {@link UserAllFriendsDto} instances.
+     * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
 
     PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
@@ -427,7 +449,7 @@ public interface UserService {
      *
      * @param pageable {@link Pageable}.
      * @param userId   {@link Long} -current user's id.
-     * @return {@link PageableDto} of {@link UserAllFriendsDto} instances.
+     * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
 
     PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
@@ -453,7 +475,7 @@ public interface UserService {
      *
      * @param pageable {@link Pageable}.
      * @param userId   {@link Long} -current user's id.
-     * @return {@link PageableDto} of {@link UserAllFriendsDto} instances.
+     * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
     PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable);
 
@@ -471,10 +493,10 @@ public interface UserService {
     PageableAdvancedDto<UserManagementVO> search(Pageable pageable, UserManagementViewDto userManagementViewDto);
 
     /**
-     * Method that update user language column.
+     * Creates and returns uuid of current user.
      *
-     * @param userId     {@link Long} -current user's id.
-     * @param languageId {@link Long} - language id.
+     * @param currentUser {@link UserVO} - current user.
+     * @return {@link UbsTableCreationDto} - uuid of current user.
      */
-    void updateUserLanguage(Long userId, Long languageId);
+    UbsTableCreationDto createUbsRecord(UserVO currentUser);
 }
