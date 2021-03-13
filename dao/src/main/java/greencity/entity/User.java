@@ -141,4 +141,7 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserAction> userActions = new ArrayList<>();
+
+    @Column(columnDefinition = "varchar(60)")
+    private String uuid;
 }

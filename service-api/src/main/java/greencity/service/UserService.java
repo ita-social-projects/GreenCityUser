@@ -6,10 +6,12 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +26,39 @@ import java.util.Optional;
  * @version 1.0
  */
 public interface UserService {
+    /**
+     * Find all {@link User}'s with {@link EmailNotification} type.
+     *
+     * @param emailNotification - type of {@link EmailNotification}
+     * @return list of {@link User}'s
+     */
+    List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
+
+    /**
+     * Delete from the database users that have status 'DEACTIVATED' and last
+     * visited the site 2 years ago.
+     *
+     * @return number of deleted rows.
+     */
+    int scheduleDeleteDeactivatedUsers();
+
+    /**
+     * Find and return all cities for all users.
+     *
+     * @return {@link List} of {@link String} of cities
+     **/
+    List<String> findAllUsersCities();
+
+    /**
+     * Find and return all registration months. Runs an SQL Query which is described
+     * in {@link User} under {@link NamedNativeQuery} annotation. Spring Data JPA
+     * can run a named native query that follows the naming convention
+     * {entityClass.repositoryMethodName}.
+     *
+     * @return {@link List} of {@link RegistrationStatisticsDtoResponse}
+     **/
+    Map<Integer, Long> findAllRegistrationMonthsMap();
+
     /**
      * Method that allow you to save new {@link UserVO}.
      *
@@ -80,6 +115,14 @@ public interface UserService {
      * @author Zakhar Skaletskyi
      */
     Long findIdByEmail(String email);
+
+    /**
+     * Find UserVO's uuid by UserVO email.
+     *
+     * @param email - {@link UserVO} email
+     * @return {@link UserVO} uuid
+     */
+    String findUuIdByEmail(String email);
 
     /**
      * Update {@code ROLE} of user.
@@ -448,4 +491,12 @@ public interface UserService {
      * {@inheritDoc}
      */
     PageableAdvancedDto<UserManagementVO> search(Pageable pageable, UserManagementViewDto userManagementViewDto);
+
+    /**
+     * Creates and returns uuid of current user.
+     *
+     * @param currentUser {@link UserVO} -  current user.
+     * @return {@link UbsTableCreationDto} - uuid of current user.
+     */
+    UbsTableCreationDto createUbsRecord(UserVO currentUser);
 }

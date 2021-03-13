@@ -12,6 +12,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
@@ -20,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -729,6 +731,24 @@ public class UserController {
     }
 
     /**
+     * Method creates record in ubs table.
+     *
+     * @return {@link UbsTableCreationDto}
+     */
+    @ApiIgnore
+    @ApiOperation(value = "Creates uuid and returns it to ubs microservice.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/createUbsRecord")
+    public ResponseEntity<UbsTableCreationDto> createUbsRecord(
+         @ApiIgnore @CurrentUser UserVO userVO
+    ) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.createUbsRecord(userVO));
+    }
+
+    /**
      * Get {@link UserVO} id by email.
      *
      * @return {@link Long}.
@@ -743,6 +763,22 @@ public class UserController {
     @GetMapping("/findIdByEmail")
     public ResponseEntity<Long> findIdByEmail(@RequestParam String email) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findIdByEmail(email));
+    }
+
+    /**
+     * Get {@link UserVO} uuid by email.
+     *
+     * @return {@link String}.
+     */
+    @ApiOperation(value = "Get User uuid by email")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/findUuidByEmail")
+    public ResponseEntity<String> findUuidByEmail(@RequestParam String email) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findUuIdByEmail(email));
     }
 
     /**
@@ -856,5 +892,71 @@ public class UserController {
         @RequestBody UserManagementViewDto userViewDto) {
         PageableAdvancedDto<UserManagementVO> found = userService.search(pageable, userViewDto);
         return ResponseEntity.status(HttpStatus.OK).body(found);
+    }
+
+    /**
+     * Method that allow search users by their email notification.
+     *
+     * @param emailNotification enum with notification value.
+     * @return {@link List} of {@link UserVO}
+     */
+    @ApiOperation(value = "Search Users by email notification")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+    })
+    @GetMapping("/findAllByEmailNotification")
+    public ResponseEntity<List<UserVO>> findAllByEmailNotification(@RequestParam EmailNotification emailNotification) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllByEmailNotification(emailNotification));
+    }
+
+    /**
+     * Delete from the database users that have status 'DEACTIVATED' and last
+     * visited the site 2 years ago.
+     *
+     * @return number of deleted rows
+     */
+    @ApiOperation(value = "Delete deactivated Users")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+    })
+    @PostMapping("/deleteDeactivatedUsers")
+    public ResponseEntity<Integer> scheduleDeleteDeactivatedUsers() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.scheduleDeleteDeactivatedUsers());
+    }
+
+    /**
+     * Method that find all users' cities.
+     *
+     * @return {@link List} of cities
+     */
+    @ApiOperation(value = "Find all users cities")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+    })
+    @GetMapping("/findAllUsersCities")
+    public ResponseEntity<List<String>> findAllUsersCities() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities());
+    }
+
+    /**
+     * Method that find all registration months.
+     *
+     * @return {@link Map} with months
+     */
+    @ApiOperation(value = "Find registration months")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+    })
+    @GetMapping("/findAllRegistrationMonthsMap")
+    public ResponseEntity<Map<Integer, Long>> findAllRegistrationMonthsMap() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllRegistrationMonthsMap());
     }
 }

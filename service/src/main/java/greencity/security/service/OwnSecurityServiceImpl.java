@@ -1,5 +1,6 @@
 package greencity.security.service;
 
+import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserManagementDto;
@@ -40,6 +41,7 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -70,6 +72,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final AchievementService achievementService;
     private final EmailService emailService;
+    private final RestClient restClient;
 
     /**
      * Constructor.
@@ -83,7 +86,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         ModelMapper modelMapper,
         UserRepo userRepo,
-        AchievementService achievementService, EmailService emailService) {
+        AchievementService achievementService, EmailService emailService, RestClient restClient) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -94,6 +97,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         this.userRepo = userRepo;
         this.achievementService = achievementService;
         this.emailService = emailService;
+        this.restClient = restClient;
     }
 
     /**
@@ -113,6 +117,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setVerifyEmail(verifyEmail);
         user.setUserAchievements(userAchievementList);
         user.setUserActions(userActionsList);
+        user.setUuid(UUID.randomUUID().toString());
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());

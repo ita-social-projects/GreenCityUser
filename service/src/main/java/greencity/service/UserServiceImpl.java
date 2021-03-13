@@ -2,6 +2,7 @@ package greencity.service;
 
 //import greencity.achievement.AchievementCalculation;
 
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
@@ -297,6 +298,16 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public UbsTableCreationDto createUbsRecord(UserVO currentUser) {
+        String uuid = userRepo.findById(currentUser.getId()).get().getUuid();
+
+        return UbsTableCreationDto.builder().uuid(uuid).build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     private PageableAdvancedDto<UserManagementVO> buildPageableAdvanceDtoFromPage(Page<User> pageTags) {
         List<UserManagementVO> usersVOs = pageTags.getContent().stream()
             .map(t -> modelMapper.map(t, UserManagementVO.class))
@@ -364,6 +375,16 @@ public class UserServiceImpl implements UserService {
     public Long findIdByEmail(String email) {
         log.info(LogMessage.IN_FIND_ID_BY_EMAIL, email);
         return userRepo.findIdByEmail(email).orElseThrow(
+            () -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String findUuIdByEmail(String email) {
+        log.info(LogMessage.IN_FIND_UUID_BY_EMAIL, email);
+        return userRepo.findUuidByEmail(email).orElseThrow(
             () -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
     }
 
@@ -922,6 +943,42 @@ public class UserServiceImpl implements UserService {
             page.isFirst(),
             page.isLast());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
+        return userRepo.findAllByEmailNotification(emailNotification).stream()
+            .map(user -> modelMapper.map(user, UserVO.class))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public int scheduleDeleteDeactivatedUsers() {
+        return userRepo.scheduleDeleteDeactivatedUsers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> findAllUsersCities() {
+        return userRepo.findAllUsersCities();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<Integer, Long> findAllRegistrationMonthsMap() {
+        return userRepo.findAllRegistrationMonthsMap();
+    }
+
 
     private List<UserAllFriendsDto> listUserWithMutualFriends(List<UserAllFriendsDto> userAllFriends) {
         for (UserAllFriendsDto friendCurrentUser : userAllFriends) {

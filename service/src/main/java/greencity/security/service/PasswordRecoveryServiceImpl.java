@@ -4,13 +4,15 @@ import greencity.constant.ErrorMessage;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadVerifyEmailTokenException;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.repository.UserRepo;
+import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.events.UpdatePasswordEvent;
 import greencity.security.jwt.JwtTool;
+import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
 import java.time.LocalDateTime;
@@ -18,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Slf4j
 public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
+    private final OwnSecurityRepo ownSecurityRepo;
+    private final PasswordEncoder passwordEncoder;
     private final UserRepo userRepo;
     private final RestorePasswordEmailRepo restorePasswordEmailRepo;
     private final ApplicationEventPublisher applicationEventPublisher;
@@ -41,19 +46,24 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     /**
      * Constructor with all essentials beans for password recovery functionality.
      *
+     * @param ownSecurityRepo
+     * @param passwordEncoder
      * @param restorePasswordEmailRepo  {@link RestorePasswordEmailRepo} - Used for
-     *                                  storing recovery tokens
+ *                                  storing recovery tokens
      * @param applicationEventPublisher {@link ApplicationEventPublisher} - Used for
-     *                                  publishing events, such as email sending or
-     *                                  password update
+*                                  publishing events, such as email sending or
+*                                  password update
      * @param jwtTool                   {@link JwtTool} - Used for recovery token
      */
     public PasswordRecoveryServiceImpl(
+        OwnSecurityRepo ownSecurityRepo, PasswordEncoder passwordEncoder,
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         UserRepo userRepo,
         ApplicationEventPublisher applicationEventPublisher,
         EmailService emailService,
         JwtTool jwtTool) {
+        this.ownSecurityRepo = ownSecurityRepo;
+        this.passwordEncoder = passwordEncoder;
         this.restorePasswordEmailRepo = restorePasswordEmailRepo;
         this.userRepo = userRepo;
         this.applicationEventPublisher = applicationEventPublisher;
@@ -82,20 +92,24 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
      */
     @Transactional
     @Override
-    public void updatePasswordUsingToken(String token, String newPassword) {
+    public void updatePasswordUsingToken(OwnRestoreDto form) {
         RestorePasswordEmail restorePasswordEmail = restorePasswordEmailRepo
-            .findByToken(token)
-            .orElseThrow(() -> new BadVerifyEmailTokenException(ErrorMessage.NO_ANY_EMAIL_TO_VERIFY_BY_THIS_TOKEN));
+            .findByToken(form.getToken())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID));
+        if (!form.getPassword().equals(form.getConfirmPassword())){
+            throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCHES);
+        }
         UserStatus userStatus = restorePasswordEmail.getUser().getUserStatus();
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {
+            updatePassword(form.getPassword(), restorePasswordEmail.getUser().getId());
             applicationEventPublisher.publishEvent(
-                new UpdatePasswordEvent(this, newPassword, restorePasswordEmail.getUser().getId()));
+                new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
             restorePasswordEmailRepo.delete(restorePasswordEmail);
             log.info("User with email " + restorePasswordEmail.getUser().getEmail()
-                + " has successfully restored the password using token " + token);
+                + " has successfully restored the password using token " + form.getToken());
         } else {
             log.info("Password restoration token of user with email " + restorePasswordEmail.getUser().getEmail()
-                + " has been expired. Token: " + token);
+                + " has been expired. Token: " + form.getToken());
             throw new UserActivationEmailTokenExpiredException(ErrorMessage.EMAIL_TOKEN_EXPIRED);
         }
         if (userStatus == UserStatus.CREATED) {
@@ -159,5 +173,10 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     void deleteAllExpiredPasswordResetTokens() {
         int rows = restorePasswordEmailRepo.deleteAllExpiredPasswordResetTokens();
         log.info(rows + " password reset tokens were deleted.");
+    }
+
+    private void updatePassword(String pass, Long id) {
+        String password = passwordEncoder.encode(pass);
+        ownSecurityRepo.updatePassword(password, id);
     }
 }
