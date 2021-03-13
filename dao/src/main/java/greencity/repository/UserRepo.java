@@ -1,6 +1,7 @@
 package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
+import greencity.dto.user.UsersFriendDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;

@@ -1,5 +1,7 @@
 package greencity.security.controller;
 
+import greencity.annotations.ApiLocale;
+import greencity.annotations.ValidLanguage;
 import greencity.constant.HttpStatuses;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.service.GoogleSecurityService;
@@ -12,8 +14,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.constraints.NotBlank;
+
+import java.util.Locale;
 
 import static greencity.constant.ErrorMessage.BAD_GOOGLE_TOKEN;
 
@@ -51,7 +56,9 @@ public class GoogleSecurityController {
         @ApiResponse(code = 400, message = BAD_GOOGLE_TOKEN)
     })
     @GetMapping
-    public SuccessSignInDto authenticate(@RequestParam @NotBlank String idToken) {
-        return googleSecurityService.authenticate(idToken);
+    @ApiLocale
+    public SuccessSignInDto authenticate(@RequestParam @NotBlank String idToken,
+        @ApiIgnore @ValidLanguage Locale locale) {
+        return googleSecurityService.authenticate(idToken, locale.getLanguage());
     }
 }

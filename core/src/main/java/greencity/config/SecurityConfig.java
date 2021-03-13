@@ -129,6 +129,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findNotDeactivatedByEmail",
                 "/user/findByEmail",
                 "/user/findIdByEmail",
+                "/user/findById",
                 "/user/findUuidByEmail",
                 "/user/createUbsRecord")
             .hasAnyRole(USER, ADMIN, MODERATOR)
@@ -143,7 +144,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.PUT,
                 "/ownSecurity",
                 "/user/profile",
-                "/user/{id}/updateUserLastActivityTime/{date}")
+                "/user/{id}/updateUserLastActivityTime/{date}",
+                "/user/{userId}/language/{languageId}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PATCH,
                 "/user/shopping-list-items/{userShoppingListItemId}",

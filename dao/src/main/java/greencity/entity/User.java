@@ -4,6 +4,7 @@ import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -144,4 +145,10 @@ public class User {
 
     @Column(columnDefinition = "varchar(60)")
     private String uuid;
+
+    @ManyToOne
+    private Language language;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserDeactivationReason> userDeactivationReasons;
 }

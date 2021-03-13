@@ -715,7 +715,6 @@ public class UserController {
      *
      * @param email - {@link UserVO}'s email
      * @return {@link UserVO}.
-     *
      * @author Orest Mamchuk
      */
     @ApiOperation(value = "Get find not 'DEACTIVATED' User by email")

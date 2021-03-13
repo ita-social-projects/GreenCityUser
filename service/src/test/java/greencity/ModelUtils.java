@@ -5,6 +5,7 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.*;
@@ -37,6 +38,16 @@ public class ModelUtils {
         @Override
         public String getName() {
             return TestConst.NAME;
+        }
+
+        @Override
+        public String getCity() {
+            return "test";
+        }
+
+        @Override
+        public Double getRating() {
+            return 20.0;
         }
 
         @Override
@@ -145,11 +156,15 @@ public class ModelUtils {
                     .id(13L)
                     .build())
                 .build()))
+            .languageVO(LanguageVO.builder()
+                .id(1L)
+                .code("ua")
+                .build())
             .build();
     }
 
     public static Language getLanguage() {
-        return new Language(1L, AppConstant.DEFAULT_LANGUAGE_CODE);
+        return Language.builder().id(1L).code(AppConstant.DEFAULT_LANGUAGE_CODE).build();
     }
 
     public static UserProfilePictureDto getUserProfilePictureDto() {
