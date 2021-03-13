@@ -1,7 +1,5 @@
 package greencity.security.service;
 
-import greencity.security.dto.ownsecurity.OwnRestoreDto;
-
 /**
  * Service for password recovery functionality. It manages recovery tokens
  * creation and persistence as well as minimal validation, but do neither
@@ -22,8 +20,9 @@ public interface PasswordRecoveryService {
     /**
      * Restore password by token.
      *
-     * @param form token that confirm that this user are owner of this email +
-     *             password and confirm password.
+     * @param token       token that confirm that this user are owner of this email.
+     * @param newPassword new password to which current user's password will be
+     *                    replaced
      */
-    void updatePasswordUsingToken(OwnRestoreDto form);
+    void updatePasswordUsingToken(String token, String newPassword);
 }

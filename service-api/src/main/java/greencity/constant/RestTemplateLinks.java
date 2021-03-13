@@ -15,7 +15,6 @@ public class RestTemplateLinks {
     public static final String USER_ID = "?userId=";
     public static final String URL = "?url=";
     public static final String IMAGE = "?image=";
-    public static final String TOKEN = "/token";
 
     private RestTemplateLinks() {
     }

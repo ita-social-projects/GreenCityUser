@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import greencity.ModelUtils;
-import greencity.client.RestClient;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserManagementDto;
@@ -82,9 +81,6 @@ class OwnSecurityServiceImplTest {
     @Mock
     EmailService emailService;
 
-    @Mock
-    RestClient restClient;
-
     private OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -98,7 +94,7 @@ class OwnSecurityServiceImplTest {
         initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, userService, passwordEncoder,
             jwtTool, 1, restorePasswordEmailRepo, modelMapper,
-            userRepo, achievementService, emailService, restClient);
+            userRepo, achievementService, emailService);
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")
