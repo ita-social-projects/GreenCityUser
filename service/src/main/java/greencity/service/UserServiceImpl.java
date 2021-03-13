@@ -300,7 +300,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UbsTableCreationDto createUbsRecord(UserVO currentUser) {
-        String uuid = userRepo.findById(currentUser.getId()).get().getUuid();
+        User user = userRepo.findById(currentUser.getId()).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        String uuid = user.getUuid();
 
         return UbsTableCreationDto.builder().uuid(uuid).build();
     }

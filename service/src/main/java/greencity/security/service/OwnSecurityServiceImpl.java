@@ -70,7 +70,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final AchievementService achievementService;
     private final EmailService emailService;
-    private final RestClient restClient;
 
     /**
      * Constructor.
@@ -95,7 +94,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         this.userRepo = userRepo;
         this.achievementService = achievementService;
         this.emailService = emailService;
-        this.restClient = restClient;
     }
 
     /**
