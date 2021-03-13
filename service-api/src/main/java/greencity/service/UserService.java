@@ -495,7 +495,7 @@ public interface UserService {
     /**
      * Creates and returns uuid of current user.
      *
-     * @param currentUser {@link UserVO} -  current user.
+     * @param currentUser {@link UserVO} - current user.
      * @return {@link UbsTableCreationDto} - uuid of current user.
      */
     UbsTableCreationDto createUbsRecord(UserVO currentUser);

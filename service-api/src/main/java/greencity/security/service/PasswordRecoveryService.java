@@ -22,8 +22,8 @@ public interface PasswordRecoveryService {
     /**
      * Restore password by token.
      *
-     * @param form  token that confirm that this user are owner of this email
-     *              + password and confirm password.
+     * @param form token that confirm that this user are owner of this email +
+     *             password and confirm password.
      */
     void updatePasswordUsingToken(OwnRestoreDto form);
 }

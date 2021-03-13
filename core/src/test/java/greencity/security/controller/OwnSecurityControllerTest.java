@@ -120,7 +120,7 @@ class OwnSecurityControllerTest {
             "  \"token\": \"12345\"\n" +
             "}";
 
-        OwnRestoreDto form = new OwnRestoreDto("Qwerty123=", "Qwerty123=","12345");
+        OwnRestoreDto form = new OwnRestoreDto("Qwerty123=", "Qwerty123=", "12345");
 
         mockMvc.perform(post(LINK + "/changePassword")
             .contentType(MediaType.APPLICATION_JSON)

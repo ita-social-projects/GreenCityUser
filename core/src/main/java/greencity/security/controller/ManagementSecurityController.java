@@ -25,17 +25,34 @@ public class ManagementSecurityController {
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
 
+    /**
+     * Constructor.
+     *
+     * @param service - - {@link OwnSecurityService} - service for security logic.
+     */
     @Autowired
     public ManagementSecurityController(OwnSecurityService service) {
         this.service = service;
     }
 
+    /**
+     * Controller returns view for management log in.
+     *
+     * @param model - ModelAndView that will be configured.
+     * @return View template path {@link String}.
+     */
     @GetMapping("/login")
     public String loginPage(Model model) {
         model.addAttribute("signInForm", new OwnSignInDto());
         return "core/management_login";
     }
 
+    /**
+     * Redirects user to management page with access toket set in cookies.
+     *
+     * @param dto - {@link OwnSignInDto} - form filled with log in data.
+     * @return View template path {@link String}.
+     */
     @PostMapping("/login")
     public String signIn(@Valid @ModelAttribute("signInForm") OwnSignInDto dto) {
         SuccessSignInDto result = service.signIn(dto);

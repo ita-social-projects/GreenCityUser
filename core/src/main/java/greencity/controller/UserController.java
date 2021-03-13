@@ -742,8 +742,7 @@ public class UserController {
     })
     @GetMapping("/createUbsRecord")
     public ResponseEntity<UbsTableCreationDto> createUbsRecord(
-         @ApiIgnore @CurrentUser UserVO userVO
-    ) {
+        @ApiIgnore @CurrentUser UserVO userVO) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.createUbsRecord(userVO));
     }
 

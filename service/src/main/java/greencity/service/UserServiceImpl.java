@@ -979,7 +979,6 @@ public class UserServiceImpl implements UserService {
         return userRepo.findAllRegistrationMonthsMap();
     }
 
-
     private List<UserAllFriendsDto> listUserWithMutualFriends(List<UserAllFriendsDto> userAllFriends) {
         for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
             long mutualFriends = 0;

@@ -46,13 +46,13 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     /**
      * Constructor with all essentials beans for password recovery functionality.
      *
-     * @param ownSecurityRepo
-     * @param passwordEncoder
+     * @param ownSecurityRepo           - security repository.
+     * @param passwordEncoder           - encodes password.
      * @param restorePasswordEmailRepo  {@link RestorePasswordEmailRepo} - Used for
- *                                  storing recovery tokens
+     *                                  storing recovery tokens
      * @param applicationEventPublisher {@link ApplicationEventPublisher} - Used for
-*                                  publishing events, such as email sending or
-*                                  password update
+     *                                  publishing events, such as email sending or
+     *                                  password update
      * @param jwtTool                   {@link JwtTool} - Used for recovery token
      */
     public PasswordRecoveryServiceImpl(
@@ -96,7 +96,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         RestorePasswordEmail restorePasswordEmail = restorePasswordEmailRepo
             .findByToken(form.getToken())
             .orElseThrow(() -> new NotFoundException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID));
-        if (!form.getPassword().equals(form.getConfirmPassword())){
+        if (!form.getPassword().equals(form.getConfirmPassword())) {
             throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCHES);
         }
         UserStatus userStatus = restorePasswordEmail.getUser().getUserStatus();
