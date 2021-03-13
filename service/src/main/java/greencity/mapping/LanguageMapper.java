@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class LanguageMapper extends AbstractConverter<String, Long> {
     private int k = 7;
-    
     @Override
     protected Long convert(String lang) {
         switch (lang) {
