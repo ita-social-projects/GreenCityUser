@@ -1,6 +1,7 @@
 package greencity.security.controller;
 
 import greencity.ModelUtils;
+import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
@@ -119,12 +120,14 @@ class OwnSecurityControllerTest {
             "  \"token\": \"12345\"\n" +
             "}";
 
+        OwnRestoreDto form = new OwnRestoreDto("Qwerty123=", "Qwerty123=", "12345");
+
         mockMvc.perform(post(LINK + "/changePassword")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
 
-        verify(passwordRecoveryService).updatePasswordUsingToken("12345", "Qwerty123=");
+        verify(passwordRecoveryService).updatePasswordUsingToken(form);
     }
 
     @Test

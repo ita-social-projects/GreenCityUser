@@ -6,7 +6,6 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.user.*;
 import greencity.enums.Role;
-import greencity.service.EmailService;
 import greencity.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +44,6 @@ class UserControllerTest {
     private MockMvc mockMvc;
     @InjectMocks
     private UserController userController;
-    @Mock
-    private EmailService emailService;
     @Mock
     private UserService userService;
     private ObjectMapper objectMapper;
@@ -414,60 +411,5 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         verify(userService).search(pageable, userViewDto);
-    }
-
-    @Test
-    void updateUserLanguageTest() throws Exception {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        mockMvc.perform(put(userLink + "/{userId}/language/{languageId}", 1, 1)
-            .headers(headers))
-            .andExpect(status().isOk());
-        verify(userService).updateUserLanguage(1L, 1L);
-    }
-
-    @Test
-    void deactivateUser() throws Exception {
-        List<String> test = List.of("test", "test");
-        String json = objectMapper.writeValueAsString(test);
-        UserDeactivationReasonDto test1 = UserDeactivationReasonDto.builder()
-            .deactivationReasons(test)
-            .lang("en")
-            .email("test@ukr.net")
-            .name("test")
-            .build();
-        mockMvc.perform(put(userLink + "/deactivate" + "?id=1")
-            .content(json)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-        when(userService.deactivateUser(1L, test)).thenReturn(test1);
-        verify(userService).deactivateUser(1L, test);
-    }
-
-    @Test
-    void getUserLang() throws Exception {
-        this.mockMvc.perform(get(userLink + "/lang" + "?id=1")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-        verify(userService).getUserLang(1L);
-    }
-
-    @Test
-    void setActivatedStatus() throws Exception {
-        mockMvc.perform(put(userLink + "/activate" + "?id=1")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-        verify(userService).setActivatedStatus(1L);
-    }
-
-    @Test
-    void getReasonsOfDeactivation() throws Exception {
-        List<String> test = List.of("test", "test");
-        when(userService.getDeactivationReason(1L, "en")).thenReturn(test);
-        this.mockMvc.perform(get(userLink + "/reasons" + "?id=1" + "&admin=en")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-        verify(userService).getDeactivationReason(1L, "en");
     }
 }
