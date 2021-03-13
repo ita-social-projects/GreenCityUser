@@ -5,8 +5,6 @@ trigger:
   paths:
     exclude:
     - README.md
-    
-pr: none
 
 
 variables:
