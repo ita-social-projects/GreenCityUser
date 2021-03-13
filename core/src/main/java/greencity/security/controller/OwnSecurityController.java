@@ -87,6 +87,7 @@ public class OwnSecurityController {
     @ApiLocale
     public ResponseEntity<SuccessSignUpDto> singUp(@Valid @RequestBody OwnSignUpDto dto,
         @ApiIgnore @ValidLanguage Locale locale) {
+        System.out.println("gergergregre");
         return ResponseEntity.status(HttpStatus.CREATED).body(service.signUp(dto, locale.getLanguage()));
     }
 
