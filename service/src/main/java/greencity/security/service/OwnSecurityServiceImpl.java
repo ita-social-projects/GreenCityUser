@@ -117,7 +117,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
-            achievementService.findUserAchievement(savedUser.getId(), DEFAULT_ACHIEVEMENT_ID);
+            /*
+             * achievementService.findUserAchievement(savedUser.getId(),
+             * DEFAULT_ACHIEVEMENT_ID);
+             */
             emailService.sendVerificationEmail(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
                 savedUser.getVerifyEmail().getToken(), language);
         } catch (DataIntegrityViolationException e) {
