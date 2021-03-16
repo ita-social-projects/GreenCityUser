@@ -18,6 +18,7 @@ import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.AchievementService;
 import greencity.service.UserService;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +92,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                     List<UserAction> userActionsList = createUserActions(user);
                     user.setUserAchievements(userAchievementList);
                     user.setUserActions(userActionsList);
+                    user.setUuid(UUID.randomUUID().toString());
                     User savedUser = userRepo.save(user);
                     user.setId(savedUser.getId());
                     achievementService.findUserAchievement(savedUser.getId(), ACHIEVEMENT_ID);

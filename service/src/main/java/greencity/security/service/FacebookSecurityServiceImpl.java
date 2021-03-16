@@ -10,6 +10,7 @@ import greencity.enums.UserStatus;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -119,6 +120,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .email(email)
             .name(userName)
             .role(Role.ROLE_USER)
+            .uuid(UUID.randomUUID().toString())
             .dateOfRegistration(LocalDateTime.now())
             .lastVisit(LocalDateTime.now())
             .userStatus(UserStatus.ACTIVATED)
