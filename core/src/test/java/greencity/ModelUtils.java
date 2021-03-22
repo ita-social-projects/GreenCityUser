@@ -1,32 +1,16 @@
 package greencity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import greencity.constant.AppConstant;
 import greencity.dto.PageableAdvancedDto;
-import greencity.dto.achievement.AchievementTranslationVO;
-import greencity.dto.achievement.AchievementVO;
-import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.achievementcategory.AchievementCategoryVO;
-import greencity.dto.language.LanguageVO;
-import greencity.dto.user.UserProfilePictureDto;
+import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.Language;
-import greencity.entity.User;
 import greencity.enums.Role;
-import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.Principal;
-import java.time.*;
-import java.util.Arrays;
-import java.util.Collections;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ModelUtils {
 
@@ -42,5 +26,19 @@ public class ModelUtils {
     public static ObjectMapper getObjectMapper() {
         return new ObjectMapper();
 
+    }
+
+    public static UserManagementDto getUserManagementDto() {
+        return UserManagementDto.builder()
+            .id(1L)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .email(TestConst.EMAIL)
+            .userCredo(TestConst.CREDO)
+            .build();
+    }
+
+    public static PageableAdvancedDto<UserManagementDto> getPageableAdvancedDto() {
+        return new PageableAdvancedDto<>(List.of(getUserManagementDto()), 1L, 1, 1, 1, false, false, true, true);
     }
 }

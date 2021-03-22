@@ -2,20 +2,36 @@ package greencity.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
+import greencity.TestConst;
+import static greencity.constant.AppConstant.AUTHORIZATION;
+import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.achievement.AchievementVO;
+import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.achievement.UserVOAchievement;
+import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
+import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.service.UserService;
+import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -25,17 +41,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.security.Principal;
-import java.util.Collections;
-import java.util.List;
-
-import static greencity.constant.AppConstant.AUTHORIZATION;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -52,7 +61,8 @@ class UserControllerTest {
     void setup() {
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(userController)
-            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver(),
+                new UserArgumentResolver(userService, new ModelMapper()))
             .build();
         objectMapper = new ObjectMapper();
     }
@@ -292,6 +302,17 @@ class UserControllerTest {
     }
 
     @Test
+    void deleteUserProfilePictureTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("test@email.com");
+        mockMvc.perform(patch(userLink + "/deleteProfilePicture")
+            .principal(principal))
+            .andExpect(status().isOk());
+
+        verify(userService, times(1)).deleteUserProfilePicture(eq("test@email.com"));
+    }
+
+    @Test
     void deleteUserFriendTest() throws Exception {
         mockMvc.perform(delete(userLink + "/{userId}/userFriend/{friendId}", 1, 1))
             .andExpect(status().isOk());
@@ -411,5 +432,275 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         verify(userService).search(pageable, userViewDto);
+    }
+
+    @Test
+    void findByEmailTest() throws Exception {
+        UserVO userVO = ModelUtils.getUserVO();
+        when(userService.findByEmail(TestConst.EMAIL)).thenReturn(userVO);
+        mockMvc.perform(get(userLink + "/findByEmail")
+            .param("email", TestConst.EMAIL))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findByIdTest() throws Exception {
+        UserVO userVO = ModelUtils.getUserVO();
+        when(userService.findById(1L)).thenReturn(userVO);
+        mockMvc.perform(get(userLink + "/findById")
+            .param("id", "1"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json;charset=UTF-8"))
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findUserForAchievementTest() throws Exception {
+        UserVOAchievement userVOAchievement = UserVOAchievement.builder()
+            .id(1L)
+            .name(TestConst.NAME)
+            .userAchievements(List.of(
+                UserAchievementVO.builder()
+                    .id(10L)
+                    .user(ModelUtils.getUserVO())
+                    .achievement(AchievementVO.builder()
+                        .id(20L)
+                        .achievementCategory(AchievementCategoryVO.builder()
+                            .id(30L)
+                            .name("TestAchievementCategory")
+                            .build())
+                        .build())
+                    .build()))
+            .build();
+        when(userService.findUserForAchievement(1L)).thenReturn(userVOAchievement);
+        mockMvc.perform(get(userLink + "/findByIdForAchievement")
+            .param("id", "1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.userAchievements.length()").value(1));
+    }
+
+    @Test
+    void findUserForManagementTest() throws Exception {
+        Pageable pageable = PageRequest.of(0, 20);
+        when(userService.findUserForManagementByPage(pageable)).thenReturn(ModelUtils.getPageableAdvancedDto());
+        mockMvc.perform(get(userLink + "/findUserForManagement"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.length()").value(1))
+            .andExpect(jsonPath("$.totalElements").value(1L))
+            .andExpect(jsonPath("$.totalPages").value(1));
+    }
+
+    @Test
+    void searchByTest() throws Exception {
+        Pageable pageable = PageRequest.of(0, 20);
+        String query = "testQuery";
+        when(userService.searchBy(pageable, query)).thenReturn(ModelUtils.getPageableAdvancedDto());
+        mockMvc.perform(get(userLink + "/searchBy")
+            .param("query", query))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.page.length()").value(1))
+            .andExpect(jsonPath("$.totalElements").value(1L))
+            .andExpect(jsonPath("$.totalPages").value(1));
+    }
+
+    @Test
+    void updateUserManagementTest() throws Exception {
+        String content = objectMapper.writeValueAsString(ModelUtils.getUserManagementDto());
+        mockMvc.perform(put(userLink)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+        verify(userService).updateUser(ModelUtils.getUserManagementDto());
+    }
+
+    @Test
+    void updateUserManagementBadRequestTest() throws Exception {
+        mockMvc.perform(put(userLink)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(""))
+            .andExpect(status().isBadRequest());
+        verify(userService, times(0)).updateUser(ModelUtils.getUserManagementDto());
+    }
+
+    @Test
+    void findAllTest() throws Exception {
+        when(userService.findAll()).thenReturn(List.of(ModelUtils.getUserVO()));
+        mockMvc.perform(get(userLink + "/findAll"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].name").value(TestConst.NAME))
+            .andExpect(jsonPath("$[0].id").value(1L))
+            .andExpect(jsonPath("$[0].email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findUserFriendByUserIdTest() throws Exception {
+        when(userService.findUserFriendsByUserId(1L)).thenReturn(List.of(ModelUtils.getUserManagementDto()));
+        mockMvc.perform(get(userLink + "/1/friends"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].name").value(TestConst.NAME))
+            .andExpect(jsonPath("$[0].id").value(1L))
+            .andExpect(jsonPath("$[0].email").value(TestConst.EMAIL))
+            .andExpect(jsonPath("$[0].userCredo").value(TestConst.CREDO));
+    }
+
+    @Test
+    void findNotDeactivatedByEmailTest() throws Exception {
+        when(userService.findNotDeactivatedByEmail(TestConst.EMAIL)).thenReturn(Optional.of(ModelUtils.getUserVO()));
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
+            .param("email", TestConst.EMAIL))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findNotDeactivatedByEmailIfNullTest() throws Exception {
+        when(userService.findNotDeactivatedByEmail(TestConst.EMAIL)).thenReturn(Optional.empty());
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
+            .param("email", TestConst.EMAIL))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").doesNotExist());
+    }
+
+    @Test
+    void createUbsRecordTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(TestConst.EMAIL);
+        when(userService.findByEmail(principal.getName())).thenReturn(ModelUtils.getUserVO());
+
+        when(userService.createUbsRecord(ModelUtils.getUserVO())).thenReturn(UbsTableCreationDto.builder()
+            .uuid("testUuid")
+            .build());
+        mockMvc.perform(get(userLink + "/createUbsRecord")
+            .principal(principal)
+            .content(objectMapper.writeValueAsString(ModelUtils.getUserVO())))
+            .andExpect(status().isOk())
+            .andDo(MockMvcResultHandlers.print())
+            .andExpect(jsonPath("$.uuid").value("testUuid"));
+
+    }
+
+    @Test
+    void findIdByEmailTest() throws Exception {
+        when(userService.findIdByEmail(TestConst.EMAIL)).thenReturn(1L);
+        mockMvc.perform(get(userLink + "/findIdByEmail")
+            .param("email", TestConst.EMAIL))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value(1L));
+    }
+
+    @Test
+    void findUuidByEmailTest() throws Exception {
+        when(userService.findUuIdByEmail(TestConst.EMAIL)).thenReturn(TestConst.UUID);
+        mockMvc.perform(get(userLink + "/findUuidByEmail")
+            .param("email", TestConst.EMAIL))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value(TestConst.UUID));
+    }
+
+    @Test
+    void updateUserLastActivityTimeTest() throws Exception {
+        String pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        Date date = simpleDateFormat.parse("2020-09-10 20:00:00.000000");
+        String dateSt = simpleDateFormat.format(date);
+
+        mockMvc.perform(put(userLink + "/{id}/updateUserLastActivityTime/{date}", 1, "2020-09-10 20:00:00.000000"))
+            .andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    void deactivateUserTest() throws Exception {
+        mockMvc.perform(put(userLink + "/deactivate")
+            .param("id", "1"))
+            .andExpect(status().isOk());
+        verify(userService).deactivateUser(1L);
+    }
+
+    @Test
+    void activateUserTest() throws Exception {
+        mockMvc.perform(put(userLink + "/activate")
+            .param("id", "1"))
+            .andExpect(status().isOk());
+        verify(userService).setActivatedStatus(1L);
+    }
+
+    @Test
+    void deactivateAllUserTest() throws Exception {
+        List<Long> ids = List.of(1L, 2L, 3L, 4L);
+        when(userService.deactivateAllUsers(ids)).thenReturn(ids);
+        mockMvc.perform(put(userLink + "/deactivateAll")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(ids)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(4));
+
+    }
+
+    @Test
+    void saveUserTest() throws Exception {
+        when(userService.save(ModelUtils.getUserVO())).thenReturn(ModelUtils.getUserVO());
+        mockMvc.perform(post(userLink)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(ModelUtils.getUserVO())))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findAllByEmailNotificationTest() throws Exception {
+        EmailNotification notification = EmailNotification.DAILY;
+        when(userService.findAllByEmailNotification(notification))
+            .thenReturn(List.of(ModelUtils.getUserVO()));
+        mockMvc.perform(get(userLink + "/findAllByEmailNotification")
+            .param("emailNotification", notification.toString()))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].id").value(1L));
+
+    }
+
+    @Test
+    void scheduleDeleteDeactivateUserTest() throws Exception {
+        when(userService.scheduleDeleteDeactivatedUsers()).thenReturn(1);
+
+        mockMvc.perform(post(userLink + "/deleteDeactivatedUsers"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value(1));
+    }
+
+    @Test
+    void findAllUsersCitiesTest() throws Exception {
+        List<String> cities = List.of("Lviv", "Kyiv", "Kharkiv");
+        when(userService.findAllUsersCities()).thenReturn(cities);
+        mockMvc.perform(get(userLink + "/findAllUsersCities"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(3))
+            .andExpect(jsonPath("$", Matchers.containsInAnyOrder("Lviv", "Kyiv", "Kharkiv")));
+    }
+
+    @Test
+    void findAllRegistrationMonthsMapTest() throws Exception {
+        Map<Integer, Long> map = new HashMap<>();
+        map.put(1, 10L);
+        map.put(12, 20L);
+        when(userService.findAllRegistrationMonthsMap()).thenReturn(map);
+        mockMvc.perform(get(userLink + "/findAllRegistrationMonthsMap"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$.1").value(10))
+            .andExpect(jsonPath("$.12").value(20));
     }
 }
