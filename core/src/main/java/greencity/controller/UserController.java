@@ -794,7 +794,7 @@ public class UserController {
     @PutMapping("/{id}/updateUserLastActivityTime/{date}")
     public ResponseEntity<Object> updateUserLastActivityTime(@PathVariable Long id,
         @PathVariable(value = "date") @DateTimeFormat(
-            pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS") Date userLastActivityTime) {
+            pattern = "yyyy-MM-ddHH:mm:ss.SSSSSS") Date userLastActivityTime) {
         userService.updateUserLastActivityTime(id, userLastActivityTime);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
