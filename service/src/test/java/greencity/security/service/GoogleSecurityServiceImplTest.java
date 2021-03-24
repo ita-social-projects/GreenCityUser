@@ -120,12 +120,12 @@ class GoogleSecurityServiceImplTest {
     void authenticationThrowsUserDeactivatedExceptionTest() throws GeneralSecurityException, IOException {
         User user = User.builder().id(1L)
             .email(TestConst.EMAIL).name(TestConst.NAME).role(Role.ROLE_USER)
-            .userStatus(UserStatus.DEACTIVATED).lastVisit(LocalDateTime.now())
+            .userStatus(UserStatus.DEACTIVATED).lastActivityTime(LocalDateTime.now())
             .dateOfRegistration(LocalDateTime.now()).build();
         UserVO userVO =
             UserVO.builder().id(1L).email(TestConst.EMAIL).name(TestConst.NAME)
                 .role(Role.ROLE_USER).userStatus(UserStatus.DEACTIVATED)
-                .lastVisit(LocalDateTime.now()).dateOfRegistration(LocalDateTime.now())
+                .lastActivityTime(LocalDateTime.now()).dateOfRegistration(LocalDateTime.now())
                 .build();
         when(googleIdTokenVerifier.verify("1234")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);

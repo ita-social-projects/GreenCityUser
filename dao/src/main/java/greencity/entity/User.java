@@ -58,7 +58,7 @@ import java.util.List;
 @Builder
 @Table(name = "users")
 @EqualsAndHashCode(
-    exclude = {"lastVisit", "verifyEmail", "ownSecurity",
+    exclude = {"verifyEmail", "ownSecurity",
         "refreshTokenKey", "restorePasswordEmail", "userFriends"})
 public class User {
     @Id
@@ -77,10 +77,6 @@ public class User {
 
     @Enumerated(value = EnumType.ORDINAL)
     private UserStatus userStatus;
-
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "HH:mm")
-    private LocalDateTime lastVisit;
 
     @Column(nullable = false)
     private LocalDateTime dateOfRegistration;

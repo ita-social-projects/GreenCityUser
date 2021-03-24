@@ -62,7 +62,7 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
             .build();
@@ -78,7 +78,7 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmailVO())
             .dateOfRegistration(LocalDateTime.now())
             .build();
@@ -94,7 +94,6 @@ public class ModelUtils {
             .firstName("name")
             .emailNotification(EmailNotification.MONTHLY)
             .userStatus(UserStatus.ACTIVATED)
-            .lastVisit(LocalDateTime.of(2020, 12, 11, 13, 33))
             .rating(13.4)
             .verifyEmail(VerifyEmailVO.builder()
                 .id(32L)

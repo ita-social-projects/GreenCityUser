@@ -439,8 +439,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO updateLastVisit(UserVO userVO) {
         UserVO user = findById(userVO.getId());
-        log.info(user.getLastVisit() + "s");
-        userVO.setLastVisit(LocalDateTime.now());
+        log.info(user.getLastActivityTime() + "s");
+        userVO.setLastActivityTime(LocalDateTime.now());
         User updatable = modelMapper.map(userVO, User.class);
         return modelMapper.map(userRepo.save(updatable), UserVO.class);
     }

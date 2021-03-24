@@ -41,8 +41,6 @@ public class UserVO {
 
     private UserStatus userStatus;
 
-    private LocalDateTime lastVisit;
-
     private VerifyEmailVO verifyEmail;
 
     private Double rating;
