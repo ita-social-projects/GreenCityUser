@@ -122,7 +122,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .role(Role.ROLE_USER)
             .uuid(UUID.randomUUID().toString())
             .dateOfRegistration(LocalDateTime.now())
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
