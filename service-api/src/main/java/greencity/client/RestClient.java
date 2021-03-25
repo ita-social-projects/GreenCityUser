@@ -6,9 +6,11 @@ import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.user.UserVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -16,11 +18,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.IMAGES;
+import static greencity.constant.AppConstant.IMAGE;
 
 @RequiredArgsConstructor
 @Component
@@ -69,17 +72,25 @@ public class RestClient {
      * @return String
      * @author Orest Mamchuk
      */
-    public String uploadImage(MultipartFile image) {
+    public String uploadImage(MultipartFile image) throws IOException {
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add(IMAGES, image);
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, setHeader());
+        ByteArrayResource fileAsResource = new ByteArrayResource(image.getBytes()) {
+            @Override
+            public String getFilename() {
+                return image.getOriginalFilename();
+            }
+        };
+        map.add(IMAGE, fileAsResource);
+        HttpHeaders headers = setHeader();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         return restTemplate.postForObject(greenCityServerAddress
             + RestTemplateLinks.FILES_IMAGE, requestEntity, String.class);
     }
 
     /**
      * Method for delete social network by id.
-     * 
+     *
      * @param socialNetworkId of {@link SocialNetworkImageVO}
      * @return Long
      * @author Orest Mamchuk

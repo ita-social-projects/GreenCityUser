@@ -283,7 +283,7 @@ class UserControllerTest {
 
         when(principal.getName()).thenReturn("testmail@gmail.com");
         when(userService.updateUserProfilePicture(null, "testmail@gmail.com",
-            new UserProfilePictureDto(1L, "test", "image"))).thenReturn(user);
+            "test")).thenReturn(user);
 
         MockMultipartHttpServletRequestBuilder builder =
             MockMvcRequestBuilders.multipart(userLink + "/profilePicture");
