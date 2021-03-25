@@ -4,36 +4,11 @@ import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.SqlResultSetMapping;
-import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.*;
+import lombok.*;
 
 @Entity
 @SqlResultSetMapping(
@@ -58,7 +33,7 @@ import java.util.List;
 @Builder
 @Table(name = "users")
 @EqualsAndHashCode(
-    exclude = {"lastVisit", "verifyEmail", "ownSecurity",
+    exclude = {"verifyEmail", "ownSecurity",
         "refreshTokenKey", "restorePasswordEmail", "userFriends"})
 public class User {
     @Id
@@ -77,10 +52,6 @@ public class User {
 
     @Enumerated(value = EnumType.ORDINAL)
     private UserStatus userStatus;
-
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "HH:mm")
-    private LocalDateTime lastVisit;
 
     @Column(nullable = false)
     private LocalDateTime dateOfRegistration;

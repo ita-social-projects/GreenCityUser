@@ -65,7 +65,7 @@ class UserServiceImplTest {
         .role(Role.ROLE_USER)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
-        .lastVisit(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
+        .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
         .build();
@@ -77,7 +77,7 @@ class UserServiceImplTest {
         .role(Role.ROLE_USER)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
-        .lastVisit(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
+        .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
         .build();
@@ -88,7 +88,7 @@ class UserServiceImplTest {
         .role(Role.ROLE_MODERATOR)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
-        .lastVisit(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
+        .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .build();
     private UserVO userVO2 =
@@ -99,7 +99,7 @@ class UserServiceImplTest {
             .role(Role.ROLE_MODERATOR)
             .userStatus(ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
-            .lastVisit(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
+            .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
             .dateOfRegistration(LocalDateTime.now())
             .build();
 
@@ -357,8 +357,8 @@ class UserServiceImplTest {
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         when(userRepo.save(any())).thenReturn(user);
-        LocalDateTime localDateTime = user.getLastVisit().minusHours(1);
-        assertNotEquals(localDateTime, userService.updateLastVisit(userVO).getLastVisit());
+        LocalDateTime localDateTime = user.getLastActivityTime().minusHours(1);
+        assertNotEquals(localDateTime, userService.updateLastVisit(userVO).getLastActivityTime());
     }
 
     @Test
