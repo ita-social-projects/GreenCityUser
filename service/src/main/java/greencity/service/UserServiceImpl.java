@@ -561,24 +561,24 @@ public class UserServiceImpl implements UserService {
     /**
      * Update user profile picture {@link UserVO}.
      *
-     * @param image                 {@link MultipartFile}
-     * @param email                 {@link String} - email of user that need to
-     *                              update.
-     * @param userProfilePictureDto {@link UserProfilePictureDto}
+     * @param image  {@link MultipartFile}
+     * @param email  {@link String} - email of user that need to update.
+     * @param base64 {@link String} - picture in base 64 format.
      * @return {@link UserVO}.
      * @author Marian Datsko
      */
     @Override
     public UserVO updateUserProfilePicture(MultipartFile image, String email,
-        UserProfilePictureDto userProfilePictureDto) {
+        String base64) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        if (userProfilePictureDto.getProfilePicturePath() != null) {
-            image = restClient.convertToMultipartImage(userProfilePictureDto.getProfilePicturePath());
+        if (base64 != null) {
+            image = restClient.convertToMultipartImage(base64);
         }
         if (image != null) {
-            String profilePicturePath = restClient.uploadImage(image);
+            String profilePicturePath = null;
+            profilePicturePath = restClient.uploadImage(image);
             user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);

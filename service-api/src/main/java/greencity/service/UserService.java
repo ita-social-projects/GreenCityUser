@@ -260,15 +260,14 @@ public interface UserService {
     /**
      * Update user profile picture {@link UserVO}.
      *
-     * @param image                 {@link MultipartFile}
-     * @param email                 {@link String} - email of user that need to
-     *                              update.
-     * @param userProfilePictureDto {@link UserProfilePictureDto}
+     * @param image  {@link MultipartFile}
+     * @param email  {@link String} - email of user that need to update.
+     * @param base64 {@link String} - picture in base 64 format.
      * @return {@link UserVO}.
      * @author Marian Datsko
      */
     UserVO updateUserProfilePicture(MultipartFile image, String email,
-        UserProfilePictureDto userProfilePictureDto);
+        String base64);
 
     /**
      * Delete user profile picture {@link UserVO}.
