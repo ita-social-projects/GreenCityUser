@@ -39,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -579,11 +578,7 @@ public class UserServiceImpl implements UserService {
         }
         if (image != null) {
             String profilePicturePath = null;
-            try {
-                profilePicturePath = restClient.uploadImage(image);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            profilePicturePath = restClient.uploadImage(image);
             user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);

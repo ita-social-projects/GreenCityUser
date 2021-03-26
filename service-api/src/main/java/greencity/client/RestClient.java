@@ -5,6 +5,7 @@ import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.user.UserVO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
@@ -25,6 +26,7 @@ import java.util.List;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.constant.AppConstant.IMAGE;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class RestClient {
@@ -72,15 +74,13 @@ public class RestClient {
      * @return String
      * @author Orest Mamchuk
      */
-    public String uploadImage(MultipartFile image) throws IOException {
+    public String uploadImage(MultipartFile image) {
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        ByteArrayResource fileAsResource = new ByteArrayResource(image.getBytes()) {
-            @Override
-            public String getFilename() {
-                return image.getOriginalFilename();
-            }
-        };
-        map.add(IMAGE, fileAsResource);
+        try {
+            map.add(IMAGE, convert(image));
+        } catch (IOException e) {
+            log.info("File did not convert to ByteArrayResource");
+        }
         HttpHeaders headers = setHeader();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
@@ -194,5 +194,20 @@ public class RestClient {
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
         return headers;
+    }
+
+    /**
+     * Method convert MultipartFile to ByteArrayResource.
+     *
+     * @param image {@link MultipartFile}
+     * @return {@link ByteArrayResource}
+     */
+    private ByteArrayResource convert(MultipartFile image) throws IOException {
+        return new ByteArrayResource(image.getBytes()) {
+            @Override
+            public String getFilename() {
+                return image.getOriginalFilename();
+            }
+        };
     }
 }
