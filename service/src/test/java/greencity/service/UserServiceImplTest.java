@@ -443,7 +443,7 @@ class UserServiceImplTest {
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         assertThrows(BadRequestException.class,
             () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
-                userProfilePictureDto));
+                "test"));
     }
 
     @Test
