@@ -1,4 +1,5 @@
-pr:
+trigger:
+  batch: true
   branches:
     include:
     - dev, master
