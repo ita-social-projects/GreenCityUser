@@ -31,6 +31,9 @@ public class EmailController {
     public ResponseEntity<Object> addEcoNews(@RequestBody AddEcoNewsMessage message) {
         emailService.sendNewNewsForSubscriber(message.getSubscribers(), message.getAddEcoNewsDtoResponse());
         return ResponseEntity.status(HttpStatus.OK).build();
+        System.out.println("teste");
+        System.out.println("teste");
+        System.out.println("teste");
     }
 
     /**
