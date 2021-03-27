@@ -30,10 +30,10 @@ public class EmailController {
     @PostMapping("/addEcoNews")
     public ResponseEntity<Object> addEcoNews(@RequestBody AddEcoNewsMessage message) {
         emailService.sendNewNewsForSubscriber(message.getSubscribers(), message.getAddEcoNewsDtoResponse());
+        System.out.println("teste");
+        System.out.println("teste");
+        System.out.println("teste");
         return ResponseEntity.status(HttpStatus.OK).build();
-        System.out.println("teste");
-        System.out.println("teste");
-        System.out.println("teste");
     }
 
     /**
