@@ -87,9 +87,11 @@ class RestClientTest {
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        MultipartFile image = new MockMultipartFile("data", "filename.png",
-            "image/png", "some xml".getBytes());
+        MultipartFile image =
+            new MockMultipartFile("data", "filename.png", "image/png",
+                "some xml".getBytes());
         ByteArrayResource fileAsResource = new ByteArrayResource(image.getBytes()) {
+
             @Override
             public String getFilename() {
                 return image.getOriginalFilename();
@@ -99,9 +101,11 @@ class RestClientTest {
         map.add(IMAGE, fileAsResource);
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.postForObject(greenCityServerAddress
-            + RestTemplateLinks.FILES_IMAGE, requestEntity, String.class)).thenReturn(imagePath);
-        assertEquals(imagePath, restClient.uploadImage(image));
+        when(restTemplate.postForObject(greenCityServerAddress +
+            RestTemplateLinks.FILES_IMAGE, requestEntity,
+            String.class)).thenReturn(imagePath);
+        assertEquals(imagePath,
+            restClient.uploadImage(image));
     }
 
     @Test
