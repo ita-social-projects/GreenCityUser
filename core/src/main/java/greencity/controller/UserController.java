@@ -215,7 +215,7 @@ public class UserController {
     })
     @PatchMapping
     public ResponseEntity<UserUpdateDto> updateUser(@Valid @RequestBody UserUpdateDto dto,
-                                                    @ApiIgnore @AuthenticationPrincipal Principal principal) {
+        @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(dto, email));
     }
@@ -804,9 +804,8 @@ public class UserController {
     })
     @PutMapping("/{id}/updateUserLastActivityTime/{date}")
     public ResponseEntity<Object> updateUserLastActivityTime(@PathVariable Long id,
-                                                             @PathVariable(value = "date") @DateTimeFormat(
-                                                                 pattern = "yyyy-MM-ddHH:mm:ss.SSSSSS")
-                                                                 Date userLastActivityTime) {
+        @PathVariable(value = "date") @DateTimeFormat(
+            pattern = "yyyy-MM-ddHH:mm:ss.SSSSSS") Date userLastActivityTime) {
         userService.updateUserLastActivityTime(id, userLastActivityTime);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -903,8 +902,7 @@ public class UserController {
     })
     @PostMapping("/search")
     public ResponseEntity<PageableAdvancedDto<UserManagementVO>> search(@ApiIgnore Pageable pageable,
-                                                                        @RequestBody
-                                                                            UserManagementViewDto userViewDto) {
+        @RequestBody UserManagementViewDto userViewDto) {
         PageableAdvancedDto<UserManagementVO> found = userService.search(pageable, userViewDto);
         return ResponseEntity.status(HttpStatus.OK).body(found);
     }
@@ -935,7 +933,6 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-
     })
     @PostMapping("/deleteDeactivatedUsers")
     public ResponseEntity<Integer> scheduleDeleteDeactivatedUsers() {
