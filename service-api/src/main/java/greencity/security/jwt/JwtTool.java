@@ -147,4 +147,13 @@ public class JwtTool {
     public String generateTokenKey() {
         return UUID.randomUUID().toString();
     }
+
+    public String generateTokenKeyWithCodedDate() {
+        Date date = new Date();
+        Long dateLong = date.getTime();
+        dateLong += 86400000L;
+        String input = dateLong + "." + UUID.randomUUID().toString();
+        String encodedString = Base64.getEncoder().encodeToString(input.getBytes());
+        return encodedString;
+    }
 }

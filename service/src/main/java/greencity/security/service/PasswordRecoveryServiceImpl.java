@@ -15,7 +15,9 @@ import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
+
 import java.time.LocalDateTime;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -56,12 +58,12 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
      * @param jwtTool                   {@link JwtTool} - Used for recovery token
      */
     public PasswordRecoveryServiceImpl(
-        OwnSecurityRepo ownSecurityRepo, PasswordEncoder passwordEncoder,
-        RestorePasswordEmailRepo restorePasswordEmailRepo,
-        UserRepo userRepo,
-        ApplicationEventPublisher applicationEventPublisher,
-        EmailService emailService,
-        JwtTool jwtTool) {
+            OwnSecurityRepo ownSecurityRepo, PasswordEncoder passwordEncoder,
+            RestorePasswordEmailRepo restorePasswordEmailRepo,
+            UserRepo userRepo,
+            ApplicationEventPublisher applicationEventPublisher,
+            EmailService emailService,
+            JwtTool jwtTool) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.passwordEncoder = passwordEncoder;
         this.restorePasswordEmailRepo = restorePasswordEmailRepo;
@@ -78,13 +80,13 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     @Override
     public void sendPasswordRecoveryEmailTo(String email, String language) {
         User user = userRepo
-            .findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+                .findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         RestorePasswordEmail restorePasswordEmail = user.getRestorePasswordEmail();
         if (restorePasswordEmail != null) {
             throw new WrongEmailException(ErrorMessage.PASSWORD_RESTORE_LINK_ALREADY_SENT + email);
         }
-        savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey(), language);
+        savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKeyWithCodedDate(), language);
     }
 
     /**
@@ -94,8 +96,8 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     @Override
     public void updatePasswordUsingToken(OwnRestoreDto form) {
         RestorePasswordEmail restorePasswordEmail = restorePasswordEmailRepo
-            .findByToken(form.getToken())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID));
+                .findByToken(form.getToken())
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID));
         if (!form.getPassword().equals(form.getConfirmPassword())) {
             throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCHES);
         }
@@ -103,13 +105,13 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {
             updatePassword(form.getPassword(), restorePasswordEmail.getUser().getId());
             applicationEventPublisher.publishEvent(
-                new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
+                    new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
             restorePasswordEmailRepo.delete(restorePasswordEmail);
             log.info("User with email " + restorePasswordEmail.getUser().getEmail()
-                + " has successfully restored the password using token " + form.getToken());
+                    + " has successfully restored the password using token " + form.getToken());
         } else {
             log.info("Password restoration token of user with email " + restorePasswordEmail.getUser().getEmail()
-                + " has been expired. Token: " + form.getToken());
+                    + " has been expired. Token: " + form.getToken());
             throw new UserActivationEmailTokenExpiredException(ErrorMessage.EMAIL_TOKEN_EXPIRED);
         }
         if (userStatus == UserStatus.CREATED) {
@@ -126,18 +128,18 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
      */
     private void savePasswordRestorationTokenForUser(User user, String token, String language) {
         RestorePasswordEmail restorePasswordEmail =
-            RestorePasswordEmail.builder()
-                .user(user)
-                .token(token)
-                .expiryDate(calculateExpirationDate(tokenExpirationTimeInHours))
-                .build();
+                RestorePasswordEmail.builder()
+                        .user(user)
+                        .token(token)
+                        .expiryDate(calculateExpirationDate(tokenExpirationTimeInHours))
+                        .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
         emailService.sendRestoreEmail(
-            user.getId(),
-            user.getFirstName(),
-            user.getEmail(),
-            token,
-            language);
+                user.getId(),
+                user.getFirstName(),
+                user.getEmail(),
+                token,
+                language);
     }
 
     /**
