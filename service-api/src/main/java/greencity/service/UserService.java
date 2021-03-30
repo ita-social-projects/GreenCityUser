@@ -377,14 +377,6 @@ public interface UserService {
     UserAndAllFriendsWithOnlineStatusDto getAllFriendsWithTheOnlineStatus(Long userId, Pageable pageable);
 
     /**
-     * change {@link UserVO}'s status to DEACTIVATED.
-     *
-     * @param id {@link UserVO}'s id
-     * @author Vasyl Zhovnir
-     */
-    void deactivateUser(Long id);
-
-    /**
      * Method deactivates all the {@link UserVO} by list of IDs.
      *
      * @param listId {@link List} of {@link UserVO}s` ids to be deactivated
@@ -399,7 +391,7 @@ public interface UserService {
      * @param id {@link UserVO}'s id
      * @author Vasyl Zhovnir
      */
-    void setActivatedStatus(Long id);
+    UserActivationDto setActivatedStatus(Long id);
 
     /**
      * Method that allow you to find {@link UserVO} by ID and token.
@@ -498,4 +490,41 @@ public interface UserService {
      * @return {@link UbsTableCreationDto} - uuid of current user.
      */
     UbsTableCreationDto createUbsRecord(UserVO currentUser);
+
+    /**
+     * change {@link UserVO}'s status to DEACTIVATED.
+     *
+     * @param id          {@link UserVO}'s id
+     * @param userReasons {@link List} of {@link String}.
+     * @author Vasyl Zhovnir
+     */
+    UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons);
+
+    /**
+     * Method for getting a {@link List} of {@link String} - reasons for
+     * deactivation of the current user.
+     *
+     * @param id        {@link Long} - user's id.
+     * @param adminLang {@link String} - current administrator language.
+     * @return {@link List} of {@link String}.
+     * @author Vlad Pikhotskyi
+     */
+    List<String> getDeactivationReason(Long id, String adminLang);
+
+    /**
+     * Method for getting {@link String} user language.
+     *
+     * @param id of the searched {@link UserVO}.
+     * @return current user language {@link String}.
+     * @author Vlad Pikhotskyi
+     */
+    String getUserLang(Long id);
+
+    /**
+     * Method that update user language column.
+     *
+     * @param userId     {@link Long} -current user's id.
+     * @param languageId {@link Long} - language id.
+     */
+    void updateUserLanguage(Long userId, Long languageId);
 }
