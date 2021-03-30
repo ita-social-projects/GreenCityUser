@@ -6,6 +6,7 @@ public final class EmailConstants {
     public static final String GC_CONTRIBUTORS = "GreenCity contributors";
     public static final String NEW_PLACES = "New places";
     public static final String NEWS = "Eco news from GreenCity";
+    public static final String CREATED_NEWS = "You created news on GreenCity ";
     public static final String VERIFY_EMAIL = "Verify your email address";
     public static final String CONFIRM_RESTORING_PASS = "Confirm restoring password";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
