@@ -631,37 +631,11 @@ class UserControllerTest {
     }
 
     @Test
-    void deactivateUser() throws Exception {
-        List<String> test = List.of("test", "test");
-        String json = objectMapper.writeValueAsString(test);
-        UserDeactivationReasonDto test1 = UserDeactivationReasonDto.builder()
-            .deactivationReasons(test)
-            .lang("en")
-            .email("test@ukr.net")
-            .name("test")
-            .build();
-        mockMvc.perform(put(userLink + "/deactivate" + "?id=1")
-            .content(json)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-        when(userService.deactivateUser(1L, test)).thenReturn(test1);
-        verify(userService).deactivateUser(1L, test);
-    }
-
-    @Test
     void getUserLang() throws Exception {
         this.mockMvc.perform(get(userLink + "/lang" + "?id=1")
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         verify(userService).getUserLang(1L);
-    }
-
-    @Test
-    void setActivatedStatus() throws Exception {
-        mockMvc.perform(put(userLink + "/activate" + "?id=1")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-        verify(userService).setActivatedStatus(1L);
     }
 
     @Test
