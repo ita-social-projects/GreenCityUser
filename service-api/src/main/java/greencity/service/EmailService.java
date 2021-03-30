@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
@@ -34,6 +35,13 @@ public interface EmailService {
      */
     void sendNewNewsForSubscriber(List<NewsSubscriberResponseDto> subscribers,
         AddEcoNewsDtoResponse newsDto);
+
+    /**
+     * Method for sending created news for author.
+     *
+     * @param newDto - includes all information about ecoNews and author.
+     */
+    void sendCreatedNewsForAuthor(EcoNewsForSendEmailDto newDto);
 
     /**
      * Method for sending simple notification to {@code User} about change status.

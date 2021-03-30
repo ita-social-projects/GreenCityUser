@@ -1,6 +1,6 @@
 package greencity.controller;
 
-import greencity.message.AddEcoNewsMessage;
+import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
@@ -28,8 +28,8 @@ public class EmailController {
      * @author Taras Kavkalo
      */
     @PostMapping("/addEcoNews")
-    public ResponseEntity<Object> addEcoNews(@RequestBody AddEcoNewsMessage message) {
-        emailService.sendNewNewsForSubscriber(message.getSubscribers(), message.getAddEcoNewsDtoResponse());
+    public ResponseEntity<Object> addEcoNews(@RequestBody EcoNewsForSendEmailDto message) {
+        emailService.sendCreatedNewsForAuthor(message);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
