@@ -574,10 +574,10 @@ public class UserServiceImpl implements UserService {
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         if (base64 != null) {
-            image = restClient.convertToMultipartImage(base64);
+            image = modelMapper.map(base64, MultipartFile.class);
         }
         if (image != null) {
-            String profilePicturePath = null;
+            String profilePicturePath;
             profilePicturePath = restClient.uploadImage(image);
             user.setProfilePicturePath(profilePicturePath);
         } else {

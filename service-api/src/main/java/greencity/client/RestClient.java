@@ -76,14 +76,14 @@ public class RestClient {
      */
     public String uploadImage(MultipartFile image) {
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
+        HttpHeaders headers = setHeader();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         try {
             map.add(IMAGE, convert(image));
         } catch (IOException e) {
             log.info("File did not convert to ByteArrayResource");
         }
-        HttpHeaders headers = setHeader();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         return restTemplate.postForObject(greenCityServerAddress
             + RestTemplateLinks.FILES_IMAGE, requestEntity, String.class);
     }
