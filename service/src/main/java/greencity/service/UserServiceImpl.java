@@ -4,6 +4,8 @@ package greencity.service;
 
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
+import greencity.entity.Language;
+import greencity.entity.UserDeactivationReason;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -23,6 +25,8 @@ import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
+import greencity.repository.LanguageRepo;
+import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +63,8 @@ public class UserServiceImpl implements UserService {
      */
     private final UserRepo userRepo;
     private final RestClient restClient;
+    private final LanguageRepo languageRepo;
+    private final UserDeactivationRepo userDeactivationRepo;
     // private final AchievementCalculation achievementCalculation;
     /**
      * Autowired mapper.
@@ -879,15 +885,89 @@ public class UserServiceImpl implements UserService {
             .build();
     }
 
+    @Override
+    public UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons) {
+        User foundUser =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        foundUser.setUserStatus(UserStatus.DEACTIVATED);
+        userRepo.save(foundUser);
+        String reasons = userReasons.stream().map(Object::toString).collect(Collectors.joining("/"));
+        userDeactivationRepo.save(UserDeactivationReason.builder()
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .reason(reasons)
+            .user(foundUser)
+            .build());
+        return UserDeactivationReasonDto.builder()
+            .email(foundUser.getEmail())
+            .name(foundUser.getName())
+            .deactivationReasons(filterReasons(foundUser.getLanguage().getCode(), reasons))
+            .lang(foundUser.getLanguage().getCode())
+            .build();
+    }
+
     /**
      * {@inheritDoc}
      */
+    @Override
+    public String getUserLang(Long id) {
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        return user.getLanguage().getCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getDeactivationReason(Long id, String adminLang) {
+        UserDeactivationReason userReason = userDeactivationRepo.getLastDeactivationReasons(id)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DEACTIVATION_REASON_IS_EMPTY));
+        if (adminLang.equals("uk")) {
+            adminLang = "ua";
+        }
+        return filterReasons(adminLang,
+            userReason.getReason());
+    }
+
+    private List<String> filterReasons(String lang, String reasons) {
+        List<String> result = null;
+        List<String> forAll = List.of(reasons.split("/"));
+        if (lang.equals("en")) {
+            result = forAll.stream().filter(s -> s.contains("{en}"))
+                .map(filterEn -> filterEn.replace("{en}", "").trim()).collect(Collectors.toList());
+        }
+        if (lang.equals("ua")) {
+            result = forAll.stream().filter(s -> s.contains("{ua}"))
+                .map(filterEn -> filterEn.replace("{ua}", "").trim()).collect(Collectors.toList());
+        }
+        return result;
+    }
+
     @Transactional
     @Override
-    public void deactivateUser(Long id) {
-        UserVO foundUser = findById(id);
-        foundUser.setUserStatus(UserStatus.DEACTIVATED);
-        userRepo.save(modelMapper.map(foundUser, User.class));
+    public UserActivationDto setActivatedStatus(Long id) {
+        User foundUser =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        foundUser.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(foundUser);
+        return UserActivationDto.builder()
+            .email(foundUser.getEmail())
+            .name(foundUser.getName())
+            .lang(foundUser.getLanguage().getCode())
+            .build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUserLanguage(Long userId, Long languageId) {
+        Language language = languageRepo.findById(languageId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+        user.setLanguage(language);
+        userRepo.save(user);
     }
 
     /**
@@ -898,17 +978,6 @@ public class UserServiceImpl implements UserService {
     public List<Long> deactivateAllUsers(List<Long> listId) {
         userRepo.deactivateSelectedUsers(listId);
         return listId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Transactional
-    @Override
-    public void setActivatedStatus(Long id) {
-        UserVO foundUser = findById(id);
-        foundUser.setUserStatus(UserStatus.ACTIVATED);
-        userRepo.save(modelMapper.map(foundUser, User.class));
     }
 
     /**

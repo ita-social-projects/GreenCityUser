@@ -620,19 +620,32 @@ class UserControllerTest {
     }
 
     @Test
-    void deactivateUserTest() throws Exception {
-        mockMvc.perform(put(userLink + "/deactivate")
-            .param("id", "1"))
+    void updateUserLanguageTest() throws Exception {
+        String accessToken = "accessToken";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+        mockMvc.perform(put(userLink + "/{userId}/language/{languageId}", 1, 1)
+            .headers(headers))
             .andExpect(status().isOk());
-        verify(userService).deactivateUser(1L);
+        verify(userService).updateUserLanguage(1L, 1L);
     }
 
     @Test
-    void activateUserTest() throws Exception {
-        mockMvc.perform(put(userLink + "/activate")
-            .param("id", "1"))
+    void getUserLang() throws Exception {
+        this.mockMvc.perform(get(userLink + "/lang" + "?id=1")
+            .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
-        verify(userService).setActivatedStatus(1L);
+        verify(userService).getUserLang(1L);
+    }
+
+    @Test
+    void getReasonsOfDeactivation() throws Exception {
+        List<String> test = List.of("test", "test");
+        when(userService.getDeactivationReason(1L, "en")).thenReturn(test);
+        this.mockMvc.perform(get(userLink + "/reasons" + "?id=1" + "&admin=en")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+        verify(userService).getDeactivationReason(1L, "en");
     }
 
     @Test
