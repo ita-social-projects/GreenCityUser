@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import greencity.message.AddEcoNewsMessage;
+import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
@@ -44,28 +44,23 @@ class EmailControllerTest {
 
     @Test
     void addEcoNews() throws Exception {
-        String content = "{" +
-            "\"addEcoNewsDtoResponse\":" +
-            "{\"creationDate\":\"2021-02-05T15:10:22.434Z\"," +
-            "\"ecoNewsAuthorDto\":{\"id\":0,\"name\":\"string\"}," +
-            "\"id\":0," +
-            "\"imagePath\":\"string\"," +
-            "\"source\":\"string\"," +
-            "\"tags\":[\"string\"]," +
-            "\"text\":\"string\"," +
-            "\"title\":\"string\"}," +
-            "\"subscribers\":[{\"email\":\"string\"," +
-            "\"unsubscribeToken\":\"string\"}]" +
-            "}";
+        String content =
+            "{\"unsubscribeToken\":\"string\"," +
+                "\"creationDate\":\"2021-02-05T15:10:22.434Z\"," +
+                "\"imagePath\":\"string\"," +
+                "\"source\":\"string\"," +
+                "\"author\":{\"id\":0,\"name\":\"string\",\"email\":\"test.email@gmail.com\" }," +
+                "\"title\":\"string\"," +
+                "\"text\":\"string\"}";
 
         mockPerform(content, "/addEcoNews");
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         objectMapper.registerModule(new JavaTimeModule());
-        AddEcoNewsMessage message = objectMapper.readValue(content, AddEcoNewsMessage.class);
+        EcoNewsForSendEmailDto message = objectMapper.readValue(content, EcoNewsForSendEmailDto.class);
 
-        verify(emailService).sendNewNewsForSubscriber(message.getSubscribers(), message.getAddEcoNewsDtoResponse());
+        verify(emailService).sendCreatedNewsForAuthor(message);
     }
 
     @Test

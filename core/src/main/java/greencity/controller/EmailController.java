@@ -1,10 +1,12 @@
 package greencity.controller;
 
+import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.message.AddEcoNewsMessage;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
+import greencity.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,11 +30,8 @@ public class EmailController {
      * @author Taras Kavkalo
      */
     @PostMapping("/addEcoNews")
-    public ResponseEntity<Object> addEcoNews(@RequestBody AddEcoNewsMessage message) {
-        emailService.sendNewNewsForSubscriber(message.getSubscribers(), message.getAddEcoNewsDtoResponse());
-        System.out.println("testt");
-        System.out.println("testt");
-        System.out.println("testt");
+    public ResponseEntity<Object> addEcoNews(@RequestBody EcoNewsForSendEmailDto message) {
+        emailService.sendCreatedNewsForAuthor(message);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
