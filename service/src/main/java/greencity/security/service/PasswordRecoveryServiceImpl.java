@@ -84,7 +84,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         if (restorePasswordEmail != null) {
             throw new WrongEmailException(ErrorMessage.PASSWORD_RESTORE_LINK_ALREADY_SENT + email);
         }
-        savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey(), language);
+        savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKeyWithCodedDate(), language);
     }
 
     /**

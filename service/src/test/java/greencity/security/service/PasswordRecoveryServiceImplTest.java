@@ -70,7 +70,7 @@ class PasswordRecoveryServiceImplTest {
         User user = new User();
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
         String token = "bar";
-        when(jwtTool.generateTokenKey()).thenReturn(token);
+        when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn(token);
         ReflectionTestUtils.setField(passwordRecoveryService, "tokenExpirationTimeInHours", 24);
         passwordRecoveryService.sendPasswordRecoveryEmailTo(email, language);
         verify(restorePasswordEmailRepo).save(refEq(
