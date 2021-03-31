@@ -147,4 +147,18 @@ public class JwtTool {
     public String generateTokenKey() {
         return UUID.randomUUID().toString();
     }
+
+    /**
+     * Generates a random string that can be used as refresh token key with
+     * token-expiration date.
+     *
+     * @return random generated token key with token-expiration date
+     */
+    public String generateTokenKeyWithCodedDate() {
+        Date date = new Date();
+        Long dateLong = date.getTime();
+        dateLong += 86400000L;
+        String input = dateLong + "." + UUID.randomUUID().toString();
+        return Base64.getEncoder().encodeToString(input.getBytes());
+    }
 }
