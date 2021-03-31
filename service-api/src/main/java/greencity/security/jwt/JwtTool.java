@@ -159,7 +159,6 @@ public class JwtTool {
         Long dateLong = date.getTime();
         dateLong += 86400000L;
         String input = dateLong + "." + UUID.randomUUID().toString();
-        String encodedString = Base64.getEncoder().encodeToString(input.getBytes());
-        return encodedString;
+        return Base64.getEncoder().encodeToString(input.getBytes());
     }
 }
