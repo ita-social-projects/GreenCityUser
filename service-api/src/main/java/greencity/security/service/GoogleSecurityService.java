@@ -16,5 +16,5 @@ public interface GoogleSecurityService {
      * @param idToken {@link String} - google id token.
      * @return {@link SuccessSignInDto} if token valid
      */
-    SuccessSignInDto authenticate(String idToken);
+    SuccessSignInDto authenticate(String idToken, String language);
 }

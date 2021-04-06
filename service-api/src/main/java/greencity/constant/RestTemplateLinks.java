@@ -20,6 +20,7 @@ public class RestTemplateLinks {
     public static final Object CALCULATE_ACHIEVEMENT_SETTER = "&setter=";
     public static final Object CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK = "&socialNetwork=";
     public static final String CALCULATE_ACHIEVEMENT_SIZE = "&size=";
+    public static final String TOKEN = "/token";
 
     private RestTemplateLinks() {
     }

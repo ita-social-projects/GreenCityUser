@@ -4,18 +4,11 @@ import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.*;
+import lombok.*;
 
 @Entity
 @SqlResultSetMapping(
@@ -40,7 +33,7 @@ import java.util.List;
 @Builder
 @Table(name = "users")
 @EqualsAndHashCode(
-    exclude = {"lastVisit", "verifyEmail", "ownSecurity",
+    exclude = {"verifyEmail", "ownSecurity",
         "refreshTokenKey", "restorePasswordEmail", "userFriends"})
 public class User {
     @Id
@@ -59,10 +52,6 @@ public class User {
 
     @Enumerated(value = EnumType.ORDINAL)
     private UserStatus userStatus;
-
-    @Column(nullable = false)
-    @DateTimeFormat(pattern = "HH:mm")
-    private LocalDateTime lastVisit;
 
     @Column(nullable = false)
     private LocalDateTime dateOfRegistration;
@@ -125,6 +114,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserAction> userActions = new ArrayList<>();
 
+    @Column(columnDefinition = "varchar(60)")
+    private String uuid;
+
     @ManyToOne
     private Language language;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<UserDeactivationReason> userDeactivationReasons;
 }

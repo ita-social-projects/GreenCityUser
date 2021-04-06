@@ -1,16 +1,11 @@
 package greencity.security.service;
 
+import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
-import greencity.entity.OwnSecurity;
-import greencity.entity.RestorePasswordEmail;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -36,11 +31,14 @@ import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
@@ -51,6 +49,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static greencity.constant.AppConstant.DEFAULT_ACHIEVEMENT_ID;
 
 /**
  * {@inheritDoc}
@@ -83,7 +83,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         ModelMapper modelMapper,
         UserRepo userRepo,
-        AchievementService achievementService, EmailService emailService) {
+        AchievementService achievementService, EmailService emailService, RestClient restClient) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -104,7 +104,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     @Transactional
     @Override
     public SuccessSignUpDto signUp(OwnSignUpDto dto, String language) {
-        User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey());
+        User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         OwnSecurity ownSecurity = createOwnSecurity(dto, user);
         VerifyEmail verifyEmail = createVerifyEmail(user, jwtTool.generateTokenKey());
         List<UserAchievement> userAchievementList = createUserAchievements(user);
@@ -113,9 +113,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setVerifyEmail(verifyEmail);
         user.setUserAchievements(userAchievementList);
         user.setUserActions(userActionsList);
+        user.setUuid(UUID.randomUUID().toString());
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
+            /*
+             * achievementService.findUserAchievement(savedUser.getId(),
+             * DEFAULT_ACHIEVEMENT_ID);
+             */
             emailService.sendVerificationEmail(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
                 savedUser.getVerifyEmail().getToken(), language);
         } catch (DataIntegrityViolationException e) {
@@ -124,7 +129,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
-    private User createNewRegisteredUser(OwnSignUpDto dto, String refreshTokenKey) {
+    private User createNewRegisteredUser(OwnSignUpDto dto, String refreshTokenKey, String language) {
         return User.builder()
             .name(dto.getName())
             .firstName(dto.getName())
@@ -132,10 +137,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .dateOfRegistration(LocalDateTime.now())
             .role(Role.ROLE_USER)
             .refreshTokenKey(refreshTokenKey)
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
+            .language(Language.builder()
+                .id(modelMapper.map(language, Long.class))
+                .build())
             .build();
     }
 
@@ -307,7 +315,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .dateOfRegistration(LocalDateTime.now())
             .role(dto.getRole())
             .refreshTokenKey(refreshTokenKey)
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)

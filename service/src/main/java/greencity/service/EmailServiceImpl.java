@@ -4,9 +4,11 @@ import greencity.constant.EmailConstants;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +19,9 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserDeactivationReasonDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -110,6 +115,22 @@ public class EmailServiceImpl implements EmailService {
             String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
             sendEmail(dto.getEmail(), EmailConstants.NEWS, template);
         }
+    }
+
+    @Override
+    public void sendCreatedNewsForAuthor(EcoNewsForSendEmailDto newDto) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.ECO_NEWS_LINK, ecoNewsLink);
+        model.put(EmailConstants.NEWS_RESULT, newDto);
+        try {
+            model.put(EmailConstants.UNSUBSCRIBE_LINK, serverLink + "/newSubscriber/unsubscribe?email="
+                + URLEncoder.encode(newDto.getAuthor().getEmail(), StandardCharsets.UTF_8.toString())
+                + "&unsubscribeToken=" + newDto.getUnsubscribeToken());
+        } catch (UnsupportedEncodingException e) {
+            log.error(e.getMessage());
+        }
+        String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
+        sendEmail(newDto.getAuthor().getEmail(), EmailConstants.CREATED_NEWS, template);
     }
 
     /**
@@ -217,5 +238,28 @@ public class EmailServiceImpl implements EmailService {
         String subject = "Notification about not marked habits";
         String content = "Dear " + name + ", you haven't marked any habit during last 3 days";
         sendEmail(email, subject, content);
+    }
+
+    @Override
+    public void sendReasonOfDeactivation(UserDeactivationReasonDto userDeactivationDto) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, userDeactivationDto.getName());
+        model.put(EmailConstants.REASONS, userDeactivationDto.getDeactivationReasons());
+        changeLocale(userDeactivationDto.getLang());
+        log.info(Locale.getDefault().toString());
+        String template = createEmailTemplate(model, EmailConstants.REASONS_OF_DEACTIVATION_PAGE);
+        sendEmail(userDeactivationDto.getEmail(), EmailConstants.DEACTIVATION, template);
+    }
+
+    @Override
+    public void sendMessageOfActivation(UserActivationDto userActivationDto) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, userActivationDto.getName());
+        changeLocale(userActivationDto.getLang());
+        log.info(Locale.getDefault().toString());
+        String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
+        sendEmail(userActivationDto.getEmail(), EmailConstants.ACTIVATION, template);
     }
 }
