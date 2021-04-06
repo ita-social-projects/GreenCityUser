@@ -4,6 +4,8 @@ import greencity.constant.RestTemplateLinks;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.user.UserVO;
+import greencity.enums.AchievementCategoryType;
+import greencity.enums.AchievementType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +13,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -34,6 +37,21 @@ public class RestClient {
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
     private final HttpServletRequest httpServletRequest;
+
+    /**
+     * Method for sending request for achievement calculation.
+     */
+    public ResponseEntity<Object> calculateAchievement(Long id, AchievementType setter,
+                                                       AchievementCategoryType socialNetwork, int size) {
+        HttpEntity<String> entity = new HttpEntity<>(setHeader());
+        restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
+                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + id
+                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + setter
+                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + socialNetwork
+                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + size,
+            HttpMethod.POST, entity, Object.class);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 
     /**
      * Method for finding all custom shopping list items.
