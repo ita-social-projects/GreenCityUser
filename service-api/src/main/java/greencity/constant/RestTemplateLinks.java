@@ -16,6 +16,11 @@ public class RestTemplateLinks {
     public static final String URL = "?url=";
     public static final String IMAGE = "?image=";
     public static final String TOKEN = "/token";
+    public static final String CALCULATE_ACHIEVEMENT = "/achievements/calculate-achievement";
+    public static final String CALCULATE_ACHIEVEMENT_ID = "?id=";
+    public static final Object CALCULATE_ACHIEVEMENT_SETTER = "&setter=";
+    public static final Object CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK = "&socialNetwork=";
+    public static final String CALCULATE_ACHIEVEMENT_SIZE = "&size=";
 
     private RestTemplateLinks() {
     }
