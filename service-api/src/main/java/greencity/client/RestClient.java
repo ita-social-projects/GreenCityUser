@@ -42,13 +42,13 @@ public class RestClient {
      * Method for sending request for achievement calculation.
      */
     public ResponseEntity<Object> calculateAchievement(Long id, AchievementType setter,
-                                                       AchievementCategoryType socialNetwork, int size) {
+        AchievementCategoryType socialNetwork, int size) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
-                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + id
-                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + setter
-                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + socialNetwork
-                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + size,
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + id
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + setter
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + socialNetwork
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + size,
             HttpMethod.POST, entity, Object.class);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

@@ -52,10 +52,10 @@ class RestClientTest {
         HttpEntity<String> entity = new HttpEntity<>(headers);
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
-                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + 1L
-                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + AchievementType.INCREMENT
-                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + AchievementCategoryType.ECO_NEWS
-                + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + 1,
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + 1L
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + AchievementType.INCREMENT
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + AchievementCategoryType.ECO_NEWS
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + 1,
             HttpMethod.POST, entity, Object.class)).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
         assertEquals(ResponseEntity.status(HttpStatus.OK).build(),
             restClient.calculateAchievement(1L, AchievementType.INCREMENT, AchievementCategoryType.ECO_NEWS, 1));
