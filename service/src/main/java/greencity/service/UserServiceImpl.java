@@ -6,6 +6,8 @@ import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.entity.Language;
 import greencity.entity.UserDeactivationReason;
+import greencity.enums.AchievementCategoryType;
+import greencity.enums.AchievementType;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -752,9 +754,8 @@ public class UserServiceImpl implements UserService {
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
         userRepo.save(user);
-        // CompletableFuture.runAsync(() -> achievementCalculation
-        // .calculateAchievement(user.getId(), AchievementType.SETTER,
-        // AchievementCategory.SOCIAL_NETWORK, user.getSocialNetworks().size()));
+        restClient.calculateAchievement(user.getId(), AchievementType.SETTER,
+            AchievementCategoryType.SOCIAL_NETWORK, user.getSocialNetworks().size());
         return modelMapper.map(user, UserProfileDtoResponse.class);
     }
 
