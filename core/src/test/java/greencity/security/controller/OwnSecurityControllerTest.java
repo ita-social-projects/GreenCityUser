@@ -122,7 +122,7 @@ class OwnSecurityControllerTest {
 
         OwnRestoreDto form = new OwnRestoreDto("Qwerty123=", "Qwerty123=", "12345");
 
-        mockMvc.perform(post(LINK + "/changePassword")
+        mockMvc.perform(post(LINK + "/updatePassword")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
@@ -141,7 +141,7 @@ class OwnSecurityControllerTest {
             "  \"password\": \"Qwerty124=\"\n" +
             "}";
 
-        mockMvc.perform(put(LINK)
+        mockMvc.perform(put(LINK + "/changePassword")
             .principal(principal)
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
