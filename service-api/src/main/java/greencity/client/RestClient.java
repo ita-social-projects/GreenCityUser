@@ -37,6 +37,8 @@ public class RestClient {
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
     private final HttpServletRequest httpServletRequest;
+    @Value("${greencitychat.server.address}")
+    private String greenCityChatServerAddress;
 
     /**
      * Method for sending request for achievement calculation.
@@ -200,6 +202,13 @@ public class RestClient {
             + RestTemplateLinks.LANGUAGE, String[].class);
         assert restTemplateForObject != null;
         return Arrays.asList(restTemplateForObject);
+    }
+
+    /**
+     * Method for add new user to system chat.
+     */
+    public void addUserToSystemChat(Long userId) {
+        restTemplate.postForEntity(greenCityChatServerAddress + "/chat/user", userId, Long.class);
     }
 
     /**

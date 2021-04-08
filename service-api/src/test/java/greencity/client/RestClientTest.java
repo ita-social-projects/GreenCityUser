@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -41,6 +42,8 @@ class RestClientTest {
     private HttpServletRequest httpServletRequest;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
+    @Value("${greencitychat.server.address}")
+    private String greenCityChatServerAddress;
     @InjectMocks
     private RestClient restClient;
 
@@ -230,5 +233,16 @@ class RestClientTest {
             + RestTemplateLinks.LANGUAGE, String[].class)).thenReturn(allLanguageCodes);
 
         assertEquals(Arrays.asList(allLanguageCodes), restClient.getAllLanguageCodes());
+    }
+
+    @Test
+    void addUserToSystemChat() {
+        Long userId = 1L;
+        ResponseEntity<Long> responseEntity = ResponseEntity.ok().body(userId);
+        when(restTemplate.postForEntity(greenCityChatServerAddress + "/chat/user", 1L, Long.class))
+            .thenReturn(responseEntity);
+        restClient.addUserToSystemChat(userId);
+        verify(restTemplate).postForEntity(greenCityChatServerAddress + "/chat/user", 1L, Long.class);
+
     }
 }
