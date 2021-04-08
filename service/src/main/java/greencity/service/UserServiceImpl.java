@@ -1,6 +1,5 @@
 package greencity.service;
 
-
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.entity.Language;
