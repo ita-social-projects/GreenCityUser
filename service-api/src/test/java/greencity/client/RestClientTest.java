@@ -3,6 +3,8 @@ package greencity.client;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
+import greencity.enums.AchievementCategoryType;
+import greencity.enums.AchievementType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,9 +12,12 @@ import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.LinkedMultiValueMap;
@@ -20,11 +25,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Arrays;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.IMAGES;
+import static greencity.constant.AppConstant.IMAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +46,23 @@ class RestClientTest {
     private String greenCityChatServerAddress;
     @InjectMocks
     private RestClient restClient;
+
+    @Test
+    void calculateAchievement() {
+        String accessToken = "accessToken";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
+        when(restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + 1L
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + AchievementType.INCREMENT
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + AchievementCategoryType.ECO_NEWS
+            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + 1,
+            HttpMethod.POST, entity, Object.class)).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
+        assertEquals(ResponseEntity.status(HttpStatus.OK).build(),
+            restClient.calculateAchievement(1L, AchievementType.INCREMENT, AchievementCategoryType.ECO_NEWS, 1));
+    }
 
     @Test
     void getAllAvailableCustomShoppingListItems() {
@@ -80,20 +104,31 @@ class RestClientTest {
     }
 
     @Test
-    void uploadImage() {
+    void uploadImage() throws IOException {
         String imagePath = "image";
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
-        MultipartFile image = new MockMultipartFile("data", "filename.png",
-            "image/png", "some xml".getBytes());
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultipartFile image =
+            new MockMultipartFile("data", "filename.png", "image/png",
+                "some xml".getBytes());
+        ByteArrayResource fileAsResource = new ByteArrayResource(image.getBytes()) {
+
+            @Override
+            public String getFilename() {
+                return image.getOriginalFilename();
+            }
+        };
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add(IMAGES, image);
+        map.add(IMAGE, fileAsResource);
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.postForObject(greenCityServerAddress
-            + RestTemplateLinks.FILES_IMAGE, requestEntity, String.class)).thenReturn(imagePath);
-        assertEquals(imagePath, restClient.uploadImage(image));
+        when(restTemplate.postForObject(greenCityServerAddress +
+            RestTemplateLinks.FILES_IMAGE, requestEntity,
+            String.class)).thenReturn(imagePath);
+        assertEquals(imagePath,
+            restClient.uploadImage(image));
     }
 
     @Test

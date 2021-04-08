@@ -2,15 +2,20 @@ package greencity.service;
 
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserDeactivationReasonDto;
+
 import java.util.List;
 import java.util.Map;
 
 /**
  * Provides the interface to manage sending emails to {@code User}.
  */
+
 public interface EmailService {
     /**
      * Method for sending notification to {@link User}'s who subscribed for updates
@@ -30,6 +35,13 @@ public interface EmailService {
      */
     void sendNewNewsForSubscriber(List<NewsSubscriberResponseDto> subscribers,
         AddEcoNewsDtoResponse newsDto);
+
+    /**
+     * Method for sending created news for author.
+     *
+     * @param newDto - includes all information about ecoNews and author.
+     */
+    void sendCreatedNewsForAuthor(EcoNewsForSendEmailDto newDto);
 
     /**
      * Method for sending simple notification to {@code User} about change status.
@@ -81,4 +93,18 @@ public interface EmailService {
      * @param email letter is sent to this email.
      */
     void sendHabitNotification(String name, String email);
+
+    /**
+     * Method for sending reasons of deactivating the user.
+     *
+     * @param userDeactivationDto - includes all information about the User.
+     */
+    void sendReasonOfDeactivation(UserDeactivationReasonDto userDeactivationDto);
+
+    /**
+     * Method for send message of activation user.
+     *
+     * @param userActivationDto - includes all information about the User.
+     */
+    void sendMessageOfActivation(UserActivationDto userActivationDto);
 }

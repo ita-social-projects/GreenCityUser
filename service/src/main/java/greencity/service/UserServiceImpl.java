@@ -2,8 +2,12 @@ package greencity.service;
 
 //import greencity.achievement.AchievementCalculation;
 
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
-import greencity.entity.*;
+import greencity.entity.Language;
+import greencity.entity.UserDeactivationReason;
+import greencity.enums.AchievementCategoryType;
+import greencity.enums.AchievementType;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -14,12 +18,17 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.entity.SocialNetwork;
+import greencity.entity.SocialNetworkImage;
+import greencity.entity.User;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
+import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -57,6 +66,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
+    private final UserDeactivationRepo userDeactivationRepo;
     // private final AchievementCalculation achievementCalculation;
     /**
      * Autowired mapper.
@@ -296,6 +306,18 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public UbsTableCreationDto createUbsRecord(UserVO currentUser) {
+        User user = userRepo.findById(currentUser.getId()).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        String uuid = user.getUuid();
+
+        return UbsTableCreationDto.builder().uuid(uuid).build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     private PageableAdvancedDto<UserManagementVO> buildPageableAdvanceDtoFromPage(Page<User> pageTags) {
         List<UserManagementVO> usersVOs = pageTags.getContent().stream()
             .map(t -> modelMapper.map(t, UserManagementVO.class))
@@ -370,6 +392,16 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public String findUuIdByEmail(String email) {
+        log.info(LogMessage.IN_FIND_UUID_BY_EMAIL, email);
+        return userRepo.findUuidByEmail(email).orElseThrow(
+            () -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UserRoleDto updateRole(Long id, Role role, String email) {
         checkUpdatableUser(id, email);
         UserVO userVO = findById(id);
@@ -415,8 +447,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO updateLastVisit(UserVO userVO) {
         UserVO user = findById(userVO.getId());
-        log.info(user.getLastVisit() + "s");
-        userVO.setLastVisit(LocalDateTime.now());
+        log.info(user.getLastActivityTime() + "s");
+        userVO.setLastActivityTime(LocalDateTime.now());
         User updatable = modelMapper.map(userVO, User.class);
         return modelMapper.map(userRepo.save(updatable), UserVO.class);
     }
@@ -537,24 +569,24 @@ public class UserServiceImpl implements UserService {
     /**
      * Update user profile picture {@link UserVO}.
      *
-     * @param image                 {@link MultipartFile}
-     * @param email                 {@link String} - email of user that need to
-     *                              update.
-     * @param userProfilePictureDto {@link UserProfilePictureDto}
+     * @param image  {@link MultipartFile}
+     * @param email  {@link String} - email of user that need to update.
+     * @param base64 {@link String} - picture in base 64 format.
      * @return {@link UserVO}.
      * @author Marian Datsko
      */
     @Override
     public UserVO updateUserProfilePicture(MultipartFile image, String email,
-        UserProfilePictureDto userProfilePictureDto) {
+        String base64) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        if (userProfilePictureDto.getProfilePicturePath() != null) {
-            image = restClient.convertToMultipartImage(userProfilePictureDto.getProfilePicturePath());
+        if (base64 != null) {
+            image = modelMapper.map(base64, MultipartFile.class);
         }
         if (image != null) {
-            String profilePicturePath = restClient.uploadImage(image);
+            String profilePicturePath;
+            profilePicturePath = restClient.uploadImage(image);
             user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
@@ -722,9 +754,8 @@ public class UserServiceImpl implements UserService {
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
         userRepo.save(user);
-        // CompletableFuture.runAsync(() -> achievementCalculation
-        // .calculateAchievement(user.getId(), AchievementType.SETTER,
-        // AchievementCategory.SOCIAL_NETWORK, user.getSocialNetworks().size()));
+        restClient.calculateAchievement(user.getId(), AchievementType.SETTER,
+            AchievementCategoryType.SOCIAL_NETWORK, user.getSocialNetworks().size());
         return modelMapper.map(user, UserProfileDtoResponse.class);
     }
 
@@ -855,15 +886,89 @@ public class UserServiceImpl implements UserService {
             .build();
     }
 
+    @Override
+    public UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons) {
+        User foundUser =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        foundUser.setUserStatus(UserStatus.DEACTIVATED);
+        userRepo.save(foundUser);
+        String reasons = userReasons.stream().map(Object::toString).collect(Collectors.joining("/"));
+        userDeactivationRepo.save(UserDeactivationReason.builder()
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .reason(reasons)
+            .user(foundUser)
+            .build());
+        return UserDeactivationReasonDto.builder()
+            .email(foundUser.getEmail())
+            .name(foundUser.getName())
+            .deactivationReasons(filterReasons(foundUser.getLanguage().getCode(), reasons))
+            .lang(foundUser.getLanguage().getCode())
+            .build();
+    }
+
     /**
      * {@inheritDoc}
      */
+    @Override
+    public String getUserLang(Long id) {
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        return user.getLanguage().getCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getDeactivationReason(Long id, String adminLang) {
+        UserDeactivationReason userReason = userDeactivationRepo.getLastDeactivationReasons(id)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DEACTIVATION_REASON_IS_EMPTY));
+        if (adminLang.equals("uk")) {
+            adminLang = "ua";
+        }
+        return filterReasons(adminLang,
+            userReason.getReason());
+    }
+
+    private List<String> filterReasons(String lang, String reasons) {
+        List<String> result = null;
+        List<String> forAll = List.of(reasons.split("/"));
+        if (lang.equals("en")) {
+            result = forAll.stream().filter(s -> s.contains("{en}"))
+                .map(filterEn -> filterEn.replace("{en}", "").trim()).collect(Collectors.toList());
+        }
+        if (lang.equals("ua")) {
+            result = forAll.stream().filter(s -> s.contains("{ua}"))
+                .map(filterEn -> filterEn.replace("{ua}", "").trim()).collect(Collectors.toList());
+        }
+        return result;
+    }
+
     @Transactional
     @Override
-    public void deactivateUser(Long id) {
-        UserVO foundUser = findById(id);
-        foundUser.setUserStatus(UserStatus.DEACTIVATED);
-        userRepo.save(modelMapper.map(foundUser, User.class));
+    public UserActivationDto setActivatedStatus(Long id) {
+        User foundUser =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        foundUser.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(foundUser);
+        return UserActivationDto.builder()
+            .email(foundUser.getEmail())
+            .name(foundUser.getName())
+            .lang(foundUser.getLanguage().getCode())
+            .build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUserLanguage(Long userId, Long languageId) {
+        Language language = languageRepo.findById(languageId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+        user.setLanguage(language);
+        userRepo.save(user);
     }
 
     /**
@@ -874,17 +979,6 @@ public class UserServiceImpl implements UserService {
     public List<Long> deactivateAllUsers(List<Long> listId) {
         userRepo.deactivateSelectedUsers(listId);
         return listId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Transactional
-    @Override
-    public void setActivatedStatus(Long id) {
-        UserVO foundUser = findById(id);
-        foundUser.setUserStatus(UserStatus.ACTIVATED);
-        userRepo.save(modelMapper.map(foundUser, User.class));
     }
 
     /**
@@ -922,6 +1016,41 @@ public class UserServiceImpl implements UserService {
             page.isLast());
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
+        return userRepo.findAllByEmailNotification(emailNotification).stream()
+            .map(user -> modelMapper.map(user, UserVO.class))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public int scheduleDeleteDeactivatedUsers() {
+        return userRepo.scheduleDeleteDeactivatedUsers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> findAllUsersCities() {
+        return userRepo.findAllUsersCities();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<Integer, Long> findAllRegistrationMonthsMap() {
+        return userRepo.findAllRegistrationMonthsMap();
+    }
+
     private List<UserAllFriendsDto> allUsersMutualFriendsMethod(List<UserAllFriendsDto> userAllFriends) {
         for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
             long mutualFriends = 0;
@@ -954,18 +1083,5 @@ public class UserServiceImpl implements UserService {
             friendCurrentUser.setMutualFriends(mutualFriends);
         }
         return userAllFriends;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateUserLanguage(Long userId, Long languageId) {
-        Language language = languageRepo.findById(languageId)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
-        user.setLanguage(language);
-        userRepo.save(user);
     }
 }

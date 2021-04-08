@@ -5,6 +5,7 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.*;
@@ -61,7 +62,7 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
             .build();
@@ -77,7 +78,7 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmailVO())
             .dateOfRegistration(LocalDateTime.now())
             .build();
@@ -93,7 +94,6 @@ public class ModelUtils {
             .firstName("name")
             .emailNotification(EmailNotification.MONTHLY)
             .userStatus(UserStatus.ACTIVATED)
-            .lastVisit(LocalDateTime.of(2020, 12, 11, 13, 33))
             .rating(13.4)
             .verifyEmail(VerifyEmailVO.builder()
                 .id(32L)
@@ -155,6 +155,10 @@ public class ModelUtils {
                     .id(13L)
                     .build())
                 .build()))
+            .languageVO(LanguageVO.builder()
+                .id(1L)
+                .code("ua")
+                .build())
             .build();
     }
 

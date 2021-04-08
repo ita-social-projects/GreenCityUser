@@ -14,13 +14,15 @@ public final class SwaggerExampleModel {
 
     private static final String AFTER_EXAMPLE = "\t</pre>\n"
         + "</div>";
+    private static final String EXAMPLE = "  \"id\": \"0\",\n"
+        + "  \"name\": \"string\",\n"
+        + "  \"profilePicturePath\": \"string\"\n";
 
     public static final String USER_PROFILE_PICTURE_DTO =
         "User Profile Picture\n"
             + BEFORE_EXAMPLE
             + "{\n"
-            + "  \"id\": 0,\n"
-            + "  \"profilePicturePath\": \"string\"\n"
+            + EXAMPLE
             + "}\n"
             + AFTER_EXAMPLE;
 

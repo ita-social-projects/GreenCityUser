@@ -12,4 +12,10 @@ public interface AchievementService {
      * @return list of all{@link AchievementDTO}.
      */
     List<AchievementVO> findAll();
+
+    /**
+     * Method for finding all the achievements.
+     *
+     */
+    void findUserAchievement(Long userId, Long achievementId);
 }

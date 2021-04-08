@@ -11,10 +11,14 @@ import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
+
 import java.util.*;
 import java.util.concurrent.Executors;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserDeactivationReasonDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -117,6 +121,31 @@ class EmailServiceImplTest {
     @Test
     void sendHabitNotification() {
         service.sendHabitNotification("userName", "userEmail");
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendReasonOfDeactivation() {
+        List<String> test = List.of("test", "test");
+        UserDeactivationReasonDto test1 = UserDeactivationReasonDto.builder()
+            .deactivationReasons(test)
+            .lang("en")
+            .email("test@ukr.net")
+            .name("test")
+            .build();
+        service.sendReasonOfDeactivation(test1);
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendMessageOfActivation() {
+        List<String> test = List.of("test", "test");
+        UserActivationDto test1 = UserActivationDto.builder()
+            .lang("en")
+            .email("test@ukr.net")
+            .name("test")
+            .build();
+        service.sendMessageOfActivation(test1);
         verify(javaMailSender).createMimeMessage();
     }
 }

@@ -10,18 +10,19 @@ import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.user.*;
 import greencity.entity.Language;
 import greencity.entity.User;
+import greencity.entity.UserDeactivationReason;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
+import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -48,6 +49,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -56,10 +60,13 @@ class UserServiceImplTest {
     UserRepo userRepo;
 
     @Mock
-    LanguageRepo languageRepo;
+    RestClient restClient;
 
     @Mock
-    RestClient restClient;
+    UserDeactivationRepo userDeactivationRepo;
+
+    @Mock
+    LanguageRepo languageRepo;
 
     private User user = User.builder()
         .id(1L)
@@ -68,7 +75,7 @@ class UserServiceImplTest {
         .role(Role.ROLE_USER)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
-        .lastVisit(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
+        .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
         .build();
@@ -80,7 +87,7 @@ class UserServiceImplTest {
         .role(Role.ROLE_USER)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
-        .lastVisit(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
+        .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
         .build();
@@ -91,7 +98,7 @@ class UserServiceImplTest {
         .role(Role.ROLE_MODERATOR)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
-        .lastVisit(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
+        .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .build();
     private UserVO userVO2 =
@@ -102,7 +109,7 @@ class UserServiceImplTest {
             .role(Role.ROLE_MODERATOR)
             .userStatus(ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
-            .lastVisit(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
+            .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
             .dateOfRegistration(LocalDateTime.now())
             .build();
 
@@ -115,6 +122,35 @@ class UserServiceImplTest {
     private UserServiceImpl userService;
     @Mock
     private ModelMapper modelMapper;
+
+    @Test
+    void findAllByEmailNotification() {
+        when(userRepo.findAllByEmailNotification(any(EmailNotification.class)))
+            .thenReturn(Collections.singletonList(user));
+        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        assertEquals(Collections.singletonList(userVO),
+            userService.findAllByEmailNotification(EmailNotification.IMMEDIATELY));
+    }
+
+    @Test
+    void scheduleDeleteDeactivatedUsers() {
+        when(userRepo.scheduleDeleteDeactivatedUsers()).thenReturn(1);
+        assertEquals(1, userService.scheduleDeleteDeactivatedUsers());
+    }
+
+    @Test
+    void findAllUsersCities() {
+        List<String> expected = Collections.singletonList("city");
+        when(userRepo.findAllUsersCities()).thenReturn(expected);
+        assertEquals(expected, userService.findAllUsersCities());
+    }
+
+    @Test
+    void findAllRegistrationMonthsMap() {
+        Map<Integer, Long> expected = Collections.singletonMap(1, 1L);
+        when(userRepo.findAllRegistrationMonthsMap()).thenReturn(expected);
+        assertEquals(expected, userService.findAllRegistrationMonthsMap());
+    }
 
     @Test
     void findUsersRecommendedFriendsTest() {
@@ -331,8 +367,8 @@ class UserServiceImplTest {
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         when(userRepo.save(any())).thenReturn(user);
-        LocalDateTime localDateTime = user.getLastVisit().minusHours(1);
-        assertNotEquals(localDateTime, userService.updateLastVisit(userVO).getLastVisit());
+        LocalDateTime localDateTime = user.getLastActivityTime().minusHours(1);
+        assertNotEquals(localDateTime, userService.updateLastVisit(userVO).getLastActivityTime());
     }
 
     @Test
@@ -417,7 +453,7 @@ class UserServiceImplTest {
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         assertThrows(BadRequestException.class,
             () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
-                userProfilePictureDto));
+                "test"));
     }
 
     @Test
@@ -763,12 +799,58 @@ class UserServiceImplTest {
 
     @Test
     void deactivateUser() {
-        User expecteduUser = user;
-        expecteduUser.setUserStatus(DEACTIVATED);
+        List<String> test = List.of();
+        User user = ModelUtils.getUser();
+        user.setLanguage(Language.builder()
+            .id(1L)
+            .code("en")
+            .build());
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        userService.deactivateUser(userId);
-        assertEquals(expecteduUser, user);
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        user.setUserStatus(DEACTIVATED);
+        when(userRepo.save(user)).thenReturn(user);
+        UserDeactivationReason userReason = UserDeactivationReason.builder()
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .reason("test")
+            .user(user)
+            .build();
+        when(userDeactivationRepo.save(userReason)).thenReturn(userReason);
+        assertEquals(UserDeactivationReasonDto.builder()
+            .email(user.getEmail())
+            .name(user.getName())
+            .deactivationReasons(test)
+            .lang(user.getLanguage().getCode())
+            .build(), userService.deactivateUser(1L, test));
+    }
+
+    @Test
+    void getUserLang() {
+        User user = ModelUtils.getUser();
+        user.setLanguage(Language.builder()
+            .id(1L)
+            .code("en")
+            .build());
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        assertEquals(user.getLanguage().getCode(), userService.getUserLang(1L));
+    }
+
+    @Test
+    void getDeactivationReason() {
+        List<String> test1 = List.of();
+        User user = ModelUtils.getUser();
+        user.setLanguage(Language.builder()
+            .id(1L)
+            .code("en")
+            .build());
+        UserDeactivationReason test = UserDeactivationReason.builder()
+            .id(1L)
+            .user(user)
+            .reason("test")
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .build();
+        when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
+        assertEquals(test1, userService.getDeactivationReason(1L, "en"));
+        assertEquals(test1, userService.getDeactivationReason(1L, "ua"));
     }
 
     @Test
@@ -779,14 +861,53 @@ class UserServiceImplTest {
 
     @Test
     void setActivatedStatus() {
-        User expecteduUser = user;
-        user.setUserStatus(DEACTIVATED);
-        expecteduUser.setUserStatus(ACTIVATED);
-        when(modelMapper.map(userVO, User.class)).thenReturn(user);
-        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        userService.setActivatedStatus(userId);
-        assertEquals(expecteduUser, user);
+        User user = ModelUtils.getUser();
+        user.setLanguage(Language.builder()
+            .id(1L)
+            .code("en")
+            .build());
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        user.setUserStatus(ACTIVATED);
+        when(userRepo.save(user)).thenReturn(user);
+        assertEquals(UserActivationDto.builder()
+            .email(user.getEmail())
+            .name(user.getName())
+            .lang(user.getLanguage().getCode())
+            .build(), userService.setActivatedStatus(userId));
+    }
+
+    @Test
+    void updateUserLanguage() {
+        Language language = ModelUtils.getLanguage();
+        User user = ModelUtils.getUser();
+        user.setLanguage(language);
+
+        when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        userService.updateUserLanguage(1L, 1L);
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void updateUserLanguageNotFoundExeption() {
+        Language language = ModelUtils.getLanguage();
+        User user = ModelUtils.getUser();
+        user.setLanguage(language);
+
+        when(languageRepo.findById(10L)).thenThrow(NotFoundException.class);
+        assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 10L));
+    }
+
+    @Test
+    void updateUserLanguageUserNotFoundExeption() {
+        Language language = ModelUtils.getLanguage();
+        User user = ModelUtils.getUser();
+        user.setLanguage(language);
+
+        when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
+        when(userRepo.findById(1L)).thenThrow(NotFoundException.class);
+        assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 1L));
     }
 
     @Test
@@ -856,39 +977,5 @@ class UserServiceImplTest {
             false, false, true, true);
         PageableAdvancedDto<UserManagementVO> expected = userService.search(pageable, userViewDto);
         assertEquals(expected, actual);
-    }
-
-    @Test
-    void updateUserLanguage() {
-        Language language = ModelUtils.getLanguage();
-        User user = ModelUtils.getUser();
-        user.setLanguage(language);
-
-        when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        when(userRepo.save(user)).thenReturn(user);
-        userService.updateUserLanguage(1L, 1L);
-        verify(userRepo).save(user);
-    }
-
-    @Test
-    void updateUserLanguageNotFoundExeption() {
-        Language language = ModelUtils.getLanguage();
-        User user = ModelUtils.getUser();
-        user.setLanguage(language);
-
-        when(languageRepo.findById(10L)).thenThrow(NotFoundException.class);
-        assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 10L));
-    }
-
-    @Test
-    void updateUserLanguageUserNotFoundExeption() {
-        Language language = ModelUtils.getLanguage();
-        User user = ModelUtils.getUser();
-        user.setLanguage(language);
-
-        when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
-        when(userRepo.findById(1L)).thenThrow(NotFoundException.class);
-        assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 1L));
     }
 }

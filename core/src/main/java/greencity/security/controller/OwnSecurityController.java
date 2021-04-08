@@ -170,11 +170,12 @@ public class OwnSecurityController {
     @ApiOperation("Updating password for restore password option.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = TOKEN_FOR_RESTORE_IS_INVALID)
+        @ApiResponse(code = 404, message = TOKEN_FOR_RESTORE_IS_INVALID),
+        @ApiResponse(code = 400, message = PASSWORD_DOES_NOT_MATCH)
     })
-    @PostMapping("/changePassword")
+    @PostMapping("/updatePassword")
     public ResponseEntity<Object> changePassword(@Valid @RequestBody OwnRestoreDto form) {
-        passwordRecoveryService.updatePasswordUsingToken(form.getToken(), form.getPassword());
+        passwordRecoveryService.updatePasswordUsingToken(form);
         return ResponseEntity.ok().build();
     }
 
@@ -190,7 +191,7 @@ public class OwnSecurityController {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = PASSWORD_DOES_NOT_MATCH)
     })
-    @PutMapping
+    @PutMapping("/changePassword")
     public ResponseEntity<Object> updatePassword(@Valid @RequestBody UpdatePasswordDto updateDto,
         @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
