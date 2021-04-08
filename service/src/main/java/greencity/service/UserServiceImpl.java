@@ -1,6 +1,5 @@
 package greencity.service;
 
-//import greencity.achievement.AchievementCalculation;
 
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
@@ -50,7 +49,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-//import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
