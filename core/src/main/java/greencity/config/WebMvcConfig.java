@@ -1,7 +1,6 @@
 package greencity.config;
 
 import greencity.converters.UserArgumentResolver;
-//import greencity.security.interceptor.UserActivityInterceptor;
 import greencity.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +79,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // registry.addInterceptor(new UserActivityInterceptor(userService));
         registry.addInterceptor(localeChangeInterceptor());
     }
 
