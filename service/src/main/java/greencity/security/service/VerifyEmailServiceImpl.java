@@ -1,5 +1,6 @@
 package greencity.security.service;
 
+import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.entity.VerifyEmail;
 import greencity.exception.exceptions.BadVerifyEmailTokenException;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class VerifyEmailServiceImpl implements VerifyEmailService {
     private final VerifyEmailRepo verifyEmailRepo;
+    private final RestClient restClient;
 
     /**
      * Constructor.
@@ -27,8 +29,9 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
      * @param verifyEmailRepo {@link VerifyEmailRepo}
      */
     @Autowired
-    public VerifyEmailServiceImpl(VerifyEmailRepo verifyEmailRepo) {
+    public VerifyEmailServiceImpl(VerifyEmailRepo verifyEmailRepo, RestClient restClient) {
         this.verifyEmailRepo = verifyEmailRepo;
+        this.restClient = restClient;
     }
 
     /**
@@ -43,6 +46,8 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
         if (isNotExpired(verifyEmail.getExpiryDate())) {
             int rows = verifyEmailRepo.deleteVerifyEmailByTokenAndUserId(userId, token);
             log.info("User has successfully verify the email by token {}. Records deleted {}.", token, rows);
+            restClient.addUserToSystemChat(userId);
+            log.info("The user has been added to the system chats");
             return true;
         } else {
             log.info("User didn't verify his/her email on time with token {}.", token);
