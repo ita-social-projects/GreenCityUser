@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -794,7 +795,7 @@ public class UserController {
     /**
      * Update {@link UserVO} Last Activity Time.
      *
-     * @param id of the searched {@link UserVO}.
+     * @param userVO {@link UserVO}.
      * @author Orest Mamchuk
      */
     @ApiOperation(value = "Update User Last Activity Time")
@@ -804,11 +805,11 @@ public class UserController {
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/{id}/updateUserLastActivityTime/{date}")
-    public ResponseEntity<Object> updateUserLastActivityTime(@PathVariable Long id,
+    @PutMapping("/updateUserLastActivityTime/{date}")
+    public ResponseEntity<Object> updateUserLastActivityTime(@ApiIgnore @CurrentUser UserVO userVO,
         @PathVariable(value = "date") @DateTimeFormat(
-            pattern = "yyyy-MM-ddHH:mm:ss.SSSSSS") Date userLastActivityTime) {
-        userService.updateUserLastActivityTime(id, userLastActivityTime);
+            pattern = "yyyy-MM-dd.HH:mm:ss.SSSSSS") LocalDateTime userLastActivityTime) {
+        userService.updateUserLastActivityTime(userVO.getId(), userLastActivityTime);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 

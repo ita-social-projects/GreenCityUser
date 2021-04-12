@@ -609,17 +609,6 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserLastActivityTimeTest() throws Exception {
-        String pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        Date date = simpleDateFormat.parse("2020-09-10 20:00:00.000000");
-        String dateSt = simpleDateFormat.format(date);
-
-        mockMvc.perform(put(userLink + "/{id}/updateUserLastActivityTime/{date}", 1, "2020-09-10 20:00:00.000000"))
-            .andExpect(status().isBadRequest()).andDo(MockMvcResultHandlers.print());
-    }
-
-    @Test
     void updateUserLanguageTest() throws Exception {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
