@@ -29,6 +29,7 @@ import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
+import java.text.SimpleDateFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -780,7 +781,7 @@ public class UserServiceImpl implements UserService {
      * @author Yurii Zhurakovskyi
      */
     @Override
-    public void updateUserLastActivityTime(Long userId, Date userLastActivityTime) {
+    public void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime) {
         userRepo.updateUserLastActivityTime(userId, userLastActivityTime);
     }
 

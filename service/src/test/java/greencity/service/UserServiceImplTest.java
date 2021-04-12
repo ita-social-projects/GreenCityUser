@@ -650,7 +650,7 @@ class UserServiceImplTest {
 
     @Test
     void updateUserLastActivityTimeTest() {
-        Date currentTime = new Date();
+        LocalDateTime currentTime = LocalDateTime.now();
         userService.updateUserLastActivityTime(userId, currentTime);
         verify(userRepo).updateUserLastActivityTime(userId, currentTime);
     }
