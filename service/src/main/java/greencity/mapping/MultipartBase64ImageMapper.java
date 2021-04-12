@@ -35,9 +35,9 @@ public class MultipartBase64ImageMapper extends AbstractConverter<String, Multip
             BufferedImage bufferedImage = ImageIO.read(bis);
             ImageIO.write(bufferedImage, "png", tempFile);
             FileItem fileItem = new DiskFileItem("mainFile", Files.probeContentType(tempFile.toPath()),
-                false, tempFile.getName(), (int) tempFile.length(), tempFile.getParentFile());
+                    false, tempFile.getName(), (int) tempFile.length(), tempFile.getParentFile());
             try (InputStream input = new FileInputStream(tempFile);
-                OutputStream outputStream = fileItem.getOutputStream()) {
+                 OutputStream outputStream = fileItem.getOutputStream()) {
                 IOUtils.copy(input, outputStream);
                 outputStream.flush();
                 return new CommonsMultipartFile(fileItem);
@@ -46,7 +46,7 @@ public class MultipartBase64ImageMapper extends AbstractConverter<String, Multip
             throw new NotSavedException("Cannot convert to BASE64 image");
         } finally {
             if (!tempFile.delete()) {
-                System.out.println("File has not been deleted");
+                System.err.println("File has not been deleted");
             }
         }
     }
