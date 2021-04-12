@@ -5,6 +5,7 @@ import greencity.dto.user.UsersFriendDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
+import java.time.LocalDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -215,7 +216,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Modifying
     @Transactional
     @Query(value = "UPDATE User SET last_activity_time=:userLastActivityTime WHERE id=:userId")
-    void updateUserLastActivityTime(Long userId, Date userLastActivityTime);
+    void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime);
 
     /**
      * Find the last activity time by {@link User}'s id.

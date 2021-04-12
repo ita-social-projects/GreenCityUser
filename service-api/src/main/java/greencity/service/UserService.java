@@ -11,6 +11,7 @@ import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import java.time.LocalDateTime;
 import java.util.Map;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
@@ -334,7 +335,7 @@ public interface UserService {
      * @param userLastActivityTime - new {@link UserVO}'s last activity time
      * @author Yurii Zhurakovskyi
      */
-    void updateUserLastActivityTime(Long userId, Date userLastActivityTime);
+    void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime);
 
     /**
      * The method checks by id if a {@link UserVO} is online.

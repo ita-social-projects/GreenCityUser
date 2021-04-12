@@ -1,7 +1,5 @@
 package greencity.service;
 
-//import greencity.achievement.AchievementCalculation;
-
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.entity.Language;
@@ -31,6 +29,7 @@ import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
+import java.text.SimpleDateFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -50,7 +49,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-//import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -783,7 +781,7 @@ public class UserServiceImpl implements UserService {
      * @author Yurii Zhurakovskyi
      */
     @Override
-    public void updateUserLastActivityTime(Long userId, Date userLastActivityTime) {
+    public void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime) {
         userRepo.updateUserLastActivityTime(userId, userLastActivityTime);
     }
 
