@@ -126,6 +126,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
+        user.setShowLocation(true);
+        user.setShowEcoPlace(true);
+        user.setShowShoppingList(true);
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
