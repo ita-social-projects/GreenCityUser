@@ -752,8 +752,7 @@ public class UserServiceImpl implements UserService {
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
         userRepo.save(user);
-        restClient.calculateAchievement(user.getId(), AchievementType.SETTER,
-            AchievementCategoryType.SOCIAL_NETWORK, user.getSocialNetworks().size());
+
         return modelMapper.map(user, UserProfileDtoResponse.class);
     }
 
