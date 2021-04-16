@@ -4,8 +4,6 @@ import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.entity.Language;
 import greencity.entity.UserDeactivationReason;
-import greencity.enums.AchievementCategoryType;
-import greencity.enums.AchievementType;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -29,7 +27,6 @@ import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
-import java.text.SimpleDateFormat;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -752,8 +749,6 @@ public class UserServiceImpl implements UserService {
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
         userRepo.save(user);
-        restClient.calculateAchievement(user.getId(), AchievementType.SETTER,
-            AchievementCategoryType.SOCIAL_NETWORK, user.getSocialNetworks().size());
         return modelMapper.map(user, UserProfileDtoResponse.class);
     }
 
