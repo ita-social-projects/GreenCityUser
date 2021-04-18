@@ -100,7 +100,7 @@ public class UserController {
     }
 
     /**
-     * The method which return list of users by page. Parameter pageable ignored
+     * The method which return listt of users by page. Parameter pageable ignored
      * because swagger ui shows the wrong params, instead they are explained in the
      * {@link ApiPageable}.
      *
