@@ -3,51 +3,107 @@
 
 <head>
     <title>Management Login Page</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <style>
-        .vertical-offset-100{
-            padding-top:200px;
-        }
-    </style>
-
+    <link rel="stylesheet" href="../static/css/position.css" th:href="@{/css/position.css}"/>
     <link rel="stylesheet" th:href="@{/css/header.css}" type="text/css">
     <link rel="icon" th:href="@{/img/icon.ico}" type="image/x-icon"/>
     <link rel="stylesheet" th:href="@{/css/footer.css}" type="text/css">
     <link rel="stylesheet" th:href="@{/css/position.css}">
+    <link rel="stylesheet" th:href="@{/css/signin.css}">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 </head>
 <body>
-<div id="header" th:insert="core/header"></div>
+<div class="wrap">
 
-<div class="main-content">
-<div class="container">
-    <div class="row vertical-offset-100">
-        <div class="col-md-4 col-md-offset-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Please sign in</h3>
+    <div id="Modal" class="modal">
+
+        <div class="modal-content">
+            <div class="gc-img" >
+            </div>
+            <div class="form-content">
+                <div class="close">&times;</div>
+                <div style="margin-top: 70px; margin-left: 70px; margin-right: 70px">
+                    <div style="font-size: 40px">З поверненням!</div>
                 </div>
-                <div class="panel-body">
-                    <form th:action="@{/management/login}" th:object="${signInForm}" method="post" class="form-horizontal">
+                <div style="font-size: 18px;margin-left: 70px; margin-right: 70px">Будь ласка, внеси свої дані для входу</div>
+                <div class="form-input">
+                    <form th:action="@{/management/login}" th:object="${signInForm}" method="post">
                         <fieldset>
                             <div class="form-group">
-                                <input class="form-control" placeholder="E-mail" name="email" th:field="*{email}" type="text">
+                                <div style="font-size: 12px">Електронна пошта</div>
+                                <input style="height: 50px;width: 350px" class="form-control" placeholder="E-mail" name="email" th:field="*{email}"
+                                       type="text">
                             </div>
                             <div class="form-group">
-                                <input class="form-control" placeholder="Password" name="password" th:field="*{password}" type="password" value="">
+                                <div style="font-size: 12px">Пароль</div>
+                                <input style="height: 50px;width: 350px" class="form-control" placeholder="Password" name="password"
+                                       th:field="*{password}" type="password" value="">
                             </div>
-                            <input class="btn btn-lg btn-success btn-block" type="submit" value="Login">
+                            <input style="height: 50px;width: 350px; margin-top: 65px"
+                                   class="btn btn-lg btn-success btn-block" type="submit" value="Login">
                         </fieldset>
                     </form>
                 </div>
             </div>
         </div>
+
     </div>
-</div>
+
+
+<div id="header" th:insert="core/header"></div>
+
+<div class="content">
+<!--    <div class="container">-->
+
+<!--        <div class="row vertical-offset-100">-->
+<!--            <div class="col-md-4 col-md-offset-4">-->
+<!--                <div class="panel panel-default">-->
+<!--                    <div class="panel-heading">-->
+<!--                        <h3 class="panel-title">Please sign in</h3>-->
+<!--                    </div>-->
+<!--                    <div class="panel-body">-->
+<!--                        <form th:action="@{/management/login}" th:object="${signInForm}" method="post"-->
+<!--                              class="form-horizontal">-->
+<!--                            <fieldset>-->
+<!--                                <div class="form-group">-->
+<!--                                    <input class="form-control" placeholder="E-mail" name="email" th:field="*{email}"-->
+<!--                                           type="text">-->
+<!--                                </div>-->
+<!--                                <div class="form-group">-->
+<!--                                    <input class="form-control" placeholder="Password" name="password"-->
+<!--                                           th:field="*{password}" type="password" value="">-->
+<!--                                </div>-->
+<!--                                <input class="btn btn-lg btn-success btn-block" type="submit" value="Login">-->
+<!--                            </fieldset>-->
+<!--                        </form>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
 </div>
 <div id="footer" th:insert="core/footer"></div>
+</div>
+
+<script>
+    var modal = document.getElementById("Modal");
+    var btn = document.getElementById("openButton");
+    var span = document.getElementsByClassName("close")[0];
+    btn.onclick = function() {
+        modal.style.display = "block";
+    }
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+
 </body>
 </html>
