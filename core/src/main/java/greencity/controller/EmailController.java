@@ -34,7 +34,7 @@ public class EmailController {
     }
 
     /**
-     * Method for sending notification to users who subscribed for updates about
+     * Method for sending notification to userss who subscribed for updates about
      * added new places.
      *
      * @param message - object with all necessary data for sending email
