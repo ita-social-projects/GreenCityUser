@@ -21,76 +21,62 @@
     <div id="Modal" class="modal">
 
         <div class="modal-content">
-            <div class="gc-img" >
+            <div class="gc-img">
             </div>
             <div class="form-content">
                 <div class="close">&times;</div>
                 <div style="margin-top: 70px; margin-left: 70px; margin-right: 70px">
                     <div style="font-size: 40px">З поверненням!</div>
                 </div>
-                <div style="font-size: 18px;margin-left: 70px; margin-right: 70px">Будь ласка, внеси свої дані для входу</div>
+                <div style="font-size: 18px;margin-left: 70px; margin-right: 70px">Будь ласка, внеси свої дані для
+                    входу
+                </div>
                 <div class="form-input">
                     <form th:action="@{/management/login}" th:object="${signInForm}" method="post">
                         <fieldset>
                             <div class="form-group">
                                 <div style="font-size: 12px">Електронна пошта</div>
-                                <input style="height: 50px;width: 350px" class="form-control" placeholder="E-mail" name="email" th:field="*{email}"
+                                <input style="height: 50px;width: 350px" class="form-control" placeholder="E-mail"
+                                       name="email" th:field="*{email}"
                                        type="text">
+                                <p style="color: #bc0000" th:each="error: ${#fields.errors('email')}"
+                                   th:text="${error}">Validation error</p>
                             </div>
                             <div class="form-group">
                                 <div style="font-size: 12px">Пароль</div>
-                                <input style="height: 50px;width: 350px" class="form-control" placeholder="Password" name="password"
+                                <input style="height: 50px;width: 350px" class="form-control" placeholder="Password"
+                                       name="password"
                                        th:field="*{password}" type="password" value="">
+                                <p style="color: #bc0000" th:each="error: ${#fields.errors('password')}"
+                                   th:text="${error}">Validation error</p>
                             </div>
-                            <input style="height: 50px;width: 350px; margin-top: 65px"
-                                   class="btn btn-lg btn-success btn-block" type="submit" value="Увійти">
-                        </fieldset>
-                    </form>
-                    <div style="margin-left: 160px;margin-top: 5px;margin-bottom: 5px">або</div>
+                <input style="height: 50px;width: 350px; margin-top: 65px;background-color: #13aa57"
+                       class="btn btn-lg btn-success btn-block" type="submit" value="Увійти">
+                </fieldset>
+                </form>
+                <div style="margin-left: 160px;margin-top: 5px;margin-bottom: 5px">або</div>
+
+                <a th:href="@{/googleSecurity}">
                     <div style="height: 45px;width: 350px; background-color: white"
                          class="btn btn-lg btn-success btn-block">
                         <div class="google-icon"></div>
-                        <div style="float: left;color: black;margin-left:68px; font-size: 16px">Увійти через Google</div>
+                        <div style="float: left;color: black;margin-left:68px; font-size: 16px">Увійти через
+                            Google
+                        </div>
                     </div>
-                    </div>
-                </div>
+                </a>
             </div>
         </div>
-
     </div>
+</div>
+
+</div>
 
 
 <div id="header" th:insert="core/header"></div>
 
 <div class="content">
-<!--    <div class="container">-->
 
-<!--        <div class="row vertical-offset-100">-->
-<!--            <div class="col-md-4 col-md-offset-4">-->
-<!--                <div class="panel panel-default">-->
-<!--                    <div class="panel-heading">-->
-<!--                        <h3 class="panel-title">Please sign in</h3>-->
-<!--                    </div>-->
-<!--                    <div class="panel-body">-->
-<!--                        <form th:action="@{/management/login}" th:object="${signInForm}" method="post"-->
-<!--                              class="form-horizontal">-->
-<!--                            <fieldset>-->
-<!--                                <div class="form-group">-->
-<!--                                    <input class="form-control" placeholder="E-mail" name="email" th:field="*{email}"-->
-<!--                                           type="text">-->
-<!--                                </div>-->
-<!--                                <div class="form-group">-->
-<!--                                    <input class="form-control" placeholder="Password" name="password"-->
-<!--                                           th:field="*{password}" type="password" value="">-->
-<!--                                </div>-->
-<!--                                <input class="btn btn-lg btn-success btn-block" type="submit" value="Login">-->
-<!--                            </fieldset>-->
-<!--                        </form>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
 </div>
 <div id="footer" th:insert="core/footer"></div>
 </div>
@@ -99,17 +85,20 @@
     var modal = document.getElementById("Modal");
     var btn = document.getElementById("openButton");
     var span = document.getElementsByClassName("close")[0];
-    btn.onclick = function() {
+    btn.onclick = function () {
         modal.style.display = "block";
     }
-    span.onclick = function() {
+    span.onclick = function () {
         modal.style.display = "none";
     }
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         if (event.target == modal) {
             modal.style.display = "none";
         }
     }
+    document.addEventListener("DOMContentLoaded", function(event) {
+        modal.style.display = "block";
+    });
 </script>
 
 </body>

@@ -1,6 +1,10 @@
 package greencity.security.controller;
 
 import greencity.constant.RestTemplateLinks;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.service.OwnSecurityService;
@@ -9,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,8 +58,32 @@ public class ManagementSecurityController {
      * @return View template path {@link String}.
      */
     @PostMapping("/login")
-    public String signIn(@Valid @ModelAttribute("signInForm") OwnSignInDto dto) {
-        SuccessSignInDto result = service.signIn(dto);
+    public String signIn(@Valid @ModelAttribute("signInForm") OwnSignInDto dto,
+        BindingResult bindingResult, Model model) {
+        if (bindingResult.hasErrors()) {
+            return "core/management_login";
+        }
+
+        SuccessSignInDto result;
+        try {
+            result = service.signIn(dto);
+        } catch (WrongEmailException e) {
+            bindingResult.rejectValue("email", "signInForm.email", "Неправильна пошта");
+            model.addAttribute("signInForm", dto);
+            return "core/management_login";
+        } catch (WrongPasswordException e) {
+            bindingResult.rejectValue("password", "signInForm.password", "Неправильний пароль");
+            model.addAttribute("signInForm", dto);
+            return "core/management_login";
+        } catch (EmailNotVerified e) {
+            bindingResult.rejectValue("email", "signInForm.email", "Електронна поште не підтверджена");
+            model.addAttribute("signInForm", dto);
+            return "core/management_login";
+        } catch (UserDeactivatedException e) {
+            bindingResult.rejectValue("email", "signInForm.email", "Цей користувач деактивований");
+            model.addAttribute("signInForm", dto);
+            return "core/management_login";
+        }
 
         UriComponentsBuilder uri = UriComponentsBuilder.fromHttpUrl(greenCityServerAddress
             + RestTemplateLinks.TOKEN).queryParam("accessToken", result.getAccessToken());
