@@ -63,6 +63,14 @@
     margin-right: 70px;
     margin-left: 70px;
 }
+.google-icon{
+    margin-left: 9px;
+    margin-bottom: 6px;
+    width: 26px;
+    height: 26px;
+    content: url(../img/google.png);
+    float: left;
+}
 
 
 
