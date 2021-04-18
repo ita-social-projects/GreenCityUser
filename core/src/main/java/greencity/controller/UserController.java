@@ -50,7 +50,7 @@ public class UserController {
     private final EmailService emailService;
 
     /**
-     * The method which update user status. Parameter principal are ignored because
+     * The method which update user statuss. Parameter principal are ignored because
      * Spring automatically provide the Principal object.
      *
      * @param userStatusDto - dto with updated filed.
