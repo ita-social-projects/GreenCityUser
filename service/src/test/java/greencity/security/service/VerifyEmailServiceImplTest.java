@@ -45,9 +45,9 @@ class VerifyEmailServiceImplTest {
             () -> verifyEmailService.verifyByToken(1L, "token"));
     }
 
-    @Test
-    void deleteAllUsersThatDidNotVerifyEmailTest() {
-        verifyEmailService.deleteAllUsersThatDidNotVerifyEmail();
-        verify(verifyEmailRepo).deleteAllUsersThatDidNotVerifyEmail();
-    }
+    /*
+     * @Test void deleteAllUsersThatDidNotVerifyEmailTest() {
+     * verifyEmailService.deleteAllUsersThatDidNotVerifyEmail();
+     * verify(verifyEmailRepo).deleteAllUsersThatDidNotVerifyEmail(); }
+     */
 }
