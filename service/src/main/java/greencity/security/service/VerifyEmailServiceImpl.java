@@ -8,7 +8,6 @@ import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.security.repository.VerifyEmailRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,13 +62,11 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
         return LocalDateTime.now().isBefore(emailExpiredDate);
     }
 
-    /**
-     * {@inheritDoc}
+    /*
+     * @Scheduled(fixedRate = 86400000)
+     * 
+     * @Transactional public void deleteAllUsersThatDidNotVerifyEmail() { int rows =
+     * verifyEmailRepo.deleteAllUsersThatDidNotVerifyEmail(); log.info(rows +
+     * " email verification tokens were deleted."); }
      */
-    @Scheduled(fixedRate = 86400000)
-    @Transactional
-    public void deleteAllUsersThatDidNotVerifyEmail() {
-        int rows = verifyEmailRepo.deleteAllUsersThatDidNotVerifyEmail();
-        log.info(rows + " email verification tokens were deleted.");
-    }
 }
