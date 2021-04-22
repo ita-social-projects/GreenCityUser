@@ -78,13 +78,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     @Override
     public SuccessSignInDto authenticate(String idToken, String language) {
         try {
-            System.out.println(idToken);
-            System.out.println(language);
-            System.out.println(googleIdTokenVerifier.getJsonFactory().toString());
-            System.out.println(googleIdTokenVerifier.getClock().currentTimeMillis());
-            System.out.println(googleIdTokenVerifier.getIssuer().toString());
-            System.out.println(googleIdTokenVerifier.getAudience().size());
-            System.out.println(googleIdTokenVerifier.getAcceptableTimeSkewSeconds());
             GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
             if (googleIdToken != null) {
                 GoogleIdToken.Payload payload = googleIdToken.getPayload();
