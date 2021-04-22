@@ -480,17 +480,16 @@ public class UserController {
      */
     @ApiOperation(value = "Save user profile information")
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = HttpStatuses.CREATED,
-            response = UserProfileDtoResponse.class),
+        @ApiResponse(code = 200, message = "User successfully updated."),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @PutMapping(path = "/profile")
-    public ResponseEntity<UserProfileDtoResponse> save(
+    public ResponseEntity<String> save(
         @ApiParam(required = true) @RequestBody @Valid UserProfileDtoRequest userProfileDtoRequest,
         @ApiIgnore Principal principal) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            userService.saveUserProfile(userProfileDtoRequest, principal.getName()));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.saveUserProfile(userProfileDtoRequest,
+            principal.getName()));
     }
 
     /**
