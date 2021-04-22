@@ -1,6 +1,7 @@
 package greencity;
 
 import greencity.constant.AppConstant;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
@@ -81,6 +82,12 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmailVO())
             .dateOfRegistration(LocalDateTime.now())
+            .build();
+    }
+
+    public static UbsCustomerDto getUbsCustomerDtoWithData() {
+        return UbsCustomerDto.builder()
+            .email("nazar.struk@gmail.com")
             .build();
     }
 

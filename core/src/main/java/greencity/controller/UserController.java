@@ -7,6 +7,7 @@ import greencity.annotations.ImageValidation;
 import greencity.constant.HttpStatuses;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
@@ -1038,5 +1039,22 @@ public class UserController {
     @GetMapping("/findAllRegistrationMonthsMap")
     public ResponseEntity<Map<Integer, Long>> findAllRegistrationMonthsMap() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAllRegistrationMonthsMap());
+    }
+
+    /**
+     * Get {@link UbsCustomerDto} by uuid.
+     *
+     * @return {@link UbsCustomerDto}.
+     * @author Struk Nazar
+     */
+    @ApiOperation(value = "Get User by Uuid")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/findByUuId")
+    public ResponseEntity<UbsCustomerDto> findByUuId(@RequestParam String uuid) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findByUUid(uuid));
     }
 }

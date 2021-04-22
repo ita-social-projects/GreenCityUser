@@ -324,4 +324,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(value = "select u from User u join fetch u.userAchievements where u.id = :id")
     Optional<User> findUserForAchievement(Long id);
+
+    /**
+     * Find id by UUid.
+     *
+     * @param uuid - User uuid
+     * @return User
+     * @author Nazar Struk
+     */
+
+    Optional<User> findUserByUuid(String uuid);
 }
