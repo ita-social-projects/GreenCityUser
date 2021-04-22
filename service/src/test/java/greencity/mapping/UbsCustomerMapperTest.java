@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class UbsCustomerMapperTest {
+class UbsCustomerMapperTest {
 
     @InjectMocks
     private UbsCustomerMapper customerMapper;
