@@ -4,6 +4,7 @@ import greencity.ModelUtils;
 import greencity.client.RestClient;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
@@ -80,6 +81,11 @@ class UserServiceImplTest {
         .socialNetworks(new ArrayList<>())
         .build();
 
+    private User user1 = User.builder()
+        .uuid("444e66e8-8daa-4cb0-8269-a8d856e7dd15")
+        .name("Nazar")
+        .build();
+
     private UserVO userVO = UserVO.builder()
         .id(1L)
         .name("Test Testing")
@@ -111,6 +117,12 @@ class UserServiceImplTest {
             .emailNotification(EmailNotification.DISABLED)
             .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
             .dateOfRegistration(LocalDateTime.now())
+            .build();
+    private UbsCustomerDto ubsCustomerDto =
+        UbsCustomerDto.builder()
+            .name("Nazar")
+            .phoneNumber("09876543322")
+            .email("nazar98struk.gmail.com")
             .build();
 
     private String language = "ua";
@@ -978,4 +990,14 @@ class UserServiceImplTest {
         PageableAdvancedDto<UserManagementVO> expected = userService.search(pageable, userViewDto);
         assertEquals(expected, actual);
     }
+
+    @Test
+    void findByUUidTest() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user1));
+        when(modelMapper.map(Optional.of(user1), UbsCustomerDto.class)).thenReturn(ubsCustomerDto);
+        when(userService.findByUUid(uuid)).thenReturn(ubsCustomerDto);
+        assertEquals(ubsCustomerDto, userService.findByUUid(uuid));
+    }
+
 }
