@@ -401,7 +401,7 @@ class UserControllerTest {
             .content(json)
             .param("accessToken", "accessToken")
             .principal(principal))
-            .andExpect(status().isCreated());
+            .andExpect(status().isOk());
 
         ObjectMapper mapper = new ObjectMapper();
         UserProfileDtoRequest dto = mapper.readValue(json, UserProfileDtoRequest.class);
