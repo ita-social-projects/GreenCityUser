@@ -179,7 +179,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .hasRole(ADMIN)
             .antMatchers(HttpMethod.POST,
                 "/management/login")
-            .permitAll()
+            .not().fullyAuthenticated()
             .antMatchers(HttpMethod.GET,
                 "/management/login")
             .permitAll()
