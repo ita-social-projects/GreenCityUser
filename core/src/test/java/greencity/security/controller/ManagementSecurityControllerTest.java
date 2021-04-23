@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,6 +37,9 @@ class ManagementSecurityControllerTest {
 
     @Mock
     private OwnSecurityService ownSecurityService;
+
+    @Mock
+    BindingResult bindingResult;
 
     @BeforeEach
     void setUp() {
@@ -55,7 +59,13 @@ class ManagementSecurityControllerTest {
     @Test
     void loginPage() throws Exception {
         mockMvc.perform(get(LINK + "/login"))
-            .andDo(print())
+            .andExpect(view().name("core/management_login"));
+    }
+
+    @Test
+    void loginPageInvalidDto() throws Exception {
+        OwnSignInDto dto = new OwnSignInDto("", "");
+        mockMvc.perform(post(LINK + "/login"))
             .andExpect(view().name("core/management_login"));
     }
 
