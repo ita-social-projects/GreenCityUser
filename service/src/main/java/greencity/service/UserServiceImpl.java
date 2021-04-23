@@ -727,7 +727,7 @@ public class UserServiceImpl implements UserService {
      * @author Marian Datsko
      */
     @Override
-    public UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String email) {
+    public String saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String email) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
@@ -750,7 +750,7 @@ public class UserServiceImpl implements UserService {
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
         userRepo.save(user);
-        return modelMapper.map(user, UserProfileDtoResponse.class);
+        return "User successfully updated.";
     }
 
     /**

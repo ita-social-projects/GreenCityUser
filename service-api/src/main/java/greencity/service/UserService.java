@@ -327,7 +327,7 @@ public interface UserService {
      *
      * @author Marian Datsko
      */
-    UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
+    String saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
 
     /**
      * Updates last activity time for a given user.
