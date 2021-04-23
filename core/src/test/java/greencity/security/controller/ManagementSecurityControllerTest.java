@@ -78,6 +78,7 @@ class ManagementSecurityControllerTest {
             .flashAttr("signInForm", dto))
             .andExpect(view().name("core/management_login"));
     }
+
     @Test
     void signInWrongPassword() throws Exception {
         OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998");
@@ -87,6 +88,7 @@ class ManagementSecurityControllerTest {
             .flashAttr("signInForm", dto))
             .andExpect(view().name("core/management_login"));
     }
+
     @Test
     void signInEmailNotVerified() throws Exception {
         OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998");
@@ -96,6 +98,7 @@ class ManagementSecurityControllerTest {
             .flashAttr("signInForm", dto))
             .andExpect(view().name("core/management_login"));
     }
+
     @Test
     void signInUserDeactivated() throws Exception {
         OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998");
