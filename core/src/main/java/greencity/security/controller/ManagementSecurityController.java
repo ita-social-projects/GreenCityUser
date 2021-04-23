@@ -85,8 +85,6 @@ public class ManagementSecurityController {
             return "core/management_login";
         }
 
-        UriComponentsBuilder uri = UriComponentsBuilder.fromHttpUrl(greenCityServerAddress
-            + RestTemplateLinks.TOKEN).queryParam("accessToken", result.getAccessToken());
-        return "redirect:" + uri.toUriString();
+        return "redirect:" + greenCityServerAddress + "/token?accessToken=" + result.getAccessToken();
     }
 }
