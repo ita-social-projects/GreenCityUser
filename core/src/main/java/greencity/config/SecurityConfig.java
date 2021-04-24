@@ -7,6 +7,8 @@ import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
 import greencity.service.UserService;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -248,22 +250,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param clientId {@link String} - google client id.
      */
     @Bean
-    public GoogleIdTokenVerifier googleIdTokenVerifier(@Value("${google.clientId}") String clientId) {
+    public GoogleIdTokenVerifier googleIdTokenVerifier(@Value("${google.clientId}") String clientId,
+        @Value("${google.clientId.manager}") String managerClientId) {
+        List<String> audience = new ArrayList<>();
+        audience.add(clientId);
+        audience.add(managerClientId);
         return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
-            .setAudience(Collections.singletonList(clientId))
-            .build();
-    }
-
-    /**
-     * Bean {@link GoogleIdTokenVerifier} that uses in verify googleIdToken on
-     * management login page.
-     *
-     * @param clientId {@link String} - google client id.
-     */
-    @Bean
-    public GoogleIdTokenVerifier googleIdTokenVerifierForManager(@Value("${google.clientId.manager}") String clientId) {
-        return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
-            .setAudience(Collections.singletonList(clientId))
+            .setAudience(audience)
             .build();
     }
 }
