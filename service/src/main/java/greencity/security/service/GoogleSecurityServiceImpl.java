@@ -22,6 +22,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,7 @@ import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final UserService userService;
     private final GoogleIdTokenVerifier googleIdTokenVerifier;
+    private final GoogleIdTokenVerifier googleIdTokenVerifierForManager;
     private final JwtTool jwtTool;
     private final ModelMapper modelMapper;
     private final AchievementService achievementService;
@@ -50,20 +52,23 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     /**
      * Constructor.
      *
-     * @param userService           {@link UserService} - service of {@link User}
-     *                              logic.
-     * @param jwtTool               {@link JwtTool} - tool for jwt logic.
-     * @param googleIdTokenVerifier {@link GoogleIdTokenVerifier} - tool for verify
-     *                              googleIdToken.
+     * @param userService                     {@link UserService} - service of
+     *                                        {@link User} logic.
+     * @param googleIdTokenVerifierForManager * @param jwtTool {@link JwtTool} -
+     *                                        tool for jwt logic.
+     * @param googleIdTokenVerifier           {@link GoogleIdTokenVerifier} - tool
+     *                                        for verify
      */
     @Autowired
     public GoogleSecurityServiceImpl(UserService userService,
+        @Qualifier("googleIdTokenVerifierForManager") GoogleIdTokenVerifier googleIdTokenVerifierForManager,
         JwtTool jwtTool,
-        GoogleIdTokenVerifier googleIdTokenVerifier,
+        @Qualifier("googleIdTokenVerifier") GoogleIdTokenVerifier googleIdTokenVerifier,
         ModelMapper modelMapper,
         AchievementService achievementService,
         UserRepo userRepo) {
         this.userService = userService;
+        this.googleIdTokenVerifierForManager = googleIdTokenVerifierForManager;
         this.jwtTool = jwtTool;
         this.googleIdTokenVerifier = googleIdTokenVerifier;
         this.modelMapper = modelMapper;
@@ -79,6 +84,9 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     public SuccessSignInDto authenticate(String idToken, String language) {
         try {
             GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
+            if (googleIdToken == null) {
+                googleIdToken = googleIdTokenVerifierForManager.verify(idToken);
+            }
             if (googleIdToken != null) {
                 GoogleIdToken.Payload payload = googleIdToken.getPayload();
                 String email = payload.getEmail();
@@ -130,7 +138,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
             .profilePicturePath(profilePicture)
-            .rating(AppConstant.DEFAULT_RATING)
+            .rating(DEFAULT_RATING)
             .language(Language.builder()
                 .id(modelMapper.map(language, Long.class))
                 .build())

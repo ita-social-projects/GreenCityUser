@@ -253,4 +253,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .setAudience(Collections.singletonList(clientId))
             .build();
     }
+
+    /**
+     * Bean {@link GoogleIdTokenVerifier} that uses in verify googleIdToken on
+     * management login page.
+     *
+     * @param clientId {@link String} - google client id.
+     */
+    @Bean
+    public GoogleIdTokenVerifier googleIdTokenVerifierForManager(@Value("${google.clientId.manager}") String clientId) {
+        return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
+            .setAudience(Collections.singletonList(clientId))
+            .build();
+    }
 }
