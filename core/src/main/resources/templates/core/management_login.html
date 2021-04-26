@@ -31,7 +31,7 @@
             var id_token = googleUser.getAuthResponse().id_token
 
             let url = "https://greencity-user.azurewebsites.net/googleSecurity?idToken="+id_token+"&lang=en"
-                    fetch(url)
+                    fetch(url, {headers: {'Access-Control-Allow-Origin': '*'}})
                         .then(res => res.json())
                         .then((out) => {
                             console.log('Fetching response from googleSecurity controller... ', out);
