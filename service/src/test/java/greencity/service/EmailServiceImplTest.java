@@ -12,6 +12,7 @@ import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 
+import greencity.dto.violation.UserViolationMailDto;
 import java.util.*;
 import java.util.concurrent.Executors;
 import javax.mail.Session;
@@ -148,4 +149,12 @@ class EmailServiceImplTest {
         service.sendMessageOfActivation(test1);
         verify(javaMailSender).createMimeMessage();
     }
+
+    @Test
+    void sendUserViolationEmailTest(){
+        UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
+        service.sendUserViolationEmail(dto);
+        verify(javaMailSender).createMimeMessage();
+    }
+
 }
