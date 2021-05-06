@@ -151,7 +151,7 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendUserViolationEmailTest(){
+    void sendUserViolationEmailTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         service.sendUserViolationEmail(dto);
         verify(javaMailSender).createMimeMessage();
