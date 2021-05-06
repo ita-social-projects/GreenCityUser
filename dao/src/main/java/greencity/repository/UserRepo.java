@@ -324,4 +324,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(value = "select u from User u join fetch u.userAchievements where u.id = :id")
     Optional<User> findUserForAchievement(Long id);
+
+    /**
+     * Method that finds user by name.
+     */
+    @Query(value = "select u from User u where LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    Page<User> findUsersByName(String name, Pageable page);
 }
