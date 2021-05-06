@@ -334,4 +334,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
 
     Optional<User> findUserByUuid(String uuid);
+
+    /**
+     * Method that finds user by name.
+     */
+    @Query(value = "select u from User u where LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    Page<User> findUsersByName(String name, Pageable page);
 }
