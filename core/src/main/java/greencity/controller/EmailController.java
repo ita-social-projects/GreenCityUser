@@ -1,6 +1,7 @@
 package greencity.controller;
 
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
@@ -70,6 +71,19 @@ public class EmailController {
     @PostMapping("/sendHabitNotification")
     public ResponseEntity<Object> sendHabitNotification(@RequestBody SendHabitNotification sendHabitNotification) {
         emailService.sendHabitNotification(sendHabitNotification.getName(), sendHabitNotification.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Sends email notification about violation to user on email.
+     *
+     * @param dto {@link UserViolationMailDto} - object with all necessary data for
+     *            sending email.
+     * @author Zakhar Veremchuk
+     */
+    @PostMapping("/sendUserViolation")
+    public ResponseEntity<Object> sendUserViolation(@RequestBody UserViolationMailDto dto) {
+        emailService.sendUserViolationEmail(dto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
