@@ -7,6 +7,7 @@ import greencity.annotations.ImageValidation;
 import greencity.constant.HttpStatuses;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
@@ -480,17 +481,16 @@ public class UserController {
      */
     @ApiOperation(value = "Save user profile information")
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = HttpStatuses.CREATED,
-            response = UserProfileDtoResponse.class),
+        @ApiResponse(code = 200, message = "User successfully updated."),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @PutMapping(path = "/profile")
-    public ResponseEntity<UserProfileDtoResponse> save(
+    public ResponseEntity<String> save(
         @ApiParam(required = true) @RequestBody @Valid UserProfileDtoRequest userProfileDtoRequest,
         @ApiIgnore Principal principal) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            userService.saveUserProfile(userProfileDtoRequest, principal.getName()));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.saveUserProfile(userProfileDtoRequest,
+            principal.getName()));
     }
 
     /**
@@ -1056,5 +1056,22 @@ public class UserController {
         @RequestParam String name,
         @ApiIgnore @CurrentUser UserVO userVO) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findNewFriendByName(name, page, userVO.getId()));
+    }
+
+    /**
+     * Get {@link UbsCustomerDto} by uuid.
+     *
+     * @return {@link UbsCustomerDto}.
+     * @author Struk Nazar
+     */
+    @ApiOperation(value = "Get User by Uuid")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/findByUuId")
+    public ResponseEntity<UbsCustomerDto> findByUuId(@RequestParam String uuid) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findByUUid(uuid));
     }
 }

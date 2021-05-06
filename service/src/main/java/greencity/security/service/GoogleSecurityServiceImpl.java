@@ -22,6 +22,7 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +55,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
      *                              logic.
      * @param jwtTool               {@link JwtTool} - tool for jwt logic.
      * @param googleIdTokenVerifier {@link GoogleIdTokenVerifier} - tool for verify
-     *                              googleIdToken.
      */
     @Autowired
     public GoogleSecurityServiceImpl(UserService userService,
@@ -130,7 +130,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
             .profilePicturePath(profilePicture)
-            .rating(AppConstant.DEFAULT_RATING)
+            .rating(DEFAULT_RATING)
             .language(Language.builder()
                 .id(modelMapper.map(language, Long.class))
                 .build())

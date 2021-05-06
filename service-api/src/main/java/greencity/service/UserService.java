@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
@@ -326,7 +327,7 @@ public interface UserService {
      *
      * @author Marian Datsko
      */
-    UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
+    String saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
 
     /**
      * Updates last activity time for a given user.
@@ -535,4 +536,12 @@ public interface UserService {
      * @param languageId {@link Long} - language id.
      */
     void updateUserLanguage(Long userId, Long languageId);
+
+    /**
+     * Method that return UserVo by UUid.
+     *
+     * @return {@link UserVO}
+     * @author Struk Nazar
+     */
+    UbsCustomerDto findByUUid(String uuid);
 }
