@@ -219,6 +219,7 @@ public class ModelUtils {
         return UserViolationMailDto.builder()
             .email("string@gmail.com")
             .name("string")
+            .language("en")
             .violationDescription("String Description")
             .build();
     }
