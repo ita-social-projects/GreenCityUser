@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
+import greencity.dto.violation.UserViolationMailDto;
 import greencity.enums.Role;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -40,5 +41,13 @@ public class ModelUtils {
 
     public static PageableAdvancedDto<UserManagementDto> getPageableAdvancedDto() {
         return new PageableAdvancedDto<>(List.of(getUserManagementDto()), 1L, 1, 1, 1, false, false, true, true);
+    }
+
+    public static UserViolationMailDto getUserViolationMailDto() {
+        return UserViolationMailDto.builder()
+            .email("string@gmail.com")
+            .name("string")
+            .violationDescription("String Description")
+            .build();
     }
 }

@@ -9,6 +9,7 @@ import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 
+import greencity.dto.violation.UserViolationMailDto;
 import java.util.List;
 import java.util.Map;
 
@@ -107,4 +108,13 @@ public interface EmailService {
      * @param userActivationDto - includes all information about the User.
      */
     void sendMessageOfActivation(UserActivationDto userActivationDto);
+
+    /**
+     * Method for send violation to user.
+     * 
+     * @param dto {@link UserViolationMailDto}-includes all information about
+     *            Violation.
+     * @author Zakhar Veremchuk.
+     */
+    void sendUserViolationEmail(UserViolationMailDto dto);
 }
