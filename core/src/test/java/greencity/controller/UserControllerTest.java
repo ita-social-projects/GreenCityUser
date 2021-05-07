@@ -6,6 +6,7 @@ import greencity.TestConst;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.PageableDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
@@ -705,4 +706,19 @@ class UserControllerTest {
             .andExpect(jsonPath("$.1").value(10))
             .andExpect(jsonPath("$.12").value(20));
     }
+
+    @Test
+    void findNewFriendsByNameTest() throws Exception {
+        int pageNumber = 1;
+        int pageSize = 20;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(TestConst.EMAIL);
+        when(userService.findByEmail(principal.getName())).thenReturn(ModelUtils.getUserVO());
+        mockMvc.perform(get(userLink + "/findNewFriendsByName?page=" + pageNumber + "&name=test")
+            .principal(principal)).andExpect(status().isOk());
+
+        verify(userService).findNewFriendByName("test", pageable, 1L);
+    }
+
 }
