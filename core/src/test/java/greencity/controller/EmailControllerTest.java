@@ -7,7 +7,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import greencity.ModelUtils;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
@@ -127,5 +129,19 @@ class EmailControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    void sendUserViolationEmailTest() throws Exception {
+        String content = "{" +
+            "\"name\":\"String\"," +
+            "\"email\":\"String@gmail.com\"," +
+            "\"violationDescription\":\"string string\"" +
+            "}";
+
+        mockPerform(content, "/sendUserViolation");
+
+        UserViolationMailDto userViolationMailDto = new ObjectMapper().readValue(content, UserViolationMailDto.class);
+        verify(emailService).sendUserViolationEmail(userViolationMailDto);
     }
 }

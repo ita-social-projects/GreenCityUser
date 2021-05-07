@@ -9,6 +9,7 @@ import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 
+import greencity.dto.violation.UserViolationMailDto;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -261,5 +262,18 @@ public class EmailServiceImpl implements EmailService {
         log.info(Locale.getDefault().toString());
         String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
         sendEmail(userActivationDto.getEmail(), EmailConstants.ACTIVATION, template);
+    }
+
+    @Override
+    public void sendUserViolationEmail(UserViolationMailDto dto) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, dto.getName());
+        model.put(EmailConstants.DESCRIPTION, dto.getViolationDescription());
+        model.put(EmailConstants.LANGUAGE, dto.getLanguage());
+        changeLocale(dto.getLanguage());
+        log.info(dto.getLanguage());
+        String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
+        sendEmail(dto.getEmail(), EmailConstants.VIOLATION_EMAIL, template);
     }
 }

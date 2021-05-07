@@ -12,6 +12,7 @@ import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
+import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.Achievement;
 import greencity.entity.AchievementCategory;
 import greencity.entity.Language;
@@ -211,6 +212,15 @@ public class ModelUtils {
             .imagePath("/imagePath")
             .source("source")
             .tags(Collections.singletonList("tag"))
+            .build();
+    }
+
+    public static UserViolationMailDto getUserViolationMailDto() {
+        return UserViolationMailDto.builder()
+            .email("string@gmail.com")
+            .name("string")
+            .language("en")
+            .violationDescription("String Description")
             .build();
     }
 }
