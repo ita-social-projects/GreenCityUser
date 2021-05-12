@@ -1,7 +1,5 @@
 package greencity.constant;
 
-import greencity.dto.user.UserVO;
-
 public final class UpdateConstants {
     public static final String SUCCESS_UA = "Користувача успішно оновлено.";
     public static final String SUCCESS_EN = "User successfully updated.";
