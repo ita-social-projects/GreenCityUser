@@ -5,6 +5,9 @@ public final class UpdateConstants {
     public static final String SUCCESS_EN = "User successfully updated.";
     public static final String SUCCESS_RU = "Пользователь успешно обновлен.";
 
+    public UpdateConstants() {
+    }
+
     public static String getResultByLanguageCode(String code) {
         if (code.equals("ua")) {
             return SUCCESS_UA;
@@ -14,5 +17,4 @@ public final class UpdateConstants {
             return SUCCESS_EN;
         }
     }
-
 }
