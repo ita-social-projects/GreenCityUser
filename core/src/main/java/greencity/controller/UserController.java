@@ -221,7 +221,7 @@ public class UserController {
     })
     @PatchMapping
     public ResponseEntity<UserUpdateDto> updateUser(@Valid @RequestBody UserUpdateDto dto,
-                                                    @ApiIgnore @AuthenticationPrincipal Principal principal) {
+        @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(dto, email));
     }
@@ -809,9 +809,8 @@ public class UserController {
     })
     @PutMapping("/updateUserLastActivityTime/{date}")
     public ResponseEntity<Object> updateUserLastActivityTime(@ApiIgnore @CurrentUser UserVO userVO,
-                                                             @PathVariable(value = "date") @DateTimeFormat(
-                                                                 pattern = "yyyy-MM-dd.HH:mm:ss.SSSSSS")
-                                                                 LocalDateTime userLastActivityTime) {
+        @PathVariable(value = "date") @DateTimeFormat(
+            pattern = "yyyy-MM-dd.HH:mm:ss.SSSSSS") LocalDateTime userLastActivityTime) {
         userService.updateUserLastActivityTime(userVO.getId(), userLastActivityTime);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -833,7 +832,7 @@ public class UserController {
     })
     @PutMapping("/deactivate")
     public ResponseEntity<ResponseEntity.BodyBuilder> deactivateUser(@RequestParam Long id,
-                                                                     @RequestBody List<String> userReasons) {
+        @RequestBody List<String> userReasons) {
         UserDeactivationReasonDto userDeactivationDto = userService.deactivateUser(id, userReasons);
         emailService.sendReasonOfDeactivation(userDeactivationDto);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -863,7 +862,8 @@ public class UserController {
      *
      * @param id        {@link Long} - user's id.
      * @param adminLang {@link String} - current administrator language.
-     * @return {@link List} of {@link String} - reasons for deactivation of the current user.
+     * @return {@link List} of {@link String} - reasons for deactivation of the
+     *         current user.
      * @author Vlad Pikhotskyi
      */
     @ApiOperation(value = "Get list reasons of deactivating the user")
@@ -893,7 +893,7 @@ public class UserController {
     })
     @PutMapping("/{userId}/language/{languageId}")
     public ResponseEntity<Object> setUserLanguage(@PathVariable @CurrentUserId Long userId,
-                                                  @PathVariable Long languageId) {
+        @PathVariable Long languageId) {
         userService.updateUserLanguage(userId, languageId);
         return ResponseEntity.ok().build();
     }
@@ -971,8 +971,7 @@ public class UserController {
     })
     @PostMapping("/search")
     public ResponseEntity<PageableAdvancedDto<UserManagementVO>> search(@ApiIgnore Pageable pageable,
-                                                                        @RequestBody
-                                                                            UserManagementViewDto userViewDto) {
+        @RequestBody UserManagementViewDto userViewDto) {
         PageableAdvancedDto<UserManagementVO> found = userService.search(pageable, userViewDto);
         return ResponseEntity.status(HttpStatus.OK).body(found);
     }
@@ -1095,8 +1094,7 @@ public class UserController {
     public ResponseEntity<PageableDto<UserAllFriendsDto>> findNewFriendsWithMutualFriendsOrdering(
         @ApiIgnore int page,
         @ApiIgnore int size,
-        @ApiIgnore @CurrentUser UserVO userVO
-    ) {
+        @ApiIgnore @CurrentUser UserVO userVO) {
         return ResponseEntity.status(HttpStatus.OK)
             .body(allUsersMutualFriends.findAllUsersWithMutualFriends(userVO.getId(), page, size));
     }

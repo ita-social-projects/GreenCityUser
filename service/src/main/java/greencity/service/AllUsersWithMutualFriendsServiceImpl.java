@@ -31,8 +31,7 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
                 + "left join users on users.id = u2.user_id\n"
                 + "WHERE U1.user_id =" + id + " GROUP BY U2.user_id Having u2.user_id not in (" + id + ")\n"
                 + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n"
-                + "LIMIT " + size + " OFFSET " + offset
-            );
+                + "LIMIT " + size + " OFFSET " + offset);
         int numberOfElements =
             jdbcTemplate.queryForObject("SELECT count(*) FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT"
                 + " FROM users_friends U1\n"
@@ -57,7 +56,6 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
             result,
             size,
             pages,
-            totalPages
-        );
+            totalPages);
     }
 }
