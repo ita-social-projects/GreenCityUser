@@ -3,15 +3,12 @@ package greencity.service;
 import greencity.client.RestClient;
 import greencity.dto.PageableDto;
 import greencity.dto.user.UserAllFriendsDto;
-import greencity.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +47,6 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
                 .profilePicture((String) map.get("profile_picture"))
                 .build());
         }
-        Page<UserAllFriendsDto> ourDtos = new PageImpl<>(result);
         int totalPages = (numberOfElements / size) + 1;
         return new PageableDto<>(
             result,
