@@ -1,10 +1,8 @@
 package greencity.service;
 
-import greencity.client.RestClient;
 import greencity.dto.PageableDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.repository.UserRepo;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +14,6 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFriends {
     private final JdbcTemplate jdbcTemplate;
-    private final RestClient restClient;
     private final UserRepo userRepo;
 
     @Override
