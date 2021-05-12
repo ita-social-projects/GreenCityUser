@@ -19,9 +19,9 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
 
     @Override
     public PageableDto<UserAllFriendsDto> findAllUsersWithMutualFriends(Long id, int pages, int size) {
-        int numberOfElements = 0;
+        int numberOfElements;
         int offset = pages * size;
-        List<Map<String, Object>> maps = null;
+        List<Map<String, Object>> maps;
         try {
             maps = jdbcTemplate.queryForList("SELECT * FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT"
                 + " FROM users_friends U1\n"
@@ -37,8 +37,8 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
                 + "left join users on users.id = u2.user_id\n"
                 + "WHERE U1.user_id =" + id + " GROUP BY U2.user_id Having u2.user_id not in (" + id + ")\n"
                 + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n", Integer.class);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (NullPointerException e) {
+            throw new NullPointerException();
         }
         List<UserAllFriendsDto> result = new ArrayList<>();
         for (Map<String, Object> map : maps) {
