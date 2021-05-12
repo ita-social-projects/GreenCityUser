@@ -1,5 +1,7 @@
 package greencity.constant;
 
+import greencity.dto.user.UserVO;
+
 public final class UpdateConstants {
     public static final String SUCCESS_UA = "Користувача успішно оновлено.";
     public static final String SUCCESS_EN = "User successfully updated.";
@@ -8,6 +10,11 @@ public final class UpdateConstants {
     private UpdateConstants() {
     }
 
+    /**
+     * Method return user message depends on users language.
+     *
+     * @author Volodia Lesko
+     */
     public static String getResultByLanguageCode(String code) {
         if (code.equals("ua")) {
             return SUCCESS_UA;
