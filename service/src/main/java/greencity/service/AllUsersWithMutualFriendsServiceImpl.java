@@ -29,9 +29,6 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
                 + "WHERE U1.user_id =" + id + " GROUP BY U2.user_id Having u2.user_id not in (" + id + ")\n"
                 + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n"
                 + "LIMIT " + size + " OFFSET " + offset);
-            for (Map<String, Object> elem : maps) {
-                System.out.println(elem);
-            }
             numberOfElements = userRepo.countOfMutualFriends(id);
         } catch (NullPointerException e) {
             throw new NullPointerException();

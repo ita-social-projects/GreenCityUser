@@ -341,7 +341,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> findUsersByName(String name, Pageable page);
 
     /**
-     * Method that finds user by name.
+     * Method that returns count of mutual friends.
      */
     @Query(nativeQuery = true, value = "SELECT count(*) "
         + " FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT"
