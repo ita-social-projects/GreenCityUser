@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.client.RestClient;
 import greencity.dto.PageableDto;
 import greencity.dto.user.UserAllFriendsDto;
+import greencity.repository.UserRepo;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFriends {
     private final JdbcTemplate jdbcTemplate;
     private final RestClient restClient;
+    private final UserRepo userRepo;
 
     @Override
     public PageableDto<UserAllFriendsDto> findAllUsersWithMutualFriends(Long id, int pages, int size) {
@@ -30,13 +32,10 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
                 + "WHERE U1.user_id =" + id + " GROUP BY U2.user_id Having u2.user_id not in (" + id + ")\n"
                 + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n"
                 + "LIMIT " + size + " OFFSET " + offset);
-            numberOfElements = jdbcTemplate.queryForObject("SELECT count(*) "
-                + " FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT"
-                + " FROM users_friends U1\n"
-                + "LEFT JOIN users_friends U2 on U1.friend_id = U2.friend_id\n"
-                + "left join users on users.id = u2.user_id\n"
-                + "WHERE U1.user_id =" + id + " GROUP BY U2.user_id Having u2.user_id not in (" + id + ")\n"
-                + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n", Integer.class);
+            for (Map<String, Object> elem : maps) {
+                System.out.println(elem);
+            }
+            numberOfElements = userRepo.countOfMutualFriends(id);
         } catch (NullPointerException e) {
             throw new NullPointerException();
         }
