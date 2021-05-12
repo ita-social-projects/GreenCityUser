@@ -313,8 +313,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return {@link Page} of {@link UsersFriendDto} instances.
      */
     @Query(nativeQuery = true, value = "select * FROM public.fn_recommended_friends ( :userId )")
-    Page<UsersFriendDto> findUsersRecommendedFriends(Pageable pageable,
-        @Param("userId") Long userId);
+    Page<UsersFriendDto> findUsersRecommendedFriends(Pageable pageable, @Param("userId") Long userId);
 
     /**
      * Method that finds user.

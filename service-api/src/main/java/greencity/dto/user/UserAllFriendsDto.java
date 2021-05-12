@@ -1,9 +1,11 @@
 package greencity.dto.user;
 
+import java.util.Comparator;
 import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
 @EqualsAndHashCode
