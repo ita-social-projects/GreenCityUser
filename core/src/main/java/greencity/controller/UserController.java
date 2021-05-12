@@ -483,7 +483,7 @@ public class UserController {
      */
     @ApiOperation(value = "Save user profile information")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "User successfully updated."),
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
