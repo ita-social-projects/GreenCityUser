@@ -1,9 +1,6 @@
 package greencity.controller;
 
-import greencity.annotations.ApiPageable;
-import greencity.annotations.CurrentUser;
-import greencity.annotations.CurrentUserId;
-import greencity.annotations.ImageValidation;
+import greencity.annotations.*;
 import greencity.constant.HttpStatuses;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
@@ -24,6 +21,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -483,7 +481,7 @@ public class UserController {
      */
     @ApiOperation(value = "Save user profile information")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = "User successfully updated."),
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
