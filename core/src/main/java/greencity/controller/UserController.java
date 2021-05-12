@@ -16,6 +16,7 @@ import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
+import greencity.service.AllUsersMutualFriends;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.swagger.annotations.ApiOperation;
@@ -49,6 +50,7 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final EmailService emailService;
+    private final AllUsersMutualFriends allUsersMutualFriends;
 
     /**
      * The method which update user statuss. Parameter principal are ignored because
@@ -1073,5 +1075,27 @@ public class UserController {
     @GetMapping("/findByUuId")
     public ResponseEntity<UbsCustomerDto> findByUuId(@RequestParam String uuid) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findByUUid(uuid));
+    }
+
+    /**
+     * Get {@link UserAllFriendsDto} by uuid.
+     *
+     * @return {@link UserAllFriendsDto }.
+     * @author Struk Nazar
+     */
+    @ApiOperation(value = "Get All Users which have mutual friends")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/findNewUsersWithMutualFriends")
+    @ApiPageable
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findNewFriendsWithMutualFriendsOrdering(
+        @ApiIgnore int page,
+        @ApiIgnore int size,
+        @ApiIgnore @CurrentUser UserVO userVO) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(allUsersMutualFriends.findAllUsersWithMutualFriends(userVO.getId(), page, size));
     }
 }
