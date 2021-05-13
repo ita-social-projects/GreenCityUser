@@ -50,6 +50,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 /**
  * {@inheritDoc}
  */
@@ -352,7 +353,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .concat(specialChar)
             .concat(totalChars);
         List<Character> pwdChars = combinedChars.chars()
-            .mapToObj(char.class::cast)
+            .mapToObj(c -> (char) c)
             .collect(Collectors.toList());
         Collections.shuffle(pwdChars);
         return pwdChars.stream()
