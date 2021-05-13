@@ -310,7 +310,7 @@ class UserControllerTest {
             .principal(principal))
             .andExpect(status().isOk());
 
-        verify(userService, times(1)).deleteUserProfilePicture(eq("test@email.com"));
+        verify(userService, times(1)).deleteUserProfilePicture("test@email.com");
     }
 
     @Test
