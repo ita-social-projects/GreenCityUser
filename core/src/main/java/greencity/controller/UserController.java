@@ -59,7 +59,7 @@ public class UserController {
      * @return {@link UserStatusDto}
      * @author Rostyslav Khasanov
      */
-    @ApiOperation(value = "Update status of user")
+    @ApiOperation(value = "Update statuss of user")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = UserStatus.class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
