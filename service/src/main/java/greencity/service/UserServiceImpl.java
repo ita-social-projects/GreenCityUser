@@ -1,5 +1,6 @@
 package greencity.service;
 
+import greencity.constant.UpdateConstants;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
@@ -750,7 +751,7 @@ public class UserServiceImpl implements UserService {
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
         userRepo.save(user);
-        return "User successfully updated.";
+        return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
 
     /**
