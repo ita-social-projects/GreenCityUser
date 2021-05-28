@@ -5,7 +5,9 @@ import greencity.dto.user.UsersFriendDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
+
 import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -306,7 +308,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     }
 
     /**
-     * Method that finds user's recommended friends.
+     * Method that finds user's recommended friends depending on habits.
      *
      * @param pageable {@link Pageable}.
      * @param userId   {@link Long} -current user's id.
@@ -314,6 +316,19 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(nativeQuery = true, value = "select * FROM public.fn_recommended_friends ( :userId )")
     Page<UsersFriendDto> findUsersRecommendedFriends(Pageable pageable, @Param("userId") Long userId);
+
+    /**
+     * Method that finds top 6 user's recommended friends.
+     *
+     * @param userId {@link Long} -current user's id.
+     * @return {@link List} of {@link User} instances.
+     */
+    @Query(nativeQuery = true, value = "select * from users u where u.id not in "
+        + "((select friend_id from users_friends where user_id = :userId) "
+        + "union (select user_id from users_friends where friend_id = :userId) "
+        + "union (select :userId)) "
+        + "order by u.rating desc limit 6")
+    List<UsersFriendDto> findAnyRecommendedFriends(@Param("userId") Long userId);
 
     /**
      * Method that finds user.
