@@ -5,7 +5,9 @@ import greencity.dto.user.UsersFriendDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
+
 import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -116,8 +118,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return list of {@link User}.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 1)"
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 1));")
+            + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 1)"
+            + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 1));")
     List<User> getAllUserFriends(Long userId);
 
     /**
@@ -128,8 +130,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @author Yurii Yhurakovskyi
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 1) "
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 1))")
+            + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 1) "
+            + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 1))")
     Page<User> getAllUserFriends(Long userId, Pageable pageable);
 
     /**
@@ -139,7 +141,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return {@link Page}
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 0)")
+            + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 0)")
     Page<User> getAllUserFriendRequests(Long userId, Pageable pageable);
 
     /**
@@ -148,7 +150,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return list of {@link User}.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 0)")
+            + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 0)")
     List<User> getAllUserFriendRequests(Long userId);
 
     /**
@@ -156,7 +158,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Modifying
     @Query(nativeQuery = true,
-        value = "DELETE FROM users_friends WHERE user_id = :userId AND friend_id = :friendId")
+            value = "DELETE FROM users_friends WHERE user_id = :userId AND friend_id = :friendId")
     void deleteUserFriendById(Long userId, Long friendId);
 
     /**
@@ -164,8 +166,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Modifying
     @Query(nativeQuery = true,
-        value = "INSERT INTO users_friends(user_id, friend_id, status, created_date) "
-            + "VALUES (:userId, :friendId, 0, CURRENT_TIMESTAMP)")
+            value = "INSERT INTO users_friends(user_id, friend_id, status, created_date) "
+                    + "VALUES (:userId, :friendId, 0, CURRENT_TIMESTAMP)")
     void addNewFriend(Long userId, Long friendId);
 
     /**
@@ -173,8 +175,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Modifying
     @Query(nativeQuery = true,
-        value = "UPDATE users_friends SET status = 1 "
-            + "WHERE user_id = :friendId AND friend_id = :userId")
+            value = "UPDATE users_friends SET status = 1 "
+                    + "WHERE user_id = :friendId AND friend_id = :userId")
     void acceptFriendRequest(Long userId, Long friendId);
 
     /**
@@ -182,17 +184,17 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Modifying
     @Query(nativeQuery = true,
-        value = "UPDATE users_friends SET status = 2 "
-            + "WHERE user_id = :friendId AND friend_id = :userId")
+            value = "UPDATE users_friends SET status = 2 "
+                    + "WHERE user_id = :friendId AND friend_id = :userId")
     void declineFriendRequest(Long userId, Long friendId);
 
     /**
      * Get six friends with the highest rating {@link User}.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 1) "
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 1)) "
-        + "ORDER BY users.rating DESC LIMIT 6;")
+            + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 1) "
+            + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 1)) "
+            + "ORDER BY users.rating DESC LIMIT 6;")
     List<User> getSixFriendsWithTheHighestRating(Long userId);
 
     /**
@@ -202,8 +204,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return - {@link Integer} count of user friends
      */
     @Query(nativeQuery = true, value = "SELECT count(id) FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 1)"
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 1))")
+            + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 1)"
+            + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 1))")
     Integer getAllUserFriendsCount(Long userId);
 
     /**
@@ -226,7 +228,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @author Yurii Zhurakovskyi
      */
     @Query(nativeQuery = true,
-        value = "SELECT last_activity_time FROM users WHERE id=:userId")
+            value = "SELECT last_activity_time FROM users WHERE id=:userId")
     Optional<Timestamp> findLastActivityTimeById(Long userId);
 
     /**
@@ -238,7 +240,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      **/
     @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM users where user_status = 1 "
-        + "AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP")
+            + "AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP")
     int scheduleDeleteDeactivatedUsers();
 
     /**
@@ -259,9 +261,9 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return list of {@link User}.
      */
     @Query("SELECT u FROM User u WHERE CONCAT(u.id,'') LIKE LOWER(CONCAT('%', :query, '%')) "
-        + "OR LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))"
-        + "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) "
-        + "OR LOWER(u.userCredo) LIKE LOWER(CONCAT('%', :query, '%'))")
+            + "OR LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))"
+            + "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) "
+            + "OR LOWER(u.userCredo) LIKE LOWER(CONCAT('%', :query, '%'))")
     Page<User> searchBy(Pageable paging, String query);
 
     /**
@@ -273,7 +275,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      **/
     @Modifying
     @Query(nativeQuery = true, value = "DELETE FROM users u WHERE u.user_status = 3 "
-        + "AND u.date_of_registration + interval '1 day' <= CURRENT_TIMESTAMP")
+            + "AND u.date_of_registration + interval '1 day' <= CURRENT_TIMESTAMP")
     int scheduleDeleteCreatedUsers();
 
     /**
@@ -302,11 +304,11 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     default Map<Integer, Long> findAllRegistrationMonthsMap() {
         return findAllRegistrationMonths().stream().collect(
-            Collectors.toMap(RegistrationStatisticsDtoResponse::getMonth, RegistrationStatisticsDtoResponse::getCount));
+                Collectors.toMap(RegistrationStatisticsDtoResponse::getMonth, RegistrationStatisticsDtoResponse::getCount));
     }
 
     /**
-     * Method that finds user's recommended friends.
+     * Method that finds user's recommended friends depending on habits.
      *
      * @param pageable {@link Pageable}.
      * @param userId   {@link Long} -current user's id.
@@ -314,6 +316,19 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(nativeQuery = true, value = "select * FROM public.fn_recommended_friends ( :userId )")
     Page<UsersFriendDto> findUsersRecommendedFriends(Pageable pageable, @Param("userId") Long userId);
+
+    /**
+     * Method that finds top 6 user's recommended friends.
+     *
+     * @param userId {@link Long} -current user's id.
+     * @return {@link List} of {@link User} instances.
+     */
+    @Query(nativeQuery = true, value = "select * from users u where u.id not in " +
+            "((select friend_id from users_friends where user_id = :userId) " +
+            "union (select user_id from users_friends where friend_id = :userId) " +
+            "union (select :userId)) " +
+            "order by u.rating desc limit 6")
+    List<UsersFriendDto> findAnyRecommendedFriends( @Param("userId") Long userId);
 
     /**
      * Method that finds user.
@@ -344,11 +359,11 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * Method that returns count of mutual friends.
      */
     @Query(nativeQuery = true, value = "SELECT count(*) "
-        + " FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT"
-        + " FROM users_friends U1\n"
-        + "LEFT JOIN users_friends U2 on U1.friend_id = U2.friend_id\n"
-        + "left join users on users.id = u2.user_id\n"
-        + "WHERE U1.user_id =:id GROUP BY U2.user_id Having u2.user_id not in (:id)\n"
-        + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n")
+            + " FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT"
+            + " FROM users_friends U1\n"
+            + "LEFT JOIN users_friends U2 on U1.friend_id = U2.friend_id\n"
+            + "left join users on users.id = u2.user_id\n"
+            + "WHERE U1.user_id =:id GROUP BY U2.user_id Having u2.user_id not in (:id)\n"
+            + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n")
     int countOfMutualFriends(Long id);
 }
