@@ -310,8 +310,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Method that finds user's recommended friends depending on habits.
      *
-     * @param pageable {@link Pageable}.
-     * @param userId   {@link Long} -current user's id.
+     * @param userId {@link Long} -current user's id.
      * @return {@link Page} of {@link UsersFriendDto} instances.
      */
     @Query(nativeQuery = true, value = "select * FROM public.fn_recommended_friends ( :userId )")
@@ -320,15 +319,16 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Method that finds top 6 user's recommended friends.
      *
-     * @param userId {@link Long} -current user's id.
-     * @return {@link List} of {@link User} instances.
+     * @param pageable {@link Pageable}.
+     * @param userId   {@link Long} - current user's id.
+     * @return {@link Page} of {@link UsersFriendDto} instances.
      */
     @Query(nativeQuery = true, value = "select * from users u where u.id not in "
         + "((select friend_id from users_friends where user_id = :userId) "
         + "union (select user_id from users_friends where friend_id = :userId) "
         + "union (select :userId)) "
-        + "order by u.rating desc limit 6")
-    List<UsersFriendDto> findAnyRecommendedFriends(@Param("userId") Long userId);
+        + "order by u.rating desc ")
+    Page<UsersFriendDto> findAnyRecommendedFriends(Pageable pageable, @Param("userId") Long userId);
 
     /**
      * Method that finds user.
