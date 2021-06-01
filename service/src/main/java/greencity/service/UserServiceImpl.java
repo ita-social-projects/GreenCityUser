@@ -210,13 +210,9 @@ public class UserServiceImpl implements UserService {
     public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
         Page<UsersFriendDto> recommendedFriends = userRepo.findUsersRecommendedFriends(pageable, userId);
 
-        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
-        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
-
-        if (recommendedFriends.isEmpty()
-            && amountOfAcquiredHabitsByUserId == 0
-            && amountOfHabitsInProgressByUserId == 0) {
-            recommendedFriends = userRepo.findAnyRecommendedFriends(PageRequest.of(0, 6), userId);
+        if (recommendedFriends.isEmpty()) {
+            List<UsersFriendDto> users = userRepo.findAnyRecommendedFriends(userId);
+            recommendedFriends = new PageImpl<>(users, pageable, users.size());
         }
 
         List<UserAllFriendsDto> recommendedFriendsDtos = modelMapper
