@@ -216,7 +216,11 @@ public class UserServiceImpl implements UserService {
         if (recommendedFriends.isEmpty()
             && amountOfAcquiredHabitsByUserId == 0
             && amountOfHabitsInProgressByUserId == 0) {
-            recommendedFriends = userRepo.findAnyRecommendedFriends(PageRequest.of(0, 6), userId);
+            List<UsersFriendDto> recommendedFriendsList = userRepo.findAnyRecommendedFriends(userId);
+            int start = Math.min((int) pageable.getOffset(), recommendedFriendsList.size());
+            int end = Math.min((start + pageable.getPageSize()), recommendedFriendsList.size());
+            recommendedFriends = new PageImpl<>(recommendedFriendsList.subList(start, end),
+                pageable, recommendedFriendsList.size());
         }
 
         List<UserAllFriendsDto> recommendedFriendsDtos = modelMapper
