@@ -365,4 +365,13 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         + "WHERE U1.user_id =:id GROUP BY U2.user_id Having u2.user_id not in (:id)\n"
         + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n")
     int countOfMutualFriends(Long id);
+
+    /**
+     * This method was created only for testing some functions. We don't need this
+     * method in our application.
+     */
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
+        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId)"
+        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId));")
+    List<User> getAllUserFriendsWithoutStatus(Long userId);
 }
