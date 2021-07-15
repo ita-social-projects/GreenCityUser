@@ -3,7 +3,6 @@ package greencity.security.service;
 import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
-import greencity.dto.achievement.AchievementVO;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.*;
@@ -35,7 +34,6 @@ import io.jsonwebtoken.ExpiredJwtException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +42,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -165,16 +164,18 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     }
 
     private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, achievementService);
+        return getUserAchievements(user, modelMapper, achievementService);
     }
 
     private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, achievementService);
+        return getUserActions(user, modelMapper, achievementService);
     }
 
-    static List<UserAchievement> getUserAchievements(User user,
+    static List<UserAchievement> getUserAchievements(User user, ModelMapper modelMapper,
         AchievementService achievementService) {
-        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
+        List<Achievement> achievementList =
+            modelMapper.map(achievementService.findAll(), new TypeToken<List<Achievement>>() {
+            }.getType());
         return achievementList.stream()
             .map(a -> {
                 UserAchievement userAchievement = new UserAchievement();
@@ -185,8 +186,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .collect(Collectors.toList());
     }
 
-    static List<UserAction> getUserActions(User user, AchievementService achievementService) {
-        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
+    static List<UserAction> getUserActions(User user, ModelMapper modelMapper,
+        AchievementService achievementService) {
+        List<Achievement> achievementList =
+            modelMapper.map(achievementService.findAll(), new TypeToken<List<Achievement>>() {
+            }.getType());
         return achievementList.stream()
             .map(a -> {
                 UserAction userAction = new UserAction();
@@ -303,20 +307,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         OwnSecurity ownSecurity = managementCreateOwnSecurity(user);
         user.setOwnSecurity(ownSecurity);
         savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey());
-    }
-
-    static List<Achievement> buildAchievementList(List<AchievementVO> achievementVOList) {
-        List<Achievement> achievements = new ArrayList<>();
-        for (AchievementVO achievementVO : achievementVOList) {
-            achievements.add(Achievement.builder()
-                .id(achievementVO.getId())
-                .achievementCategory(AchievementCategory.builder()
-                    .id(achievementVO.getAchievementCategory().getId())
-                    .name(achievementVO.getAchievementCategory().getName())
-                    .build())
-                .build());
-        }
-        return achievements;
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {

@@ -136,11 +136,11 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     }
 
     private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, achievementService);
+        return getUserAchievements(user, modelMapper, achievementService);
     }
 
     private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, achievementService);
+        return getUserActions(user, modelMapper, achievementService);
     }
 
     private SuccessSignInDto getSuccessSignInDto(UserVO user) {
