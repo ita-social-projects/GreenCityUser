@@ -27,6 +27,7 @@ public class UserPasswordValidator implements ConstraintValidator<PasswordValida
 
     @Override
     public void initialize(PasswordValidation constraintAnnotation) {
+        // Initializes the validator in preparation for #isValid calls
     }
 
     @Override
