@@ -15,13 +15,13 @@ import static greencity.constant.ValidationConstants.INVALID_PASSWORD;
 public class OwnRestoreDto {
     @NotBlank
     @Pattern(
-        regexp = "^(?=.*[a-z]+)(?=.*[A-Z]+)(?=.*\\d+)(?=.*[~`!@#$%^&*()+=_\\-{}|:;”’?/<>,.\\]\\[]+).{8,}$",
+        regexp = "^(?=.{0,23}[a-z]+)(?=.{0,23}[A-Z]+)(?=.{0,23}\\d+)(?=.{0,23}[~`!@#$%^&*()+=_\\-{}|:;”’?/<>,.\\]\\[]+).{8,24}$",
         message = INVALID_PASSWORD)
     private String password;
 
     @NotBlank
     @Pattern(
-        regexp = "^(?=.*[a-z]+)(?=.*[A-Z]+)(?=.*\\d+)(?=.*[~`!@#$%^&*()+=_\\-{}|:;”’?/<>,.\\]\\[]+).{8,}$",
+        regexp = "^(?=.{0,23}[a-z]+)(?=.{0,23}[A-Z]+)(?=.{0,23}\\d+)(?=.{0,23}[~`!@#$%^&*()+=_\\-{}|:;”’?/<>,.\\]\\[]+).{8,24}$",
         message = INVALID_PASSWORD)
     private String confirmPassword;
 
