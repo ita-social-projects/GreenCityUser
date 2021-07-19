@@ -55,7 +55,7 @@ class OwnSecurityControllerTest {
         String content = "{\n" +
             "  \"email\": \"test@mail.com\",\n" +
             "  \"name\": \"string\",\n" +
-            "  \"password\": \"Qwerty123=\"\n" +
+            "  \"password\": \"String123=\"\n" +
             "}";
 
         mockMvc.perform(post(LINK + "/signUp?lang=en")
@@ -71,7 +71,7 @@ class OwnSecurityControllerTest {
     void signInTest() throws Exception {
         String content = "{\n" +
             "  \"email\": \"test@mail.com\",\n" +
-            "  \"password\": \"string\"\n" +
+            "  \"password\": \"String-123\"\n" +
             "}";
 
         mockMvc.perform(post(LINK + "/signIn")
@@ -115,12 +115,12 @@ class OwnSecurityControllerTest {
     @Test
     void changePasswordTest() throws Exception {
         String content = "{\n" +
-            "  \"confirmPassword\": \"Qwerty123=\",\n" +
-            "  \"password\": \"Qwerty123=\",\n" +
+            "  \"confirmPassword\": \"String123=\",\n" +
+            "  \"password\": \"String124=\",\n" +
             "  \"token\": \"12345\"\n" +
             "}";
 
-        OwnRestoreDto form = new OwnRestoreDto("Qwerty123=", "Qwerty123=", "12345");
+        OwnRestoreDto form = new OwnRestoreDto("String124=", "String123=", "12345");
 
         mockMvc.perform(post(LINK + "/updatePassword")
             .contentType(MediaType.APPLICATION_JSON)
@@ -136,9 +136,9 @@ class OwnSecurityControllerTest {
         when(principal.getName()).thenReturn("test@mail.com");
 
         String content = "{\n" +
-            "  \"confirmPassword\": \"Qwerty123=\",\n" +
-            "  \"currentPassword\": \"Qwerty123=\",\n" +
-            "  \"password\": \"Qwerty124=\"\n" +
+            "  \"confirmPassword\": \"String123=\",\n" +
+            "  \"currentPassword\": \"String123=\",\n" +
+            "  \"password\": \"String124=\"\n" +
             "}";
 
         mockMvc.perform(put(LINK + "/changePassword")
