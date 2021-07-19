@@ -1,5 +1,6 @@
 package greencity.security.dto.ownsecurity;
 
+import greencity.annotations.PasswordValidation;
 import greencity.constant.ValidationConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,8 +37,6 @@ public class OwnSignUpDto {
     private String email;
 
     @NotBlank
-    @Pattern(
-        regexp = "^(?=.*[a-z]+)(?=.*[A-Z]+)(?=.*\\d+)(?=.*[~`!@#$%^&*()+=_\\-{}|:;”’?/<>,.\\]\\[]+).{8,}$",
-        message = ValidationConstants.INVALID_PASSWORD)
+    @PasswordValidation
     private String password;
 }
