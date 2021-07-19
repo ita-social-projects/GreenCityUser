@@ -31,7 +31,7 @@ class UserPasswordValidatorTest {
         String incorrect4 = "Test-123456";
 
         when(context.buildConstraintViolationWithTemplate(any()))
-                .thenReturn(ModelUtils.getConstraintViolationBuilder());
+            .thenReturn(ModelUtils.getConstraintViolationBuilder());
 
         assertTrue(validator.isValid(correct1, context));
         assertTrue(validator.isValid(correct2, context));

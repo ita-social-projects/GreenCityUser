@@ -9,6 +9,7 @@ public class ModelUtils {
     public static URL getUrl() throws MalformedURLException {
         return new URL(TestConst.SITE);
     }
+
     public static ConstraintValidatorContext.ConstraintViolationBuilder getConstraintViolationBuilder() {
         return new ConstraintValidatorContext.ConstraintViolationBuilder() {
             @Override
@@ -28,8 +29,8 @@ public class ModelUtils {
 
             @Override
             public ContainerElementNodeBuilderCustomizableContext addContainerElementNode(String name,
-                                                                                          Class<?> containerType,
-                                                                                          Integer typeArgumentIndex) {
+                Class<?> containerType,
+                Integer typeArgumentIndex) {
                 return null;
             }
 
