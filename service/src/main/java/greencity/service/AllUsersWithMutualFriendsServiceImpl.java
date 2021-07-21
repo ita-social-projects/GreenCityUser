@@ -26,9 +26,9 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
                 + " FROM users_friends U1\n"
                 + "LEFT JOIN users_friends U2 on U1.friend_id = U2.friend_id\n"
                 + "left join users on users.id = u2.user_id\n"
-                + "WHERE U1.user_id =" + id + " GROUP BY U2.user_id Having u2.user_id not in (" + id + ")\n"
+                + "WHERE U1.user_id = ? GROUP BY U2.user_id Having u2.user_id not in (?)\n"
                 + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n"
-                + "LIMIT " + size + " OFFSET " + offset);
+                + "LIMIT ? OFFSET ?",new Object[] {id,id,size,offset});
             numberOfElements = userRepo.countOfMutualFriends(id);
         } catch (NullPointerException e) {
             throw new NullPointerException();
