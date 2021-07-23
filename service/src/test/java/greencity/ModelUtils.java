@@ -223,4 +223,16 @@ public class ModelUtils {
             .violationDescription("String Description")
             .build();
     }
+
+    public static UserAdminRegistrationDto getUserAdminRegistrationDto() {
+        return UserAdminRegistrationDto.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.BLOCKED)
+            .languageCode("en")
+            .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
+            .build();
+    }
 }

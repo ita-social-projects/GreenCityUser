@@ -132,6 +132,7 @@ public class JwtTool {
      * @return {@link String} of token or null.
      */
     public String getTokenFromHttpServletRequest(HttpServletRequest servletRequest) {
+        String auth = servletRequest.getHeader("Authorization");
         return Optional
             .ofNullable(servletRequest.getHeader("Authorization"))
             .filter(authHeader -> authHeader.startsWith("Bearer "))

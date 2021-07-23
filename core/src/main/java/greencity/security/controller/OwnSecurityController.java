@@ -3,6 +3,7 @@ package greencity.security.controller;
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
 import greencity.constant.HttpStatuses;
+import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
@@ -189,7 +190,8 @@ public class OwnSecurityController {
     @ApiOperation("Updating current password.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = PASSWORD_DOES_NOT_MATCH)
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED)
     })
     @PutMapping("/changePassword")
     public ResponseEntity<Object> updatePassword(@Valid @RequestBody UpdatePasswordDto updateDto,
@@ -203,18 +205,19 @@ public class OwnSecurityController {
      * Register new user from admin panel.
      *
      * @param userDto - dto with info for registering user.
-     * @return - {@link ResponseEntity}
+     * @return - {@link UserAdminRegistrationDto}
      * @author Orest Mamchuk
      */
     @ApiOperation("Register new user.")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 201, message = HttpStatuses.CREATED, response = UserAdminRegistrationDto.class),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PostMapping("/register")
-    public ResponseEntity<Object> managementRegisterUser(@Valid @RequestBody UserManagementDto userDto) {
-        service.managementRegisterUser(userDto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UserAdminRegistrationDto> managementRegisterUser(
+        @Valid @RequestBody UserManagementDto userDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.managementRegisterUser(userDto));
     }
 }

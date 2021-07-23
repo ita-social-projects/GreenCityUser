@@ -1,6 +1,9 @@
 package greencity.security.service;
 
+import greencity.TestConst;
 import greencity.client.RestClient;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -8,15 +11,14 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import greencity.ModelUtils;
 import greencity.client.RestClient;
+import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
+import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
-import greencity.entity.Achievement;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRefreshTokenException;
@@ -38,8 +40,13 @@ import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.logging.ErrorManager;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -126,10 +133,10 @@ class OwnSecurityServiceImplTest {
             .confirmPassword("newPassword")
             .build();
         userManagementDto = UserManagementDto.builder()
-            .name("Tester")
-            .email("test@gmail.com")
+            .name(TestConst.NAME)
+            .email(TestConst.EMAIL)
             .role(Role.ROLE_USER)
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.BLOCKED)
             .build();
     }
 
@@ -309,14 +316,38 @@ class OwnSecurityServiceImplTest {
         when(userService.findByEmail("test@gmail.com")).thenReturn(verifiedUser);
         when(passwordEncoder.matches(updatePasswordDto.getCurrentPassword(),
             verifiedUser.getOwnSecurity().getPassword())).thenReturn(false);
-        assertThrows(PasswordsDoNotMatchesException.class,
+        assertThrows(WrongPasswordException.class,
             () -> ownSecurityService.updateCurrentPassword(updatePasswordDto, "test@gmail.com"));
     }
 
     @Test
     void managementRegisterUserTest() {
+        User user = ModelUtils.getUser();
+        user.setUserStatus(UserStatus.BLOCKED);
+        user.setLanguage(Language.builder().id(2L).code("en").build());
+        user.setDateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47));
+
+        UserAdminRegistrationDto dto = ModelUtils.getUserAdminRegistrationDto();
         when(jwtTool.generateTokenKey()).thenReturn("token-key");
-        ownSecurityService.managementRegisterUser(userManagementDto);
-        verify(emailService).sendApprovalEmail(null, "Tester", "test@gmail.com", "token-key");
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+        when(userRepo.save(any())).thenReturn(user);
+        when(modelMapper.map(user, UserAdminRegistrationDto.class)).thenReturn(dto);
+
+        UserAdminRegistrationDto expected = ownSecurityService.managementRegisterUser(userManagementDto);
+
+        assertEquals(dto, expected);
+
+        verify(restorePasswordEmailRepo, times(1)).save(any());
+        verify(emailService).sendApprovalEmail(1L, TestConst.NAME, TestConst.EMAIL, "token-key");
+    }
+
+    @Test
+    void managementRegisterUserShouldThrowUserAlreadyRegisteredException() {
+        when(userRepo.findByEmail(any())).thenReturn(Optional.of(ModelUtils.getUser()));
+
+        Exception thrown = assertThrows(UserAlreadyRegisteredException.class,
+            () -> ownSecurityService.managementRegisterUser(userManagementDto));
+
+        assertEquals(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL, thrown.getMessage());
     }
 }
