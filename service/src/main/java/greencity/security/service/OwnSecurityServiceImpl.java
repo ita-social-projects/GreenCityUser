@@ -4,6 +4,7 @@ import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
+import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.*;
@@ -298,10 +299,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     public void updateCurrentPassword(UpdatePasswordDto updatePasswordDto, String email) {
         UserVO user = userService.findByEmail(email);
         if (!updatePasswordDto.getPassword().equals(updatePasswordDto.getConfirmPassword())) {
-            throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORDS_DO_NOT_MATCHES);
+            throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
         if (!passwordEncoder.matches(updatePasswordDto.getCurrentPassword(), user.getOwnSecurity().getPassword())) {
-            throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORD_DOES_NOT_MATCH);
+            throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
         }
         updatePassword(updatePasswordDto.getPassword(), user.getId());
     }
@@ -311,11 +312,15 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Transactional
     @Override
-    public void managementRegisterUser(UserManagementDto dto) {
+    public UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto) {
+        if (userRepo.findByEmail(dto.getEmail()).isPresent()) {
+            throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
+        }
         User user = managementCreateNewRegisteredUser(dto, jwtTool.generateTokenKey());
         OwnSecurity ownSecurity = managementCreateOwnSecurity(user);
         user.setOwnSecurity(ownSecurity);
-        savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey());
+        return modelMapper.map(
+            savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey()), UserAdminRegistrationDto.class);
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
@@ -329,6 +334,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
+            .language(Language.builder()
+                .id(2L)
+                .code("en")
+                .build())
             .build();
     }
 
@@ -376,7 +385,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * @param user  {@link User} - User whose password is to be recovered
      * @param token {@link String} - token for password restoration
      */
-    private void savePasswordRestorationTokenForUser(User user, String token) {
+    private User savePasswordRestorationTokenForUser(User user, String token) {
         RestorePasswordEmail restorePasswordEmail =
             RestorePasswordEmail.builder()
                 .user(user)
@@ -384,8 +393,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 .expiryDate(calculateExpirationDate(expirationTime))
                 .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
-        userService.save(modelMapper.map(user, UserVO.class));
+        user = userRepo.save(user);
         emailService.sendApprovalEmail(user.getId(), user.getName(), user.getEmail(), token);
+        return user;
     }
 
     /**

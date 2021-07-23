@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.ModelUtils;
 import greencity.client.RestClient;
+import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
@@ -44,15 +45,9 @@ import java.util.stream.Collectors;
 
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -749,8 +744,18 @@ class UserServiceImplTest {
         String email = "test@gmail.com";
         user.setEmail(email);
         when(userRepo.findNotDeactivatedByEmail(email)).thenReturn(Optional.of(user));
-        when(modelMapper.map(Optional.of(user), UserVO.class)).thenReturn(userVO);
+        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         assertEquals(Optional.of(userVO), userService.findNotDeactivatedByEmail(email));
+    }
+
+    @Test
+    void findNotDeactivatedByEmailShouldThrowNotFoundException() {
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        Exception thrown = assertThrows(NotFoundException.class,
+            () -> userService.findNotDeactivatedByEmail(anyString()));
+
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL, thrown.getMessage());
     }
 
     @Test

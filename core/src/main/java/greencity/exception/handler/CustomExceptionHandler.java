@@ -258,4 +258,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     private Map<String, Object> getErrorAttributes(WebRequest webRequest) {
         return new HashMap<>(errorAttributes.getErrorAttributes(webRequest, true));
     }
+
+    /**
+     * Method interceptor exception {@link PasswordsDoNotMatchesException}.
+     *
+     * @param ex Exception witch should be intercepted.
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     */
+    @ExceptionHandler(PasswordsDoNotMatchesException.class)
+    public final ResponseEntity<Object> handlePasswordsDoNotMatchesException(PasswordsDoNotMatchesException ex) {
+        ValidationExceptionDto validationExceptionDto =
+            new ValidationExceptionDto(AppConstant.PASSWORD, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
+    }
 }
