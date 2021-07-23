@@ -1,5 +1,6 @@
 package greencity.security.service;
 
+import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
@@ -63,5 +64,5 @@ public interface OwnSecurityService {
      * @param dto a value of {@link UserManagementDto}
      * @author Vasyl Zhovnir
      */
-    void managementRegisterUser(UserManagementDto dto);
+    UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto);
 }

@@ -17,6 +17,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.awt.print.Pageable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,14 @@ import java.util.List;
 @Slf4j
 public class SwaggerConfig {
     private static final String AUTHORIZATION_HEADER = "Authorization";
+    private static final String OWN_SECURITY = "/ownSecurity";
+    private final List<String> pathOwnSecurityPermitAll = List.of(
+        OWN_SECURITY + "/signUp",
+        OWN_SECURITY + "/signIn",
+        OWN_SECURITY + "/verifyEmail",
+        OWN_SECURITY + "/updateAccessToken",
+        OWN_SECURITY + "/restorePassword",
+        OWN_SECURITY + "/updatePassword");
 
     /**
      * Customizing the Docket bean.
@@ -82,6 +91,6 @@ public class SwaggerConfig {
     }
 
     private boolean include(String path) {
-        return !path.startsWith("/ownSecurity");
+        return !pathOwnSecurityPermitAll.contains(path);
     }
 }

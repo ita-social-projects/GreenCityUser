@@ -97,7 +97,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             .findByToken(form.getToken())
             .orElseThrow(() -> new NotFoundException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID));
         if (!form.getPassword().equals(form.getConfirmPassword())) {
-            throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCHES);
+            throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
         UserStatus userStatus = restorePasswordEmail.getUser().getUserStatus();
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {

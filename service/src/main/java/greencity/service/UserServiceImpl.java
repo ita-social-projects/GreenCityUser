@@ -31,6 +31,7 @@ import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
@@ -387,8 +388,10 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public Optional<UserVO> findNotDeactivatedByEmail(String email) {
-        Optional<User> notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email);
+        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVO.class));
     }
 
