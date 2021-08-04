@@ -31,7 +31,6 @@ import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
@@ -1122,5 +1121,13 @@ public class UserServiceImpl implements UserService {
     public UbsCustomerDto findByUUid(String uuid) {
         Optional<User> optionalUser = userRepo.findUserByUuid(uuid);
         return optionalUser.isEmpty() ? null : modelMapper.map(optionalUser.get(), UbsCustomerDto.class);
+    }
+
+    @Override
+    public void markUserAsDeactivated(String uuid) {
+        User user = userRepo.findUserByUuid(uuid).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
+        user.setUserStatus(UserStatus.DEACTIVATED);
+        userRepo.save(user);
     }
 }
