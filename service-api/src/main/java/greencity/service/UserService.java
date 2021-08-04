@@ -14,6 +14,8 @@ import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import java.time.LocalDateTime;
 import java.util.Map;
+
+import org.apache.catalina.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -543,4 +545,11 @@ public interface UserService {
      * @author Struk Nazar
      */
     UbsCustomerDto findByUUid(String uuid);
+
+    /**
+     * Method that mark User Deactivated.
+     *
+     * @author Bratakh Liubomyr
+     */
+    void markUserAsDeactivated(String uuid);
 }

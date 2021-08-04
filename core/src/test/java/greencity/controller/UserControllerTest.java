@@ -6,7 +6,6 @@ import greencity.TestConst;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
-import greencity.dto.PageableDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
@@ -18,13 +17,11 @@ import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.service.UserService;
 import java.security.Principal;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -42,10 +39,11 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -721,4 +719,18 @@ class UserControllerTest {
         verify(userService).findNewFriendByName("test", pageable, 1L);
     }
 
+    @Test
+    void deactivateUser() throws Exception {
+        String uuid = "87df9ad5-6393-441f-8423-8b2e770b01a8";
+        List<String> uuids = List.of("uuid5", "uuid3");
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("test@email.com");
+
+        mockMvc.perform(put(userLink + "/markUserAsDeactivated" + "?uuid=" + uuid)
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(uuids)))
+            .andExpect(status().isOk());
+        verify(userService).markUserAsDeactivated(uuid);
+    }
 }

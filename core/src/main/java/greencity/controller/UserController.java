@@ -1097,4 +1097,25 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK)
             .body(allUsersMutualFriends.findAllUsersWithMutualFriends(userVO.getId(), page, size));
     }
+
+    /**
+     * Method for mark user like DEACTIVATED .
+     *
+     * @param uuid - for found user.
+     *
+     * @author Liubomyr Bratakh.
+     */
+    @ApiOperation(value = "mark user as DEACTIVATED")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+    })
+    @PutMapping("/markUserAsDeactivated")
+    public ResponseEntity<Object> markUserAsDeactivated(
+        @RequestParam @ApiIgnore String uuid) {
+        userService.markUserAsDeactivated(uuid);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
 }

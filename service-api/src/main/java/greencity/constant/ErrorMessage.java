@@ -2,6 +2,7 @@ package greencity.constant;
 
 public final class ErrorMessage {
     public static final String USER_NOT_FOUND_BY_ID = "The user does not exist by this id: ";
+    public static final String USER_NOT_FOUND_BY_UUID = "The user does not exist by this uuid: ";
     public static final String USER_NOT_FOUND_BY_EMAIL = "The user does not exist by this email: ";
     public static final String USER_CANT_UPDATE_HIMSELF = "User can't update yourself";
     public static final String IMPOSSIBLE_UPDATE_USER_STATUS = "Impossible to update status of admin or moderator";

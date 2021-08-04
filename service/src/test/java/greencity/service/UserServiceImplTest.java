@@ -16,6 +16,7 @@ import greencity.entity.UserDeactivationReason;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -1005,4 +1007,22 @@ class UserServiceImplTest {
         assertEquals(ubsCustomerDto, userService.findByUUid(uuid));
     }
 
+    @Test
+    void markUserDeactivated() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        User user = ModelUtils.getUser();
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        user.setUserStatus(DEACTIVATED);
+        when(userRepo.save(user)).thenReturn(user);
+        userService.markUserAsDeactivated(uuid);
+        verify(userRepo).save(user);
+
+    }
+
+    @Test
+    void markUserDeactivatedException() {
+        when(userRepo.findUserByUuid(anyString())).thenThrow(NotFoundException.class);
+        assertThrows(NotFoundException.class,
+            () -> userService.markUserAsDeactivated("444e66e8-8daa-4cb0-8269-a8d856e7dd15"));
+    }
 }
