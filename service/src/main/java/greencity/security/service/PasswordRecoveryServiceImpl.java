@@ -1,6 +1,7 @@
 package greencity.security.service;
 
 import greencity.constant.ErrorMessage;
+import greencity.entity.OwnSecurity;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
 import greencity.enums.UserStatus;
@@ -16,6 +17,8 @@ import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -23,6 +26,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.NoResultException;
 
 /**
  * Service for password recovery functionality. It manages recovery tokens
@@ -177,6 +182,18 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
 
     private void updatePassword(String pass, Long id) {
         String password = passwordEncoder.encode(pass);
-        ownSecurityRepo.updatePassword(password, id);
+        Optional<OwnSecurity> ownSecurity = ownSecurityRepo.findByUserId(id);
+
+        ownSecurity.ifPresentOrElse(s -> {
+            s.setPassword(password);
+            ownSecurityRepo.save(s);
+        }, () -> ownSecurityRepo.save(createOwnSecurity(id, password)));
+    }
+
+    private OwnSecurity createOwnSecurity(Long id, String password) {
+        return OwnSecurity.builder()
+            .password(password)
+            .user(userRepo.findById(id).orElseThrow(NoResultException::new))
+            .build();
     }
 }
