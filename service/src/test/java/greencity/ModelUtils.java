@@ -13,17 +13,13 @@ import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.entity.Achievement;
-import greencity.entity.AchievementCategory;
-import greencity.entity.Language;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.entity.localization.AchievementTranslation;
 import greencity.enums.AchievementStatus;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import greencity.security.dto.ownsecurity.OwnRestoreDto;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -31,6 +27,14 @@ import java.util.Collections;
 import java.util.List;
 
 public class ModelUtils {
+    public static final User TEST_USER = createUser();
+    public static final OwnSecurity TEST_OWN_SECURITY = createOwnSecurity();
+    public static final RestorePasswordEmail TEST_RESTORE_PASSWORD_EMAIL = createRestorePasswordEmail();
+    public static final RestorePasswordEmail TEST_RESTORE_PASSWORD_EMAIL_EXPIRED_TOKEN =
+        createRestorePasswordEmailExpiredToken();
+    public static final OwnRestoreDto TEST_OWN_RESTORE_DTO = createOwnRestoreDto();
+    public static final OwnRestoreDto TEST_OWN_RESTORE_DTO_WRONG = createOwnRestoreDtoWrong();
+
     public static UsersFriendDto usersFriendDto = new UsersFriendDto() {
         @Override
         public Long getId() {
@@ -233,6 +237,54 @@ public class ModelUtils {
             .userStatus(UserStatus.BLOCKED)
             .languageCode("en")
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
+            .build();
+    }
+
+    private static RestorePasswordEmail createRestorePasswordEmailExpiredToken() {
+        return RestorePasswordEmail.builder()
+            .token("test")
+            .id(1L)
+            .user(TEST_USER)
+            .expiryDate(LocalDateTime.now().minusDays(1L))
+            .build();
+    }
+
+    private static OwnRestoreDto createOwnRestoreDtoWrong() {
+        return OwnRestoreDto.builder()
+            .token("test")
+            .password("TestPassword&1")
+            .confirmPassword("TestPassword&2")
+            .build();
+    }
+
+    private static OwnSecurity createOwnSecurity() {
+        return OwnSecurity.builder()
+            .user(TEST_USER)
+            .build();
+    }
+
+    private static User createUser() {
+        return User.builder()
+            .id(2L)
+            .email("test@mail.com")
+            .userStatus(UserStatus.CREATED)
+            .build();
+    }
+
+    private static OwnRestoreDto createOwnRestoreDto() {
+        return OwnRestoreDto.builder()
+            .token("test")
+            .password("TestPassword&1")
+            .confirmPassword("TestPassword&1")
+            .build();
+    }
+
+    private static RestorePasswordEmail createRestorePasswordEmail() {
+        return RestorePasswordEmail.builder()
+            .token("test")
+            .id(1L)
+            .user(TEST_USER)
+            .expiryDate(LocalDateTime.now().plusDays(1L))
             .build();
     }
 }
