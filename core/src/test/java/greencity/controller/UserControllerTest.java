@@ -379,10 +379,10 @@ class UserControllerTest {
     @Test
     void saveTest() throws Exception {
         Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("testmail@gmail.com");
+        when(principal.getName()).thenReturn("testFirstname");
 
         String json = "{\n"
-            + "\t\"firstName\": \"name\",\n"
+            + "\t\"firstName\": \"firstname\",\n"
             + "\t\"city\": \"city\",\n"
             + "\t\"userCredo\": \"credo\",\n"
             + "\t\"socialNetworks\": [],\n"
@@ -405,7 +405,7 @@ class UserControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         UserProfileDtoRequest dto = mapper.readValue(json, UserProfileDtoRequest.class);
 
-        verify(userService).saveUserProfile(dto, "testmail@gmail.com");
+        verify(userService).saveUserProfile(dto, "testFirstname");
     }
 
     @Test
