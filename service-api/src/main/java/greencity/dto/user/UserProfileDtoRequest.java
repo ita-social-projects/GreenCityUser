@@ -4,6 +4,9 @@ import greencity.annotations.ValidSocialNetworkLinks;
 import java.util.List;
 import lombok.*;
 
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -11,6 +14,9 @@ import lombok.*;
 @EqualsAndHashCode
 @Builder
 public class UserProfileDtoRequest {
+    @Size(min = 6, max = 30, message = "firstname must have no less than 6 and no more than 30 special symbols")
+    @Pattern(regexp = "^[a-zA-Z0-9]+",
+        message = "firstname must have no less than 6 and no more than 30 special symbols")
     private String firstName;
     private String city;
     private String userCredo;
