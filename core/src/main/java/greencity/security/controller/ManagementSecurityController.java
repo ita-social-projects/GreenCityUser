@@ -26,6 +26,8 @@ public class ManagementSecurityController {
     private final OwnSecurityService service;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
+    private static final String signInForm = "signInForm";
+    private static final String managementLoginPage = "core/management_login";
 
     /**
      * Constructor.
@@ -45,8 +47,8 @@ public class ManagementSecurityController {
      */
     @GetMapping("/login")
     public String loginPage(Model model) {
-        model.addAttribute("signInForm", new OwnSignInDto());
-        return "core/management_login";
+        model.addAttribute(signInForm, new OwnSignInDto());
+        return managementLoginPage;
     }
 
     /**
@@ -63,24 +65,26 @@ public class ManagementSecurityController {
         }
 
         SuccessSignInDto result;
+        String email = "email";
+        String signInFormEmailError = "signInForm.email";
         try {
             result = service.signIn(dto);
         } catch (WrongEmailException e) {
-            bindingResult.rejectValue("email", "signInForm.email", "Неправильна пошта");
-            model.addAttribute("signInForm", dto);
-            return "core/management_login";
+            bindingResult.rejectValue(email, signInFormEmailError, "Неправильна пошта");
+            model.addAttribute(signInForm, dto);
+            return managementLoginPage;
         } catch (WrongPasswordException e) {
-            bindingResult.rejectValue("password", "signInForm.password", "Неправильний пароль");
-            model.addAttribute("signInForm", dto);
-            return "core/management_login";
+            bindingResult.rejectValue(email, signInFormEmailError, "Неправильний пароль");
+            model.addAttribute(signInForm, dto);
+            return managementLoginPage;
         } catch (EmailNotVerified e) {
-            bindingResult.rejectValue("email", "signInForm.email", "Електронна поште не підтверджена");
-            model.addAttribute("signInForm", dto);
-            return "core/management_login";
+            bindingResult.rejectValue(email, signInFormEmailError, "Електронна поште не підтверджена");
+            model.addAttribute(signInForm, dto);
+            return managementLoginPage;
         } catch (UserDeactivatedException e) {
-            bindingResult.rejectValue("email", "signInForm.email", "Цей користувач деактивований");
-            model.addAttribute("signInForm", dto);
-            return "core/management_login";
+            bindingResult.rejectValue(email, signInFormEmailError, "Цей користувач деактивований");
+            model.addAttribute(signInForm, dto);
+            return managementLoginPage;
         }
 
         return "redirect:" + greenCityServerAddress + "/token?accessToken=" + result.getAccessToken();

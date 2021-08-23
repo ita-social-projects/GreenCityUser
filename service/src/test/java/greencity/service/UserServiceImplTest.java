@@ -755,7 +755,7 @@ class UserServiceImplTest {
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
 
         Exception thrown = assertThrows(NotFoundException.class,
-            () -> userService.findNotDeactivatedByEmail(anyString()));
+            () -> userService.findNotDeactivatedByEmail("test@gmail.com"));
 
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL, thrown.getMessage());
     }

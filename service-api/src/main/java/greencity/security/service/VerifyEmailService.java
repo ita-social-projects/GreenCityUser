@@ -28,5 +28,4 @@ public interface VerifyEmailService {
     /**
      * Deletes email verification tokens that are expired.
      */
-    /* void deleteAllUsersThatDidNotVerifyEmail(); */
 }
