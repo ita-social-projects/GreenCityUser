@@ -29,8 +29,7 @@ public class MultipartBase64ImageMapper extends AbstractConverter<String, Multip
         String imageToConvert = image.substring(image.indexOf(',') + 1);
         File tempFile = new File("tempImage.jpg");
         byte[] imageByte = decodeBase64(imageToConvert);
-        ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);
-        try {
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(imageByte);) {
             BufferedImage bufferedImage = ImageIO.read(bis);
             ImageIO.write(bufferedImage, "png", tempFile);
             FileItem fileItem = new DiskFileItem("mainFile", Files.probeContentType(tempFile.toPath()),
@@ -44,7 +43,7 @@ public class MultipartBase64ImageMapper extends AbstractConverter<String, Multip
         } catch (IOException e) {
             throw new NotSavedException("Cannot convert to BASE64 image");
         } finally {
-            tempFile.delete();
+            tempFile.deleteOnExit();
         }
     }
 }
