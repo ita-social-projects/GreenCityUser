@@ -26,8 +26,8 @@ public class ManagementSecurityController {
     private final OwnSecurityService service;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
-    private final String signInForm = "signInForm";
-    private final String managementLoginPage = "core/management_login";
+    private static final String signInForm = "signInForm";
+    private static final String managementLoginPage = "core/management_login";
 
     /**
      * Constructor.
