@@ -17,7 +17,6 @@
         <jjwt.version>0.9.1</jjwt.version>
         <modelmapper.version>2.3.6</modelmapper.version>
         <mockito-junit-jupiter.version>3.3.3</mockito-junit-jupiter.version>
-        <sonar.sources>src/main/resources</sonar.sources>
     </properties>
 
     <artifactId>core</artifactId>
