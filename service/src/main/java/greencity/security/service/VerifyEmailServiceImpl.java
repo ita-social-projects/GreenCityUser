@@ -61,12 +61,4 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
     public boolean isNotExpired(LocalDateTime emailExpiredDate) {
         return LocalDateTime.now().isBefore(emailExpiredDate);
     }
-
-    /*
-     * @Scheduled(fixedRate = 86400000)
-     * 
-     * @Transactional public void deleteAllUsersThatDidNotVerifyEmail() { int rows =
-     * verifyEmailRepo.deleteAllUsersThatDidNotVerifyEmail(); log.info(rows +
-     * " email verification tokens were deleted."); }
-     */
 }

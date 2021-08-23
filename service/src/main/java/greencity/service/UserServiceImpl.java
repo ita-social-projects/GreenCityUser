@@ -64,7 +64,6 @@ public class UserServiceImpl implements UserService {
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
     private final UserDeactivationRepo userDeactivationRepo;
-    // private final AchievementCalculation achievementCalculation;
     /**
      * Autowired mapper.
      */
