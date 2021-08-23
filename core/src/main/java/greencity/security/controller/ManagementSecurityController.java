@@ -61,7 +61,7 @@ public class ManagementSecurityController {
     public String signIn(@Valid @ModelAttribute("signInForm") OwnSignInDto dto,
         BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            return "core/management_login";
+            return managementLoginPage;
         }
 
         SuccessSignInDto result;
