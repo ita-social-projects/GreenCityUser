@@ -6,14 +6,13 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
+import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
-import greencity.entity.Language;
-import greencity.entity.User;
-import greencity.entity.UserDeactivationReason;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -36,6 +35,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.social.facebook.api.Achievement;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Timestamp;
@@ -44,6 +44,7 @@ import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import static org.junit.jupiter.api.Assertions.*;
@@ -70,7 +71,7 @@ class UserServiceImplTest {
         .id(1L)
         .name("Test Testing")
         .email("test@gmail.com")
-        .role(Role.ROLE_USER)
+        .role(ROLE_USER)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
         .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
@@ -87,7 +88,7 @@ class UserServiceImplTest {
         .id(1L)
         .name("Test Testing")
         .email("test@gmail.com")
-        .role(Role.ROLE_USER)
+        .role(ROLE_USER)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
         .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
@@ -984,7 +985,7 @@ class UserServiceImplTest {
                 .name("vivo")
                 .email("test@ukr.net")
                 .userCredo("Hello")
-                .role(Role.ROLE_USER)
+                .role(ROLE_USER)
                 .userStatus(ACTIVATED)
                 .build();
         List<UserManagementVO> userManagementVOS = Collections.singletonList(userManagementVO);
@@ -1024,5 +1025,46 @@ class UserServiceImplTest {
         when(userRepo.findUserByUuid(anyString())).thenThrow(NotFoundException.class);
         assertThrows(NotFoundException.class,
             () -> userService.markUserAsDeactivated("444e66e8-8daa-4cb0-8269-a8d856e7dd15"));
+    }
+
+    @Test
+    void findUserForAchievementTest() {
+        Long id = 1L;
+        UserVOAchievement userVOAchievement = UserVOAchievement.builder().id(id).build();
+        User user = User.builder().id(id).build();
+        when(userRepo.findUserForAchievement(id)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVOAchievement.class)).thenReturn(userVOAchievement);
+        assertEquals(userVOAchievement, userService.findUserForAchievement(id));
+        verify(userRepo, times(1)).findUserForAchievement(id);
+    }
+
+    @Test
+    void findUserFriendsByUserIdTest() {
+        List<UserManagementDto> newList = new ArrayList<>();
+        when(userService.findUserFriendsByUserId(anyLong())).thenReturn(newList);
+    }
+
+    @Test
+    void createUbsRecordTest() {
+        Long id = 1L;
+        User user = new User();
+        user.setId(1L);
+        when(userRepo.findById(id)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        UbsTableCreationDto actual = UbsTableCreationDto.builder().uuid(user.getUuid()).build();
+        assertEquals(actual, userService.createUbsRecord(userVO));
+    }
+
+    @Test
+    void deleteUserProfilePictureTest() {
+        String email = "test@gmail.com";
+        String picture = "picture";
+        User user = new User();
+        user.setEmail(email);
+        user.setProfilePicturePath(picture);
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        userService.deleteUserProfilePicture(email);
+        assertNull(user.getProfilePicturePath());
     }
 }
