@@ -1040,8 +1040,11 @@ class UserServiceImplTest {
 
     @Test
     void findUserFriendsByUserIdTest() {
-        List<UserManagementDto> newList = new ArrayList<>();
-        when(userService.findUserFriendsByUserId(anyLong())).thenReturn(newList);
+        UserManagementDto user = UserManagementDto.builder().id(1L).build();
+        List<UserManagementDto> friends = new ArrayList<>();
+        friends.add(user);
+        when(userService.findUserFriendsByUserId(anyLong())).thenReturn(friends);
+        assertEquals(userService.findUserFriendsByUserId(anyLong()).size(), 1);
     }
 
     @Test
