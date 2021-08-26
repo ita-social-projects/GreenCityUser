@@ -7,7 +7,6 @@ import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.language.LanguageVO;
-import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
@@ -23,6 +22,7 @@ import greencity.security.dto.ownsecurity.OwnRestoreDto;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,6 +34,9 @@ public class ModelUtils {
         createRestorePasswordEmailExpiredToken();
     public static final OwnRestoreDto TEST_OWN_RESTORE_DTO = createOwnRestoreDto();
     public static final OwnRestoreDto TEST_OWN_RESTORE_DTO_WRONG = createOwnRestoreDtoWrong();
+    public static final UserProfileStatisticsDto USER_PROFILE_STATISTICS_DTO = createUserProfileStatisticsDto();
+    public static final UserManagementDto CREATE_USER_MANAGER_DTO = createUserManagerDto();
+    public static final List<UserAllFriendsDto> CREATE_USER_ALL_FRIENDS_DTO = createUserAllFriendsDto();
 
     public static UsersFriendDto usersFriendDto = new UsersFriendDto() {
         @Override
@@ -61,6 +64,55 @@ public class ModelUtils {
             return "profile";
         }
     };
+
+    private static UserManagementDto createUserManagerDto() {
+        return UserManagementDto.builder()
+            .id(1L)
+            .name("Martin")
+            .email("martin@gmail.com")
+            .userCredo("credo")
+            .role(Role.ROLE_ADMIN)
+            .userStatus(UserStatus.ACTIVATED).build();
+    }
+
+    private static UserProfileStatisticsDto createUserProfileStatisticsDto() {
+        return UserProfileStatisticsDto.builder()
+            .amountHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER)
+            .amountHabitsAcquired(TestConst.SIMPLE_LONG_NUMBER)
+            .amountWrittenTipsAndTrick(TestConst.SIMPLE_LONG_NUMBER)
+            .amountPublishedNews(TestConst.SIMPLE_LONG_NUMBER)
+            .build();
+    }
+
+    private static List<UserAllFriendsDto> createUserAllFriendsDto() {
+        List<UserAllFriendsDto> list = new ArrayList<>();
+
+        list.add(UserAllFriendsDto.builder()
+            .id(1L)
+            .name("Martin")
+            .city("New-York")
+            .rating(30.00)
+            .mutualFriends(11L)
+            .profilePicture("Picture")
+            .build());
+        list.add(UserAllFriendsDto.builder()
+            .id(1L)
+            .name("Martin")
+            .city("New-York")
+            .rating(30.00)
+            .mutualFriends(11L)
+            .profilePicture("Picture")
+            .build());
+        list.add(UserAllFriendsDto.builder()
+            .id(1L)
+            .name("Martin")
+            .city("New-York")
+            .rating(30.00)
+            .mutualFriends(11L)
+            .profilePicture("Picture")
+            .build());
+        return list;
+    }
 
     public static User getUser() {
         return User.builder()

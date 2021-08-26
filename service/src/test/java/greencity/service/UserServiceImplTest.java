@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.ModelUtils;
+import greencity.TestConst;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
@@ -15,7 +16,6 @@ import greencity.dto.user.*;
 import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
-import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
@@ -35,7 +35,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.social.facebook.api.Achievement;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Timestamp;
@@ -44,6 +43,7 @@ import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
@@ -576,6 +576,65 @@ class UserServiceImplTest {
 
         userService.declineFriendRequest(1L, 2L);
         verify(userRepo).declineFriendRequest(1L, 2L);
+    }
+
+    @Test
+    void geTUserProfileStatistics() {
+        when(restClient.findAmountOfPublishedNews(TestConst.SIMPLE_LONG_NUMBER))
+            .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
+        when(restClient.findAmountOfWrittenTipsAndTrick(TestConst.SIMPLE_LONG_NUMBER))
+            .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
+        when(restClient.findAmountOfAcquiredHabits(TestConst.SIMPLE_LONG_NUMBER))
+            .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
+        when(restClient.findAmountOfHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER))
+            .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
+        userService.getUserProfileStatistics(TestConst.SIMPLE_LONG_NUMBER);
+        assertEquals(ModelUtils.USER_PROFILE_STATISTICS_DTO,
+            userService.getUserProfileStatistics(TestConst.SIMPLE_LONG_NUMBER));
+        assertNotEquals(ModelUtils.USER_PROFILE_STATISTICS_DTO,
+            userService.getUserProfileStatistics(TestConst.SIMPLE_LONG_NUMBER_BAD_VALUE));
+    }
+
+    @Test
+    void searchBy() {
+        Pageable pageable = PageRequest.of(1, 3);
+        user.setUserCredo("credo");
+        Page<User> userPages = new PageImpl<>(List.of(user, user, user), pageable, 3);
+        when(userRepo.searchBy(pageable, "query"))
+            .thenReturn(userPages);
+        when(modelMapper.map(user, UserManagementDto.class)).thenReturn(ModelUtils.CREATE_USER_MANAGER_DTO);
+        List<UserManagementDto> users = userPages.stream()
+            .map(user -> modelMapper.map(user, UserManagementDto.class))
+            .collect(Collectors.toList());
+        PageableAdvancedDto<UserManagementDto> pageableAdvancedDto = new PageableAdvancedDto<>(
+            users,
+            userPages.getTotalElements(),
+            userPages.getPageable().getPageNumber(),
+            userPages.getTotalPages(),
+            userPages.getNumber(),
+            userPages.hasPrevious(),
+            userPages.hasNext(),
+            userPages.isFirst(),
+            userPages.isLast());
+        assertEquals(pageableAdvancedDto, userService.searchBy(pageable, "query"));
+    }
+
+    @Test
+    void testFindNewFriendByName() {
+        Pageable pageable = PageRequest.of(1, 3);
+        user.setUserCredo("credo");
+        Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
+        when(userRepo.findUsersByName("martin", pageable))
+            .thenReturn(pages);
+        when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
+        }.getType()))
+            .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
+        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
+            CREATE_USER_ALL_FRIENDS_DTO,
+            pages.getTotalElements(),
+            pages.getPageable().getPageNumber(),
+            pages.getTotalPages());
+        assertEquals(pageableDto, userService.findNewFriendByName("martin", pageable, 1L));
     }
 
     @Test
