@@ -8,11 +8,13 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import greencity.ModelUtils;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
+import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 
 import greencity.dto.violation.UserViolationMailDto;
+
 import java.util.*;
 import java.util.concurrent.Executors;
 import javax.mail.Session;
@@ -71,6 +73,16 @@ class EmailServiceImplTest {
         categoriesWithPlacesTest.put(testCategory, Arrays.asList(testPlace1, testPlace2));
         service.sendAddedNewPlacesReportEmail(
             Collections.singletonList(placeAuthorDto), categoriesWithPlacesTest, "DAILY");
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendCreatedNewsForAuthorTest() {
+        EcoNewsForSendEmailDto dto = new EcoNewsForSendEmailDto();
+        PlaceAuthorDto placeAuthorDto = new PlaceAuthorDto();
+        placeAuthorDto.setEmail("test@gmail.com");
+        dto.setAuthor(placeAuthorDto);
+        service.sendCreatedNewsForAuthor(dto);
         verify(javaMailSender).createMimeMessage();
     }
 
