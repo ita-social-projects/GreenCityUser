@@ -28,7 +28,7 @@ class UserVOMapperTest {
             .email(expected.getEmail())
             .role(expected.getRole())
             .userCredo(expected.getUserCredo())
-            .firstName(expected.getFirstName())
+            //.firstName(expected.getFirstName())
             .emailNotification(expected.getEmailNotification())
             .userStatus(expected.getUserStatus())
             .rating(expected.getRating())
