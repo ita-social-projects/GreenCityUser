@@ -61,7 +61,7 @@ public class UserVO {
 
     private String profilePicturePath;
 
-    //private String firstName;
+    // private String firstName;
 
     private String city;
 

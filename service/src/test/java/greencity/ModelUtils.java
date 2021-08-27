@@ -155,7 +155,7 @@ public class ModelUtils {
             .email("namesurname1995@gmail.com")
             .role(Role.ROLE_USER)
             .userCredo("save the world")
-            //.firstName("name")
+            // .firstName("name")
             .emailNotification(EmailNotification.MONTHLY)
             .userStatus(UserStatus.ACTIVATED)
             .rating(13.4)
