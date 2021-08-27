@@ -16,8 +16,8 @@ import javax.validation.constraints.Size;
 public class UserProfileDtoRequest {
     @Size(min = 6, max = 30, message = "firstname must have no less than 6 and no more than 30 special symbols")
     @Pattern(regexp = "^[a-zA-Z0-9]+",
-        message = "firstname must have no less than 6 and no more than 30 special symbols")
-    private String firstName;
+        message = "name must have no less than 6 and no more than 30 special symbols")
+    private String name;
     private String city;
     private String userCredo;
     @ValidSocialNetworkLinks
