@@ -44,6 +44,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
+import static greencity.ModelUtils.getUserVO;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
@@ -174,8 +175,9 @@ class UserServiceImplTest {
         List<User> singletonListUsers = Collections.singletonList(user);
         UsersFriendDto usersFriendDto = ModelUtils.usersFriendDto;
         List<UsersFriendDto> singletonList = Collections.singletonList(usersFriendDto);
+        List<UsersFriendDto> list = new ArrayList();
         PageRequest pageRequest = PageRequest.of(0, 1);
-        Page<UsersFriendDto> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
+        Page<UsersFriendDto> page = new PageImpl<>(list, pageRequest, singletonList.size());
         List<UserAllFriendsDto> dtoList =
             Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test"));
         PageableDto<UserAllFriendsDto> pageableDto =
@@ -185,6 +187,7 @@ class UserServiceImplTest {
         }.getType())).thenReturn(dtoList);
         when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
         when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
+        when(userRepo.findAnyRecommendedFriends(userId)).thenReturn(singletonList);
         PageableDto<UserAllFriendsDto> actual = userService.findUsersRecommendedFriends(pageRequest, 1L);
         assertEquals(pageableDto, actual);
     }
@@ -328,6 +331,29 @@ class UserServiceImplTest {
         String email = "email";
 
         assertThrows(WrongEmailException.class, () -> userService.findIdByEmail(email));
+    }
+
+    @Test
+    void findUuIdByEmailTest() {
+        String email = "email";
+        when(userRepo.findUuidByEmail(email)).thenReturn(Optional.of("email"));
+        assertEquals("email", userService.findUuIdByEmail(email));
+    }
+
+    @Test
+    void findUuIdByEmailNotFoundTest() {
+        String email = "email";
+
+        assertThrows(WrongEmailException.class, () -> userService.findUuIdByEmail(email));
+    }
+
+    @Test
+    void findAllTest() {
+        List<UserVO> userVO = List.of(getUserVO(), getUserVO(), getUserVO());
+        when(modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVO>>() {
+        }.getType())).thenReturn(userVO);
+        assertEquals(userVO, userService.findAll());
+
     }
 
     @Test
@@ -1081,9 +1107,9 @@ class UserServiceImplTest {
 
     @Test
     void markUserDeactivatedException() {
-        when(userRepo.findUserByUuid(anyString())).thenThrow(NotFoundException.class);
+        String uuid = "uuid";
         assertThrows(NotFoundException.class,
-            () -> userService.markUserAsDeactivated("444e66e8-8daa-4cb0-8269-a8d856e7dd15"));
+            () -> userService.markUserAsDeactivated(uuid));
     }
 
     @Test
