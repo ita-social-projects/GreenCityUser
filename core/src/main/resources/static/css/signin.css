@@ -47,8 +47,8 @@
     cursor: pointer;
 }
 .gc-img{
-    height: 100%;
-    width: 50%;
+    height: 700px;
+    width: 442px;
     background: url(../img/auth-img.png);
     float:left
 }

@@ -1129,4 +1129,18 @@ public class UserServiceImpl implements UserService {
         user.setUserStatus(UserStatus.DEACTIVATED);
         userRepo.save(user);
     }
+
+    @Override
+    public UserVO findAdminById(Long id) {
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+
+        boolean isAdmin = user.getRole().equals(Role.ROLE_ADMIN);
+
+        if (isAdmin) {
+            return modelMapper.map(user, UserVO.class);
+        }
+
+        throw new LowRoleLevelException("You do not have authorities");
+    }
 }
