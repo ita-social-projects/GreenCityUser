@@ -43,8 +43,7 @@ import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
-import static greencity.ModelUtils.getUserVO;
+import static greencity.ModelUtils.*;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
@@ -1154,5 +1153,23 @@ class UserServiceImplTest {
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         userService.deleteUserProfilePicture(email);
         assertNull(user.getProfilePicturePath());
+    }
+
+    @Test
+    void findAdminByIdTest() {
+        when(userRepo.findById(2L)).thenReturn(Optional.ofNullable(TEST_ADMIN));
+        when(modelMapper.map(TEST_ADMIN, UserVO.class)).thenReturn(TEST_USER_VO);
+
+        UserVO actual = userService.findAdminById(2L);
+
+        assertEquals(TEST_USER_VO, actual);
+    }
+
+    @Test
+    void findAdminByIdThrowsExceptionTest() {
+        when(userRepo.findById(2L)).thenReturn(Optional.ofNullable(TEST_USER));
+
+        assertThrows(LowRoleLevelException.class,
+            () -> userService.findAdminById(2L));
     }
 }
