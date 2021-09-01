@@ -15,7 +15,6 @@ import greencity.enums.UserStatus;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import org.apache.catalina.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -552,4 +551,11 @@ public interface UserService {
      * @author Bratakh Liubomyr
      */
     void markUserAsDeactivated(String uuid);
+
+    /**
+     * Method find user with admin authority.
+     *
+     * @author Ihor Volianskyi
+     */
+    UserVO findAdminById(Long id);
 }

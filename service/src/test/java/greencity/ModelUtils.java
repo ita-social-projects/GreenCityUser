@@ -28,6 +28,8 @@ import java.util.List;
 
 public class ModelUtils {
     public static final User TEST_USER = createUser();
+    public static final User TEST_ADMIN = createAdmin();
+    public static final UserVO TEST_USER_VO = createTestUserVO();
     public static final OwnSecurity TEST_OWN_SECURITY = createOwnSecurity();
     public static final RestorePasswordEmail TEST_RESTORE_PASSWORD_EMAIL = createRestorePasswordEmail();
     public static final RestorePasswordEmail TEST_RESTORE_PASSWORD_EMAIL_EXPIRED_TOKEN =
@@ -320,6 +322,16 @@ public class ModelUtils {
             .id(2L)
             .email("test@mail.com")
             .userStatus(UserStatus.CREATED)
+            .role(Role.ROLE_USER)
+            .build();
+    }
+
+    private static User createAdmin() {
+        return User.builder()
+            .id(2L)
+            .email("test@mail.com")
+            .userStatus(UserStatus.CREATED)
+            .role(Role.ROLE_ADMIN)
             .build();
     }
 
@@ -337,6 +349,15 @@ public class ModelUtils {
             .id(1L)
             .user(TEST_USER)
             .expiryDate(LocalDateTime.now().plusDays(1L))
+            .build();
+    }
+
+    private static UserVO createTestUserVO() {
+        return UserVO.builder()
+            .id(2L)
+            .email("test@mail.com")
+            .userStatus(UserStatus.CREATED)
+            .role(Role.ROLE_ADMIN)
             .build();
     }
 }

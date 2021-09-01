@@ -1,30 +1,29 @@
 package greencity.security.controller;
 
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.*;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.service.OwnSecurityService;
+import greencity.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
+
+import static greencity.ModelUtils.TEST_USER_VO;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @ExtendWith(MockitoExtension.class)
 class ManagementSecurityControllerTest {
@@ -37,6 +36,9 @@ class ManagementSecurityControllerTest {
 
     @Mock
     private OwnSecurityService ownSecurityService;
+
+    @Mock
+    private UserService userService;
 
     @Mock
     BindingResult bindingResult;
@@ -53,6 +55,7 @@ class ManagementSecurityControllerTest {
             .build();
         this.successDto = SuccessSignInDto.builder()
             .accessToken("ejqwsadsdadq")
+            .userId(1L)
             .build();
     }
 
@@ -73,6 +76,7 @@ class ManagementSecurityControllerTest {
     void signIn() throws Exception {
         OwnSignInDto dto = new OwnSignInDto("test@gmail.com", "Vovk@1998");
         when(ownSecurityService.signIn(any())).thenReturn(successDto);
+        when(userService.findAdminById(successDto.getUserId())).thenReturn(TEST_USER_VO);
 
         mockMvc.perform(post(LINK + "/login")
             .flashAttr("signInForm", dto))
@@ -113,6 +117,17 @@ class ManagementSecurityControllerTest {
     void signInUserDeactivated() throws Exception {
         OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998");
         when(ownSecurityService.signIn(any())).thenThrow(UserDeactivatedException.class);
+
+        mockMvc.perform(post(LINK + "/login")
+            .flashAttr("signInForm", dto))
+            .andExpect(view().name("core/management_login"));
+    }
+
+    @Test
+    void signInUserDoNotHaveAuthorities() throws Exception {
+        OwnSignInDto dto = new OwnSignInDto("test@mail.com", "Vovk@1998");
+        when(ownSecurityService.signIn(any())).thenReturn(successDto);
+        when(userService.findAdminById(1L)).thenThrow(LowRoleLevelException.class);
 
         mockMvc.perform(post(LINK + "/login")
             .flashAttr("signInForm", dto))
