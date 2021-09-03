@@ -116,7 +116,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         return User.builder()
             .email(email)
             .name(userName)
-            .firstName(userName)
             .role(Role.ROLE_USER)
             .dateOfRegistration(LocalDateTime.now())
             .lastActivityTime(LocalDateTime.now())
