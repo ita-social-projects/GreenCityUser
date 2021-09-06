@@ -1,13 +1,10 @@
 package greencity.security.controller;
 
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.*;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.service.OwnSecurityService;
-import javax.validation.Valid;
+import greencity.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -19,24 +16,30 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import springfox.documentation.annotations.ApiIgnore;
 
+import javax.validation.Valid;
+
 @Controller
 @ApiIgnore
 @RequestMapping("/management")
 public class ManagementSecurityController {
     private final OwnSecurityService service;
+    private final UserService userService;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
-    private static final String signInForm = "signInForm";
-    private static final String managementLoginPage = "core/management_login";
+    private static final String SIGN_IN_FORM = "signInForm";
+    private static final String MANAGEMENT_LOGIN_PAGE = "core/management_login";
 
     /**
      * Constructor.
      *
-     * @param service - - {@link OwnSecurityService} - service for security logic.
+     * @param service     - - {@link OwnSecurityService} - service for security
+     *                    logic.
+     * @param userService - {@link UserService} - service for User manipulations.
      */
     @Autowired
-    public ManagementSecurityController(OwnSecurityService service) {
+    public ManagementSecurityController(OwnSecurityService service, UserService userService) {
         this.service = service;
+        this.userService = userService;
     }
 
     /**
@@ -47,8 +50,8 @@ public class ManagementSecurityController {
      */
     @GetMapping("/login")
     public String loginPage(Model model) {
-        model.addAttribute(signInForm, new OwnSignInDto());
-        return managementLoginPage;
+        model.addAttribute(SIGN_IN_FORM, new OwnSignInDto());
+        return MANAGEMENT_LOGIN_PAGE;
     }
 
     /**
@@ -61,7 +64,7 @@ public class ManagementSecurityController {
     public String signIn(@Valid @ModelAttribute("signInForm") OwnSignInDto dto,
         BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            return managementLoginPage;
+            return MANAGEMENT_LOGIN_PAGE;
         }
 
         SuccessSignInDto result;
@@ -69,22 +72,28 @@ public class ManagementSecurityController {
         String signInFormEmailError = "signInForm.email";
         try {
             result = service.signIn(dto);
+
+            userService.findAdminById(result.getUserId());
+        } catch (LowRoleLevelException e) {
+            bindingResult.rejectValue(email, signInFormEmailError, "У вас немає прав адміністратора");
+            model.addAttribute(SIGN_IN_FORM, dto);
+            return MANAGEMENT_LOGIN_PAGE;
         } catch (WrongEmailException e) {
             bindingResult.rejectValue(email, signInFormEmailError, "Неправильна пошта");
-            model.addAttribute(signInForm, dto);
-            return managementLoginPage;
+            model.addAttribute(SIGN_IN_FORM, dto);
+            return MANAGEMENT_LOGIN_PAGE;
         } catch (WrongPasswordException e) {
             bindingResult.rejectValue(email, signInFormEmailError, "Неправильний пароль");
-            model.addAttribute(signInForm, dto);
-            return managementLoginPage;
+            model.addAttribute(SIGN_IN_FORM, dto);
+            return MANAGEMENT_LOGIN_PAGE;
         } catch (EmailNotVerified e) {
             bindingResult.rejectValue(email, signInFormEmailError, "Електронна поште не підтверджена");
-            model.addAttribute(signInForm, dto);
-            return managementLoginPage;
+            model.addAttribute(SIGN_IN_FORM, dto);
+            return MANAGEMENT_LOGIN_PAGE;
         } catch (UserDeactivatedException e) {
             bindingResult.rejectValue(email, signInFormEmailError, "Цей користувач деактивований");
-            model.addAttribute(signInForm, dto);
-            return managementLoginPage;
+            model.addAttribute(SIGN_IN_FORM, dto);
+            return MANAGEMENT_LOGIN_PAGE;
         }
 
         return "redirect:" + greenCityServerAddress + "/token?accessToken=" + result.getAccessToken();

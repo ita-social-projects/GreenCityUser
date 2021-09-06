@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class ModelUtils {
+    public static final UserVO TEST_USER_VO = createUserVO();
 
     public static UserVO getUserVO() {
         return UserVO.builder()
@@ -49,5 +50,9 @@ public class ModelUtils {
             .name("string")
             .violationDescription("String Description")
             .build();
+    }
+
+    private static UserVO createUserVO() {
+        return UserVO.builder().email("test@gmail.com").role(Role.ROLE_ADMIN).build();
     }
 }

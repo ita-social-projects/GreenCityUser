@@ -752,7 +752,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        user.setFirstName(userProfileDtoRequest.getFirstName());
+        user.setName(userProfileDtoRequest.getName());
         user.setCity(userProfileDtoRequest.getCity());
         user.setUserCredo(userProfileDtoRequest.getUserCredo());
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
@@ -784,9 +784,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findById(userId)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
-        if (user.getFirstName() == null) {
-            user.setFirstName(user.getName());
-        }
         return modelMapper.map(user, UserProfileDtoResponse.class);
     }
 
@@ -1128,5 +1125,19 @@ public class UserServiceImpl implements UserService {
             () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
         user.setUserStatus(UserStatus.DEACTIVATED);
         userRepo.save(user);
+    }
+
+    @Override
+    public UserVO findAdminById(Long id) {
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+
+        boolean isAdmin = user.getRole().equals(Role.ROLE_ADMIN);
+
+        if (isAdmin) {
+            return modelMapper.map(user, UserVO.class);
+        }
+
+        throw new LowRoleLevelException("You do not have authorities");
     }
 }
