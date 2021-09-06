@@ -1,11 +1,18 @@
 package greencity.controller;
 
+import greencity.annotations.CurrentUser;
+import greencity.constant.HttpStatuses;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.notification.NotificationDto;
+import greencity.dto.user.UserVO;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @RequestMapping("/email")
@@ -84,6 +92,29 @@ public class EmailController {
     @PostMapping("/sendUserViolation")
     public ResponseEntity<Object> sendUserViolation(@RequestBody UserViolationMailDto dto) {
         emailService.sendUserViolationEmail(dto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Sends notification to user on email.
+     *
+     * @param notification {@link NotificationDto} - object with all necessary data
+     *                     for sending notification via email.
+     * @param userVO       {@link UserVO} - object of active user with all necessary
+     *                     data for sending notification via email.
+     * @author Ann Sakhno
+     */
+    @ApiOperation(value = "Send notification to user via email")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @PostMapping("/notification")
+    public ResponseEntity<Object> sendUserNotification(@RequestBody NotificationDto notification,
+        @ApiIgnore @CurrentUser UserVO userVO) {
+        emailService.sendNotificationByEmail(notification, userVO.getEmail());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
