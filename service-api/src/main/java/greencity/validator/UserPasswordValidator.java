@@ -19,9 +19,6 @@ public class UserPasswordValidator implements ConstraintValidator<PasswordValida
             new CharacterRule(EnglishCharacterData.LowerCase, 1),
             new CharacterRule(EnglishCharacterData.Digit, 1),
             new CharacterRule(EnglishCharacterData.Special, 1),
-            new IllegalSequenceRule(EnglishSequenceData.Alphabetical, 5, false),
-            new IllegalSequenceRule(EnglishSequenceData.Numerical, 5, false),
-            new IllegalSequenceRule(EnglishSequenceData.USQwerty, 5, false),
             new WhitespaceRule());
     }
 
