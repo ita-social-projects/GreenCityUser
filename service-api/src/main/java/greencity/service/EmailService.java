@@ -4,6 +4,7 @@ import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
+import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
@@ -117,4 +118,14 @@ public interface EmailService {
      * @author Zakhar Veremchuk.
      */
     void sendUserViolationEmail(UserViolationMailDto dto);
+
+    /**
+     * Method for send notification to user.
+     *
+     * @param notification {@link NotificationDto}-includes all information about
+     *                     notification.
+     * @param email        letter is sent to this email.
+     * @author Ann Sakhno.
+     */
+    void sendNotificationByEmail(NotificationDto notification, String email);
 }
