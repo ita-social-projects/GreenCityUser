@@ -6,6 +6,7 @@ import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
+import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 
@@ -275,5 +276,10 @@ public class EmailServiceImpl implements EmailService {
         log.info(dto.getLanguage());
         String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
         sendEmail(dto.getEmail(), EmailConstants.VIOLATION_EMAIL, template);
+    }
+
+    @Override
+    public void sendNotificationByEmail(NotificationDto notification, String email) {
+        sendEmail(email, notification.getTitle(), notification.getBody());
     }
 }
