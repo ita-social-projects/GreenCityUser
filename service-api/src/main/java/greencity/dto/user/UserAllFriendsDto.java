@@ -14,5 +14,5 @@ public class UserAllFriendsDto {
     private String city;
     private Double rating;
     private Long mutualFriends;
-    private String profilePicture;
+    private String profilePicturePath;
 }
