@@ -374,4 +374,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         + "(SELECT user_id FROM users_friends WHERE friend_id = :userId)"
         + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId));")
     List<User> getAllUserFriendsWithoutStatus(Long userId);
+
+    /**
+     * Method that finds all users except current user and his friends.
+     *
+     * @param pageable {@link Pageable} -current page.
+     * @param userId   {@link Long} -current user's id.
+     * @return {@link User}.
+     */
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id <> :userId AND users.id NOT IN"
+        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 1) ")
+    Page<User> getAllUsersExceptMainUserAndFriends(Pageable pageable, @Param("userId") Long userId);
 }

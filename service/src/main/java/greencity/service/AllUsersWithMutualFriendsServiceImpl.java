@@ -41,7 +41,7 @@ public class AllUsersWithMutualFriendsServiceImpl implements AllUsersMutualFrien
                 .city((String) map.get("city"))
                 .rating((Double) map.get("rating"))
                 .mutualFriends((Long) map.get("mutual_count"))
-                .profilePicture((String) map.get("profile_picture"))
+                .profilePicturePath((String) map.get("profile_picture"))
                 .build());
         }
         int totalPages = (numberOfElements / size) + 1;

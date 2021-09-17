@@ -95,7 +95,7 @@ public class ModelUtils {
             .city("New-York")
             .rating(30.00)
             .mutualFriends(11L)
-            .profilePicture("Picture")
+            .profilePicturePath("Picture")
             .build());
         list.add(UserAllFriendsDto.builder()
             .id(1L)
@@ -103,7 +103,7 @@ public class ModelUtils {
             .city("New-York")
             .rating(30.00)
             .mutualFriends(11L)
-            .profilePicture("Picture")
+            .profilePicturePath("Picture")
             .build());
         list.add(UserAllFriendsDto.builder()
             .id(1L)
@@ -111,7 +111,7 @@ public class ModelUtils {
             .city("New-York")
             .rating(30.00)
             .mutualFriends(11L)
-            .profilePicture("Picture")
+            .profilePicturePath("Picture")
             .build());
         return list;
     }
