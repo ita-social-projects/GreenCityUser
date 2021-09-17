@@ -558,4 +558,11 @@ public interface UserService {
      * @author Ihor Volianskyi
      */
     UserVO findAdminById(Long id);
+
+    /**
+     * Method find all users except current user and his friends.
+     *
+     * @author Stepan Omeliukh
+     */
+    PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId);
 }

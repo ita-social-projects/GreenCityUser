@@ -1064,6 +1064,7 @@ public class UserServiceImpl implements UserService {
         List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
+
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
             ourUsersList.getTotalElements(),
@@ -1139,5 +1140,25 @@ public class UserServiceImpl implements UserService {
         }
 
         throw new LowRoleLevelException("You do not have authorities");
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @return
+     */
+    @Override
+    public PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId) {
+        Page<User> allUsers = userRepo.getAllUsersExceptMainUserAndFriends(pageable, userId);
+        List<UserAllFriendsDto> allFriends = modelMapper
+            .map(allUsers.getContent(),
+                new TypeToken<List<UserAllFriendsDto>>() {
+                }.getType());
+
+        return new PageableDto<>(
+            allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
+            allUsers.getTotalElements(),
+            allUsers.getPageable().getPageNumber(),
+            allUsers.getTotalPages());
     }
 }
