@@ -131,7 +131,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findByEmail",
                 "/user/findIdByEmail",
                 "/user/findById",
-                "user/findByUuId",
+                "/user/findByUuId",
                 "/user/findUuidByEmail",
                 "/user/createUbsRecord")
             .hasAnyRole(USER, ADMIN, MODERATOR)
