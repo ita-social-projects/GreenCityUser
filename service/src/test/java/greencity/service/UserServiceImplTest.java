@@ -649,7 +649,7 @@ class UserServiceImplTest {
         Pageable pageable = PageRequest.of(1, 3);
         user.setUserCredo("credo");
         Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
-        when(userRepo.findUsersByName("martin", pageable, 3L))
+        when(userRepo.findUsersByName("martin", pageable, 1L))
             .thenReturn(pages);
         when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
         }.getType()))
