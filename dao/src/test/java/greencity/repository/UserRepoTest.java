@@ -238,7 +238,7 @@ class UserRepoTest {
     void findUsersByNameTest() {
         Pageable pageable = PageRequest.of(0, 3);
         User user = userRepo.findByEmail("test2@email.com").get();
-        Page<User> expected = userRepo.findUsersByName("SuperTest2", pageable);
+        Page<User> expected = userRepo.findUsersByName("SuperTest2", pageable, 3L);
         assertEquals(user, expected.getContent().get(0));
     }
 

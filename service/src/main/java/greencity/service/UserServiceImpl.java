@@ -1060,7 +1060,24 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id) {
-        Page<User> ourUsersList = userRepo.findUsersByName(name, page);
+        Page<User> ourUsersList = userRepo.findUsersByName(name, page, id);
+        List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
+            new TypeToken<List<UserAllFriendsDto>>() {
+            }.getType());
+
+        return new PageableDto<>(
+            allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
+            ourUsersList.getTotalElements(),
+            ourUsersList.getPageable().getPageNumber(),
+            ourUsersList.getTotalPages());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id) {
+        Page<User> ourUsersList = userRepo.findFriendsByName(name, page, id);
         List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
