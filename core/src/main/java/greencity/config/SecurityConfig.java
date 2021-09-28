@@ -134,6 +134,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{userId}/findAll/friendsWithoutExist/",
                 "/user/findNewFriendsByName",
                 "/user/findFriendByName",
+                "/user/findByUuId",
                 "/user/findUuidByEmail",
                 "/user/createUbsRecord")
             .hasAnyRole(USER, ADMIN, MODERATOR)
