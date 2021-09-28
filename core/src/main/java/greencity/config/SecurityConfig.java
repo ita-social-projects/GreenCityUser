@@ -120,7 +120,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{userId}/sixUserFriends/",
                 "/user/{userId}/profile/",
                 "/user/isOnline/{userId}/",
-                "/user/{userId}/profileStatistics/",
+                "//findFriendByNameuser/{userId}/profileStatistics/",
                 "/user/userAndSixFriendsWithOnlineStatus",
                 "/user/userAndAllFriendsWithOnlineStatus",
                 "/user/{userId}/recommendedFriends/",
@@ -131,6 +131,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findByEmail",
                 "/user/findIdByEmail",
                 "/user/findById",
+                "/user/{userId}/findAll/friendsWithoutExist/",
+                "/user/findNewFriendsByName",
+                "/user/findFriendByName",
                 "/user/findUuidByEmail",
                 "/user/createUbsRecord")
             .hasAnyRole(USER, ADMIN, MODERATOR)

@@ -351,8 +351,19 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Method that finds user by name.
      */
-    @Query(value = "select u from User u where LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))")
-    Page<User> findUsersByName(String name, Pageable page);
+    @Query(nativeQuery = true, value = "select * from users u where u.id <> :userId and \n"
+        + "                            u.name = :name and \n"
+        + "                            u.id not in \n"
+        + "                            (select uf.friend_id from users_friends uf where uf.user_id = :userId)")
+    Page<User> findUsersByName(String name, Pageable page, Long userId);
+
+    /**
+     * Method that finds user by name.
+     */
+    @Query(nativeQuery = true, value = "SELECT * FROM users U\n"
+        + "    LEFT JOIN users_friends F ON U.id = F.friend_id\n"
+        + "WHERE F.user_id = :userId AND U.name = :name AND F.status = 1")
+    Page<User> findFriendsByName(String name, Pageable page, Long userId);
 
     /**
      * Method that returns count of mutual friends.
@@ -383,6 +394,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return {@link User}.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id <> :userId AND users.id NOT IN"
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 1) ")
+        + "(SELECT friend_id FROM users_friends WHERE user_id = :userId)")
     Page<User> getAllUsersExceptMainUserAndFriends(Pageable pageable, @Param("userId") Long userId);
 }

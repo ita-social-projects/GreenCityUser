@@ -435,6 +435,13 @@ public interface UserService {
     PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id);
 
     /**
+     * Method that finds friends by name.
+     *
+     * @return {@link List} of {@link UserAllFriendsDto} instances.
+     */
+    PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id);
+
+    /**
      * Method that finds user's recommended friends.
      *
      * @param pageable {@link Pageable}.
