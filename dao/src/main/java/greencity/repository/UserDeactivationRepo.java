@@ -12,7 +12,8 @@ public interface UserDeactivationRepo extends JpaRepository<UserDeactivationReas
     /**
      * {@inheritDoc}
      */
-    @Query(nativeQuery = true, value = "SELECT * FROM reasons_for_user_deactivation where id_user = :id and"
-        + " date_of_deactivation=(select MAX(date_of_deactivation) from reasons_for_user_deactivation)")
+    @Query(nativeQuery = true,
+        value = "SELECT * FROM reasons_for_user_deactivation where id_user = :id"
+            + "ORDER BY date_of_deactivation DESC LIMIT 1")
     Optional<UserDeactivationReason> getLastDeactivationReasons(Long id);
 }
