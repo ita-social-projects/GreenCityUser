@@ -14,9 +14,8 @@ import javax.validation.constraints.Size;
 @EqualsAndHashCode
 @Builder
 public class UserProfileDtoRequest {
-    @Size(min = 6, max = 30, message = "firstname must have no less than 6 and no more than 30 special symbols")
-    @Pattern(regexp = "[ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'\\s.]{1,30}",
-        message = "name must have no less than 6 and no more than 30 special symbols")
+    @Pattern(regexp = "[ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'\\s.]{4,30}",
+        message = "name must have no less than 4 and no more than 30 special symbols and contains only ЁёІіЇїҐґЄєА-Яа-яA-Za-z-' .")
     private String name;
     private String city;
     private String userCredo;
