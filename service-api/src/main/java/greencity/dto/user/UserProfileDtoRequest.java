@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.*;
 
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,8 +14,9 @@ import javax.validation.constraints.Pattern;
 @EqualsAndHashCode
 @Builder
 public class UserProfileDtoRequest {
+    @Size(min = 4, max = 30, message = "name must have no less than 4 and no more than 30 symbols")
     @Pattern(regexp = "[ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'\\s.]{4,30}",
-        message = "name must have no less than 4 and no more than 30 special symbols and contains only ЁёІіЇїҐґЄєА-Яа-яA-Za-z-' .")
+        message = "name must contain only ЁёІіЇїҐґЄєА-Яа-яA-Za-z-' s.")
     private String name;
     private String city;
     private String userCredo;
