@@ -184,8 +184,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Modifying
     @Query(nativeQuery = true,
-        value = "UPDATE users_friends SET status = 2 "
-            + "WHERE user_id = :friendId AND friend_id = :userId")
+        value = "DELETE FROM users_friends WHERE user_id = :friendId AND friend_id = :userId")
     void declineFriendRequest(Long userId, Long friendId);
 
     /**
@@ -396,4 +395,16 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id <> :userId AND users.id NOT IN"
         + "(SELECT friend_id FROM users_friends WHERE user_id = :userId)")
     Page<User> getAllUsersExceptMainUserAndFriends(Pageable pageable, @Param("userId") Long userId);
+
+    /**
+     * Method, that return status from table user_friends.
+     *
+     * @param userId   - Id of current user
+     * @param friendId - friend Id
+     * @return status
+     * @author Bohdan Melnyk
+     */
+    @Query(nativeQuery = true,
+        value = "SELECT status FROM users_friends WHERE user_id = :userId AND friend_id = :friendId")
+    Integer getStatus(Long userId, Long friendId);
 }

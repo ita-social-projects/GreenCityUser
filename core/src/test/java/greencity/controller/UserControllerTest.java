@@ -337,7 +337,7 @@ class UserControllerTest {
 
     @Test
     void declineFriendRequestTest() throws Exception {
-        mockMvc.perform(post(userLink + "/{userId}/declineFriend/{friendId}", 1, 2))
+        mockMvc.perform(delete(userLink + "/{userId}/declineFriend/{friendId}", 1, 2))
             .andExpect(status().isOk());
 
         verify(userService).declineFriendRequest(1L, 2L);

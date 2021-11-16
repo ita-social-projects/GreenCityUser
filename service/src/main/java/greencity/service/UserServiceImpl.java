@@ -243,6 +243,12 @@ public class UserServiceImpl implements UserService {
         List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
+        for (UserAllFriendsDto friendDto : friendDtos) {
+            friendDto.setFriendStatus(userRepo.getStatus(userId, friendDto.getId()));
+            if (friendDto.getFriendStatus() == null) {
+                friendDto.setFriendStatus(2);
+            }
+        }
         return new PageableDto<>(
             allUsersMutualFriendsMethod(friendDtos),
             friends.getTotalElements(),
