@@ -382,7 +382,7 @@ public class UserController {
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
-    @PostMapping("/{userId}/declineFriend/{friendId}")
+    @DeleteMapping("/{userId}/declineFriend/{friendId}")
     public ResponseEntity<Object> declineFriendRequest(
         @ApiParam("Friend's id. Cannot be empty.") @PathVariable Long friendId,
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
