@@ -166,8 +166,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Modifying
     @Query(nativeQuery = true,
-        value = "INSERT INTO users_friends(user_id, friend_id, status_user, created_date, status_friend) "
-            + "VALUES (:userId, :friendId, 0, CURRENT_TIMESTAMP, 1)")
+        value = "INSERT INTO users_friends(user_id, friend_id, status_user, created_date) "
+            + "VALUES (:userId, :friendId, 0, CURRENT_TIMESTAMP)")
     void addNewFriend(Long userId, Long friendId);
 
     /**
@@ -175,7 +175,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Modifying
     @Query(nativeQuery = true,
-        value = "UPDATE users_friends SET status_user = 1, status_friend = 1 "
+        value = "UPDATE users_friends SET status_user = 1 "
             + "WHERE user_id = :friendId AND friend_id = :userId")
     void acceptFriendRequest(Long userId, Long friendId);
 
