@@ -6,6 +6,7 @@ import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.entity.Language;
 import greencity.entity.UserDeactivationReason;
+import greencity.enums.UserStatusRequest;
 import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -244,10 +245,7 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
         for (UserAllFriendsDto friendDto : friendDtos) {
-            friendDto.setFriendStatus(userRepo.getStatus(userId, friendDto.getId()));
-            if (friendDto.getFriendStatus() == null) {
-                friendDto.setFriendStatus(2);
-            }
+            friendDto.setFriendStatus(UserStatusRequest.FRIEND.toString());
         }
         return new PageableDto<>(
             allUsersMutualFriendsMethod(friendDtos),
@@ -266,6 +264,9 @@ public class UserServiceImpl implements UserService {
         userRepo.acceptFriendRequest(userId, friendId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     private void checkFriendRequest(Long userId, Long friendId) {
         if (userId.equals(friendId)) {
             throw new CheckRepeatingValueException(ErrorMessage.OWN_USER_ID + friendId);
@@ -297,6 +298,9 @@ public class UserServiceImpl implements UserService {
         List<UserAllFriendsDto> friendDtos = modelMapper.map(friendsRequests.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
+        for (UserAllFriendsDto friendDto : friendDtos) {
+            friendDto.setFriendStatus(UserStatusRequest.REQUEST.toString());
+        }
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, friendDtos),
             friendsRequests.getTotalElements(),
@@ -1167,7 +1171,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @return
      */
     @Override
