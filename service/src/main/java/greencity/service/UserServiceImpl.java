@@ -300,9 +300,6 @@ public class UserServiceImpl implements UserService {
             }.getType());
         for (UserAllFriendsDto friendDto : friendDtos) {
             friendDto.setFriendStatus(UserStatusRequest.REQUEST.toString());
-            if (friendDto.getFriendStatus() == "Request") {
-                System.out.println(UserStatusRequest.REQUEST);
-            }
         }
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, friendDtos),
