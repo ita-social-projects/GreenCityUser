@@ -15,5 +15,5 @@ public class UserAllFriendsDto {
     private Double rating;
     private Long mutualFriends;
     private String profilePicturePath;
-    private Integer friendStatus;
+    private String friendStatus;
 }
