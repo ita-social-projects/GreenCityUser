@@ -3,7 +3,9 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
+
 import static greencity.constant.AppConstant.AUTHORIZATION;
+
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
@@ -16,8 +18,10 @@ import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.service.UserService;
+
 import java.security.Principal;
 import java.util.*;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +29,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+
 import static org.mockito.Mockito.*;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -717,6 +723,31 @@ class UserControllerTest {
             .principal(principal)).andExpect(status().isOk());
 
         verify(userService).findNewFriendByName("test", pageable, 1L);
+    }
+
+    @Test
+    void findFriendsByName() throws Exception {
+        int pageNumber = 1;
+        int pageSize = 20;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(TestConst.EMAIL);
+        when(userService.findByEmail(principal.getName())).thenReturn(ModelUtils.getUserVO());
+        mockMvc.perform(get(userLink + "/findFriendByName?page=" + pageNumber + "&name=test")
+            .principal(principal)).andExpect(status().isOk());
+
+        verify(userService).findFriendByName("test", pageable, 1L);
+    }
+
+    @Test
+    void findAllUsersExceptMainUserAndUsersFriend() throws Exception {
+        int pageNumber = 0;
+        int pageSize = 20;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        mockMvc.perform(get(userLink + "/{userId}/findAll/friendsWithoutExist/", 1))
+            .andExpect(status().isOk());
+
+        verify(userService).findAllUsersExceptMainUserAndUsersFriend(pageable, 1L);
     }
 
     @Test
