@@ -5,7 +5,7 @@ CREATE TABLE users_friends(
     PRIMARY KEY (ID),
     USER_ID int NOT NULL,
     FRIEND_ID int NOT NULL,
-    STATUS INT NOT NULL,
+    STATUS VARCHAR NOT NULL,
     CREATED_DATE TIMESTAMP NOT NULL
 );
 
@@ -164,36 +164,34 @@ VALUES (9, '2021-03-31T00:00', 'test9@email.com', 0, 'SuperTest9', '2016-09-29T0
 
 
 INSERT INTO USERS_FRIENDS(user_id, friend_id, status, created_date)
-VALUES (1, 2, 1, '2020-09-10');
+VALUES (1, 2, 'FRIEND', '2020-09-10');
 
 INSERT INTO USERS_FRIENDS(user_id, friend_id, status, created_date)
-VALUES (1, 3, 1, '2020-09-10');
+VALUES (1, 3, 'FRIEND', '2020-09-10');
 
 INSERT INTO users_friends(user_id, friend_id, status, created_date)
-VALUES (1, 4, 1, '2020-09-10 21:00:00+02');
+VALUES (1, 4, 'FRIEND', '2020-09-10 21:00:00+02');
 
 INSERT INTO users_friends(user_id, friend_id, status, created_date)
-VALUES (1, 5, 1, '2020-09-10 21:00:00+02');
+VALUES (1, 5, 'FRIEND', '2020-09-10 21:00:00+02');
 
 INSERT INTO users_friends(user_id, friend_id, status, created_date)
-VALUES (1, 6, 1, '2020-09-10 21:00:00+02');
+VALUES (1, 6, 'FRIEND', '2020-09-10 21:00:00+02');
 
 INSERT INTO users_friends(user_id, friend_id, status, created_date)
-VALUES (1, 7, 1, '2020-09-10 21:00:00+02');
+VALUES (1, 7, 'FRIEND', '2020-09-10 21:00:00+02');
 
 INSERT INTO users_friends(user_id, friend_id, status, created_date)
-VALUES (1, 8, 1, '2020-09-10 21:00:00+02');
+VALUES (1, 8, 'FRIEND', '2020-09-10 21:00:00+02');
 
 
 
 
 INSERT INTO users_friends(user_id, friend_id, status, created_date)
-VALUES (4, 5, 0, '2020-09-10 21:00:00+02');
+VALUES (4, 5, 'REQUEST', '2020-09-10 21:00:00+02');
 
 INSERT INTO users_friends(user_id, friend_id, status, created_date)
-VALUES (5, 4, 0, '2020-09-10 21:00:00+02');
-
-
+VALUES (5, 4, 'REQUEST', '2020-09-10 21:00:00+02');
 
 
 INSERT INTO user_achievements(user_id, achievement_id, achievement_status, notified)

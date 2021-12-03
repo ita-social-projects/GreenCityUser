@@ -178,7 +178,7 @@ class UserServiceImplTest {
         PageRequest pageRequest = PageRequest.of(0, 1);
         Page<UsersFriendDto> page = new PageImpl<>(list, pageRequest, singletonList.size());
         List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", 1));
+            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa"));
         PageableDto<UserAllFriendsDto> pageableDto =
             new PageableDto<>(dtoList, dtoList.size(), 0, 1);
         when(userRepo.findUsersRecommendedFriends(pageRequest, userId)).thenReturn(page);
@@ -205,7 +205,7 @@ class UserServiceImplTest {
         Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
         List<User> list = Collections.singletonList(user);
         List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", 1));
+            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa"));
         PageableDto<UserAllFriendsDto> pageableDto =
             new PageableDto<>(dtoList, dtoList.size(), 0, 1);
         when(userRepo.getAllUserFriends(userId, pageRequest)).thenReturn(page);
@@ -685,7 +685,7 @@ class UserServiceImplTest {
         PageRequest pageRequest = PageRequest.of(0, 1);
         Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
         List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", 1));
+            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa"));
         PageableDto<UserAllFriendsDto> pageableDto =
             new PageableDto<>(dtoList, dtoList.size(), 0, 1);
         when(userRepo.getAllUserFriendRequests(userId, pageRequest)).thenReturn(page);
