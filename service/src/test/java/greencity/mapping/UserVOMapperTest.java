@@ -28,10 +28,8 @@ class UserVOMapperTest {
             .email(expected.getEmail())
             .role(expected.getRole())
             .userCredo(expected.getUserCredo())
-            .firstName(expected.getFirstName())
             .emailNotification(expected.getEmailNotification())
             .userStatus(expected.getUserStatus())
-            .lastVisit(expected.getLastVisit())
             .rating(expected.getRating())
             .verifyEmail(expected.getVerifyEmail() != null ? VerifyEmail.builder()
                 .id(expected.getVerifyEmail().getId())
@@ -88,6 +86,10 @@ class UserVOMapperTest {
                         .build())
                     .build())
                 .collect(Collectors.toList()) : new ArrayList<>())
+            .language(Language.builder()
+                .id(1L)
+                .code("ua")
+                .build())
             .build();
 
         assertEquals(expected, mapper.convert(userToBeConverted));

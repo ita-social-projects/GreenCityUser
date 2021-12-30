@@ -1,29 +1,34 @@
 package greencity.controller;
 
 import greencity.annotations.ApiPageable;
+import greencity.annotations.CurrentUser;
 import greencity.annotations.CurrentUserId;
 import greencity.annotations.ImageValidation;
 import greencity.constant.HttpStatuses;
-import greencity.constant.SwaggerExampleModel;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
+import greencity.service.AllUsersMutualFriends;
+import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.time.LocalDateTime;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -35,7 +40,6 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -44,9 +48,11 @@ import java.util.List;
 @Validated
 public class UserController {
     private final UserService userService;
+    private final EmailService emailService;
+    private final AllUsersMutualFriends allUsersMutualFriends;
 
     /**
-     * The method which update user status. Parameter principal are ignored because
+     * The method which update user statuss. Parameter principal are ignored because
      * Spring automatically provide the Principal object.
      *
      * @param userStatusDto - dto with updated filed.
@@ -58,6 +64,7 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = UserStatus.class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PatchMapping("status")
@@ -82,6 +89,7 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = UserRoleDto.class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PatchMapping("role")
@@ -107,6 +115,7 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = PageableDto.class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @ApiPageable
@@ -125,6 +134,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = RoleDto.class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("roles")
@@ -164,6 +174,7 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = PageableDto.class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @ApiPageable
@@ -184,6 +195,7 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = UserUpdateDto.class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @GetMapping
@@ -203,6 +215,7 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PatchMapping
@@ -213,23 +226,24 @@ public class UserController {
     }
 
     /**
-     * Method returns list of available (not ACTIVE) custom goals for user.
+     * Method returns list of available (not ACTIVE) custom shopping list items for
+     * user.
      *
      * @return {@link ResponseEntity}.
      * @author Vitalii Skolozdra
      */
-    @ApiOperation(value = "Get available custom goals for current user.")
+    @ApiOperation(value = "Get available custom shopping list items for current user.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
-    @GetMapping("/{userId}/customGoals/available")
-    public ResponseEntity<List<CustomGoalResponseDto>> getAvailableCustomGoals(
+    @GetMapping("/{userId}/custom-shopping-list-items/available")
+    public ResponseEntity<List<CustomShoppingListItemResponseDto>> getAvailableCustomShoppingListItems(
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(userService.getAvailableCustomGoals(userId));
+            .body(userService.getAvailableCustomShoppingListItems(userId));
     }
 
     /**
@@ -243,7 +257,6 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = Long.class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
     })
     @GetMapping("/activatedUsersAmount")
     public ResponseEntity<Long> getActivatedUsersAmount() {
@@ -262,17 +275,15 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
-    @PatchMapping(path = "/profilePicture",
-        consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PatchMapping(path = "/profilePicture")
     public ResponseEntity<HttpStatus> updateUserProfilePicture(
-        @ApiParam(value = SwaggerExampleModel.USER_PROFILE_PICTURE_DTO,
-            required = true) @RequestPart UserProfilePictureDto userProfilePictureDto,
+        @ApiParam(value = "pass image as base64") @RequestPart(required = false) String base64,
         @ApiParam(value = "Profile picture") @ImageValidation @RequestPart(required = false) MultipartFile image,
         @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
-        userService.updateUserProfilePicture(image, email, userProfilePictureDto);
+        userService.updateUserProfilePicture(image, email, base64);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -286,7 +297,7 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @PatchMapping(path = "/deleteProfilePicture")
     public ResponseEntity<HttpStatus> deleteUserProfilePicture(
@@ -308,7 +319,7 @@ public class UserController {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @DeleteMapping("/{userId}/userFriend/{friendId}")
     public ResponseEntity<Object> deleteUserFriend(
@@ -329,7 +340,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @PostMapping("/{userId}/userFriend/{friendId}")
     public ResponseEntity<Object> addNewFriend(
@@ -349,7 +360,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @PostMapping("/{userId}/acceptFriend/{friendId}")
     public ResponseEntity<Object> acceptFriendRequest(
@@ -369,9 +380,9 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
-    @PostMapping("/{userId}/declineFriend/{friendId}")
+    @DeleteMapping("/{userId}/declineFriend/{friendId}")
     public ResponseEntity<Object> declineFriendRequest(
         @ApiParam("Friend's id. Cannot be empty.") @PathVariable Long friendId,
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
@@ -389,7 +400,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/{userId}/sixUserFriends/")
     public ResponseEntity<SixFriendsPageResponceDto> getSixFriendsWithTheHighestRating(
@@ -400,7 +411,7 @@ public class UserController {
     }
 
     /**
-     * The method finds {@link RecommendedFriendDto} for the current userId.
+     * The method finds {@link UserAllFriendsDto} for the current userId.
      *
      * @return {@link ResponseEntity}.
      */
@@ -408,16 +419,38 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/{userId}/recommendedFriends/")
     @ApiPageable
-    public ResponseEntity<PageableDto<RecommendedFriendDto>> findUsersRecommendedFriends(
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findUsersRecommendedFriends(
         @ApiIgnore Pageable page,
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(userService.findUsersRecommendedFriends(page, userId));
+    }
+
+    /**
+     * The method finds {@link UserAllFriendsDto} for the current userId.
+     *
+     * @return {@link ResponseEntity}.
+     */
+    @ApiOperation(value = "Find all friends without exist")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/{userId}/findAll/friendsWithoutExist/")
+    @ApiPageable
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findAllUsersExceptMainUserAndUsersFriend(
+        @ApiIgnore Pageable page,
+        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(userService.findAllUsersExceptMainUserAndUsersFriend(page, userId));
     }
 
     /**
@@ -429,11 +462,11 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/{userId}/friendRequests/")
     @ApiPageable
-    public ResponseEntity<PageableDto<RecommendedFriendDto>> getAllUserFriendsRequests(
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> getAllUserFriendsRequests(
         @ApiIgnore Pageable page,
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity
@@ -442,7 +475,7 @@ public class UserController {
     }
 
     /**
-     * The method finds {@link RecommendedFriendDto} for the current userId.
+     * The method finds {@link UserAllFriendsDto} for the current userId.
      *
      * @return {@link ResponseEntity}.
      */
@@ -450,11 +483,11 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/{userId}/findAll/friends/")
     @ApiPageable
-    public ResponseEntity<PageableDto<RecommendedFriendDto>> findAllUsersFriends(
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findAllUsersFriends(
         @ApiIgnore Pageable page,
         @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
         return ResponseEntity
@@ -471,17 +504,16 @@ public class UserController {
      */
     @ApiOperation(value = "Save user profile information")
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = HttpStatuses.CREATED,
-            response = UserProfileDtoResponse.class),
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @PutMapping(path = "/profile")
-    public ResponseEntity<UserProfileDtoResponse> save(
+    public ResponseEntity<String> save(
         @ApiParam(required = true) @RequestBody @Valid UserProfileDtoRequest userProfileDtoRequest,
         @ApiIgnore Principal principal) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-            userService.saveUserProfile(userProfileDtoRequest, principal.getName()));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.saveUserProfile(userProfileDtoRequest,
+            principal.getName()));
     }
 
     /**
@@ -494,7 +526,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/{userId}/profile/")
     public ResponseEntity<UserProfileDtoResponse> getUserProfileInformation(
@@ -514,7 +546,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("isOnline/{userId}/")
     public ResponseEntity<Boolean> checkIfTheUserIsOnline(
@@ -534,7 +566,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/{userId}/profileStatistics/")
     public ResponseEntity<UserProfileStatisticsDto> getUserProfileStatistics(
@@ -580,7 +612,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findByEmail")
     public ResponseEntity<UserVO> findByEmail(@RequestParam String email) {
@@ -597,7 +629,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findById")
     public ResponseEntity<UserVO> findById(@RequestParam Long id) {
@@ -614,7 +646,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findByIdForAchievement")
     public ResponseEntity<UserVOAchievement> findUserForAchievement(@RequestParam Long id) {
@@ -631,6 +663,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/findUserForManagement")
@@ -650,6 +683,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/searchBy")
@@ -666,6 +700,8 @@ public class UserController {
      * @param userDto dto with updated fields.
      * @author Orest Mamchuk
      */
+    @ApiOperation(value = "update UserManagement")
+    @ApiResponses(value = @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED))
     @PutMapping
     public ResponseEntity<Object> updateUserManagement(@RequestBody UserManagementDto userDto) {
         userService.updateUser(userDto);
@@ -682,6 +718,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/findAll")
@@ -699,6 +736,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/{id}/friends")
@@ -709,20 +747,37 @@ public class UserController {
     /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
      *
-     * @return {@link UserVO}.
      * @param email - {@link UserVO}'s email
+     * @return {@link UserVO}.
      * @author Orest Mamchuk
      */
     @ApiOperation(value = "Get find not 'DEACTIVATED' User by email")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedByEmail")
     public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
         return ResponseEntity.status(HttpStatus.OK)
             .body(userService.findNotDeactivatedByEmail(email).orElse(null));
+    }
+
+    /**
+     * Method creates record in ubs table.
+     *
+     * @return {@link UbsTableCreationDto}
+     */
+    @ApiIgnore
+    @ApiOperation(value = "Creates uuid and returns it to ubs microservice.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/createUbsRecord")
+    public ResponseEntity<UbsTableCreationDto> createUbsRecord(
+        @ApiIgnore @CurrentUser UserVO userVO) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.createUbsRecord(userVO));
     }
 
     /**
@@ -735,6 +790,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/findIdByEmail")
@@ -743,22 +799,40 @@ public class UserController {
     }
 
     /**
+     * Get {@link UserVO} uuid by email.
+     *
+     * @return {@link String}.
+     */
+    @ApiOperation(value = "Get User uuid by email")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/findUuidByEmail")
+    public ResponseEntity<String> findUuidByEmail(@RequestParam String email) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findUuIdByEmail(email));
+    }
+
+    /**
      * Update {@link UserVO} Last Activity Time.
      *
-     * @param id of the searched {@link UserVO}.
+     * @param userVO {@link UserVO}.
      * @author Orest Mamchuk
      */
     @ApiOperation(value = "Update User Last Activity Time")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/{id}/updateUserLastActivityTime/{date}")
-    public ResponseEntity<Object> updateUserLastActivityTime(@PathVariable Long id,
+    @PutMapping("/updateUserLastActivityTime/{date}")
+    public ResponseEntity<Object> updateUserLastActivityTime(@ApiIgnore @CurrentUser UserVO userVO,
         @PathVariable(value = "date") @DateTimeFormat(
-            pattern = "yyyy-MM-dd HH:mm:ss.SSSSSS") Date userLastActivityTime) {
-        userService.updateUserLastActivityTime(id, userLastActivityTime);
+            pattern = "yyyy-MM-dd.HH:mm:ss.SSSSSS") LocalDateTime userLastActivityTime) {
+        userService.updateUserLastActivityTime(userVO.getId(), userLastActivityTime);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -766,19 +840,83 @@ public class UserController {
      * Method for setting {@link UserVO}'s status to DEACTIVATED, so the user will
      * not be able to log in into the system.
      *
-     * @param id of the searched {@link UserVO}.
+     * @param id          of the searched {@link UserVO}.
+     * @param userReasons {@link List} of {@link String}.
      * @author Orest Mamchuk
      */
-    @ApiOperation(value = "Deactivate User")
+    @ApiOperation(value = "Deactivate user indicating the list of reasons for deactivation")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @PutMapping("/deactivate")
+    public ResponseEntity<ResponseEntity.BodyBuilder> deactivateUser(@RequestParam Long id,
+        @RequestBody List<String> userReasons) {
+        UserDeactivationReasonDto userDeactivationDto = userService.deactivateUser(id, userReasons);
+        emailService.sendReasonOfDeactivation(userDeactivationDto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Method for getting {@link String} user language.
+     *
+     * @param id of the searched {@link UserVO}.
+     * @return current user language {@link String}.
+     * @author Vlad Pikhotskyi
+     */
+    @ApiOperation(value = "Get the current User language")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/deactivate")
-    public ResponseEntity<Object> deactivateUser(@RequestParam Long id) {
-        userService.deactivateUser(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @GetMapping("/lang")
+    public ResponseEntity<String> getUserLang(@RequestParam Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserLang(id));
+    }
+
+    /**
+     * Method for getting a {@link List} of {@link String} - reasons for
+     * deactivation of the current user.
+     *
+     * @param id        {@link Long} - user's id.
+     * @param adminLang {@link String} - current administrator language.
+     * @return {@link List} of {@link String} - reasons for deactivation of the
+     *         current user.
+     * @author Vlad Pikhotskyi
+     */
+    @ApiOperation(value = "Get list reasons of deactivating the user")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/reasons")
+    public ResponseEntity<List<String>> getReasonsOfDeactivation(
+        @RequestParam("id") Long id, @RequestParam("admin") String adminLang) {
+        List<String> list = userService.getDeactivationReason(id, adminLang);
+        return ResponseEntity.status(HttpStatus.OK).body(list);
+    }
+
+    /**
+     * Method that change user language.
+     *
+     * @param userId     {@link Long } user id
+     * @param languageId {@link Long} language id.
+     */
+    @ApiOperation(value = "Update user language")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @PutMapping("/{userId}/language/{languageId}")
+    public ResponseEntity<Object> setUserLanguage(@PathVariable @CurrentUserId Long userId,
+        @PathVariable Long languageId) {
+        userService.updateUserLanguage(userId, languageId);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -791,11 +929,13 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PutMapping("/activate")
     public ResponseEntity<Object> activateUser(@RequestParam Long id) {
-        userService.setActivatedStatus(id);
+        UserActivationDto userActivationDto = userService.setActivatedStatus(id);
+        emailService.sendMessageOfActivation(userActivationDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -811,6 +951,7 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PutMapping("/deactivateAll")
@@ -828,10 +969,193 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
     })
     @PostMapping()
-    public ResponseEntity<UserVO> saveUser(@RequestBody UserVO userVO) {
+    public ResponseEntity<UserVO> saveUser(@RequestBody @CurrentUser UserVO userVO) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.save(userVO));
+    }
+
+    /**
+     * Method that allow to search users by several values.
+     *
+     * @param pageable    {@link Pageable}
+     * @param userViewDto {@link UserManagementViewDto} - stores values.
+     */
+    @ApiOperation(value = "Search Users")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+    })
+    @PostMapping("/search")
+    public ResponseEntity<PageableAdvancedDto<UserManagementVO>> search(@ApiIgnore Pageable pageable,
+        @RequestBody UserManagementViewDto userViewDto) {
+        PageableAdvancedDto<UserManagementVO> found = userService.search(pageable, userViewDto);
+        return ResponseEntity.status(HttpStatus.OK).body(found);
+    }
+
+    /**
+     * Method that allow search users by their email notification.
+     *
+     * @param emailNotification enum with notification value.
+     * @return {@link List} of {@link UserVO}
+     */
+    @ApiOperation(value = "Search Users by email notification")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+    })
+    @GetMapping("/findAllByEmailNotification")
+    public ResponseEntity<List<UserVO>> findAllByEmailNotification(@RequestParam EmailNotification emailNotification) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllByEmailNotification(emailNotification));
+    }
+
+    /**
+     * Delete from the database users that have status 'DEACTIVATED' and last
+     * visited the site 2 years ago.
+     *
+     * @return number of deleted rows
+     */
+    @ApiOperation(value = "Delete deactivated Users")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+    })
+    @PostMapping("/deleteDeactivatedUsers")
+    public ResponseEntity<Integer> scheduleDeleteDeactivatedUsers() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.scheduleDeleteDeactivatedUsers());
+    }
+
+    /**
+     * Method that find all users' cities.
+     *
+     * @return {@link List} of cities
+     */
+    @ApiOperation(value = "Find all users cities")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+    })
+    @GetMapping("/findAllUsersCities")
+    public ResponseEntity<List<String>> findAllUsersCities() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities());
+    }
+
+    /**
+     * Method that find all registration months.
+     *
+     * @return {@link Map} with months
+     */
+    @ApiOperation(value = "Find registration months")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+    })
+    @GetMapping("/findAllRegistrationMonthsMap")
+    public ResponseEntity<Map<Integer, Long>> findAllRegistrationMonthsMap() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllRegistrationMonthsMap());
+    }
+
+    /**
+     * Method that find new Friends by name.
+     */
+    @ApiOperation(value = "Search new Friends by name")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+    })
+    @GetMapping("/findNewFriendsByName")
+    @ApiPageable
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findNewFriendsByName(
+        @ApiIgnore Pageable page,
+        @RequestParam String name,
+        @ApiIgnore @CurrentUser UserVO userVO) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findNewFriendByName(name, page, userVO.getId()));
+    }
+
+    /**
+     * Method that find new Friends by name.
+     */
+    @ApiOperation(value = "Search Friends by name")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+    })
+    @GetMapping("/findFriendByName")
+    @ApiPageable
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findFriendByName(
+        @ApiIgnore Pageable page,
+        @RequestParam String name,
+        @ApiIgnore @CurrentUser UserVO userVO) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findFriendByName(name, page, userVO.getId()));
+    }
+
+    /**
+     * Get {@link UbsCustomerDto} by uuid.
+     *
+     * @return {@link UbsCustomerDto}.
+     * @author Struk Nazar
+     */
+    @ApiOperation(value = "Get User by Uuid")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/findByUuId")
+    public ResponseEntity<UbsCustomerDto> findByUuId(@RequestParam String uuid) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findByUUid(uuid));
+    }
+
+    /**
+     * Get {@link UserAllFriendsDto} by uuid.
+     *
+     * @return {@link UserAllFriendsDto }.
+     * @author Struk Nazar
+     */
+    @ApiOperation(value = "Get All Users which have mutual friends")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/findNewUsersWithMutualFriends")
+    @ApiPageable
+    public ResponseEntity<PageableDto<UserAllFriendsDto>> findNewFriendsWithMutualFriendsOrdering(
+        @ApiIgnore int page,
+        @ApiIgnore int size,
+        @ApiIgnore @CurrentUser UserVO userVO) {
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(allUsersMutualFriends.findAllUsersWithMutualFriends(userVO.getId(), page, size));
+    }
+
+    /**
+     * Method for mark user like DEACTIVATED .
+     *
+     * @param uuid - for found user.
+     *
+     * @author Liubomyr Bratakh.
+     */
+    @ApiOperation(value = "mark user as DEACTIVATED")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+    })
+    @PutMapping("/markUserAsDeactivated")
+    public ResponseEntity<Object> markUserAsDeactivated(
+        @RequestParam @ApiIgnore String uuid) {
+        userService.markUserAsDeactivated(uuid);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

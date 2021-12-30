@@ -1,6 +1,13 @@
 package greencity.service;
 
-//import greencity.achievement.AchievementCalculation;
+import greencity.constant.UpdateConstants;
+import greencity.dto.UbsCustomerDto;
+import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.*;
+import greencity.entity.Language;
+import greencity.entity.UserDeactivationReason;
+import greencity.enums.UserStatusRequest;
+import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -9,23 +16,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
-import greencity.dto.user.RecommendedFriendDto;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.dto.user.UsersFriendDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
@@ -34,6 +25,9 @@ import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
+import greencity.filters.UserSpecification;
+import greencity.repository.LanguageRepo;
+import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +41,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
@@ -54,7 +49,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-//import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -65,11 +59,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     /**
-     * Autowired repository.
+     * Autowired greencity.repository.
      */
     private final UserRepo userRepo;
     private final RestClient restClient;
-    // private final AchievementCalculation achievementCalculation;
+    private final LanguageRepo languageRepo;
+    private final UserDeactivationRepo userDeactivationRepo;
     /**
      * Autowired mapper.
      */
@@ -208,30 +203,52 @@ public class UserServiceImpl implements UserService {
             }.getType());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public PageableDto<RecommendedFriendDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
-        Page<UsersFriendDto> friends = userRepo.findUsersRecommendedFriends(pageable, userId);
-        List<RecommendedFriendDto> recommendedFriendDtos = friends.get()
-            .map(user -> new RecommendedFriendDto(user.getId(), user.getName(), user.getProfilePicture()))
-            .collect(Collectors.toList());
+    public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
+        Page<UsersFriendDto> recommendedFriends = userRepo.findUsersRecommendedFriends(pageable, userId);
+
+        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
+        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
+
+        if (recommendedFriends.isEmpty()
+            && amountOfAcquiredHabitsByUserId == 0
+            && amountOfHabitsInProgressByUserId == 0) {
+            List<UsersFriendDto> recommendedFriendsList = userRepo.findAnyRecommendedFriends(userId);
+            int start = Math.min((int) pageable.getOffset(), recommendedFriendsList.size());
+            int end = Math.min((start + pageable.getPageSize()), recommendedFriendsList.size());
+            recommendedFriends = new PageImpl<>(recommendedFriendsList.subList(start, end),
+                pageable, recommendedFriendsList.size());
+        }
+
+        List<UserAllFriendsDto> recommendedFriendsDtos = modelMapper
+            .map(recommendedFriends.getContent(),
+                new TypeToken<List<UserAllFriendsDto>>() {
+                }.getType());
+
         return new PageableDto<>(
-            recommendedFriendDtos,
-            friends.getTotalElements(),
-            friends.getPageable().getPageNumber(),
-            friends.getTotalPages());
+            allUsersMutualFriendsRecommendedOrRequest(userId, recommendedFriendsDtos),
+            recommendedFriends.getTotalElements(),
+            recommendedFriends.getPageable().getPageNumber(),
+            recommendedFriends.getTotalPages());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PageableDto<RecommendedFriendDto> findAllUsersFriends(Pageable pageable, Long userId) {
+    public PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId) {
         Page<User> friends = userRepo.getAllUserFriends(userId, pageable);
-        List<RecommendedFriendDto> friendDtos = modelMapper.map(friends.getContent(),
-            new TypeToken<List<RecommendedFriendDto>>() {
+        List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
+            new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
+        for (UserAllFriendsDto friendDto : friendDtos) {
+            friendDto.setFriendStatus(UserStatusRequest.FRIEND.toString());
+        }
         return new PageableDto<>(
-            friendDtos,
+            allUsersMutualFriendsMethod(friendDtos),
             friends.getTotalElements(),
             friends.getPageable().getPageNumber(),
             friends.getTotalPages());
@@ -247,6 +264,9 @@ public class UserServiceImpl implements UserService {
         userRepo.acceptFriendRequest(userId, friendId);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     private void checkFriendRequest(Long userId, Long friendId) {
         if (userId.equals(friendId)) {
             throw new CheckRepeatingValueException(ErrorMessage.OWN_USER_ID + friendId);
@@ -273,13 +293,16 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public PageableDto<RecommendedFriendDto> getAllUserFriendRequests(Long userId, Pageable pageable) {
+    public PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable) {
         Page<User> friendsRequests = userRepo.getAllUserFriendRequests(userId, pageable);
-        List<RecommendedFriendDto> friendDtos = modelMapper.map(friendsRequests.getContent(),
-            new TypeToken<List<RecommendedFriendDto>>() {
+        List<UserAllFriendsDto> friendDtos = modelMapper.map(friendsRequests.getContent(),
+            new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
+        for (UserAllFriendsDto friendDto : friendDtos) {
+            friendDto.setFriendStatus(UserStatusRequest.REQUEST.toString());
+        }
         return new PageableDto<>(
-            friendDtos,
+            allUsersMutualFriendsRecommendedOrRequest(userId, friendDtos),
             friendsRequests.getTotalElements(),
             friendsRequests.getPageable().getPageNumber(),
             friendsRequests.getTotalPages());
@@ -299,8 +322,84 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public PageableAdvancedDto<UserManagementVO> search(Pageable pageable,
+        UserManagementViewDto userManagementViewDto) {
+        Page<User> found = userRepo.findAll(buildSpecification(userManagementViewDto), pageable);
+        return buildPageableAdvanceDtoFromPage(found);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UbsTableCreationDto createUbsRecord(UserVO currentUser) {
+        User user = userRepo.findById(currentUser.getId()).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        String uuid = user.getUuid();
+
+        return UbsTableCreationDto.builder().uuid(uuid).build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private PageableAdvancedDto<UserManagementVO> buildPageableAdvanceDtoFromPage(Page<User> pageTags) {
+        List<UserManagementVO> usersVOs = pageTags.getContent().stream()
+            .map(t -> modelMapper.map(t, UserManagementVO.class))
+            .collect(Collectors.toList());
+
+        return new PageableAdvancedDto<>(
+            usersVOs,
+            pageTags.getTotalElements(), pageTags.getPageable().getPageNumber(),
+            pageTags.getTotalPages(), pageTags.getNumber(),
+            pageTags.hasPrevious(), pageTags.hasNext(),
+            pageTags.isFirst(), pageTags.isLast());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private UserSpecification buildSpecification(UserManagementViewDto userViewDto) {
+        List<SearchCriteria> searchCriteriaList = buildSearchCriteriaList(userViewDto);
+
+        return new UserSpecification(searchCriteriaList);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private List<SearchCriteria> buildSearchCriteriaList(UserManagementViewDto userViewDto) {
+        List<SearchCriteria> searchCriteriaList = new ArrayList<>();
+        setValueIfNotEmpty(searchCriteriaList, "id", userViewDto.getId());
+        setValueIfNotEmpty(searchCriteriaList, "name", userViewDto.getName());
+        setValueIfNotEmpty(searchCriteriaList, "email", userViewDto.getEmail());
+        setValueIfNotEmpty(searchCriteriaList, "userCredo", userViewDto.getUserCredo());
+        setValueIfNotEmpty(searchCriteriaList, "role", userViewDto.getRole());
+        setValueIfNotEmpty(searchCriteriaList, "userStatus", userViewDto.getUserStatus());
+        return searchCriteriaList;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    private void setValueIfNotEmpty(List<SearchCriteria> searchCriteria, String key, String value) {
+        if (!StringUtils.isEmpty(value)) {
+            searchCriteria.add(SearchCriteria.builder()
+                .key(key)
+                .type(key)
+                .value(value)
+                .build());
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
     public Optional<UserVO> findNotDeactivatedByEmail(String email) {
-        Optional<User> notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email);
+        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVO.class));
     }
 
@@ -313,6 +412,16 @@ public class UserServiceImpl implements UserService {
     public Long findIdByEmail(String email) {
         log.info(LogMessage.IN_FIND_ID_BY_EMAIL, email);
         return userRepo.findIdByEmail(email).orElseThrow(
+            () -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String findUuIdByEmail(String email) {
+        log.info(LogMessage.IN_FIND_UUID_BY_EMAIL, email);
+        return userRepo.findUuidByEmail(email).orElseThrow(
             () -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
     }
 
@@ -365,8 +474,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO updateLastVisit(UserVO userVO) {
         UserVO user = findById(userVO.getId());
-        log.info(user.getLastVisit() + "s");
-        userVO.setLastVisit(LocalDateTime.now());
+        log.info(user.getLastActivityTime() + "s");
+        userVO.setLastActivityTime(LocalDateTime.now());
         User updatable = modelMapper.map(userVO, User.class);
         return modelMapper.map(userRepo.save(updatable), UserVO.class);
     }
@@ -460,8 +569,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId) {
-        return restClient.getAllAvailableCustomGoals(userId);
+    public List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId) {
+        return restClient.getAllAvailableCustomShoppingListItems(userId);
     }
 
     /**
@@ -487,24 +596,24 @@ public class UserServiceImpl implements UserService {
     /**
      * Update user profile picture {@link UserVO}.
      *
-     * @param image                 {@link MultipartFile}
-     * @param email                 {@link String} - email of user that need to
-     *                              update.
-     * @param userProfilePictureDto {@link UserProfilePictureDto}
+     * @param image  {@link MultipartFile}
+     * @param email  {@link String} - email of user that need to update.
+     * @param base64 {@link String} - picture in base 64 format.
      * @return {@link UserVO}.
      * @author Marian Datsko
      */
     @Override
     public UserVO updateUserProfilePicture(MultipartFile image, String email,
-        UserProfilePictureDto userProfilePictureDto) {
+        String base64) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        if (userProfilePictureDto.getProfilePicturePath() != null) {
-            image = restClient.convertToMultipartImage(userProfilePictureDto.getProfilePicturePath());
+        if (base64 != null) {
+            image = modelMapper.map(base64, MultipartFile.class);
         }
         if (image != null) {
-            String profilePicturePath = restClient.uploadImage(image);
+            String profilePicturePath;
+            profilePicturePath = restClient.uploadImage(image);
             user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
@@ -649,11 +758,11 @@ public class UserServiceImpl implements UserService {
      * @author Marian Datsko
      */
     @Override
-    public UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String email) {
+    public String saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String email) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        user.setFirstName(userProfileDtoRequest.getFirstName());
+        user.setName(userProfileDtoRequest.getName());
         user.setCity(userProfileDtoRequest.getCity());
         user.setUserCredo(userProfileDtoRequest.getUserCredo());
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
@@ -672,10 +781,7 @@ public class UserServiceImpl implements UserService {
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
         userRepo.save(user);
-        // CompletableFuture.runAsync(() -> achievementCalculation
-        // .calculateAchievement(user.getId(), AchievementType.SETTER,
-        // AchievementCategory.SOCIAL_NETWORK, user.getSocialNetworks().size()));
-        return modelMapper.map(user, UserProfileDtoResponse.class);
+        return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
 
     /**
@@ -688,9 +794,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findById(userId)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
-        if (user.getFirstName() == null) {
-            user.setFirstName(user.getName());
-        }
         return modelMapper.map(user, UserProfileDtoResponse.class);
     }
 
@@ -702,7 +805,7 @@ public class UserServiceImpl implements UserService {
      * @author Yurii Zhurakovskyi
      */
     @Override
-    public void updateUserLastActivityTime(Long userId, Date userLastActivityTime) {
+    public void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime) {
         userRepo.updateUserLastActivityTime(userId, userLastActivityTime);
     }
 
@@ -805,15 +908,89 @@ public class UserServiceImpl implements UserService {
             .build();
     }
 
+    @Override
+    public UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons) {
+        User foundUser =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        foundUser.setUserStatus(UserStatus.DEACTIVATED);
+        userRepo.save(foundUser);
+        String reasons = userReasons.stream().map(Object::toString).collect(Collectors.joining("/"));
+        userDeactivationRepo.save(UserDeactivationReason.builder()
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .reason(reasons)
+            .user(foundUser)
+            .build());
+        return UserDeactivationReasonDto.builder()
+            .email(foundUser.getEmail())
+            .name(foundUser.getName())
+            .deactivationReasons(filterReasons(foundUser.getLanguage().getCode(), reasons))
+            .lang(foundUser.getLanguage().getCode())
+            .build();
+    }
+
     /**
      * {@inheritDoc}
      */
+    @Override
+    public String getUserLang(Long id) {
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        return user.getLanguage().getCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> getDeactivationReason(Long id, String adminLang) {
+        UserDeactivationReason userReason = userDeactivationRepo.getLastDeactivationReasons(id)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DEACTIVATION_REASON_IS_EMPTY));
+        if (adminLang.equals("uk")) {
+            adminLang = "ua";
+        }
+        return filterReasons(adminLang,
+            userReason.getReason());
+    }
+
+    private List<String> filterReasons(String lang, String reasons) {
+        List<String> result = null;
+        List<String> forAll = List.of(reasons.split("/"));
+        if (lang.equals("en")) {
+            result = forAll.stream().filter(s -> s.contains("{en}"))
+                .map(filterEn -> filterEn.replace("{en}", "").trim()).collect(Collectors.toList());
+        }
+        if (lang.equals("ua")) {
+            result = forAll.stream().filter(s -> s.contains("{ua}"))
+                .map(filterEn -> filterEn.replace("{ua}", "").trim()).collect(Collectors.toList());
+        }
+        return result;
+    }
+
     @Transactional
     @Override
-    public void deactivateUser(Long id) {
-        UserVO foundUser = findById(id);
-        foundUser.setUserStatus(UserStatus.DEACTIVATED);
-        userRepo.save(modelMapper.map(foundUser, User.class));
+    public UserActivationDto setActivatedStatus(Long id) {
+        User foundUser =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        foundUser.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(foundUser);
+        return UserActivationDto.builder()
+            .email(foundUser.getEmail())
+            .name(foundUser.getName())
+            .lang(foundUser.getLanguage().getCode())
+            .build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUserLanguage(Long userId, Long languageId) {
+        Language language = languageRepo.findById(languageId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+        user.setLanguage(language);
+        userRepo.save(user);
     }
 
     /**
@@ -824,17 +1001,6 @@ public class UserServiceImpl implements UserService {
     public List<Long> deactivateAllUsers(List<Long> listId) {
         userRepo.deactivateSelectedUsers(listId);
         return listId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Transactional
-    @Override
-    public void setActivatedStatus(Long id) {
-        UserVO foundUser = findById(id);
-        foundUser.setUserStatus(UserStatus.ACTIVATED);
-        userRepo.save(modelMapper.map(foundUser, User.class));
     }
 
     /**
@@ -870,5 +1036,156 @@ public class UserServiceImpl implements UserService {
             page.hasNext(),
             page.isFirst(),
             page.isLast());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
+        return userRepo.findAllByEmailNotification(emailNotification).stream()
+            .map(user -> modelMapper.map(user, UserVO.class))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public int scheduleDeleteDeactivatedUsers() {
+        return userRepo.scheduleDeleteDeactivatedUsers();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<String> findAllUsersCities() {
+        return userRepo.findAllUsersCities();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id) {
+        Page<User> ourUsersList = userRepo.findUsersByName(name, page, id);
+        List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
+            new TypeToken<List<UserAllFriendsDto>>() {
+            }.getType());
+
+        return new PageableDto<>(
+            allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
+            ourUsersList.getTotalElements(),
+            ourUsersList.getPageable().getPageNumber(),
+            ourUsersList.getTotalPages());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id) {
+        Page<User> ourUsersList = userRepo.findFriendsByName(name, page, id);
+        List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
+            new TypeToken<List<UserAllFriendsDto>>() {
+            }.getType());
+
+        return new PageableDto<>(
+            allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
+            ourUsersList.getTotalElements(),
+            ourUsersList.getPageable().getPageNumber(),
+            ourUsersList.getTotalPages());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Map<Integer, Long> findAllRegistrationMonthsMap() {
+        return userRepo.findAllRegistrationMonthsMap();
+    }
+
+    private List<UserAllFriendsDto> allUsersMutualFriendsMethod(List<UserAllFriendsDto> userAllFriends) {
+        for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
+            long mutualFriends = 0;
+            List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
+            for (User friendUser : allFriendsCurrentUser) {
+                for (UserAllFriendsDto user : userAllFriends) {
+                    if (friendUser.getId().equals(user.getId())) {
+                        mutualFriends++;
+                    }
+                }
+            }
+            friendCurrentUser.setMutualFriends(mutualFriends);
+        }
+        return userAllFriends;
+    }
+
+    private List<UserAllFriendsDto> allUsersMutualFriendsRecommendedOrRequest(Long id,
+        List<UserAllFriendsDto> recommendedFriends) {
+        List<User> allUserFriends = userRepo.getAllUserFriends(id);
+        for (UserAllFriendsDto currentFriend : recommendedFriends) {
+            long mutualFriendsCount = 0;
+            List<User> allCurrentUserFriends = userRepo.getAllUserFriends(currentFriend.getId());
+            for (User friendUser : allCurrentUserFriends) {
+                for (User user : allUserFriends) {
+                    if (friendUser.getId().equals(user.getId())) {
+                        mutualFriendsCount++;
+                    }
+                }
+            }
+            currentFriend.setMutualFriends(mutualFriendsCount);
+        }
+        return recommendedFriends;
+    }
+
+    @Override
+    public UbsCustomerDto findByUUid(String uuid) {
+        Optional<User> optionalUser = userRepo.findUserByUuid(uuid);
+        return optionalUser.isEmpty() ? null : modelMapper.map(optionalUser.get(), UbsCustomerDto.class);
+    }
+
+    @Override
+    public void markUserAsDeactivated(String uuid) {
+        User user = userRepo.findUserByUuid(uuid).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
+        user.setUserStatus(UserStatus.DEACTIVATED);
+        userRepo.save(user);
+    }
+
+    @Override
+    public UserVO findAdminById(Long id) {
+        User user = userRepo.findById(id)
+            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+
+        boolean isAdmin = user.getRole().equals(Role.ROLE_ADMIN);
+
+        if (isAdmin) {
+            return modelMapper.map(user, UserVO.class);
+        }
+
+        throw new LowRoleLevelException("You do not have authorities");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    @Override
+    public PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId) {
+        Page<User> allUsers = userRepo.getAllUsersExceptMainUserAndFriends(pageable, userId);
+        List<UserAllFriendsDto> allFriends = modelMapper
+            .map(allUsers.getContent(),
+                new TypeToken<List<UserAllFriendsDto>>() {
+                }.getType());
+
+        return new PageableDto<>(
+            allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
+            allUsers.getTotalElements(),
+            allUsers.getPageable().getPageNumber(),
+            allUsers.getTotalPages());
     }
 }

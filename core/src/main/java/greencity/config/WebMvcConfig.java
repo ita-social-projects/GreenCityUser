@@ -1,7 +1,6 @@
 package greencity.config;
 
 import greencity.converters.UserArgumentResolver;
-import greencity.security.interceptor.UserActivityInterceptor;
 import greencity.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -26,6 +26,16 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private UserService userService;
     @Autowired
     private ModelMapper modelMapper;
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler(
+            "/img/**",
+            "/css/**")
+            .addResourceLocations(
+                "classpath:/static/img/",
+                "classpath:/static/css/");
+    }
 
     /**
      * Method for configuring message source.
@@ -80,7 +90,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new UserActivityInterceptor(userService));
         registry.addInterceptor(localeChangeInterceptor());
     }
 

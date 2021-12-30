@@ -7,6 +7,8 @@ import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
 import greencity.service.UserService;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -85,8 +87,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities."))
             .and()
             .authorizeRequests()
-            .antMatchers("/css/**",
-                "/img/**")
+            .antMatchers("/static/css/**",
+                "/static/img/**")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 "/ownSecurity/verifyEmail",
@@ -99,17 +101,22 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/activatedUsersAmount",
                 "/user/{userId}/habit/assign",
                 "/token",
-                "/socket/**")
+                "/socket/**",
+                "/user/findAllByEmailNotification")
             .permitAll()
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
                 "/ownSecurity/signIn",
-                "/ownSecurity/changePassword")
+                "/ownSecurity/updatePassword",
+                "/email/addEcoNews",
+                "/email/sendReport",
+                "/email/changePlaceStatus",
+                "/email/sendHabitNotification")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 USER_LINK,
-                "/user/goals/habits/{habitId}/shopping-list",
-                "/user/{userId}/customGoals/available",
+                "/user/shopping-list-items/habits/{habitId}/shopping-list",
+                "/user/{userId}/custom-shopping-list-items/available",
                 "/user/{userId}/sixUserFriends/",
                 "/user/{userId}/profile/",
                 "/user/isOnline/{userId}/",
@@ -122,28 +129,37 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findByIdForAchievement",
                 "/user/findNotDeactivatedByEmail",
                 "/user/findByEmail",
-                "/user/findIdByEmail")
+                "/user/findIdByEmail",
+                "/user/findById",
+                "/user/{userId}/findAll/friendsWithoutExist/",
+                "/user/findNewFriendsByName/**",
+                "/user/findFriendByName/**",
+                "/user/findByUuId",
+                "/user/findUuidByEmail",
+                "/user/createUbsRecord")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.POST,
-                "/user/goals",
+                USER_LINK,
+                "/user/shopping-list-items",
                 "/user/{userId}/habit",
                 "/user/{userId}/userFriend/{friendId}",
                 "/user/{userId}/declineFriend/{friendId}",
                 "/user/{userId}/acceptFriend/{friendId}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PUT,
-                "/ownSecurity",
+                "/ownSecurity/changePassword",
                 "/user/profile",
-                "/user/{id}/updateUserLastActivityTime/{date}")
+                "/user/{id}/updateUserLastActivityTime/{date}",
+                "/user/{userId}/language/{languageId}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.PATCH,
-                "/user/goals/{userGoalId}",
+                "/user/shopping-list-items/{userShoppingListItemId}",
                 "/user/profilePicture",
                 "/user/deleteProfilePicture")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.DELETE,
-                "/user/goals/user-goals",
-                "/user/goals",
+                "/user/shopping-list-items/user-shopping-list-items",
+                "/user/shopping-list-items",
                 "/user/{userId}/userFriend/{friendId}")
             .hasAnyRole(USER, ADMIN, MODERATOR)
             .antMatchers(HttpMethod.GET,
@@ -163,11 +179,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 USER_LINK)
             .hasRole(ADMIN)
             .antMatchers(HttpMethod.PATCH,
-                USER_LINK,
                 "/user/status",
                 "/user/role",
                 "/user/update/role")
             .hasRole(ADMIN)
+            .antMatchers(HttpMethod.POST,
+                "/management/login")
+            .not().fullyAuthenticated()
+            .antMatchers(HttpMethod.GET,
+                "/management/login")
+            .permitAll()
+            .antMatchers("/css/**",
+                "/img/**")
+            .permitAll()
             .anyRequest().hasAnyRole(ADMIN);
     }
 
@@ -230,9 +254,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * @param clientId {@link String} - google client id.
      */
     @Bean
-    public GoogleIdTokenVerifier googleIdTokenVerifier(@Value("${google.clientId}") String clientId) {
+    public GoogleIdTokenVerifier googleIdTokenVerifier(@Value("${google.clientId}") String clientId,
+        @Value("${google.clientId.manager}") String managerClientId) {
+        List<String> audience = new ArrayList<>();
+        audience.add(clientId);
+        audience.add(managerClientId);
         return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
-            .setAudience(Collections.singletonList(clientId))
+            .setAudience(audience)
             .build();
     }
 }

@@ -1,16 +1,13 @@
 package greencity.security.service;
 
+import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
+import greencity.dto.achievement.AchievementVO;
+import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
-import greencity.entity.OwnSecurity;
-import greencity.entity.RestorePasswordEmail;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -22,8 +19,6 @@ import greencity.exception.exceptions.UserBlockedException;
 import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
-import greencity.message.UserApprovalMessage;
-import greencity.message.VerifyEmailMessage;
 import greencity.repository.UserRepo;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
@@ -35,28 +30,27 @@ import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.AchievementService;
+import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.security.SecureRandom;
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static greencity.constant.RabbitConstants.SEND_USER_APPROVAL_ROUTING_KEY;
-import static greencity.constant.RabbitConstants.VERIFY_EMAIL_ROUTING_KEY;
 
 /**
  * {@inheritDoc}
@@ -69,15 +63,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTool jwtTool;
     private final Integer expirationTime;
-    private final RabbitTemplate rabbitTemplate;
     private final RestorePasswordEmailRepo restorePasswordEmailRepo;
-    @Value("${messaging.rabbit.email.topic}")
-    private String sendEmailTopic;
     private final ModelMapper modelMapper;
     private final UserRepo userRepo;
     private static final String VALID_PW_CHARS =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final AchievementService achievementService;
+    private final EmailService emailService;
 
     /**
      * Constructor.
@@ -88,21 +80,20 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         PasswordEncoder passwordEncoder,
         JwtTool jwtTool,
         @Value("${verifyEmailTimeHour}") Integer expirationTime,
-        RabbitTemplate rabbitTemplate,
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         ModelMapper modelMapper,
         UserRepo userRepo,
-        AchievementService achievementService) {
+        AchievementService achievementService, EmailService emailService, RestClient restClient) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTool = jwtTool;
         this.expirationTime = expirationTime;
-        this.rabbitTemplate = rabbitTemplate;
         this.restorePasswordEmailRepo = restorePasswordEmailRepo;
         this.modelMapper = modelMapper;
         this.userRepo = userRepo;
         this.achievementService = achievementService;
+        this.emailService = emailService;
     }
 
     /**
@@ -113,7 +104,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     @Transactional
     @Override
     public SuccessSignUpDto signUp(OwnSignUpDto dto, String language) {
-        User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey());
+        User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         OwnSecurity ownSecurity = createOwnSecurity(dto, user);
         VerifyEmail verifyEmail = createVerifyEmail(user, jwtTool.generateTokenKey());
         List<UserAchievement> userAchievementList = createUserAchievements(user);
@@ -122,21 +113,22 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setVerifyEmail(verifyEmail);
         user.setUserAchievements(userAchievementList);
         user.setUserActions(userActionsList);
+        user.setUuid(UUID.randomUUID().toString());
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
-            rabbitTemplate.convertAndSend(
-                sendEmailTopic,
-                VERIFY_EMAIL_ROUTING_KEY,
-                new VerifyEmailMessage(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
-                    savedUser.getVerifyEmail().getToken(), language));
+            emailService.sendVerificationEmail(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
+                savedUser.getVerifyEmail().getToken(), language);
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
+        user.setShowLocation(true);
+        user.setShowEcoPlace(true);
+        user.setShowShoppingList(true);
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
-    private User createNewRegisteredUser(OwnSignUpDto dto, String refreshTokenKey) {
+    private User createNewRegisteredUser(OwnSignUpDto dto, String refreshTokenKey, String language) {
         return User.builder()
             .name(dto.getName())
             .firstName(dto.getName())
@@ -144,10 +136,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .dateOfRegistration(LocalDateTime.now())
             .role(Role.ROLE_USER)
             .refreshTokenKey(refreshTokenKey)
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
+            .language(Language.builder()
+                .id(modelMapper.map(language, Long.class))
+                .build())
             .build();
     }
 
@@ -167,18 +162,15 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     }
 
     private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, modelMapper, achievementService);
+        return getUserAchievements(user, achievementService);
     }
 
     private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, modelMapper, achievementService);
+        return getUserActions(user, achievementService);
     }
 
-    static List<UserAchievement> getUserAchievements(User user, ModelMapper modelMapper,
-        AchievementService achievementService) {
-        List<Achievement> achievementList =
-            modelMapper.map(achievementService.findAll(), new TypeToken<List<Achievement>>() {
-            }.getType());
+    static List<UserAchievement> getUserAchievements(User user, AchievementService achievementService) {
+        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
         return achievementList.stream()
             .map(a -> {
                 UserAchievement userAchievement = new UserAchievement();
@@ -189,11 +181,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .collect(Collectors.toList());
     }
 
-    static List<UserAction> getUserActions(User user, ModelMapper modelMapper,
-        AchievementService achievementService) {
-        List<Achievement> achievementList =
-            modelMapper.map(achievementService.findAll(), new TypeToken<List<Achievement>>() {
-            }.getType());
+    static List<UserAction> getUserActions(User user, AchievementService achievementService) {
+        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
         return achievementList.stream()
             .map(a -> {
                 UserAction userAction = new UserAction();
@@ -202,6 +191,20 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 return userAction;
             })
             .collect(Collectors.toList());
+    }
+
+    static List<Achievement> buildAchievementList(List<AchievementVO> achievementVOList) {
+        List<Achievement> achievements = new ArrayList<>();
+        for (AchievementVO achievementVO : achievementVOList) {
+            achievements.add(Achievement.builder()
+                .id(achievementVO.getId())
+                .achievementCategory(AchievementCategory.builder()
+                    .id(achievementVO.getAchievementCategory().getId())
+                    .name(achievementVO.getAchievementCategory().getName())
+                    .build())
+                .build());
+        }
+        return achievements;
     }
 
     private LocalDateTime calculateExpirationDateTime() {
@@ -292,10 +295,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     public void updateCurrentPassword(UpdatePasswordDto updatePasswordDto, String email) {
         UserVO user = userService.findByEmail(email);
         if (!updatePasswordDto.getPassword().equals(updatePasswordDto.getConfirmPassword())) {
-            throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORDS_DO_NOT_MATCHES);
+            throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
         if (!passwordEncoder.matches(updatePasswordDto.getCurrentPassword(), user.getOwnSecurity().getPassword())) {
-            throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORD_DOES_NOT_MATCH);
+            throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
         }
         updatePassword(updatePasswordDto.getPassword(), user.getId());
     }
@@ -305,11 +308,15 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Transactional
     @Override
-    public void managementRegisterUser(UserManagementDto dto) {
+    public UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto) {
+        if (userRepo.findByEmail(dto.getEmail()).isPresent()) {
+            throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
+        }
         User user = managementCreateNewRegisteredUser(dto, jwtTool.generateTokenKey());
         OwnSecurity ownSecurity = managementCreateOwnSecurity(user);
         user.setOwnSecurity(ownSecurity);
-        savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey());
+        return modelMapper.map(
+            savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey()), UserAdminRegistrationDto.class);
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
@@ -319,10 +326,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .dateOfRegistration(LocalDateTime.now())
             .role(dto.getRole())
             .refreshTokenKey(refreshTokenKey)
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
+            .language(Language.builder()
+                .id(2L)
+                .code("en")
+                .build())
             .build();
     }
 
@@ -370,7 +381,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * @param user  {@link User} - User whose password is to be recovered
      * @param token {@link String} - token for password restoration
      */
-    private void savePasswordRestorationTokenForUser(User user, String token) {
+    private User savePasswordRestorationTokenForUser(User user, String token) {
         RestorePasswordEmail restorePasswordEmail =
             RestorePasswordEmail.builder()
                 .user(user)
@@ -378,12 +389,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 .expiryDate(calculateExpirationDate(expirationTime))
                 .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
-        userService.save(modelMapper.map(user, UserVO.class));
-        rabbitTemplate.convertAndSend(
-            sendEmailTopic,
-            SEND_USER_APPROVAL_ROUTING_KEY,
-            new UserApprovalMessage(user.getId(), user.getName(), user.getEmail(),
-                token));
+        user = userRepo.save(user);
+        emailService.sendApprovalEmail(user.getId(), user.getName(), user.getEmail(), token);
+        return user;
     }
 
     /**

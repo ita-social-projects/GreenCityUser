@@ -1,6 +1,7 @@
 package greencity.dto.user;
 
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.useraction.UserActionVO;
@@ -40,8 +41,6 @@ public class UserVO {
 
     private UserStatus userStatus;
 
-    private LocalDateTime lastVisit;
-
     private VerifyEmailVO verifyEmail;
 
     private Double rating;
@@ -62,8 +61,6 @@ public class UserVO {
 
     private String profilePicturePath;
 
-    private String firstName;
-
     private String city;
 
     private Boolean showLocation;
@@ -75,4 +72,6 @@ public class UserVO {
     private LocalDateTime lastActivityTime;
 
     private List<UserActionVO> userActions = new ArrayList<>();
+
+    private LanguageVO languageVO;
 }

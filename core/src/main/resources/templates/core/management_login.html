@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <title>Management Login Page</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="google-signin-client_id"
+          content="236387301472-5fqure34s5flqp7fl94jiem8todv64d5.apps.googleusercontent.com">
+
+    <link rel="stylesheet" href="../static/css/position.css" th:href="@{/css/position.css}"/>
+    <link rel="stylesheet" th:href="@{/css/header.css}" type="text/css">
+    <link rel="icon" th:href="@{/img/icon.ico}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/position.css}">
+    <link rel="stylesheet" th:href="@{/css/signin.css}">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script>
+        window.onbeforeunload = function(e){
+            gapi.auth2.getAuthInstance().signOut();
+        };
+
+        function onSignIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            console.log("ID: " + profile.getId());
+            console.log('Full Name: ' + profile.getName());
+            console.log('Given Name: ' + profile.getGivenName());
+            console.log('Family Name: ' + profile.getFamilyName());
+            console.log("Image URL: " + profile.getImageUrl());
+            console.log("Email: " + profile.getEmail());
+            console.log("idToken:" + googleUser.getAuthResponse().id_token);
+
+            var id_token = googleUser.getAuthResponse().id_token
+
+            let url = "https://greencity-user.azurewebsites.net/googleSecurity?idToken="+id_token+"&lang=en"
+            fetch(url, {method: 'GET', mode: 'cors'})
+                .then(res => res.json())
+                .then((out) => {
+                    console.log('Fetching response from googleSecurity controller... ', out);
+                    {window.location.replace("https://greencity.azurewebsites.net/token?accessToken="+out.accessToken)}
+                })
+                .catch(err => { throw err });
+
+        }
+    </script>
+</head>
+<body>
+<div id="header" th:insert="core/header"></div>
+
+<div class="container">
+    <div>
+    <div class="gc-img">
+    </div>
+    <div class="form-content">
+        <div style="margin-top: 70px; margin-left: 70px; margin-right: 70px">
+            <div style="font-size: 40px">З поверненням!</div>
+        </div>
+        <div style="font-size: 18px;margin-left: 70px; margin-right: 70px">Будь ласка, внеси свої дані для
+            входу
+        </div>
+        <div class="form-input">
+            <form th:action="@{/management/login}" th:object="${signInForm}" method="post">
+                <fieldset>
+                    <div class="form-group">
+                        <div style="font-size: 12px">Електронна пошта</div>
+                        <input style="height: 50px;width: 350px" class="form-control" placeholder="E-mail"
+                               name="email" th:field="*{email}"
+                               type="text">
+                        <p style="color: #bc0000" th:each="error: ${#fields.errors('email')}"
+                           th:text="${error}">Validation error</p>
+                    </div>
+                    <div class="form-group">
+                        <div style="font-size: 12px">Пароль</div>
+                        <input style="height: 50px;width: 350px" class="form-control" placeholder="Password"
+                               name="password"
+                               th:field="*{password}" type="password" value="">
+                        <p style="color: #bc0000" th:each="error: ${#fields.errors('password')}"
+                           th:text="${error}">Validation error</p>
+                    </div>
+                    <input style="height: 50px;width: 350px; margin-top: 65px;background-color: #13aa57"
+                           class="btn btn-lg btn-success btn-block" type="submit" value="Увійти">
+                </fieldset>
+            </form>
+            <div style="margin-left: 160px;margin-top: 5px;margin-bottom: 5px">або</div>
+
+            <a class="g-signin2" data-onsuccess="onSignIn" style="height: 45px;width: 350px">
+                <div style="height: 45px;width: 350px; background-color: white"
+                     class="btn btn-lg btn-success btn-block">
+                    <div class="google-icon"></div>
+                    <div style="float: left;color: black;margin-left:68px; font-size: 16px">Увійти через
+                        Google
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    </div>
+</div>
+<div id="footer" th:insert="core/footer"></div>
+</div>
+</body>
+</html>

@@ -2,18 +2,22 @@ package greencity.service;
 
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
-import greencity.dto.goal.CustomGoalResponseDto;
+import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import java.time.LocalDateTime;
+import java.util.Map;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +28,39 @@ import java.util.Optional;
  * @version 1.0
  */
 public interface UserService {
+    /**
+     * Find all {@link User}'s with {@link EmailNotification} type.
+     *
+     * @param emailNotification - type of {@link EmailNotification}
+     * @return list of {@link User}'s
+     */
+    List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
+
+    /**
+     * Delete from the database users that have status 'DEACTIVATED' and last
+     * visited the site 2 years ago.
+     *
+     * @return number of deleted rows.
+     */
+    int scheduleDeleteDeactivatedUsers();
+
+    /**
+     * Find and return all cities for all users.
+     *
+     * @return {@link List} of {@link String} of cities
+     **/
+    List<String> findAllUsersCities();
+
+    /**
+     * Find and return all registration months. Runs an SQL Query which is described
+     * in {@link User} under {@link NamedNativeQuery} annotation. Spring Data JPA
+     * can run a named native query that follows the naming convention
+     * {entityClass.repositoryMethodName}.
+     *
+     * @return {@link List} of {@link RegistrationStatisticsDtoResponse}
+     **/
+    Map<Integer, Long> findAllRegistrationMonthsMap();
+
     /**
      * Method that allow you to save new {@link UserVO}.
      *
@@ -80,6 +117,14 @@ public interface UserService {
      * @author Zakhar Skaletskyi
      */
     Long findIdByEmail(String email);
+
+    /**
+     * Find UserVO's uuid by UserVO email.
+     *
+     * @param email - {@link UserVO} email
+     * @return {@link UserVO} uuid
+     */
+    String findUuIdByEmail(String email);
 
     /**
      * Update {@code ROLE} of user.
@@ -190,13 +235,14 @@ public interface UserService {
     int updateUserRefreshToken(String refreshTokenKey, Long id);
 
     /**
-     * Method returns list of available (not ACTIVE) customGoals for user.
+     * Method returns list of available (not ACTIVE) customShoppingListItem for
+     * user.
      *
      * @param userId id of the {@link UserVO} current user.
-     * @return List of {@link CustomGoalResponseDto}
+     * @return List of {@link CustomShoppingListItemResponseDto}
      * @author Bogdan Kuzenko
      */
-    List<CustomGoalResponseDto> getAvailableCustomGoals(Long userId);
+    List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId);
 
     /**
      * Counts all users by user {@link UserStatus} ACTIVATED.
@@ -216,15 +262,14 @@ public interface UserService {
     /**
      * Update user profile picture {@link UserVO}.
      *
-     * @param image                 {@link MultipartFile}
-     * @param email                 {@link String} - email of user that need to
-     *                              update.
-     * @param userProfilePictureDto {@link UserProfilePictureDto}
+     * @param image  {@link MultipartFile}
+     * @param email  {@link String} - email of user that need to update.
+     * @param base64 {@link String} - picture in base 64 format.
      * @return {@link UserVO}.
      * @author Marian Datsko
      */
     UserVO updateUserProfilePicture(MultipartFile image, String email,
-        UserProfilePictureDto userProfilePictureDto);
+        String base64);
 
     /**
      * Delete user profile picture {@link UserVO}.
@@ -282,7 +327,7 @@ public interface UserService {
      *
      * @author Marian Datsko
      */
-    UserProfileDtoResponse saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
+    String saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
 
     /**
      * Updates last activity time for a given user.
@@ -291,7 +336,7 @@ public interface UserService {
      * @param userLastActivityTime - new {@link UserVO}'s last activity time
      * @author Yurii Zhurakovskyi
      */
-    void updateUserLastActivityTime(Long userId, Date userLastActivityTime);
+    void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime);
 
     /**
      * The method checks by id if a {@link UserVO} is online.
@@ -334,14 +379,6 @@ public interface UserService {
     UserAndAllFriendsWithOnlineStatusDto getAllFriendsWithTheOnlineStatus(Long userId, Pageable pageable);
 
     /**
-     * change {@link UserVO}'s status to DEACTIVATED.
-     *
-     * @param id {@link UserVO}'s id
-     * @author Vasyl Zhovnir
-     */
-    void deactivateUser(Long id);
-
-    /**
      * Method deactivates all the {@link UserVO} by list of IDs.
      *
      * @param listId {@link List} of {@link UserVO}s` ids to be deactivated
@@ -356,7 +393,7 @@ public interface UserService {
      * @param id {@link UserVO}'s id
      * @author Vasyl Zhovnir
      */
-    void setActivatedStatus(Long id);
+    UserActivationDto setActivatedStatus(Long id);
 
     /**
      * Method that allow you to find {@link UserVO} by ID and token.
@@ -391,6 +428,20 @@ public interface UserService {
     List<UserManagementDto> findUserFriendsByUserId(Long id);
 
     /**
+     * Method that finds new friends by name.
+     *
+     * @return {@link List} of {@link UserAllFriendsDto} instances.
+     */
+    PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id);
+
+    /**
+     * Method that finds friends by name.
+     *
+     * @return {@link List} of {@link UserAllFriendsDto} instances.
+     */
+    PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id);
+
+    /**
      * Method that finds user's recommended friends.
      *
      * @param pageable {@link Pageable}.
@@ -398,7 +449,7 @@ public interface UserService {
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
 
-    PageableDto<RecommendedFriendDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
+    PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
 
     /**
      * Method that finds all user's friends.
@@ -408,7 +459,7 @@ public interface UserService {
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
 
-    PageableDto<RecommendedFriendDto> findAllUsersFriends(Pageable pageable, Long userId);
+    PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
 
     /**
      * Accept friend request {@link UserVO}.
@@ -433,7 +484,7 @@ public interface UserService {
      * @param userId   {@link Long} -current user's id.
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
-    PageableDto<RecommendedFriendDto> getAllUserFriendRequests(Long userId, Pageable pageable);
+    PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable);
 
     /**
      * Method that finds all friends that send you request.
@@ -442,4 +493,83 @@ public interface UserService {
      * @return {@link List} of {@link UserVO} instances.
      */
     List<UserVO> getAllUserFriendRequests(Long userId);
+
+    /**
+     * {@inheritDoc}
+     */
+    PageableAdvancedDto<UserManagementVO> search(Pageable pageable, UserManagementViewDto userManagementViewDto);
+
+    /**
+     * Creates and returns uuid of current user.
+     *
+     * @param currentUser {@link UserVO} - current user.
+     * @return {@link UbsTableCreationDto} - uuid of current user.
+     */
+    UbsTableCreationDto createUbsRecord(UserVO currentUser);
+
+    /**
+     * change {@link UserVO}'s status to DEACTIVATED.
+     *
+     * @param id          {@link UserVO}'s id
+     * @param userReasons {@link List} of {@link String}.
+     * @author Vasyl Zhovnir
+     */
+    UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons);
+
+    /**
+     * Method for getting a {@link List} of {@link String} - reasons for
+     * deactivation of the current user.
+     *
+     * @param id        {@link Long} - user's id.
+     * @param adminLang {@link String} - current administrator language.
+     * @return {@link List} of {@link String}.
+     * @author Vlad Pikhotskyi
+     */
+    List<String> getDeactivationReason(Long id, String adminLang);
+
+    /**
+     * Method for getting {@link String} user language.
+     *
+     * @param id of the searched {@link UserVO}.
+     * @return current user language {@link String}.
+     * @author Vlad Pikhotskyi
+     */
+    String getUserLang(Long id);
+
+    /**
+     * Method that update user language column.
+     *
+     * @param userId     {@link Long} -current user's id.
+     * @param languageId {@link Long} - language id.
+     */
+    void updateUserLanguage(Long userId, Long languageId);
+
+    /**
+     * Method that return UserVo by UUid.
+     *
+     * @return {@link UserVO}
+     * @author Struk Nazar
+     */
+    UbsCustomerDto findByUUid(String uuid);
+
+    /**
+     * Method that mark User Deactivated.
+     *
+     * @author Bratakh Liubomyr
+     */
+    void markUserAsDeactivated(String uuid);
+
+    /**
+     * Method find user with admin authority.
+     *
+     * @author Ihor Volianskyi
+     */
+    UserVO findAdminById(Long id);
+
+    /**
+     * Method find all users except current user and his friends.
+     *
+     * @author Stepan Omeliukh
+     */
+    PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId);
 }

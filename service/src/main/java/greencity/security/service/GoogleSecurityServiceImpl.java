@@ -2,9 +2,9 @@ package greencity.security.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserVO;
+import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
 import greencity.entity.UserAction;
@@ -17,6 +17,7 @@ import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.AchievementService;
 import greencity.service.UserService;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,7 @@ import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static greencity.constant.AppConstant.GOOGLE_PICTURE;
-import static greencity.constant.AppConstant.USERNAME;
+import static greencity.constant.AppConstant.*;
 import static greencity.security.service.OwnSecurityServiceImpl.getUserAchievements;
 import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 
@@ -53,7 +53,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
      *                              logic.
      * @param jwtTool               {@link JwtTool} - tool for jwt logic.
      * @param googleIdTokenVerifier {@link GoogleIdTokenVerifier} - tool for verify
-     *                              googleIdToken.
      */
     @Autowired
     public GoogleSecurityServiceImpl(UserService userService,
@@ -75,7 +74,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
      */
     @Transactional
     @Override
-    public SuccessSignInDto authenticate(String idToken) {
+    public SuccessSignInDto authenticate(String idToken, String language) {
         try {
             GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
             if (googleIdToken != null) {
@@ -86,11 +85,12 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                 if (userVO == null) {
                     log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
                     String profilePicture = (String) payload.get(GOOGLE_PICTURE);
-                    User user = createNewUser(email, userName, profilePicture);
+                    User user = createNewUser(email, userName, profilePicture, language);
                     List<UserAchievement> userAchievementList = createUserAchievements(user);
                     List<UserAction> userActionsList = createUserActions(user);
                     user.setUserAchievements(userAchievementList);
                     user.setUserActions(userActionsList);
+                    user.setUuid(UUID.randomUUID().toString());
                     User savedUser = userRepo.save(user);
                     user.setId(savedUser.getId());
                     userVO = modelMapper.map(user, UserVO.class);
@@ -111,28 +111,31 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         }
     }
 
-    private User createNewUser(String email, String userName, String profilePicture) {
+    private User createNewUser(String email, String userName, String profilePicture,
+        String language) {
         return User.builder()
             .email(email)
             .name(userName)
-            .firstName(userName)
             .role(Role.ROLE_USER)
             .dateOfRegistration(LocalDateTime.now())
-            .lastVisit(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
             .profilePicturePath(profilePicture)
-            .rating(AppConstant.DEFAULT_RATING)
+            .rating(DEFAULT_RATING)
+            .language(Language.builder()
+                .id(modelMapper.map(language, Long.class))
+                .build())
             .build();
     }
 
     private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, modelMapper, achievementService);
+        return getUserAchievements(user, achievementService);
     }
 
     private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, modelMapper, achievementService);
+        return getUserActions(user, achievementService);
     }
 
     private SuccessSignInDto getSuccessSignInDto(UserVO user) {

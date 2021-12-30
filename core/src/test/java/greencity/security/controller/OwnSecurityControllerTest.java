@@ -1,6 +1,7 @@
 package greencity.security.controller;
 
 import greencity.ModelUtils;
+import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
@@ -54,7 +55,7 @@ class OwnSecurityControllerTest {
         String content = "{\n" +
             "  \"email\": \"test@mail.com\",\n" +
             "  \"name\": \"string\",\n" +
-            "  \"password\": \"Qwerty123=\"\n" +
+            "  \"password\": \"String123=\"\n" +
             "}";
 
         mockMvc.perform(post(LINK + "/signUp?lang=en")
@@ -70,7 +71,7 @@ class OwnSecurityControllerTest {
     void signInTest() throws Exception {
         String content = "{\n" +
             "  \"email\": \"test@mail.com\",\n" +
-            "  \"password\": \"string\"\n" +
+            "  \"password\": \"String-123\"\n" +
             "}";
 
         mockMvc.perform(post(LINK + "/signIn")
@@ -114,17 +115,19 @@ class OwnSecurityControllerTest {
     @Test
     void changePasswordTest() throws Exception {
         String content = "{\n" +
-            "  \"confirmPassword\": \"Qwerty123=\",\n" +
-            "  \"password\": \"Qwerty123=\",\n" +
+            "  \"confirmPassword\": \"String123=\",\n" +
+            "  \"password\": \"String124=\",\n" +
             "  \"token\": \"12345\"\n" +
             "}";
 
-        mockMvc.perform(post(LINK + "/changePassword")
+        OwnRestoreDto form = new OwnRestoreDto("String124=", "String123=", "12345");
+
+        mockMvc.perform(post(LINK + "/updatePassword")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
 
-        verify(passwordRecoveryService).updatePasswordUsingToken("12345", "Qwerty123=");
+        verify(passwordRecoveryService).updatePasswordUsingToken(form);
     }
 
     @Test
@@ -133,12 +136,12 @@ class OwnSecurityControllerTest {
         when(principal.getName()).thenReturn("test@mail.com");
 
         String content = "{\n" +
-            "  \"confirmPassword\": \"Qwerty123=\",\n" +
-            "  \"currentPassword\": \"Qwerty123=\",\n" +
-            "  \"password\": \"Qwerty124=\"\n" +
+            "  \"confirmPassword\": \"String123=\",\n" +
+            "  \"currentPassword\": \"String123=\",\n" +
+            "  \"password\": \"String124=\"\n" +
             "}";
 
-        mockMvc.perform(put(LINK)
+        mockMvc.perform(put(LINK + "/changePassword")
             .principal(principal)
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
