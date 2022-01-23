@@ -178,6 +178,13 @@ public class RestClient {
             entity, Long.class).getBody();
     }
 
+    public Boolean chatBetweenTwo(Long firstUserId, Long secondUserId){
+        HttpEntity<String> entity = new HttpEntity<>(setHeader());
+        Boolean body = restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/"+ firstUserId + "/"+secondUserId , HttpMethod.GET, entity, Boolean.class).getBody();
+        assert body != null;
+        return body;
+    }
+
     /**
      * Method for getting amount of in progress habit by {@link UserVO} id.
      *

@@ -247,6 +247,7 @@ public class UserServiceImpl implements UserService {
         for (UserAllFriendsDto friendDto : friendDtos) {
             friendDto.setFriendStatus(UserStatusRequest.FRIEND.toString());
         }
+        friendDtos.stream().forEach(f -> f.setHasAChat(restClient.chatBetweenTwo(f.getId(), userId)));
         return new PageableDto<>(
             allUsersMutualFriendsMethod(friendDtos),
             friends.getTotalElements(),

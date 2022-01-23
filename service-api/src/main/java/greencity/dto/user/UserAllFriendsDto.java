@@ -16,4 +16,5 @@ public class UserAllFriendsDto {
     private Long mutualFriends;
     private String profilePicturePath;
     private String friendStatus;
+    private Boolean hasAChat;
 }
