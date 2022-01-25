@@ -1182,7 +1182,7 @@ public class UserServiceImpl implements UserService {
             .map(allUsers.getContent(),
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
-
+        allFriends.stream().forEach(friend -> friend.setHasAChat(restClient.chatBetweenTwo(friend.getId(), userId)));
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
             allUsers.getTotalElements(),
