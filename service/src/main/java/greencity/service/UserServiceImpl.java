@@ -247,7 +247,7 @@ public class UserServiceImpl implements UserService {
         for (UserAllFriendsDto friendDto : friendDtos) {
             friendDto.setFriendStatus(UserStatusRequest.FRIEND.toString());
         }
-        friendDtos.stream().forEach(f -> f.setHasAChat(restClient.chatBetweenTwo(f.getId(), userId)));
+        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         return new PageableDto<>(
             allUsersMutualFriendsMethod(friendDtos),
             friends.getTotalElements(),
@@ -1182,7 +1182,7 @@ public class UserServiceImpl implements UserService {
             .map(allUsers.getContent(),
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
-        allFriends.stream().forEach(friend -> friend.setHasAChat(restClient.chatBetweenTwo(friend.getId(), userId)));
+        allFriends.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
             allUsers.getTotalElements(),

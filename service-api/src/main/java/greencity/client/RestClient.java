@@ -1,6 +1,7 @@
 package greencity.client;
 
 import greencity.constant.RestTemplateLinks;
+import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.user.UserVO;
@@ -178,9 +179,9 @@ public class RestClient {
             entity, Long.class).getBody();
     }
 
-    public Boolean chatBetweenTwo(Long firstUserId, Long secondUserId){
+    public FriendsChatDto chatBetweenTwo(Long firstUserId, Long secondUserId){
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        Boolean body = restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/"+ firstUserId + "/"+secondUserId , HttpMethod.GET, entity, Boolean.class).getBody();
+        FriendsChatDto body = restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/"+ firstUserId + "/"+secondUserId , HttpMethod.GET, entity, FriendsChatDto.class).getBody();
         assert body != null;
         return body;
     }
