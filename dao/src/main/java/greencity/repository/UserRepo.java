@@ -348,7 +348,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Optional<User> findUserByUuid(String uuid);
 
     /**
-     * Method that finds user by name.
+     * Method that finds all users by name.
+     */
+    @Query(nativeQuery = true, value = "select * from users u where u.id <> :userId and\n" +
+            " LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    Page<User> findAllUsersByName(String name, Pageable page, Long userId);
+
+    /**
+     * Method that finds user by name BUT except friends.
      */
     @Query(nativeQuery = true, value = "select * from users u where u.id <> :userId and \n"
         + "                            LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%')) AND \n"
@@ -357,7 +364,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> findUsersByName(String name, Pageable page, Long userId);
 
     /**
-     * Method that finds user by name.
+     * Method that finds friends by name.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users U\n"
         + "    LEFT JOIN users_friends F ON U.id = F.friend_id\n"
