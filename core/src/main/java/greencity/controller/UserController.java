@@ -489,10 +489,10 @@ public class UserController {
     @ApiPageable
     public ResponseEntity<PageableDto<UserAllFriendsDto>> findAllUsersFriends(
         @ApiIgnore Pageable page,
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
+        @ApiParam("Id of current user. Cannot be empty.") @PathVariable Long userId, Principal principal) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(userService.findAllUsersFriends(page, userId));
+            .body(userService.findAllUsersFriends(page, userId, principal.getName()));
     }
 
     /**

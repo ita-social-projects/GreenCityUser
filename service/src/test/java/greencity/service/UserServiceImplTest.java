@@ -213,7 +213,7 @@ class UserServiceImplTest {
         when(userRepo.getAllUserFriends(1L)).thenReturn(list);
         when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
         }.getType())).thenReturn(dtoList);
-        PageableDto<UserAllFriendsDto> actual = userService.findAllUsersFriends(pageRequest, 1L);
+        PageableDto<UserAllFriendsDto> actual = userService.findAllUsersFriends(pageRequest, 1L, "qqqq@email.com" );
         assertEquals(pageableDto, actual);
     }
 
