@@ -12,8 +12,6 @@ import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-
-import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.Map;
 
@@ -468,7 +466,7 @@ public interface UserService {
      * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
      */
 
-    PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId, String email);
+    PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
 
     /**
      * Accept friend request {@link UserVO}.

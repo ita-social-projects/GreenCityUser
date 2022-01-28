@@ -44,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Principal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -240,8 +239,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId, String email) {
-        User currentUser = userRepo.findByEmail(email).orElseThrow(() ->new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+    public PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId) {
         Page<User> friends = userRepo.getAllUserFriends(userId, pageable);
         List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
@@ -249,7 +247,7 @@ public class UserServiceImpl implements UserService {
         for (UserAllFriendsDto friendDto : friendDtos) {
             friendDto.setFriendStatus(UserStatusRequest.FRIEND.toString());
         }
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), currentUser.getId())));
+        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         return new PageableDto<>(
             allUsersMutualFriendsMethod(friendDtos),
             friends.getTotalElements(),
@@ -1078,7 +1076,7 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
 
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
+
 
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
@@ -1097,7 +1095,6 @@ public class UserServiceImpl implements UserService {
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
 
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
 
         return new PageableDto<>(
                 allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
@@ -1116,7 +1113,6 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
 
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
 
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
