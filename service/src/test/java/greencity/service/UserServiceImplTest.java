@@ -211,6 +211,7 @@ class UserServiceImplTest {
             new PageableDto<>(dtoList, dtoList.size(), 0, 1);
         when(userRepo.getAllUserFriends(userId, pageRequest)).thenReturn(page);
         when(userRepo.getAllUserFriends(1L)).thenReturn(list);
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(ModelUtils.getUser()));
         when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
         }.getType())).thenReturn(dtoList);
         PageableDto<UserAllFriendsDto> actual = userService.findAllUsersFriends(pageRequest, 1L, "qqqq@email.com" );
@@ -661,6 +662,42 @@ class UserServiceImplTest {
             pages.getPageable().getPageNumber(),
             pages.getTotalPages());
         assertEquals(pageableDto, userService.findNewFriendByName("martin", pageable, 1L));
+    }
+
+    @Test
+    void findUserByName() {
+        Pageable pageable = PageRequest.of(1, 3);
+        user.setUserCredo("credo");
+        Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
+        when(userRepo.findAllUsersByName("martin", pageable, 1L))
+                .thenReturn(pages);
+        when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
+        }.getType()))
+                .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
+        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
+                CREATE_USER_ALL_FRIENDS_DTO,
+                pages.getTotalElements(),
+                pages.getPageable().getPageNumber(),
+                pages.getTotalPages());
+        assertEquals(pageableDto, userService.findUserByName("martin", pageable, 1L));
+    }
+
+    @Test
+    void findFriendByName() {
+        Pageable pageable = PageRequest.of(1, 3);
+        user.setUserCredo("credo");
+        Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
+        when(userRepo.findFriendsByName("martin", pageable, 1L))
+                .thenReturn(pages);
+        when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
+        }.getType()))
+                .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
+        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
+                CREATE_USER_ALL_FRIENDS_DTO,
+                pages.getTotalElements(),
+                pages.getPageable().getPageNumber(),
+                pages.getTotalPages());
+        assertEquals(pageableDto, userService.findFriendByName("martin", pageable, 1L));
     }
 
     @Test
