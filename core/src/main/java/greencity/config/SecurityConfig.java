@@ -137,7 +137,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findByUuId",
                 "/user/findUuidByEmail",
                 "/user/createUbsRecord")
-            .hasAnyRole(USER, ADMIN, MODERATOR)
+            .hasAnyRole(USER, ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,
                 "/user/shopping-list-items",
@@ -145,23 +145,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{userId}/userFriend/{friendId}",
                 "/user/{userId}/declineFriend/{friendId}",
                 "/user/{userId}/acceptFriend/{friendId}")
-            .hasAnyRole(USER, ADMIN, MODERATOR)
+            .hasAnyRole(USER, ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PUT,
                 "/ownSecurity/changePassword",
                 "/user/profile",
                 "/user/{id}/updateUserLastActivityTime/{date}",
                 "/user/{userId}/language/{languageId}")
-            .hasAnyRole(USER, ADMIN, MODERATOR)
+            .hasAnyRole(USER, ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PATCH,
                 "/user/shopping-list-items/{userShoppingListItemId}",
                 "/user/profilePicture",
                 "/user/deleteProfilePicture")
-            .hasAnyRole(USER, ADMIN, MODERATOR)
+            .hasAnyRole(USER, ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.DELETE,
                 "/user/shopping-list-items/user-shopping-list-items",
                 "/user/shopping-list-items",
                 "/user/{userId}/userFriend/{friendId}")
-            .hasAnyRole(USER, ADMIN, MODERATOR)
+            .hasAnyRole(USER, ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
                 "/user/all",
                 "/user/roles",
@@ -170,19 +170,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/searchBy",
                 "/user/findAll",
                 "/user/{id}/friends")
-            .hasAnyRole(ADMIN, MODERATOR)
+            .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 "/user/filter",
                 "/ownSecurity/register")
-            .hasRole(ADMIN)
+            .hasAnyRole(ADMIN)
             .antMatchers(HttpMethod.PUT,
                 USER_LINK)
-            .hasRole(ADMIN)
+            .hasAnyRole(ADMIN, EMPLOYEE)
             .antMatchers(HttpMethod.PATCH,
                 "/user/status",
                 "/user/role",
                 "/user/update/role")
-            .hasRole(ADMIN)
+            .hasAnyRole(ADMIN)
             .antMatchers(HttpMethod.POST,
                 "/management/login")
             .not().fullyAuthenticated()
