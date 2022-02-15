@@ -179,9 +179,19 @@ public class RestClient {
             entity, Long.class).getBody();
     }
 
-    public FriendsChatDto chatBetweenTwo(Long firstUserId, Long secondUserId){
+    /**
+     * Method for checking if there is a chat between two people.
+     *
+     * @param firstUserId  of {Long}
+     * @param secondUserId of {Long}
+     * @return {FriendsChatDto}
+     * @author Max Bohonko
+     */
+    public FriendsChatDto chatBetweenTwo(Long firstUserId, Long secondUserId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        FriendsChatDto body = restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/"+ firstUserId + "/"+secondUserId , HttpMethod.GET, entity, FriendsChatDto.class).getBody();
+        FriendsChatDto body =
+            restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/" + firstUserId + "/" + secondUserId,
+                HttpMethod.GET, entity, FriendsChatDto.class).getBody();
         assert body != null;
         return body;
     }

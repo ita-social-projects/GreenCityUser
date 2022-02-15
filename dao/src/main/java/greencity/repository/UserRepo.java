@@ -350,8 +350,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Method that finds all users by name.
      */
-    @Query(nativeQuery = true, value = "select * from users u where u.id <> :userId and\n" +
-            " LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    @Query(nativeQuery = true, value = "select * from users u where u.id <> :userId and\n"
+        + " LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))")
     Page<User> findAllUsersByName(String name, Pageable page, Long userId);
 
     /**

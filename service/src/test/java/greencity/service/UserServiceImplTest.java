@@ -179,7 +179,8 @@ class UserServiceImplTest {
         PageRequest pageRequest = PageRequest.of(0, 1);
         Page<UsersFriendDto> page = new PageImpl<>(list, pageRequest, singletonList.size());
         List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa", FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
+            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
+                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
         PageableDto<UserAllFriendsDto> pageableDto =
             new PageableDto<>(dtoList, dtoList.size(), 0, 1);
         when(userRepo.findUsersRecommendedFriends(pageRequest, userId)).thenReturn(page);
@@ -206,7 +207,8 @@ class UserServiceImplTest {
         Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
         List<User> list = Collections.singletonList(user);
         List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa", FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
+            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
+                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
         PageableDto<UserAllFriendsDto> pageableDto =
             new PageableDto<>(dtoList, dtoList.size(), 0, 1);
         when(userRepo.getAllUserFriends(userId, pageRequest)).thenReturn(page);
@@ -670,15 +672,15 @@ class UserServiceImplTest {
         user.setUserCredo("credo");
         Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
         when(userRepo.findAllUsersByName("martin", pageable, 1L))
-                .thenReturn(pages);
+            .thenReturn(pages);
         when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
         }.getType()))
-                .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
+            .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
         PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
-                CREATE_USER_ALL_FRIENDS_DTO,
-                pages.getTotalElements(),
-                pages.getPageable().getPageNumber(),
-                pages.getTotalPages());
+            CREATE_USER_ALL_FRIENDS_DTO,
+            pages.getTotalElements(),
+            pages.getPageable().getPageNumber(),
+            pages.getTotalPages());
         assertEquals(pageableDto, userService.findUserByName("martin", pageable, 1L));
     }
 
@@ -688,15 +690,15 @@ class UserServiceImplTest {
         user.setUserCredo("credo");
         Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
         when(userRepo.findFriendsByName("martin", pageable, 1L))
-                .thenReturn(pages);
+            .thenReturn(pages);
         when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
         }.getType()))
-                .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
+            .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
         PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
-                CREATE_USER_ALL_FRIENDS_DTO,
-                pages.getTotalElements(),
-                pages.getPageable().getPageNumber(),
-                pages.getTotalPages());
+            CREATE_USER_ALL_FRIENDS_DTO,
+            pages.getTotalElements(),
+            pages.getPageable().getPageNumber(),
+            pages.getTotalPages());
         assertEquals(pageableDto, userService.findFriendByName("martin", pageable, 1L));
     }
 
@@ -723,7 +725,8 @@ class UserServiceImplTest {
         PageRequest pageRequest = PageRequest.of(0, 1);
         Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
         List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa", FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
+            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
+                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
         PageableDto<UserAllFriendsDto> pageableDto =
             new PageableDto<>(dtoList, dtoList.size(), 0, 1);
         when(userRepo.getAllUserFriendRequests(userId, pageRequest)).thenReturn(page);

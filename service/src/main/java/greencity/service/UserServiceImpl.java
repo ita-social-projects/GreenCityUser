@@ -1092,16 +1092,16 @@ public class UserServiceImpl implements UserService {
     public PageableDto<UserAllFriendsDto> findUserByName(String name, Pageable page, Long id) {
         Page<User> ourUsersList = userRepo.findAllUsersByName(name, page, id);
         List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
-                new TypeToken<List<UserAllFriendsDto>>() {
-                }.getType());
+            new TypeToken<List<UserAllFriendsDto>>() {
+            }.getType());
 
         friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
 
         return new PageableDto<>(
-                allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
-                ourUsersList.getTotalElements(),
-                ourUsersList.getPageable().getPageNumber(),
-                ourUsersList.getTotalPages());
+            allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
+            ourUsersList.getTotalElements(),
+            ourUsersList.getPageable().getPageNumber(),
+            ourUsersList.getTotalPages());
     }
 
     /**
