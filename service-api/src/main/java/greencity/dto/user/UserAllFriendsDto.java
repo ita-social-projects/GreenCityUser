@@ -1,5 +1,6 @@
 package greencity.dto.user;
 
+import greencity.dto.friends.FriendsChatDto;
 import lombok.*;
 
 @NoArgsConstructor
@@ -16,4 +17,5 @@ public class UserAllFriendsDto {
     private Long mutualFriends;
     private String profilePicturePath;
     private String friendStatus;
+    private FriendsChatDto friendsChatDto;
 }

@@ -1,6 +1,7 @@
 package greencity.client;
 
 import greencity.constant.RestTemplateLinks;
+import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.user.UserVO;
@@ -176,6 +177,23 @@ public class RestClient {
         return restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.HABIT_STATISTIC_ACQUIRED_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
             entity, Long.class).getBody();
+    }
+
+    /**
+     * Method for checking if there is a chat between two people.
+     *
+     * @param firstUserId  of {Long}
+     * @param secondUserId of {Long}
+     * @return {FriendsChatDto}
+     * @author Max Bohonko
+     */
+    public FriendsChatDto chatBetweenTwo(Long firstUserId, Long secondUserId) {
+        HttpEntity<String> entity = new HttpEntity<>(setHeader());
+        FriendsChatDto body =
+            restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/" + firstUserId + "/" + secondUserId,
+                HttpMethod.GET, entity, FriendsChatDto.class).getBody();
+        assert body != null;
+        return body;
     }
 
     /**
