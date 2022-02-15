@@ -247,6 +247,7 @@ public class UserServiceImpl implements UserService {
         for (UserAllFriendsDto friendDto : friendDtos) {
             friendDto.setFriendStatus(UserStatusRequest.FRIEND.toString());
         }
+        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         return new PageableDto<>(
             allUsersMutualFriendsMethod(friendDtos),
             friends.getTotalElements(),
@@ -1075,6 +1076,27 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
 
+        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
+
+        return new PageableDto<>(
+            allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
+            ourUsersList.getTotalElements(),
+            ourUsersList.getPageable().getPageNumber(),
+            ourUsersList.getTotalPages());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PageableDto<UserAllFriendsDto> findUserByName(String name, Pageable page, Long id) {
+        Page<User> ourUsersList = userRepo.findAllUsersByName(name, page, id);
+        List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
+            new TypeToken<List<UserAllFriendsDto>>() {
+            }.getType());
+
+        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
+
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
             ourUsersList.getTotalElements(),
@@ -1091,6 +1113,8 @@ public class UserServiceImpl implements UserService {
         List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
+
+        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
 
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
@@ -1181,7 +1205,7 @@ public class UserServiceImpl implements UserService {
             .map(allUsers.getContent(),
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
-
+        allFriends.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
             allUsers.getTotalElements(),
