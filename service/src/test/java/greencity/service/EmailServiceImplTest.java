@@ -169,4 +169,13 @@ class EmailServiceImplTest {
         verify(javaMailSender).createMimeMessage();
     }
 
+    @Test
+    void sendSuccessRestorePasswordByEmailTest() {
+        String email = "test@gmail.com";
+        String lang = "en";
+        service.sendSuccessRestorePasswordByEmail(email, lang);
+
+        verify(javaMailSender).createMimeMessage();
+    }
+
 }
