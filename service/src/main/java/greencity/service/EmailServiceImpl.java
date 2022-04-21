@@ -291,6 +291,6 @@ public class EmailServiceImpl implements EmailService {
             subject = "Скидання паролю";
             content = "Ваш пароль змінено";
         }
-        sendEmail(email,subject, content);
+        sendEmail(email, subject, content);
     }
 }
