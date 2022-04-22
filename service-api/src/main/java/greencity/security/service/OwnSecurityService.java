@@ -5,9 +5,7 @@ import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.OwnSignInDto;
-import greencity.security.dto.ownsecurity.OwnSignUpDto;
-import greencity.security.dto.ownsecurity.UpdatePasswordDto;
+import greencity.security.dto.ownsecurity.*;
 
 /**
  * Provides the interface to manage {@link OwnSecurityService} entity.
@@ -65,4 +63,20 @@ public interface OwnSecurityService {
      * @author Vasyl Zhovnir
      */
     UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto);
+
+    /**
+     * Checks if user has password.
+     *
+     * @param email {@link String} email of user.
+     * @return {@link Boolean}
+     */
+    Boolean hasPassword(String email);
+
+    /**
+     * Sets password for user that doesn't have one.
+     *
+     * @param dto   {@link SetPasswordDto} password to be set.
+     * @param email {@link String} email of user.
+     */
+    void setPassword(SetPasswordDto dto, String email);
 }

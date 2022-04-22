@@ -1,13 +1,11 @@
 package greencity.security.controller;
 
 import greencity.ModelUtils;
-import greencity.security.dto.ownsecurity.OwnRestoreDto;
-import greencity.security.dto.ownsecurity.OwnSignInDto;
-import greencity.security.dto.ownsecurity.OwnSignUpDto;
-import greencity.security.dto.ownsecurity.UpdatePasswordDto;
+import greencity.security.dto.ownsecurity.*;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -151,5 +149,40 @@ class OwnSecurityControllerTest {
             ModelUtils.getObjectMapper().readValue(content, UpdatePasswordDto.class);
 
         verify(ownSecurityService).updateCurrentPassword(dto, "test@mail.com");
+    }
+
+    @Test
+    @SneakyThrows
+    void hasPassword() {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("test@mail.com");
+
+        mockMvc.perform(get(LINK + "/has-password")
+            .principal(principal))
+            .andExpect(status().isOk());
+
+        verify(ownSecurityService).hasPassword("test@mail.com");
+    }
+
+    @Test
+    @SneakyThrows
+    void setPassword() {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("test@mail.com");
+
+        String content = "{\n" +
+            "  \"password\": \"String123=\",\n" +
+            "  \"confirmPassword\": \"String123=\"\n" +
+            "}";
+
+        SetPasswordDto dto = ModelUtils.getObjectMapper().readValue(content, SetPasswordDto.class);
+
+        mockMvc.perform(post(LINK + "/set-password")
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isCreated());
+
+        verify(ownSecurityService).setPassword(dto, "test@mail.com");
     }
 }
