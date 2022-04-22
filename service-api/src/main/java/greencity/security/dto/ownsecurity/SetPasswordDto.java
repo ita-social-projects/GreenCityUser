@@ -1,13 +1,15 @@
 package greencity.security.dto.ownsecurity;
 
 import greencity.annotations.PasswordValidation;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode
 public class SetPasswordDto {
     @NotBlank
     @PasswordValidation

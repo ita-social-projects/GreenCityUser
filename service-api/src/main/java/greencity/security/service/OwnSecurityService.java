@@ -6,7 +6,6 @@ import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
 import greencity.security.dto.ownsecurity.*;
-import org.springframework.http.ResponseEntity;
 
 /**
  * Provides the interface to manage {@link OwnSecurityService} entity.

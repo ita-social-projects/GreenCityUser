@@ -415,7 +415,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     public void setPassword(SetPasswordDto dto, String email) {
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        if (hasPassword(email)) {
+        if (Boolean.TRUE.equals(hasPassword(email))) {
             throw new UserAlreadyHasPasswordException(ErrorMessage.USER_ALREADY_HAS_PASSWORD);
         }
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {
