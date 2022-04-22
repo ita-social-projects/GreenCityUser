@@ -3,14 +3,11 @@ package greencity.security.controller;
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
 import greencity.constant.HttpStatuses;
+import greencity.security.dto.ownsecurity.*;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.OwnRestoreDto;
-import greencity.security.dto.ownsecurity.OwnSignInDto;
-import greencity.security.dto.ownsecurity.OwnSignUpDto;
-import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
@@ -23,13 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
@@ -219,5 +210,42 @@ public class OwnSecurityController {
     public ResponseEntity<UserAdminRegistrationDto> managementRegisterUser(
         @Valid @RequestBody UserManagementDto userDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.managementRegisterUser(userDto));
+    }
+
+    /**
+     * Method for checking if user has password.
+     *
+     * @return - {@link HasPasswordDto}
+     */
+    @ApiOperation("Check if user has password.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED)
+    })
+    @GetMapping("/has-password")
+    public ResponseEntity<HasPasswordDto> hasPassword(@ApiIgnore @AuthenticationPrincipal Principal principal) {
+        String email = principal.getName();
+        return ResponseEntity.ok().body(new HasPasswordDto(service.hasPassword(email)));
+    }
+
+    /**
+     * Method for setting password for user that doesn't have one.
+     *
+     * @param dto {@link SetPasswordDto} password to be set.
+     * @return {@link ResponseEntity}
+     */
+    @ApiOperation("Set password for user that doesn't have one.")
+    @ResponseStatus(value = HttpStatus.CREATED)
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = HttpStatuses.CREATED),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED)
+    })
+    @PostMapping("/set-password")
+    public ResponseEntity<Object> setPassword(@Valid @RequestBody SetPasswordDto dto,
+        @ApiIgnore @AuthenticationPrincipal Principal principal) {
+        String email = principal.getName();
+        service.setPassword(dto, email);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
