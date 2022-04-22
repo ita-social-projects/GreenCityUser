@@ -11,20 +11,14 @@ import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRefreshTokenException;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.PasswordsDoNotMatchesException;
-import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.UserBlockedException;
-import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.*;
 import greencity.repository.UserRepo;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
@@ -404,5 +398,33 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private LocalDateTime calculateExpirationDate(Integer expirationTimeInHours) {
         LocalDateTime now = LocalDateTime.now();
         return now.plusHours(expirationTimeInHours);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Boolean hasPassword(String email) {
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        return user.getOwnSecurity() != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setPassword(SetPasswordDto dto, String email) {
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        if (Boolean.TRUE.equals(hasPassword(email))) {
+            throw new UserAlreadyHasPasswordException(ErrorMessage.USER_ALREADY_HAS_PASSWORD);
+        }
+        if (!dto.getPassword().equals(dto.getConfirmPassword())) {
+            throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
+        }
+        user.setOwnSecurity(OwnSecurity.builder()
+            .password(passwordEncoder.encode(dto.getPassword()))
+            .user(user)
+            .build());
+        userRepo.save(user);
     }
 }

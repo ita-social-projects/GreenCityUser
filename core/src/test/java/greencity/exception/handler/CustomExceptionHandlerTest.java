@@ -1,5 +1,6 @@
 package greencity.exception.handler;
 
+import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -171,5 +172,15 @@ class CustomExceptionHandlerTest {
             customExceptionHandler.handleMethodArgumentNotValid(notValidException, headers, httpStatus, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonList(validationExceptionDto)));
 
+    }
+
+    @Test
+    void handleUserAlreadyHasPasswordException() {
+        UserAlreadyHasPasswordException alreadyHasPassword =
+            new UserAlreadyHasPasswordException(ErrorMessage.USER_ALREADY_HAS_PASSWORD);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
+        assertEquals(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse),
+            customExceptionHandler.handleUserAlreadyHasPasswordException(alreadyHasPassword, webRequest));
     }
 }

@@ -3,8 +3,7 @@ package greencity.security.service;
 import greencity.TestConst;
 import greencity.client.RestClient;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -21,17 +20,11 @@ import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.*;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRefreshTokenException;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.PasswordsDoNotMatchesException;
-import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.UserBlockedException;
-import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.*;
 import greencity.repository.UserRepo;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
@@ -349,5 +342,75 @@ class OwnSecurityServiceImplTest {
             () -> ownSecurityService.managementRegisterUser(userManagementDto));
 
         assertEquals(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL, thrown.getMessage());
+    }
+
+    @Test
+    void hasPasswordTrue() {
+        User user = ModelUtils.getUser();
+        user.setOwnSecurity(ModelUtils.TEST_OWN_SECURITY);
+        when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        assertTrue(ownSecurityService.hasPassword(user.getEmail()));
+    }
+
+    @Test
+    void hasPasswordFalse() {
+        User user = ModelUtils.getUser();
+        when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        assertFalse(ownSecurityService.hasPassword(user.getEmail()));
+    }
+
+    @Test
+    void hasPasswordWrongEmailException() {
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+        assertThrows(WrongEmailException.class, () -> ownSecurityService.hasPassword(""));
+    }
+
+    @Test
+    void setPassword() {
+        SetPasswordDto dto = SetPasswordDto.builder()
+            .password(ModelUtils.TEST_OWN_RESTORE_DTO.getPassword())
+            .confirmPassword(ModelUtils.TEST_OWN_RESTORE_DTO.getConfirmPassword())
+            .build();
+        User user = ModelUtils.getUser();
+        when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+
+        ownSecurityService.setPassword(dto, user.getEmail());
+
+        assertNotNull(user.getOwnSecurity());
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void setPasswordWrongEmailException() {
+        SetPasswordDto dto = SetPasswordDto.builder().build();
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(WrongEmailException.class, () -> ownSecurityService.setPassword(dto, ""));
+    }
+
+    @Test
+    void setPasswordUserAlreadyHasPasswordException() {
+        SetPasswordDto dto = SetPasswordDto.builder().build();
+        User user = ModelUtils.getUser();
+        user.setOwnSecurity(ModelUtils.TEST_OWN_SECURITY);
+        String email = user.getEmail();
+
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+
+        assertThrows(UserAlreadyHasPasswordException.class, () -> ownSecurityService.setPassword(dto, email));
+    }
+
+    @Test
+    void setPasswordPasswordsDoNotMatchesException() {
+        SetPasswordDto dto = SetPasswordDto.builder()
+            .password(ModelUtils.TEST_OWN_RESTORE_DTO_WRONG.getPassword())
+            .confirmPassword(ModelUtils.TEST_OWN_RESTORE_DTO_WRONG.getConfirmPassword())
+            .build();
+        User user = ModelUtils.getUser();
+        String email = user.getEmail();
+
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+
+        assertThrows(PasswordsDoNotMatchesException.class, () -> ownSecurityService.setPassword(dto, email));
     }
 }
