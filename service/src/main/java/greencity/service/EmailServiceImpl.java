@@ -14,10 +14,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executor;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -281,5 +278,19 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendNotificationByEmail(NotificationDto notification, String email) {
         sendEmail(email, notification.getTitle(), notification.getBody());
+    }
+
+    @Override
+    public void sendSuccessRestorePasswordByEmail(String email, String language) {
+        String subject;
+        String content;
+        if (Objects.equals(language, "en")) {
+            subject = "Restore password";
+            content = "Your password has been reset";
+        } else {
+            subject = "Скидання паролю";
+            content = "Ваш пароль змінено";
+        }
+        sendEmail(email, subject, content);
     }
 }

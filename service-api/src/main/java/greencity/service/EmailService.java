@@ -128,4 +128,14 @@ public interface EmailService {
      * @author Ann Sakhno.
      */
     void sendNotificationByEmail(NotificationDto notification, String email);
+
+    /**
+     * Method for send information about success restoring password.
+     *
+     * @param email    letter is sent to this email.
+     * @param language language which will be used in letter.
+     *
+     * @author Pavlo Hural.
+     */
+    void sendSuccessRestorePasswordByEmail(String email, String language);
 }

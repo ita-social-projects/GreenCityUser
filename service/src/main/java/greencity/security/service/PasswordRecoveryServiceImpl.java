@@ -1,6 +1,7 @@
 package greencity.security.service;
 
 import greencity.constant.ErrorMessage;
+import greencity.dto.notification.NotificationDto;
 import greencity.entity.OwnSecurity;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
@@ -104,9 +105,11 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         if (!form.getPassword().equals(form.getConfirmPassword())) {
             throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
+        User user = restorePasswordEmail.getUser();
         UserStatus userStatus = restorePasswordEmail.getUser().getUserStatus();
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {
             updatePassword(form.getPassword(), restorePasswordEmail.getUser().getId());
+            emailService.sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode());
             applicationEventPublisher.publishEvent(
                 new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
             restorePasswordEmailRepo.delete(restorePasswordEmail);
