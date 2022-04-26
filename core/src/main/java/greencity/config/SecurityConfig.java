@@ -137,7 +137,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findFriendByName/**",
                 "/user/findByUuId",
                 "/user/findUuidByEmail",
-                "/user/createUbsRecord")
+                "/user/createUbsRecord",
+                "/ownSecurity/has-password")
             .hasAnyRole(USER, ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,
@@ -145,7 +146,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{userId}/habit",
                 "/user/{userId}/userFriend/{friendId}",
                 "/user/{userId}/declineFriend/{friendId}",
-                "/user/{userId}/acceptFriend/{friendId}")
+                "/user/{userId}/acceptFriend/{friendId}",
+                "/ownSecurity/set-password")
             .hasAnyRole(USER, ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PUT,
                 "/ownSecurity/changePassword",
