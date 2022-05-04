@@ -1,19 +1,16 @@
 package greencity.controller;
 
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import greencity.ModelUtils;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.notification.NotificationDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +21,10 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class EmailControllerTest {
@@ -143,5 +144,24 @@ class EmailControllerTest {
 
         UserViolationMailDto userViolationMailDto = new ObjectMapper().readValue(content, UserViolationMailDto.class);
         verify(emailService).sendUserViolationEmail(userViolationMailDto);
+    }
+
+    @Test
+    @SneakyThrows
+    void sendUserNotification() {
+        String content = "{" +
+            "\"title\":\"title\"," +
+            "\"body\":\"body\"" +
+            "}";
+        String email = "email@mail.com";
+
+        mockMvc.perform(post(LINK + "/notification")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content)
+            .param("email", email))
+            .andExpect(status().isOk());
+
+        NotificationDto notification = new ObjectMapper().readValue(content, NotificationDto.class);
+        verify(emailService).sendNotificationByEmail(notification, email);
     }
 }

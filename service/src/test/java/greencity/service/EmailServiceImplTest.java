@@ -1,27 +1,19 @@
 package greencity.service;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import greencity.ModelUtils;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
+import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
-
-import greencity.dto.violation.UserViolationMailDto;
-
-import java.util.*;
-import java.util.concurrent.Executors;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.violation.UserViolationMailDto;
+import greencity.entity.User;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,6 +22,17 @@ import org.mockito.Mock;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
 
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+import java.util.*;
+import java.util.concurrent.Executors;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 class EmailServiceImplTest {
     private EmailService service;
     private PlaceAuthorDto placeAuthorDto;
@@ -37,11 +40,13 @@ class EmailServiceImplTest {
     private JavaMailSender javaMailSender;
     @Mock
     private ITemplateEngine templateEngine;
+    @Mock
+    private UserRepo userRepo;
 
     @BeforeEach
     public void setup() {
         initMocks(this);
-        service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
+        service = new EmailServiceImpl(javaMailSender, templateEngine, userRepo, Executors.newCachedThreadPool(),
             "http://localhost:4200", "http://localhost:4200", "http://localhost:8080",
             "test@email.com");
         placeAuthorDto = PlaceAuthorDto.builder()
@@ -178,4 +183,19 @@ class EmailServiceImplTest {
         verify(javaMailSender).createMimeMessage();
     }
 
+    @Test
+    void sendNotificationByEmail() {
+        User user = User.builder().build();
+        NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        service.sendNotificationByEmail(dto, "test@gmail.com");
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendNotificationByEmailNotFoundException() {
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+        NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
+        assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
+    }
 }
