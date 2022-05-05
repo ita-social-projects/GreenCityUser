@@ -157,7 +157,7 @@ class OwnSecurityControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@mail.com");
 
-        mockMvc.perform(get(LINK + "/has-password")
+        mockMvc.perform(get(LINK + "/password-status")
             .principal(principal))
             .andExpect(status().isOk());
 

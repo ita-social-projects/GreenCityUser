@@ -1,10 +1,8 @@
 package greencity.controller;
 
-import greencity.annotations.CurrentUser;
 import greencity.constant.HttpStatuses;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.notification.NotificationDto;
-import greencity.dto.user.UserVO;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
@@ -17,11 +15,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/email")
@@ -100,8 +94,7 @@ public class EmailController {
      *
      * @param notification {@link NotificationDto} - object with all necessary data
      *                     for sending notification via email.
-     * @param userVO       {@link UserVO} - object of active user with all necessary
-     *                     data for sending notification via email.
+     * @param email        {@link String} - user's email.
      * @author Ann Sakhno
      */
     @ApiOperation(value = "Send notification to user via email")
@@ -113,8 +106,8 @@ public class EmailController {
     })
     @PostMapping("/notification")
     public ResponseEntity<Object> sendUserNotification(@RequestBody NotificationDto notification,
-        @ApiIgnore @CurrentUser UserVO userVO) {
-        emailService.sendNotificationByEmail(notification, userVO.getEmail());
+        @RequestParam("email") String email) {
+        emailService.sendNotificationByEmail(notification, email);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

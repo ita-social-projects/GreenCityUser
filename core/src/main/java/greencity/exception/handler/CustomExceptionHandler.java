@@ -276,16 +276,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     /**
      * Method interceptor exception {@link UserAlreadyHasPasswordException}.
      *
-     * @param ex {@link UserAlreadyHasPasswordException} which should be
-     *           intercepted.
+     * @param request {@link WebRequest} in which the exception has been thrown.
      * @return {@link ResponseEntity} contains http status and body with exception
      *         message.
      */
     @ExceptionHandler(UserAlreadyHasPasswordException.class)
-    public final ResponseEntity<Object> handleUserAlreadyHasPasswordException(
-        UserAlreadyHasPasswordException ex, WebRequest request) {
+    public final ResponseEntity<Object> handleUserAlreadyHasPasswordException(WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(getErrorAttributes(request));
-        log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

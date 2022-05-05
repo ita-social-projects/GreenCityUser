@@ -9,6 +9,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class HasPasswordDto {
-    private Boolean hasPassword;
+public class PasswordStatusDto {
+    private boolean hasPassword;
 }

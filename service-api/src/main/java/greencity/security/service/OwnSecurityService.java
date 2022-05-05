@@ -70,7 +70,7 @@ public interface OwnSecurityService {
      * @param email {@link String} email of user.
      * @return {@link Boolean}
      */
-    Boolean hasPassword(String email);
+    boolean hasPassword(String email);
 
     /**
      * Sets password for user that doesn't have one.
