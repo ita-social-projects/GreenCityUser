@@ -138,7 +138,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findByUuId",
                 "/user/findUuidByEmail",
                 "/user/createUbsRecord",
-                "/ownSecurity/has-password")
+                "/ownSecurity/password-status")
             .hasAnyRole(USER, ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,

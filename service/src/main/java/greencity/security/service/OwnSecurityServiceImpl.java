@@ -30,10 +30,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -403,7 +400,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     /**
      * {@inheritDoc}
      */
-    public Boolean hasPassword(String email) {
+    public boolean hasPassword(String email) {
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return user.getOwnSecurity() != null;
@@ -415,7 +412,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     public void setPassword(SetPasswordDto dto, String email) {
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        if (Boolean.TRUE.equals(hasPassword(email))) {
+        if (hasPassword(email)) {
             throw new UserAlreadyHasPasswordException(ErrorMessage.USER_ALREADY_HAS_PASSWORD);
         }
         if (!dto.getPassword().equals(dto.getConfirmPassword())) {

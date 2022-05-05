@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.constant.EmailConstants;
+import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
@@ -9,18 +10,11 @@ import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
-
-import greencity.dto.violation.UserViolationMailDto;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
-import java.util.concurrent.Executor;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.violation.UserViolationMailDto;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.repository.UserRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -31,6 +25,14 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.Executor;
+
 /**
  * {@inheritDoc}
  */
@@ -39,6 +41,7 @@ import org.thymeleaf.context.Context;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final ITemplateEngine templateEngine;
+    private final UserRepo userRepo;
     private final Executor executor;
     private final String clientLink;
     private final String ecoNewsLink;
@@ -52,6 +55,7 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender,
         ITemplateEngine templateEngine,
+        UserRepo userRepo,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
         @Value("${econews.address}") String ecoNewsLink,
@@ -59,6 +63,7 @@ public class EmailServiceImpl implements EmailService {
         @Value("${sender.email.address}") String senderEmailAddress) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
+        this.userRepo = userRepo;
         this.executor = executor;
         this.clientLink = clientLink;
         this.ecoNewsLink = ecoNewsLink;
@@ -277,7 +282,11 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendNotificationByEmail(NotificationDto notification, String email) {
-        sendEmail(email, notification.getTitle(), notification.getBody());
+        if (userRepo.findByEmail(email).isPresent()) {
+            sendEmail(email, notification.getTitle(), notification.getBody());
+        } else {
+            throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
+        }
     }
 
     @Override

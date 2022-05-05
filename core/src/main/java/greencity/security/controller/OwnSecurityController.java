@@ -215,17 +215,17 @@ public class OwnSecurityController {
     /**
      * Method for checking if user has password.
      *
-     * @return - {@link HasPasswordDto}
+     * @return - {@link PasswordStatusDto}
      */
-    @ApiOperation("Check if user has password.")
+    @ApiOperation("Get password status for current user.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED)
     })
-    @GetMapping("/has-password")
-    public ResponseEntity<HasPasswordDto> hasPassword(@ApiIgnore @AuthenticationPrincipal Principal principal) {
+    @GetMapping("/password-status")
+    public ResponseEntity<PasswordStatusDto> passwordStatus(@ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
-        return ResponseEntity.ok().body(new HasPasswordDto(service.hasPassword(email)));
+        return ResponseEntity.ok().body(new PasswordStatusDto(service.hasPassword(email)));
     }
 
     /**
