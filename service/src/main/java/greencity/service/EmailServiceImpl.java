@@ -143,11 +143,12 @@ public class EmailServiceImpl implements EmailService {
      * @author Volodymyr Turko
      */
     @Override
-    public void sendVerificationEmail(Long id, String name, String email, String token, String language) {
+    public void sendVerificationEmail(Long id, String name, String email, String token, String language,
+        boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, name);
-        model.put(EmailConstants.VERIFY_ADDRESS, clientLink + "#/?token="
+        model.put(EmailConstants.VERIFY_ADDRESS, clientLink + "#/" + (isUbs ? "ubs" : "") + "?token="
             + token + PARAM_USER_ID + id);
         changeLocale(language);
         log.info(Locale.getDefault().toString());

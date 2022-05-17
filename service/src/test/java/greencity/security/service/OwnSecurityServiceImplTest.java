@@ -153,7 +153,7 @@ class OwnSecurityServiceImplTest {
             refEq(user.getName()),
             refEq(user.getEmail()),
             refEq(user.getVerifyEmail().getToken()),
-            refEq("en"));
+            refEq("en"), eq(false));
         verify(jwtTool, times(2)).generateTokenKey();
     }
 
