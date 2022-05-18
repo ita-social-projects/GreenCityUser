@@ -64,7 +64,8 @@ public interface EmailService {
      * @param userEmail email current user.
      * @param token     verify token current user.
      */
-    void sendVerificationEmail(Long userId, String userName, String userEmail, String token, String language);
+    void sendVerificationEmail(Long userId, String userName, String userEmail, String token, String language,
+        boolean isUbs);
 
     /**
      * Method for sending user approval email to User, when Admin adds the User from

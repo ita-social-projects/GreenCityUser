@@ -105,14 +105,14 @@ class EmailServiceImplTest {
         "1, Test, test@gmail.com, token, ua",
         "1, Test, test@gmail.com, token, en"})
     void sendVerificationEmail(Long id, String name, String email, String token, String language) {
-        service.sendVerificationEmail(id, name, email, token, language);
+        service.sendVerificationEmail(id, name, email, token, language, false);
         verify(javaMailSender).createMimeMessage();
     }
 
     @Test
     void sendVerificationEmailIllegalStateException() {
         assertThrows(IllegalStateException.class,
-            () -> service.sendVerificationEmail(1L, "Test", "test@gmail.com", "token", "enuaru"));
+            () -> service.sendVerificationEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
     @Test

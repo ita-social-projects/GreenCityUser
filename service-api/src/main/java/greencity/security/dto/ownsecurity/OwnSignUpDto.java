@@ -1,5 +1,6 @@
 package greencity.security.dto.ownsecurity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import greencity.annotations.PasswordValidation;
 import greencity.constant.ValidationConstants;
 import lombok.AllArgsConstructor;
@@ -39,4 +40,6 @@ public class OwnSignUpDto {
     @NotBlank
     @PasswordValidation
     private String password;
+    @JsonProperty("isUbs")
+    private boolean isUbs;
 }
