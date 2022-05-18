@@ -53,7 +53,8 @@ class OwnSecurityControllerTest {
         String content = "{\n" +
             "  \"email\": \"test@mail.com\",\n" +
             "  \"name\": \"string\",\n" +
-            "  \"password\": \"String123=\"\n" +
+            "  \"password\": \"String123=\",\n" +
+            "  \"isUbs\": false\n" +
             "}";
 
         mockMvc.perform(post(LINK + "/signUp?lang=en")

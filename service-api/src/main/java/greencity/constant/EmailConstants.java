@@ -29,6 +29,7 @@ public final class EmailConstants {
     public static final String REASONS = "reasons";
     public static final String DESCRIPTION = "description";
     public static final String LANGUAGE = "language";
+    public static final String IS_UBS = "isUbs";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
