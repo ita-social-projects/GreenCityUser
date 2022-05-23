@@ -24,7 +24,7 @@ public class LanguageValidator implements ConstraintValidator<ValidLanguage, Loc
         try {
             codes = restClient.getAllLanguageCodes();
         } catch (Exception e) {
-            logger.warn("Occurred error during processing request: {}",e.getMessage());
+            logger.warn("Occurred error during processing request: {}", e.getMessage());
             codes = List.of("en", "ua");
         }
     }
