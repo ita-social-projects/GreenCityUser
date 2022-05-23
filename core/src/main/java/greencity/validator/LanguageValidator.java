@@ -12,10 +12,11 @@ import org.slf4j.LoggerFactory;
 import greencity.annotations.ValidLanguage;
 import greencity.client.RestClient;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @AllArgsConstructor
+@Slf4j
 public class LanguageValidator implements ConstraintValidator<ValidLanguage, Locale> {
-    private Logger logger = LoggerFactory.getLogger(LanguageValidator.class);
     private List<String> codes;
     private final RestClient restClient;
 
@@ -24,7 +25,7 @@ public class LanguageValidator implements ConstraintValidator<ValidLanguage, Loc
         try {
             codes = restClient.getAllLanguageCodes();
         } catch (Exception e) {
-            logger.warn("Occurred error during processing request: {}", e.getMessage());
+            log.warn("Occurred error during processing request: {}", e.getMessage());
             codes = List.of("en", "ua");
         }
     }
