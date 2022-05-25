@@ -842,12 +842,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
         Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
-        Long amountOfWrittenTipsAndTrickByUserId = restClient.findAmountOfWrittenTipsAndTrick(userId);
         Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
         Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
 
         return UserProfileStatisticsDto.builder()
-            .amountWrittenTipsAndTrick(amountOfWrittenTipsAndTrickByUserId)
             .amountPublishedNews(amountOfPublishedNewsByUserId)
             .amountHabitsAcquired(amountOfAcquiredHabitsByUserId)
             .amountHabitsInProgress(amountOfHabitsInProgressByUserId)

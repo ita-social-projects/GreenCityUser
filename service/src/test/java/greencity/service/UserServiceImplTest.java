@@ -611,8 +611,6 @@ class UserServiceImplTest {
     void geTUserProfileStatistics() {
         when(restClient.findAmountOfPublishedNews(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
-        when(restClient.findAmountOfWrittenTipsAndTrick(TestConst.SIMPLE_LONG_NUMBER))
-            .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
         when(restClient.findAmountOfAcquiredHabits(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
         when(restClient.findAmountOfHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER))

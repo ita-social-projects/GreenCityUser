@@ -81,7 +81,6 @@ public class ModelUtils {
         return UserProfileStatisticsDto.builder()
             .amountHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER)
             .amountHabitsAcquired(TestConst.SIMPLE_LONG_NUMBER)
-            .amountWrittenTipsAndTrick(TestConst.SIMPLE_LONG_NUMBER)
             .amountPublishedNews(TestConst.SIMPLE_LONG_NUMBER)
             .build();
     }
