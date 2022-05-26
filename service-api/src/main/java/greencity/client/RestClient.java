@@ -152,20 +152,6 @@ public class RestClient {
     }
 
     /**
-     * The method find count of published tip&tricks.
-     *
-     * @param userId of {@link UserVO}
-     * @return Long
-     * @author Orest Mamchuk
-     */
-    public Long findAmountOfWrittenTipsAndTrick(Long userId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.TIPSANDTRICKS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity,
-            Long.class).getBody();
-    }
-
-    /**
      * Method for getting amount of acquired habit by {@link UserVO} id.
      *
      * @param userId of {@link UserVO}
