@@ -179,21 +179,6 @@ class RestClientTest {
     }
 
     @Test
-    void findAmountOfWrittenTipsAndTrick() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long writtenTipsAndTrick = 5L;
-        Long userId = 1L;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.TIPSANDTRICKS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity,
-            Long.class)).thenReturn(ResponseEntity.ok(writtenTipsAndTrick));
-        assertEquals(writtenTipsAndTrick, restClient.findAmountOfWrittenTipsAndTrick(userId));
-    }
-
-    @Test
     void findAmountOfAcquiredHabits() {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
