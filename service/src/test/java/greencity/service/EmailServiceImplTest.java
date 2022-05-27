@@ -122,18 +122,18 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ru",
-        "1, Test, test@gmail.com, token, ua",
-        "1, Test, test@gmail.com, token, en"})
-    void sendRestoreEmail(Long id, String name, String email, String token, String language) {
-        service.sendRestoreEmail(id, name, email, token, language);
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ru, true",
+        "1, Test, test@gmail.com, token, ua, false",
+        "1, Test, test@gmail.com, token, en, false"})
+    void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
+        service.sendRestoreEmail(id, name, email, token, language, isUbs);
         verify(javaMailSender).createMimeMessage();
     }
 
     @Test
     void sendRestoreEmailIllegalStateException() {
         assertThrows(IllegalStateException.class,
-            () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru"));
+            () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
     @Test

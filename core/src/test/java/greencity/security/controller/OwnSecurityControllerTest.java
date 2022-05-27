@@ -108,7 +108,7 @@ class OwnSecurityControllerTest {
             .param("lang", "en"))
             .andExpect(status().isOk());
 
-        verify(passwordRecoveryService).sendPasswordRecoveryEmailTo("test@mail.com", "en");
+        verify(passwordRecoveryService).sendPasswordRecoveryEmailTo("test@mail.com", false, "en");
     }
 
     @Test

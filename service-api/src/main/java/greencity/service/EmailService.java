@@ -87,7 +87,8 @@ public interface EmailService {
      *                     letter.
      * @param token        password recovery token.
      */
-    void sendRestoreEmail(Long userId, String userFistName, String userEmail, String token, String language);
+    void sendRestoreEmail(Long userId, String userFistName, String userEmail, String token, String language,
+        Boolean isUbs);
 
     /**
      * Sends email notification about not marked habits during 3 last days.

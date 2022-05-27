@@ -182,13 +182,16 @@ public class EmailServiceImpl implements EmailService {
      * @param token     password recovery token.
      */
     @Override
-    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language) {
+    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language,
+        Boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
+        model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, userName);
-        model.put(EmailConstants.RESTORE_PASS, clientLink + "/#/auth/restore?" + "token=" + token
+        model.put(EmailConstants.RESTORE_PASS, baseLink + "/auth/restore?" + "token=" + token
             + PARAM_USER_ID + userId);
         changeLocale(language);
+        model.put(EmailConstants.IS_UBS, isUbs);
         log.info(Locale.getDefault().toString());
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
         sendEmail(userEmail, EmailConstants.CONFIRM_RESTORING_PASS, template);

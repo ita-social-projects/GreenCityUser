@@ -53,32 +53,35 @@ class PasswordRecoveryServiceImplTest {
     @Test
     void sendPasswordRecoveryEmailToNonExistentUserTest() {
         String email = "foo";
+        Boolean isUbs = false;
         String language = "en";
         when(userRepo.findByEmail(email)).thenReturn(empty());
         assertThrows(NotFoundException.class,
-            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, language));
+            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language));
     }
 
     @Test
     void sendPasswordRecoveryEmailToUserWithExistentRestorePasswordEmailTest() {
         String email = "foo";
+        Boolean isUbs = false;
         String language = "en";
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(
             User.builder().restorePasswordEmail(new RestorePasswordEmail()).build()));
         assertThrows(WrongEmailException.class,
-            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, language));
+            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language));
     }
 
     @Test
     void sendPasswordRecoveryEmailToSimpleTest() {
         String email = "foo";
+        Boolean isUbs = true;
         String language = "en";
         User user = new User();
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
         String token = "bar";
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn(token);
         ReflectionTestUtils.setField(passwordRecoveryService, "tokenExpirationTimeInHours", 24);
-        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, language);
+        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language);
         verify(restorePasswordEmailRepo).save(refEq(
             RestorePasswordEmail.builder()
                 .user(user)
@@ -90,7 +93,8 @@ class PasswordRecoveryServiceImplTest {
             refEq(user.getName()),
             refEq(user.getEmail()),
             refEq(token),
-            refEq(language));
+            refEq(language),
+            refEq(isUbs));
     }
 //
 //    @Test
