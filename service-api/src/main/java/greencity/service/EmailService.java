@@ -139,5 +139,5 @@ public interface EmailService {
      *
      * @author Pavlo Hural.
      */
-    void sendSuccessRestorePasswordByEmail(String email, String language);
+    void sendSuccessRestorePasswordByEmail(String email, String language, String userName, Boolean isUbs);
 }

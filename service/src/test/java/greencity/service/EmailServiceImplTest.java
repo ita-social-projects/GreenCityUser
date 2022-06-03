@@ -178,7 +178,9 @@ class EmailServiceImplTest {
     void sendSuccessRestorePasswordByEmailTest() {
         String email = "test@gmail.com";
         String lang = "en";
-        service.sendSuccessRestorePasswordByEmail(email, lang);
+        String userName = "Helgi";
+        Boolean isUbs = false;
+        service.sendSuccessRestorePasswordByEmail(email, lang, userName, isUbs);
 
         verify(javaMailSender).createMimeMessage();
     }

@@ -23,4 +23,6 @@ public class OwnRestoreDto {
 
     @NotBlank
     private String token;
+
+    private Boolean isUbs;
 }

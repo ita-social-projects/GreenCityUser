@@ -295,16 +295,15 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendSuccessRestorePasswordByEmail(String email, String language) {
-        String subject;
-        String content;
-        if (Objects.equals(language, "en")) {
-            subject = "Restore password";
-            content = "Your password has been reset";
-        } else {
-            subject = "Скидання паролю";
-            content = "Ваш пароль змінено";
-        }
-        sendEmail(email, subject, content);
+    public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, Boolean isUbs) {
+        Map<String, Object> model = new HashMap<>();
+        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
+        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.USER_NAME, userName);
+        changeLocale(language);
+        model.put(EmailConstants.IS_UBS, isUbs);
+        log.info(Locale.getDefault().toString());
+        String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
+        sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
     }
 }

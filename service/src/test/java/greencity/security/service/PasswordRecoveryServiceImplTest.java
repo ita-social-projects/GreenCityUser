@@ -153,6 +153,7 @@ class PasswordRecoveryServiceImplTest {
     void testUpdatePasswordUsingToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
         user.setLanguage(ModelUtils.getLanguage());
+        TEST_OWN_RESTORE_DTO.setIsUbs(true);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
             .thenReturn(ofNullable(TEST_RESTORE_PASSWORD_EMAIL));
@@ -160,13 +161,13 @@ class PasswordRecoveryServiceImplTest {
         when(ownSecurityRepo.findByUserId(2L)).thenReturn(ofNullable(TEST_OWN_SECURITY));
         when(ownSecurityRepo.save(TEST_OWN_SECURITY)).thenReturn(TEST_OWN_SECURITY);
         doNothing().when(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(),
-            user.getLanguage().getCode());
+            user.getLanguage().getCode(), user.getName(), true);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         doNothing().when(restorePasswordEmailRepo).delete(TEST_RESTORE_PASSWORD_EMAIL);
 
         passwordRecoveryService.updatePasswordUsingToken(TEST_OWN_RESTORE_DTO);
 
-        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode());
+        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(), user.getName(), true);
         verify(restorePasswordEmailRepo).findByToken(TEST_OWN_RESTORE_DTO.getToken());
         verify(passwordEncoder).encode(TEST_OWN_RESTORE_DTO.getPassword());
         verify(ownSecurityRepo).findByUserId(2L);
@@ -179,6 +180,7 @@ class PasswordRecoveryServiceImplTest {
     void testUpdatePasswordUsingGoogleToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
         user.setLanguage(ModelUtils.getLanguage());
+        TEST_OWN_RESTORE_DTO.setIsUbs(false);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
             .thenReturn(ofNullable(TEST_RESTORE_PASSWORD_EMAIL));
@@ -186,13 +188,13 @@ class PasswordRecoveryServiceImplTest {
         when(ownSecurityRepo.findByUserId(2L)).thenReturn(empty());
         when(userRepo.findById(2L)).thenReturn(ofNullable(TEST_USER));
         doNothing().when(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(),
-            user.getLanguage().getCode());
+            user.getLanguage().getCode(), user.getName(), false);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         doNothing().when(restorePasswordEmailRepo).delete(TEST_RESTORE_PASSWORD_EMAIL);
 
         passwordRecoveryService.updatePasswordUsingToken(TEST_OWN_RESTORE_DTO);
 
-        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode());
+        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(), user.getName(), false);
         verify(restorePasswordEmailRepo).findByToken(TEST_OWN_RESTORE_DTO.getToken());
         verify(passwordEncoder).encode(TEST_OWN_RESTORE_DTO.getPassword());
         verify(ownSecurityRepo).findByUserId(2L);

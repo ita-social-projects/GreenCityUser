@@ -116,10 +116,11 @@ class OwnSecurityControllerTest {
         String content = "{\n" +
             "  \"confirmPassword\": \"String123=\",\n" +
             "  \"password\": \"String124=\",\n" +
-            "  \"token\": \"12345\"\n" +
+            "  \"token\": \"12345\",\n" +
+            "  \"isUbs\": \"false\"\n" +
             "}";
 
-        OwnRestoreDto form = new OwnRestoreDto("String124=", "String123=", "12345");
+        OwnRestoreDto form = new OwnRestoreDto("String124=", "String123=", "12345", false);
 
         mockMvc.perform(post(LINK + "/updatePassword")
             .contentType(MediaType.APPLICATION_JSON)
