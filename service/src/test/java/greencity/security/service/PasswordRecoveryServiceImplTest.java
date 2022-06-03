@@ -167,7 +167,8 @@ class PasswordRecoveryServiceImplTest {
 
         passwordRecoveryService.updatePasswordUsingToken(TEST_OWN_RESTORE_DTO);
 
-        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(), user.getName(), true);
+        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(),
+            user.getName(), true);
         verify(restorePasswordEmailRepo).findByToken(TEST_OWN_RESTORE_DTO.getToken());
         verify(passwordEncoder).encode(TEST_OWN_RESTORE_DTO.getPassword());
         verify(ownSecurityRepo).findByUserId(2L);
@@ -194,7 +195,8 @@ class PasswordRecoveryServiceImplTest {
 
         passwordRecoveryService.updatePasswordUsingToken(TEST_OWN_RESTORE_DTO);
 
-        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(), user.getName(), false);
+        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(),
+            user.getName(), false);
         verify(restorePasswordEmailRepo).findByToken(TEST_OWN_RESTORE_DTO.getToken());
         verify(passwordEncoder).encode(TEST_OWN_RESTORE_DTO.getPassword());
         verify(ownSecurityRepo).findByUserId(2L);
