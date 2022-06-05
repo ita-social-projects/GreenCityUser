@@ -82,7 +82,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
      */
     @Transactional
     @Override
-    public void sendPasswordRecoveryEmailTo(String email, Boolean isUbs, String language) {
+    public void sendPasswordRecoveryEmailTo(String email, boolean isUbs, String language) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
@@ -110,7 +110,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {
             updatePassword(form.getPassword(), restorePasswordEmail.getUser().getId());
             emailService.sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(),
-                user.getName(), form.getIsUbs());
+                user.getName(), form.isUbs());
             applicationEventPublisher.publishEvent(
                 new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
             restorePasswordEmailRepo.delete(restorePasswordEmail);
@@ -133,7 +133,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
      * @param user  {@link User} - User whose password is to be recovered
      * @param token {@link String} - token for password restoration
      */
-    private void savePasswordRestorationTokenForUser(User user, String token, String language, Boolean isUbs) {
+    private void savePasswordRestorationTokenForUser(User user, String token, String language, boolean isUbs) {
         RestorePasswordEmail restorePasswordEmail =
             RestorePasswordEmail.builder()
                 .user(user)

@@ -148,7 +148,7 @@ public class OwnSecurityController {
     @ApiLocale
     public ResponseEntity<Object> restore(@RequestParam @Email String email,
         @RequestParam Optional<String> ubs, @ApiIgnore @ValidLanguage Locale locale) {
-        Boolean isUbs = ubs.isPresent();
+        boolean isUbs = ubs.isPresent();
         log.info(Locale.getDefault().toString());
         passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, locale.getLanguage());
         return ResponseEntity.ok().build();

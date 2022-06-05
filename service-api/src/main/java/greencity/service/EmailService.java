@@ -88,7 +88,7 @@ public interface EmailService {
      * @param token        password recovery token.
      */
     void sendRestoreEmail(Long userId, String userFistName, String userEmail, String token, String language,
-        Boolean isUbs);
+        boolean isUbs);
 
     /**
      * Sends email notification about not marked habits during 3 last days.
@@ -139,5 +139,5 @@ public interface EmailService {
      *
      * @author Pavlo Hural.
      */
-    void sendSuccessRestorePasswordByEmail(String email, String language, String userName, Boolean isUbs);
+    void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
 }

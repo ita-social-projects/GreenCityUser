@@ -53,7 +53,7 @@ class PasswordRecoveryServiceImplTest {
     @Test
     void sendPasswordRecoveryEmailToNonExistentUserTest() {
         String email = "foo";
-        Boolean isUbs = false;
+        boolean isUbs = false;
         String language = "en";
         when(userRepo.findByEmail(email)).thenReturn(empty());
         assertThrows(NotFoundException.class,
@@ -63,7 +63,7 @@ class PasswordRecoveryServiceImplTest {
     @Test
     void sendPasswordRecoveryEmailToUserWithExistentRestorePasswordEmailTest() {
         String email = "foo";
-        Boolean isUbs = false;
+        boolean isUbs = false;
         String language = "en";
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(
             User.builder().restorePasswordEmail(new RestorePasswordEmail()).build()));
@@ -74,7 +74,7 @@ class PasswordRecoveryServiceImplTest {
     @Test
     void sendPasswordRecoveryEmailToSimpleTest() {
         String email = "foo";
-        Boolean isUbs = true;
+        boolean isUbs = true;
         String language = "en";
         User user = new User();
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
@@ -89,12 +89,12 @@ class PasswordRecoveryServiceImplTest {
                 .build(),
             "expiryDate"));
         verify(emailService).sendRestoreEmail(
-            refEq(user.getId()),
-            refEq(user.getName()),
-            refEq(user.getEmail()),
-            refEq(token),
-            refEq(language),
-            refEq(isUbs));
+            user.getId(),
+            user.getName(),
+            user.getEmail(),
+            token,
+            language,
+            true);
     }
 //
 //    @Test
@@ -153,7 +153,7 @@ class PasswordRecoveryServiceImplTest {
     void testUpdatePasswordUsingToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
         user.setLanguage(ModelUtils.getLanguage());
-        TEST_OWN_RESTORE_DTO.setIsUbs(true);
+        TEST_OWN_RESTORE_DTO.setUbs(true);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
             .thenReturn(ofNullable(TEST_RESTORE_PASSWORD_EMAIL));
@@ -181,7 +181,7 @@ class PasswordRecoveryServiceImplTest {
     void testUpdatePasswordUsingGoogleToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
         user.setLanguage(ModelUtils.getLanguage());
-        TEST_OWN_RESTORE_DTO.setIsUbs(false);
+        TEST_OWN_RESTORE_DTO.setUbs(false);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
             .thenReturn(ofNullable(TEST_RESTORE_PASSWORD_EMAIL));
