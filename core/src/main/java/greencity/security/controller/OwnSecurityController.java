@@ -28,6 +28,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.security.Principal;
 import java.util.Locale;
+import java.util.Optional;
 
 import static greencity.constant.ErrorMessage.*;
 import static greencity.constant.ValidationConstants.USER_CREATED;
@@ -146,9 +147,10 @@ public class OwnSecurityController {
     @GetMapping("/restorePassword")
     @ApiLocale
     public ResponseEntity<Object> restore(@RequestParam @Email String email,
-        @ApiIgnore @ValidLanguage Locale locale) {
+        @RequestParam Optional<String> ubs, @ApiIgnore @ValidLanguage Locale locale) {
+        boolean isUbs = ubs.isPresent();
         log.info(Locale.getDefault().toString());
-        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, locale.getLanguage());
+        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, locale.getLanguage());
         return ResponseEntity.ok().build();
     }
 

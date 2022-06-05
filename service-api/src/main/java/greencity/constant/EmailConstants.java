@@ -8,6 +8,7 @@ public final class EmailConstants {
     public static final String NEWS = "Eco news from GreenCity";
     public static final String CREATED_NEWS = "You created news on GreenCity ";
     public static final String VERIFY_EMAIL = "Verify your email address";
+    public static final String RESTORED_PASSWORD = "Restore password";
     public static final String CONFIRM_RESTORING_PASS = "Confirm restoring password";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
     public static final String DEACTIVATION = "Your account was deactivated";
@@ -33,6 +34,7 @@ public final class EmailConstants {
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
+    public static final String SUCCESS_RESTORED_PASSWORD_PAGE = "success-restored-password-page";
     public static final String USER_APPROVAL_EMAIL_PAGE = "user-approval-email-page";
     public static final String CHANGE_PLACE_STATUS_EMAIL_PAGE = "change-place-status-email-page";
     public static final String NEWS_RECEIVE_EMAIL_PAGE = "news-receive-email-page";
