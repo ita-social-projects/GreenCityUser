@@ -110,7 +110,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {
             updatePassword(form.getPassword(), restorePasswordEmail.getUser().getId());
             emailService.sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(),
-                user.getName(), form.isUbs());
+                user.getName(), form.getIsUbs());
             applicationEventPublisher.publishEvent(
                 new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
             restorePasswordEmailRepo.delete(restorePasswordEmail);

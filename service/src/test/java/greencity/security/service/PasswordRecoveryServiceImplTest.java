@@ -153,7 +153,7 @@ class PasswordRecoveryServiceImplTest {
     void testUpdatePasswordUsingToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
         user.setLanguage(ModelUtils.getLanguage());
-        TEST_OWN_RESTORE_DTO.setUbs(true);
+        TEST_OWN_RESTORE_DTO.setIsUbs(true);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
             .thenReturn(ofNullable(TEST_RESTORE_PASSWORD_EMAIL));
@@ -181,7 +181,7 @@ class PasswordRecoveryServiceImplTest {
     void testUpdatePasswordUsingGoogleToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
         user.setLanguage(ModelUtils.getLanguage());
-        TEST_OWN_RESTORE_DTO.setUbs(false);
+        TEST_OWN_RESTORE_DTO.setIsUbs(false);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
             .thenReturn(ofNullable(TEST_RESTORE_PASSWORD_EMAIL));
