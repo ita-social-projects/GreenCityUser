@@ -152,7 +152,6 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.VERIFY_ADDRESS, baseLink + "?token=" + token + PARAM_USER_ID + id);
         changeLocale(language);
         model.put(EmailConstants.IS_UBS, isUbs);
-        log.info(Locale.getDefault().toString());
         String template = createEmailTemplate(model, EmailConstants.VERIFY_EMAIL_PAGE);
         sendEmail(email, EmailConstants.VERIFY_EMAIL, template);
     }
@@ -182,14 +181,16 @@ public class EmailServiceImpl implements EmailService {
      * @param token     password recovery token.
      */
     @Override
-    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language) {
+    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language,
+        boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
+        model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, userName);
-        model.put(EmailConstants.RESTORE_PASS, clientLink + "/#/auth/restore?" + "token=" + token
+        model.put(EmailConstants.RESTORE_PASS, baseLink + "/auth/restore?" + "token=" + token
             + PARAM_USER_ID + userId);
         changeLocale(language);
-        log.info(Locale.getDefault().toString());
+        model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
         sendEmail(userEmail, EmailConstants.CONFIRM_RESTORING_PASS, template);
     }
@@ -253,7 +254,6 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.USER_NAME, userDeactivationDto.getName());
         model.put(EmailConstants.REASONS, userDeactivationDto.getDeactivationReasons());
         changeLocale(userDeactivationDto.getLang());
-        log.info(Locale.getDefault().toString());
         String template = createEmailTemplate(model, EmailConstants.REASONS_OF_DEACTIVATION_PAGE);
         sendEmail(userDeactivationDto.getEmail(), EmailConstants.DEACTIVATION, template);
     }
@@ -264,7 +264,6 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userActivationDto.getName());
         changeLocale(userActivationDto.getLang());
-        log.info(Locale.getDefault().toString());
         String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
         sendEmail(userActivationDto.getEmail(), EmailConstants.ACTIVATION, template);
     }
@@ -277,7 +276,6 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.DESCRIPTION, dto.getViolationDescription());
         model.put(EmailConstants.LANGUAGE, dto.getLanguage());
         changeLocale(dto.getLanguage());
-        log.info(dto.getLanguage());
         String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
         sendEmail(dto.getEmail(), EmailConstants.VIOLATION_EMAIL, template);
     }
@@ -292,16 +290,14 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendSuccessRestorePasswordByEmail(String email, String language) {
-        String subject;
-        String content;
-        if (Objects.equals(language, "en")) {
-            subject = "Restore password";
-            content = "Your password has been reset";
-        } else {
-            subject = "Скидання паролю";
-            content = "Ваш пароль змінено";
-        }
-        sendEmail(email, subject, content);
+    public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs) {
+        Map<String, Object> model = new HashMap<>();
+        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
+        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.USER_NAME, userName);
+        changeLocale(language);
+        model.put(EmailConstants.IS_UBS, isUbs);
+        String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
+        sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
     }
 }
