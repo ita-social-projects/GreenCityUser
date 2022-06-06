@@ -1,6 +1,5 @@
 package greencity.service;
 
-import greencity.dto.user.UserVO;
 import greencity.dto.useraction.UserActionMessage;
 import greencity.entity.User;
 import greencity.enums.UserActionType;

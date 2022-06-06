@@ -1,6 +1,5 @@
 package greencity.security.service;
 
-import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserAdminRegistrationDto;
@@ -9,7 +8,6 @@ import greencity.dto.user.UserVO;
 import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
-import greencity.enums.UserActionType;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.repository.UserRepo;
@@ -27,12 +25,10 @@ import greencity.service.EmailService;
 import greencity.service.KafkaMessagingService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,8 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
