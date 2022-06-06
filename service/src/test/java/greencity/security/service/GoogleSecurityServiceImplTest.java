@@ -4,18 +4,15 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.ModelUtils;
 import greencity.TestConst;
-import greencity.dto.achievement.AchievementVO;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
 import greencity.entity.User;
-import greencity.entity.UserAchievement;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
-import greencity.service.AchievementService;
+import greencity.service.KafkaMessagingService;
 import greencity.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,17 +23,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -46,6 +38,8 @@ import static org.mockito.Mockito.when;
 class GoogleSecurityServiceImplTest {
     @Mock
     private UserService userService;
+    @Mock
+    KafkaMessagingService kafkaMessagingService;
     @Mock
     UserRepo userRepo;
     @Mock
@@ -58,8 +52,6 @@ class GoogleSecurityServiceImplTest {
     ModelMapper modelMapper;
     @Spy
     GoogleIdToken.Payload payload;
-    @Mock
-    AchievementService achievementService;
 
     @InjectMocks
     GoogleSecurityServiceImpl googleSecurityService;
@@ -86,25 +78,16 @@ class GoogleSecurityServiceImplTest {
         UserVO userVO = ModelUtils.getUserVO();
         User user =
             ModelUtils.getUser();
-        List<Achievement> achievementList =
-            Collections.singletonList(ModelUtils.getAchievement());
-        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
-        List<UserAchievement> userAchievementList =
-            Collections.singletonList(ModelUtils.getUserAchievement());
         userVO.setId(null);
         userVO.setName(null);
         user.setId(null);
         user.setName(null);
-        user.setUserAchievements(userAchievementList);
         when(googleIdTokenVerifier.verify("1234")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("taras@mail.com");
         when(userService.findByEmail("taras@mail.com")).thenReturn(null);
         when(modelMapper.map(any(), eq(UserVO.class))).thenReturn(userVO);
-        when(userRepo.save(any())).thenReturn(user);
-        when(achievementService.findAll()).thenReturn(achievementVOList);
-        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);
+        when(userRepo.saveAndFlush(any())).thenReturn(user);
         SuccessSignInDto result =
             googleSecurityService.authenticate("1234", "ua");
         assertNull(result.getUserId());

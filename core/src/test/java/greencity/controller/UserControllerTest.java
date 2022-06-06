@@ -8,10 +8,6 @@ import static greencity.constant.AppConstant.AUTHORIZATION;
 
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
-import greencity.dto.achievement.AchievementVO;
-import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.achievement.UserVOAchievement;
-import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
@@ -462,33 +458,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.id").value(1L))
             .andExpect(jsonPath("$.name").value(TestConst.NAME))
             .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
-    }
-
-    @Test
-    void findUserForAchievementTest() throws Exception {
-        UserVOAchievement userVOAchievement = UserVOAchievement.builder()
-            .id(1L)
-            .name(TestConst.NAME)
-            .userAchievements(List.of(
-                UserAchievementVO.builder()
-                    .id(10L)
-                    .user(ModelUtils.getUserVO())
-                    .achievement(AchievementVO.builder()
-                        .id(20L)
-                        .achievementCategory(AchievementCategoryVO.builder()
-                            .id(30L)
-                            .name("TestAchievementCategory")
-                            .build())
-                        .build())
-                    .build()))
-            .build();
-        when(userService.findUserForAchievement(1L)).thenReturn(userVOAchievement);
-        mockMvc.perform(get(userLink + "/findByIdForAchievement")
-            .param("id", "1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.name").value(TestConst.NAME))
-            .andExpect(jsonPath("$.userAchievements.length()").value(1));
     }
 
     @Test
