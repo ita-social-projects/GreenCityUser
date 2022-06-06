@@ -67,6 +67,9 @@ class UserServiceImplTest {
     UserDeactivationRepo userDeactivationRepo;
 
     @Mock
+    KafkaMessagingService kafkaMessagingService;
+
+    @Mock
     LanguageRepo languageRepo;
 
     private User user = User.builder()
