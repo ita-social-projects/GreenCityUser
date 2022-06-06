@@ -1,30 +1,24 @@
 package greencity.service;
 
-import greencity.constant.UpdateConstants;
-import greencity.dto.UbsCustomerDto;
-import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
-import greencity.entity.Language;
-import greencity.entity.UserDeactivationReason;
-import greencity.enums.UserStatusRequest;
-import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
+import greencity.constant.UpdateConstants;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
-import greencity.dto.achievement.UserVOAchievement;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
-import greencity.entity.SocialNetwork;
-import greencity.entity.SocialNetworkImage;
-import greencity.entity.User;
-import greencity.entity.VerifyEmail;
+import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.*;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import greencity.enums.UserStatusRequest;
 import greencity.exception.exceptions.*;
+import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
@@ -65,6 +59,7 @@ public class UserServiceImpl implements UserService {
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
     private final UserDeactivationRepo userDeactivationRepo;
+    private final KafkaMessagingService kafkaMessagingService;
     /**
      * Autowired mapper.
      */
@@ -90,16 +85,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findById(id)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
         return modelMapper.map(user, UserVO.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public UserVOAchievement findUserForAchievement(Long id) {
-        User user = userRepo.findUserForAchievement(id)
-            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
-        return modelMapper.map(user, UserVOAchievement.class);
     }
 
     /**
@@ -262,6 +247,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void acceptFriendRequest(Long userId, Long friendId) {
         checkFriendRequest(userId, friendId);
+        kafkaMessagingService.sendFriendAddedEvent(userRepo.getOne(userId), userRepo.getOne(friendId));
         userRepo.acceptFriendRequest(userId, friendId);
     }
 

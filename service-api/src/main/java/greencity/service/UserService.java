@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
@@ -12,13 +11,12 @@ import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import java.time.LocalDateTime;
-import java.util.Map;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -29,10 +27,10 @@ import java.util.Optional;
  */
 public interface UserService {
     /**
-     * Find all {@link User}'s with {@link EmailNotification} type.
+     * Find all {@link greencity.entity.User}'s with {@link EmailNotification} type.
      *
      * @param emailNotification - type of {@link EmailNotification}
-     * @return list of {@link User}'s
+     * @return list of {@link greencity.entity.User}'s
      */
     List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
 
@@ -53,8 +51,9 @@ public interface UserService {
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described
-     * in {@link User} under {@link NamedNativeQuery} annotation. Spring Data JPA
-     * can run a named native query that follows the naming convention
+     * in {@link greencity.entity.User} under
+     * {@link javax.persistence.NamedNativeQuery} annotation. Spring Data JPA can
+     * run a named native query that follows the naming convention
      * {entityClass.repositoryMethodName}.
      *
      * @return {@link List} of {@link RegistrationStatisticsDtoResponse}
@@ -76,14 +75,6 @@ public interface UserService {
      * @return {@link UserVO}
      */
     UserVO findById(Long id);
-
-    /**
-     * Method that allow you to find {@link UserVO} by ID.
-     *
-     * @param id a value of {@link Long}
-     * @return {@link UserVO}
-     */
-    UserVOAchievement findUserForAchievement(Long id);
 
     /**
      * Method that allow you to delete {@link UserVO} by ID.

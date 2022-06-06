@@ -12,15 +12,6 @@ CREATE TABLE users_friends(
 INSERT INTO languages (id, code)
 VALUES (1, 'ua');
 
-INSERT INTO achievement_categories(id, name)
-VALUES (1, 'Category 1');
-
-INSERT INTO achievements(id, achievement_category_id, condition)
-VALUES (1, 1, 10);
-
-INSERT INTO achievements(id, achievement_category_id, condition)
-VALUES (2, 1, 10);
-
 INSERT INTO users (id,
                    date_of_registration,
                    email,
@@ -192,10 +183,3 @@ VALUES (4, 5, 'REQUEST', '2020-09-10 21:00:00+02');
 
 INSERT INTO users_friends(user_id, friend_id, status, created_date)
 VALUES (5, 4, 'REQUEST', '2020-09-10 21:00:00+02');
-
-
-INSERT INTO user_achievements(user_id, achievement_id, achievement_status, notified)
-VALUES (1, 1, 'ACTIVE', false);
-
-INSERT INTO user_achievements(user_id, achievement_id, achievement_status, notified)
-VALUES (1, 2, 'ACTIVE', false);

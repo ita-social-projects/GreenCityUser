@@ -1,23 +1,16 @@
 package greencity.security.service;
 
-import greencity.TestConst;
-import greencity.client.RestClient;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import greencity.ModelUtils;
-import greencity.client.RestClient;
+import greencity.TestConst;
 import greencity.constant.ErrorMessage;
-import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
-import greencity.entity.*;
+import greencity.entity.Language;
+import greencity.entity.User;
+import greencity.entity.VerifyEmail;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
@@ -29,17 +22,10 @@ import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
-import greencity.service.AchievementService;
 import greencity.service.EmailService;
+import greencity.service.KafkaMessagingService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
-
-import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.logging.ErrorManager;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,9 +34,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -78,13 +72,10 @@ class OwnSecurityServiceImplTest {
     UserRepo userRepo;
 
     @Mock
-    AchievementService achievementService;
-
-    @Mock
     EmailService emailService;
 
     @Mock
-    RestClient restClient;
+    KafkaMessagingService kafkaMessagingService;
 
     private OwnSecurityService ownSecurityService;
 
@@ -97,9 +88,9 @@ class OwnSecurityServiceImplTest {
     @BeforeEach
     public void init() {
         initMocks(this);
-        ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, userService, passwordEncoder,
-            jwtTool, 1, restorePasswordEmailRepo, modelMapper,
-            userRepo, achievementService, emailService, restClient);
+        ownSecurityService = new OwnSecurityServiceImpl(userRepo, ownSecurityRepo, restorePasswordEmailRepo,
+            userService, emailService, kafkaMessagingService, passwordEncoder, jwtTool, modelMapper);
+        ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")
@@ -137,15 +128,8 @@ class OwnSecurityServiceImplTest {
     void signUp() {
         User user = ModelUtils.getUser();
         UserVO userVO = ModelUtils.getUserVO();
-        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
-        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
-        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
-        user.setUserAchievements(userAchievementList);
-        when(achievementService.findAll()).thenReturn(achievementVOList);
-        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
-        when(userRepo.save(any(User.class))).thenReturn(user);
+        when(userRepo.saveAndFlush(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
         ownSecurityService.signUp(new OwnSignUpDto(), "en");
         verify(emailService, times(1)).sendVerificationEmail(
@@ -162,16 +146,9 @@ class OwnSecurityServiceImplTest {
         OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
         User user = User.builder().verifyEmail(new VerifyEmail()).build();
         UserVO userVO = UserVO.builder().verifyEmail(new VerifyEmailVO()).build();
-        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
-        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
-        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
-        user.setUserAchievements(userAchievementList);
-        when(achievementService.findAll()).thenReturn(achievementVOList);
-        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
-        when(userRepo.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
+        when(userRepo.saveAndFlush(any(User.class))).thenThrow(DataIntegrityViolationException.class);
         assertThrows(UserAlreadyRegisteredException.class,
             () -> ownSecurityService.signUp(ownSignUpDto, "en"));
     }

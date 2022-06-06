@@ -220,13 +220,6 @@ class UserRepoTest {
     }
 
     @Test
-    void findUserForAchievementTest() {
-        User actual = userRepo.findByEmail("test@email.com").get();
-        User expected = userRepo.findUserForAchievement(1L).get();
-        assertEquals(expected, actual);
-    }
-
-    @Test
     void findUserByUuidTest() {
         String uuid = "1488";
         User actual = userRepo.findByEmail("test8@email.com").get();
