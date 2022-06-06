@@ -2,19 +2,13 @@ package greencity;
 
 import greencity.constant.AppConstant;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.AchievementVO;
-import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.*;
-import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.*;
-import greencity.entity.localization.AchievementTranslation;
-import greencity.enums.AchievementStatus;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -188,37 +182,6 @@ public class ModelUtils {
                     .build())
                 .build())
             .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
-            .userAchievements(List.of(
-                UserAchievementVO.builder()
-                    .id(47L)
-                    .achievementStatus(AchievementStatus.ACTIVE)
-                    .user(UserVO.builder()
-                        .id(13L)
-                        .build())
-                    .achievement(AchievementVO.builder()
-                        .id(56L)
-                        .build())
-                    .build(),
-                UserAchievementVO.builder()
-                    .id(39L)
-                    .achievementStatus(AchievementStatus.INACTIVE)
-                    .user(UserVO.builder()
-                        .id(13L)
-                        .build())
-                    .achievement(AchievementVO.builder()
-                        .id(14L)
-                        .build())
-                    .build()))
-            .userActions(Collections.singletonList(UserActionVO.builder()
-                .id(13L)
-                .achievementCategory(AchievementCategoryVO.builder()
-                    .id(1L)
-                    .build())
-                .count(0)
-                .user(UserVO.builder()
-                    .id(13L)
-                    .build())
-                .build()))
             .languageVO(LanguageVO.builder()
                 .id(1L)
                 .code("ua")
@@ -232,23 +195,6 @@ public class ModelUtils {
 
     public static UserProfilePictureDto getUserProfilePictureDto() {
         return new UserProfilePictureDto(1L, "name", "image");
-    }
-
-    public static Achievement getAchievement() {
-        return new Achievement(1L, Collections.singletonList(getAchievementTranslation()), Collections.emptyList(),
-            new AchievementCategory(), 1);
-    }
-
-    public static AchievementVO getAchievementVO() {
-        return new AchievementVO(1L, Collections.emptyList(), Collections.emptyList(), new AchievementCategoryVO(), 1);
-    }
-
-    public static AchievementTranslation getAchievementTranslation() {
-        return new AchievementTranslation(1L, getLanguage(), "Title", "Description", "Message", null);
-    }
-
-    public static UserAchievement getUserAchievement() {
-        return new UserAchievement(1L, getUser(), getAchievement(), AchievementStatus.ACTIVE, false);
     }
 
     public static EcoNewsAuthorDto getEcoNewsAuthorDto() {

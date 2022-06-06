@@ -7,14 +7,16 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
-import greencity.entity.*;
+import greencity.entity.Language;
+import greencity.entity.User;
+import greencity.entity.UserDeactivationReason;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.exception.exceptions.*;
@@ -22,6 +24,7 @@ import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
+import greencity.service.kafka.UserActionMessagingService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -49,7 +52,6 @@ import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -64,6 +66,9 @@ class UserServiceImplTest {
 
     @Mock
     UserDeactivationRepo userDeactivationRepo;
+
+    @Mock
+    UserActionMessagingService userActionMessagingService;
 
     @Mock
     LanguageRepo languageRepo;
@@ -1148,17 +1153,6 @@ class UserServiceImplTest {
         String uuid = "uuid";
         assertThrows(NotFoundException.class,
             () -> userService.markUserAsDeactivated(uuid));
-    }
-
-    @Test
-    void findUserForAchievementTest() {
-        Long id = 1L;
-        UserVOAchievement userVOAchievement = UserVOAchievement.builder().id(id).build();
-        User user = User.builder().id(id).build();
-        when(userRepo.findUserForAchievement(id)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVOAchievement.class)).thenReturn(userVOAchievement);
-        assertEquals(userVOAchievement, userService.findUserForAchievement(id));
-        verify(userRepo, times(1)).findUserForAchievement(id);
     }
 
     @Test

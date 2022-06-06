@@ -6,8 +6,6 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -15,59 +13,34 @@ import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
-import greencity.service.AchievementService;
+import greencity.service.kafka.UserActionMessagingService;
 import greencity.service.UserService;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.UUID;
 
 import static greencity.constant.AppConstant.*;
-import static greencity.security.service.OwnSecurityServiceImpl.getUserAchievements;
-import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 
 /**
  * {@inheritDoc}
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final UserService userService;
     private final GoogleIdTokenVerifier googleIdTokenVerifier;
     private final JwtTool jwtTool;
     private final ModelMapper modelMapper;
-    private final AchievementService achievementService;
     private final UserRepo userRepo;
-
-    /**
-     * Constructor.
-     *
-     * @param userService           {@link UserService} - service of {@link User}
-     *                              logic.
-     * @param jwtTool               {@link JwtTool} - tool for jwt logic.
-     * @param googleIdTokenVerifier {@link GoogleIdTokenVerifier} - tool for verify
-     */
-    @Autowired
-    public GoogleSecurityServiceImpl(UserService userService,
-        JwtTool jwtTool,
-        GoogleIdTokenVerifier googleIdTokenVerifier,
-        ModelMapper modelMapper,
-        AchievementService achievementService,
-        UserRepo userRepo) {
-        this.userService = userService;
-        this.jwtTool = jwtTool;
-        this.googleIdTokenVerifier = googleIdTokenVerifier;
-        this.modelMapper = modelMapper;
-        this.achievementService = achievementService;
-        this.userRepo = userRepo;
-    }
+    private final UserActionMessagingService userActionMessagingService;
 
     /**
      * {@inheritDoc}
@@ -86,15 +59,12 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                     log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
                     String profilePicture = (String) payload.get(GOOGLE_PICTURE);
                     User user = createNewUser(email, userName, profilePicture, language);
-                    List<UserAchievement> userAchievementList = createUserAchievements(user);
-                    List<UserAction> userActionsList = createUserActions(user);
-                    user.setUserAchievements(userAchievementList);
-                    user.setUserActions(userActionsList);
                     user.setUuid(UUID.randomUUID().toString());
-                    User savedUser = userRepo.save(user);
+                    User savedUser = userRepo.saveAndFlush(user);
                     user.setId(savedUser.getId());
                     userVO = modelMapper.map(user, UserVO.class);
                     log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
+                    userActionMessagingService.sendRegistrationEvent(user);
                     return getSuccessSignInDto(userVO);
                 } else {
                     if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {
@@ -128,14 +98,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                 .id(modelMapper.map(language, Long.class))
                 .build())
             .build();
-    }
-
-    private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, achievementService);
-    }
-
-    private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, achievementService);
     }
 
     private SuccessSignInDto getSuccessSignInDto(UserVO user) {
