@@ -41,9 +41,9 @@ class JwtAuthenticationProviderTest {
     @Test
     void authenticateWithValidAccessToken() {
         final String accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJxcXFAZW1h"
-                + "aWwuY29tIiwicm9sZSI6WyJST0xFX0FETUlOIl0sImlhdCI6MTY1NDYyOT"
-                + "QxNSwiZXhwIjoxNjU0NjM2NjE1fQ.kmrocXfHNsyASmZ24zEUmFn1N2Oct"
-                + "2pmBWWZO0xmAt0";
+            + "aWwuY29tIiwicm9sZSI6WyJST0xFX0FETUlOIl0sImlhdCI6MTY1NDYyOT"
+            + "QxNSwiZXhwIjoxNjU0NjM2NjE1fQ.kmrocXfHNsyASmZ24zEUmFn1N2Oct"
+            + "2pmBWWZO0xmAt0";
         when(jwtTool.getAccessTokenKey()).thenReturn("123123123");
         Date actualExpiration = Jwts.parser()
             .setSigningKey(jwtTool.getAccessTokenKey())
