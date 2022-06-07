@@ -2,6 +2,7 @@ package greencity.security.jwt;
 
 import greencity.dto.user.UserVO;
 import greencity.enums.Role;
+import greencity.security.service.AuthorityService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
@@ -15,7 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-import static greencity.constant.AppConstant.AUTHORITIES;
+import static greencity.constant.AppConstant.ROLE;
 
 /**
  * Class that provides methods for working with JWT.
@@ -29,6 +30,7 @@ public class JwtTool {
     private final Integer accessTokenValidTimeInMinutes;
     private final Integer refreshTokenValidTimeInMinutes;
     private final String accessTokenKey;
+    private final AuthorityService authorityService;
 
     /**
      * Constructor.
@@ -36,10 +38,11 @@ public class JwtTool {
     @Autowired
     public JwtTool(@Value("${accessTokenValidTimeInMinutes}") Integer accessTokenValidTimeInMinutes,
         @Value("${refreshTokenValidTimeInMinutes}") Integer refreshTokenValidTimeInMinutes,
-        @Value("${tokenKey}") String accessTokenKey) {
+        @Value("${tokenKey}") String accessTokenKey, AuthorityService authorityService) {
         this.accessTokenValidTimeInMinutes = accessTokenValidTimeInMinutes;
         this.refreshTokenValidTimeInMinutes = refreshTokenValidTimeInMinutes;
         this.accessTokenKey = accessTokenKey;
+        this.authorityService = authorityService;
     }
 
     /**
@@ -50,7 +53,12 @@ public class JwtTool {
      */
     public String createAccessToken(String email, Role role) {
         Claims claims = Jwts.claims().setSubject(email);
-        claims.put(AUTHORITIES, Collections.singleton(role.name()));
+        claims.put(ROLE, Collections.singleton(role.name()));
+
+        if(role.equals(Role.ROLE_UBS_EMPLOYEE)){
+            claims.put("employee_authorities", authorityService.getAllEmploeesAuthorities(email));
+        }
+
         Date now = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
@@ -70,7 +78,8 @@ public class JwtTool {
      */
     public String createRefreshToken(UserVO user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
-        claims.put(AUTHORITIES, Collections.singleton(user.getRole().name()));
+        claims.put(ROLE, Collections.singleton(user.getRole().name()));
+//        claims.put("employee_authorities", Collections.singleton("BLA_BLA"));
         Date now = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
@@ -161,4 +170,5 @@ public class JwtTool {
         String input = dateLong + "." + UUID.randomUUID().toString();
         return Base64.getEncoder().encodeToString(input.getBytes());
     }
+
 }

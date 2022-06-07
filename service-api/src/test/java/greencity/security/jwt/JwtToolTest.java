@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import static greencity.constant.AppConstant.AUTHORITIES;
+import static greencity.constant.AppConstant.ROLE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -57,7 +57,7 @@ class JwtToolTest {
             .setSigningKey(jwtTool.getAccessTokenKey())
             .parseClaimsJws(accessToken)
             .getBody()
-            .get(AUTHORITIES);
+            .get(ROLE);
         assertEquals(expectedRole, Role.valueOf(authorities.get(0)));
     }
 
@@ -80,7 +80,7 @@ class JwtToolTest {
             .setSigningKey(userVO.getRefreshTokenKey())
             .parseClaimsJws(refreshToken)
             .getBody()
-            .get(AUTHORITIES);
+            .get(ROLE);
         assertEquals(expectedRole, Role.valueOf(authorities.get(0)));
     }
 
