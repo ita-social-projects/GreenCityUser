@@ -11,7 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static greencity.constant.AppConstant.AUTHORITIES;
+import static greencity.constant.AppConstant.ROLE;
 
 /**
  * Class that provides authentication logic.
@@ -57,7 +57,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             .setSigningKey(jwtTool.getAccessTokenKey())
             .parseClaimsJws(authentication.getName())
             .getBody()
-            .get(AUTHORITIES);
+            .get(ROLE);
         return new UsernamePasswordAuthenticationToken(
             email,
             "",

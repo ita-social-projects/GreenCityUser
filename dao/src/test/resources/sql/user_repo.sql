@@ -34,7 +34,7 @@ INSERT INTO users (id,
                    city,
                    language_id)
 VALUES (1, '2020-09-30T00:00', 'test@email.com', 0, 'SuperTest', '2020-09-30T00:00',
-        0, 2, 'secret', 10, 'New York',1);
+        'ROLE_USER', 2, 'secret', 10, 'New York',1);
 
 INSERT INTO users (id,
                    date_of_registration,
@@ -49,7 +49,7 @@ INSERT INTO users (id,
                    city,
                    language_id)
 VALUES (2, '2020-09-29T00:00', 'test2@email.com', 0, 'SuperTest2', '2020-09-29T00:00',
-        0, 2, 'secret', 10, 'LA',1);
+        'ROLE_USER', 2, 'secret', 10, 'LA',1);
 
 INSERT INTO users (id,
                    date_of_registration,
@@ -65,7 +65,7 @@ INSERT INTO users (id,
                    uuid,
                    language_id)
 VALUES (3, '2020-09-28T00:00', 'test3@email.com', 0, 'SuperTest3', '2020-09-28T00:00',
-        0, 2, 'secret', 10, 'Chicago', '444e66e8-8daa-4cb0-8269-a8d856e7dd15' ,1);
+        'ROLE_USER', 2, 'secret', 10, 'Chicago', '444e66e8-8daa-4cb0-8269-a8d856e7dd15' ,1);
 
 INSERT INTO users (id,
                    date_of_registration,
@@ -80,7 +80,7 @@ INSERT INTO users (id,
                    city,
                    language_id)
 VALUES (4, '2020-09-27T00:00', 'test4@email.com', 1, 'SuperTest4', '2020-09-27T00:00',
-        0, 2, 'secret', 10, 'Miami',1);
+        'ROLE_USER', 2, 'secret', 10, 'Miami',1);
 
 INSERT INTO users (id,
                    date_of_registration,
@@ -96,7 +96,7 @@ INSERT INTO users (id,
                    city,
                    language_id)
 VALUES (5, '2020-09-26T00:00', 'test5@email.com', 1, 'SuperTest5',
-        '2020-09-26T00:00', 0, 2, 'secret', 'pathToPicture',  10, 'Dallas',1);
+        '2020-09-26T00:00',  'ROLE_USER', 2, 'secret', 'pathToPicture',  10, 'Dallas',1);
 
 INSERT INTO users (id,
                    date_of_registration,
@@ -111,7 +111,7 @@ INSERT INTO users (id,
                    city,
                    language_id)
 VALUES (6, '2020-09-29T00:00', 'test6@email.com', 0, 'SuperTest6', '2020-09-29T00:00',
-        0, 2, 'secret', 8, 'Toronto',1);
+        'ROLE_USER', 2, 'secret', 8, 'Toronto',1);
 
 INSERT INTO users (id,
                    date_of_registration,
@@ -126,7 +126,7 @@ INSERT INTO users (id,
                    city,
                    language_id)
 VALUES (7, '2020-09-29T00:00', 'test7@email.com', 0, 'SuperTest7', '2020-09-29T00:00',
-        0, 2, 'secret', 10, 'Montreal',1);
+        'ROLE_USER', 2, 'secret', 10, 'Montreal',1);
 
 INSERT INTO users (id,
                    date_of_registration,
@@ -142,7 +142,7 @@ INSERT INTO users (id,
                    language_id,
                    uuid)
 VALUES (8, '2021-03-31T00:00', 'test8@email.com', 0, 'SuperTest8', '2020-09-29T00:00',
-        0, 2, 'secret', 10, 'Montreal',1, '1488');
+        'ROLE_USER', 2, 'secret', 10, 'Montreal',1, '1488');
 
 INSERT INTO users (id,
                    date_of_registration,
@@ -158,7 +158,7 @@ INSERT INTO users (id,
                    language_id,
                    uuid)
 VALUES (9, '2021-03-31T00:00', 'test9@email.com', 0, 'SuperTest9', '2016-09-29T00:00',
-        0, 1, 'secret', 10, 'Liverpool',1, '1489');
+        'ROLE_USER', 1, 'secret', 10, 'Liverpool',1, '1489');
 
 
 
