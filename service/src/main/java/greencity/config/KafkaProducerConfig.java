@@ -1,5 +1,6 @@
-package greencity.service;
+package greencity.config;
 
+import greencity.service.KafkaMessagingService;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
