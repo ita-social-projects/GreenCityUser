@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when;
  * @author Yurii Koval
  */
 class JwtAuthenticationProviderTest {
-    private final Role expectedRole = Role.ROLE_USER;
+    private final Role expectedRole = Role.ROLE_ADMIN;
 
     @Mock
     JwtTool jwtTool;
@@ -40,23 +40,16 @@ class JwtAuthenticationProviderTest {
 
     @Test
     void authenticateWithValidAccessToken() {
-        final String accessToken = "eyJhbGciOiJIUzI1NiJ9"
-            + ".eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVN"
-            + "FUiJdLCJpYXQiOjE1NzU4NDUzNTAsImV4cCI6NjE1NzU4NDUyOTB9"
-            + ".x1D799yGc0dj2uWDQYusnLyG5r6-Rjj6UgBhp2JjVDE";
+        final String accessToken = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJxcXFAZW1haWwu"
+            + "Y29tIiwicm9sZSI6WyJST0xFX0FETUlOIl0sImlhdCI6MTY1NDYzNjc2OSwiZXh"
+            + "wIjo2MTY1NDYzNjcwOX0.Ug-epWHV0a9f7BFPa1geKhqWysWkOdoG5wd4h2Hzpi4";
         when(jwtTool.getAccessTokenKey()).thenReturn("123123123");
-        Date expectedExpiration = new Date(61575845290000L); // 3921 year
-        Date actualExpiration = Jwts.parser()
-            .setSigningKey(jwtTool.getAccessTokenKey())
-            .parseClaimsJws(accessToken)
-            .getBody()
-            .getExpiration();
-        assertEquals(expectedExpiration, actualExpiration);
+
         Authentication authentication = new UsernamePasswordAuthenticationToken(
             accessToken,
             null);
         Authentication actual = jwtAuthenticationProvider.authenticate(authentication);
-        final String expectedEmail = "test@gmail.com";
+        final String expectedEmail = "qqq@email.com";
         assertEquals(expectedEmail, actual.getPrincipal());
         assertEquals(
             Stream.of(expectedRole)
