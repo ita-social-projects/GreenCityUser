@@ -13,7 +13,6 @@ import java.util.Set;
 @Service
 @AllArgsConstructor
 public class AuthorityServiceImpl implements AuthorityService {
-
     private final AuthorityRepo authorityRepo;
     private final UserRepo userRepo;
 
@@ -23,5 +22,4 @@ public class AuthorityServiceImpl implements AuthorityService {
             userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return authorityRepo.getAuthoritiesByEmployeeId(user.getId());
     }
-
 }

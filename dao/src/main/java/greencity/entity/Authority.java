@@ -15,7 +15,6 @@ import java.util.Set;
 @EqualsAndHashCode
 @Entity
 public class Authority {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
