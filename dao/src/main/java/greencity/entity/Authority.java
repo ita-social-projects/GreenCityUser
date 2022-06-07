@@ -25,8 +25,8 @@ public class Authority {
 
     @ManyToMany
     @JoinTable(
-            name = "employee_authorities_mapping",
-            joinColumns = {@JoinColumn(name = "authority_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")})
+        name = "employee_authorities_mapping",
+        joinColumns = {@JoinColumn(name = "authority_id")},
+        inverseJoinColumns = {@JoinColumn(name = "user_id")})
     private List<User> employees;
 }

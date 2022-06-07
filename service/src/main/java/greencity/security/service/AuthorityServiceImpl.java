@@ -12,14 +12,15 @@ import java.util.Set;
 
 @Service
 @AllArgsConstructor
-public class AuthorityServiceImpl implements AuthorityService{
+public class AuthorityServiceImpl implements AuthorityService {
 
     private final AuthorityRepo authorityRepo;
     private final UserRepo userRepo;
 
     @Override
     public Set<String> getAllEmploeesAuthorities(String email) {
-        User user = userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        User user =
+            userRepo.findByEmail(email).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return authorityRepo.getAuthoritiesByEmployeeId(user.getId());
     }
 

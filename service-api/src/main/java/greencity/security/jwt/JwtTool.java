@@ -55,7 +55,7 @@ public class JwtTool {
         Claims claims = Jwts.claims().setSubject(email);
         claims.put(ROLE, Collections.singleton(role.name()));
 
-        if(role.equals(Role.ROLE_UBS_EMPLOYEE)){
+        if (role.equals(Role.ROLE_UBS_EMPLOYEE)) {
             claims.put("employee_authorities", authorityService.getAllEmploeesAuthorities(email));
         }
 
@@ -79,7 +79,6 @@ public class JwtTool {
     public String createRefreshToken(UserVO user) {
         Claims claims = Jwts.claims().setSubject(user.getEmail());
         claims.put(ROLE, Collections.singleton(user.getRole().name()));
-//        claims.put("employee_authorities", Collections.singleton("BLA_BLA"));
         Date now = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
@@ -170,5 +169,4 @@ public class JwtTool {
         String input = dateLong + "." + UUID.randomUUID().toString();
         return Base64.getEncoder().encodeToString(input.getBytes());
     }
-
 }

@@ -10,7 +10,7 @@ import java.util.Set;
 public interface AuthorityRepo extends JpaRepository<Authority, Long> {
 
     @Query(value = "SELECT DISTINCT name from employee_authorities" +
-            " inner join employee_authorities_mapping eam on employee_authorities.id = eam.authority_id " +
-            "where user_id = :userId", nativeQuery = true)
+        " inner join employee_authorities_mapping eam on employee_authorities.id = eam.authority_id " +
+        "where user_id = :userId", nativeQuery = true)
     Set<String> getAuthoritiesByEmployeeId(@Param(value = "userId") Long employeeId);
 }
