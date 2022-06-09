@@ -36,6 +36,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import lombok.extern.slf4j.Slf4j;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.validation.Valid;
@@ -46,6 +48,7 @@ import java.util.List;
 @RequestMapping("/user")
 @AllArgsConstructor
 @Validated
+@Slf4j
 public class UserController {
     private final UserService userService;
     private final EmailService emailService;
@@ -759,8 +762,11 @@ public class UserController {
     })
     @GetMapping("/findNotDeactivatedByEmail")
     public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
+        log.warn("Email: {}", email);
+        UserVO userVO = userService.findNotDeactivatedByEmail(email).orElse(null);
+        log.warn("User: {}", userVO);
         return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.findNotDeactivatedByEmail(email).orElse(null));
+            .body(userVO);
     }
 
     /**
