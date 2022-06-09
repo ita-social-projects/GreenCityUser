@@ -50,6 +50,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                 .user(UserVO.builder()
                     .id(user.getOwnSecurity().getUser().getId())
                     .email(user.getOwnSecurity().getUser().getEmail())
+                    .role(user.getOwnSecurity().getUser().getRole())
                     .build())
                 .build() : null)
             .dateOfRegistration(user.getDateOfRegistration())
