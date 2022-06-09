@@ -401,6 +401,7 @@ public class UserServiceImpl implements UserService {
     public Optional<UserVO> findNotDeactivatedByEmail(String email) {
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        log.warn("{}",email);
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVO.class));
     }
 

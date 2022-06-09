@@ -82,6 +82,8 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
                 Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(token, null));
                 Optional<UserVO> user = userService.findNotDeactivatedByEmail((String) authentication.getPrincipal());
+                log.warn("{}", authentication.getPrincipal());
+                log.warn("{}",user);
                 if (user.isPresent()) {
                     log.debug("User successfully authenticate - {}", authentication.getPrincipal());
                     SecurityContextHolder.getContext().setAuthentication(authentication);
