@@ -762,9 +762,7 @@ public class UserController {
     })
     @GetMapping("/findNotDeactivatedByEmail")
     public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
-        log.warn("Email: {}", email);
         UserVO userVO = userService.findNotDeactivatedByEmail(email).orElse(null);
-        log.warn("User: {}", userVO);
         return ResponseEntity.status(HttpStatus.OK)
             .body(userVO);
     }
