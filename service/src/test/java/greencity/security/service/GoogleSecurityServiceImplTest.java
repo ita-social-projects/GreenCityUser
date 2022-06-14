@@ -12,7 +12,7 @@ import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
-import greencity.service.KafkaMessagingService;
+import greencity.service.kafka.UserActionMessagingService;
 import greencity.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +39,7 @@ class GoogleSecurityServiceImplTest {
     @Mock
     private UserService userService;
     @Mock
-    KafkaMessagingService kafkaMessagingService;
+    UserActionMessagingService userActionMessagingService;
     @Mock
     UserRepo userRepo;
     @Mock

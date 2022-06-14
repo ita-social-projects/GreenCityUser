@@ -24,6 +24,7 @@ import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
+import greencity.service.kafka.UserActionMessagingService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -67,7 +68,7 @@ class UserServiceImplTest {
     UserDeactivationRepo userDeactivationRepo;
 
     @Mock
-    KafkaMessagingService kafkaMessagingService;
+    UserActionMessagingService userActionMessagingService;
 
     @Mock
     LanguageRepo languageRepo;

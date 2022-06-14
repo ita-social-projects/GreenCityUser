@@ -23,7 +23,7 @@ import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
-import greencity.service.KafkaMessagingService;
+import greencity.service.kafka.UserActionMessagingService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +75,7 @@ class OwnSecurityServiceImplTest {
     EmailService emailService;
 
     @Mock
-    KafkaMessagingService kafkaMessagingService;
+    UserActionMessagingService userActionMessagingService;
 
     private OwnSecurityService ownSecurityService;
 
@@ -89,7 +89,7 @@ class OwnSecurityServiceImplTest {
     public void init() {
         initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(userRepo, ownSecurityRepo, restorePasswordEmailRepo,
-            userService, emailService, kafkaMessagingService, passwordEncoder, jwtTool, modelMapper);
+            userService, emailService, userActionMessagingService, passwordEncoder, jwtTool, modelMapper);
         ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
 
         verifiedUser = UserVO.builder()

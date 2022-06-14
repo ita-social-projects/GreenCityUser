@@ -24,6 +24,7 @@ import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
+import greencity.service.kafka.UserActionMessagingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -59,7 +60,7 @@ public class UserServiceImpl implements UserService {
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
     private final UserDeactivationRepo userDeactivationRepo;
-    private final KafkaMessagingService kafkaMessagingService;
+    private final UserActionMessagingService userActionMessagingService;
     /**
      * Autowired mapper.
      */
@@ -247,7 +248,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void acceptFriendRequest(Long userId, Long friendId) {
         checkFriendRequest(userId, friendId);
-        kafkaMessagingService.sendFriendAddedEvent(userRepo.getOne(userId), userRepo.getOne(friendId));
+        userActionMessagingService.sendFriendAddedEvent(userRepo.getOne(userId), userRepo.getOne(friendId));
         userRepo.acceptFriendRequest(userId, friendId);
     }
 

@@ -22,7 +22,7 @@ import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
-import greencity.service.KafkaMessagingService;
+import greencity.service.kafka.UserActionMessagingService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +54,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final RestorePasswordEmailRepo restorePasswordEmailRepo;
     private final UserService userService;
     private final EmailService emailService;
-    private final KafkaMessagingService kafkaMessagingService;
+    private final UserActionMessagingService userActionMessagingService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTool jwtTool;
     private final ModelMapper modelMapper;
@@ -88,7 +88,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setShowLocation(true);
         user.setShowEcoPlace(true);
         user.setShowShoppingList(true);
-        kafkaMessagingService.sendRegistrationEvent(user);
+        userActionMessagingService.sendRegistrationEvent(user);
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 

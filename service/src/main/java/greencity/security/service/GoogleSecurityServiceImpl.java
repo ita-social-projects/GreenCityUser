@@ -13,7 +13,7 @@ import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
-import greencity.service.KafkaMessagingService;
+import greencity.service.kafka.UserActionMessagingService;
 import greencity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final JwtTool jwtTool;
     private final ModelMapper modelMapper;
     private final UserRepo userRepo;
-    private final KafkaMessagingService kafkaMessagingService;
+    private final UserActionMessagingService userActionMessagingService;
 
     /**
      * {@inheritDoc}
@@ -64,7 +64,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                     user.setId(savedUser.getId());
                     userVO = modelMapper.map(user, UserVO.class);
                     log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
-                    kafkaMessagingService.sendRegistrationEvent(user);
+                    userActionMessagingService.sendRegistrationEvent(user);
                     return getSuccessSignInDto(userVO);
                 } else {
                     if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {

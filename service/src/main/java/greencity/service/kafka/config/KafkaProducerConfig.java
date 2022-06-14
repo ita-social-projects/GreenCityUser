@@ -1,15 +1,11 @@
-package greencity.config;
+package greencity.service.kafka.config;
 
-import greencity.service.KafkaMessagingService;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
@@ -21,24 +17,6 @@ import java.util.Map;
 public class KafkaProducerConfig {
     @Value(value = "${kafka.bootstrap-servers}")
     private String bootstrapAddress;
-
-    /**
-     * Creates a {@link KafkaAdmin} bean for Kafka producer configuration.
-     */
-    @Bean
-    public KafkaAdmin kafkaAdmin() {
-        Map<String, Object> configs = new HashMap<>();
-        configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-        return new KafkaAdmin(configs);
-    }
-
-    /**
-     * Creates a {@code greencity.user.actions} topic.
-     */
-    @Bean
-    public NewTopic userActionsTopic() {
-        return new NewTopic(KafkaMessagingService.USER_ACTIONS_TOPIC, 1, (short) 1);
-    }
 
     /**
      * Creates a {@link ProducerFactory} bean for Kafka producer configuration.
