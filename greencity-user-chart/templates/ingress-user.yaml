@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: user-greencity-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "false"
+spec:
+  tls:
+  - hosts:
+    - greencity-user.testgreencity.ga
+    secretName: greencity-user
+  rules:
+  - host: greencity-user.testgreencity.ga
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service: 
+            name: user-greencity-service
+            port: 
+              number: 80
