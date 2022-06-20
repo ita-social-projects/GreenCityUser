@@ -34,6 +34,24 @@ spec:
               name: appsecret
               key: BACKEND-ADDRESS-USER
 
+        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: appsecret
+              key: APPLICATIONINSIGHTS-CONNECTION-STRING
+
+        - name: AZURE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: appsecret
+              key: AZURE-CONNECTION-STRING
+
+        - name: AZURE_CONTAINER_NAME
+          valueFrom:
+            secretKeyRef:
+              name: appsecret
+              key: AZURE-CONTAINER-NAME
+
         - name: BUCKET_NAME
           valueFrom:
             secretKeyRef:
