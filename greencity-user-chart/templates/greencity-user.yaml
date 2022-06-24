@@ -1,32 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-greencity
+  name: {{ .Release.Name }}-greencity-user
   annotations:
     reloader.stakater.com/auto: "true"
 
 spec:
-  replicas: 1
+  replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-      app: user-greencity
+      app: {{ .Release.Name }}-greencity-user
   template:
     metadata:
       labels:
-        app: user-greencity
+        app: {{ .Release.Name }}-greencity-user
     spec:
       nodeSelector:
         "kubernetes.io/os": linux
       containers:
-      - name: user-greencity
-        image: {{ .Values.image }}
+      - name: {{ .Release.Name }}-greencity-user
+        image: {{ .Values.deployment.image }}
         resources:
           requests:
-            cpu: 50m
-            memory: 250Mi
+            cpu: {{ .Values.deployment.requests.cpu }}
+            memory: {{ .Values.deployment.requests.memory }}
           limits:
-            cpu: 2
-            memory: 1024Mi
+            cpu: {{ .Values.deployment.limits.cpu }}
+            memory: {{ .Values.deployment.limits.memory }}
         env:
         - name: BACKEND_ADDRESS
           valueFrom:
@@ -302,4 +302,4 @@ spec:
         #   value: "-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005"
         ports:
         - containerPort: 8060
-          name: http
+          name: tomcat
