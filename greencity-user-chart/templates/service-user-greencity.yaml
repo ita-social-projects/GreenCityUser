@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: user-greencity-service
+  name: {{ .Release.Name }}-greencity-user-service
 spec:
   type: ClusterIP
   ports:
@@ -9,4 +9,4 @@ spec:
     port: 80
     targetPort: 8060
   selector:
-    app: user-greencity
+    app: {{ .Release.Name }}-greencity-user
