@@ -14,6 +14,7 @@ public final class EmailConstants {
     public static final String DEACTIVATION = "Your account was deactivated";
     public static final String ACTIVATION = "Your account was activated";
     public static final String VIOLATION_EMAIL = "Violation email";
+    public static final String VERIFY_PASSWORD = "Verify password";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
@@ -42,6 +43,7 @@ public final class EmailConstants {
     public static final String REASONS_OF_DEACTIVATION_PAGE = "user-reasons-of-deactivation-page";
     public static final String ACTIVATION_PAGE = "user-activation-page";
     public static final String USER_VIOLATION_PAGE = "user-violation-mail";
+    public static final String VERIFY_PASSWORD_PAGE = "verify-password-page";
 
     private EmailConstants() {
     }
