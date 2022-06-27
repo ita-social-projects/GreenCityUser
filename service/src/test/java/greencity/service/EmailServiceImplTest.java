@@ -13,6 +13,7 @@ import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 
+import greencity.dto.user.UserManagementDto;
 import greencity.dto.violation.UserViolationMailDto;
 
 import java.util.*;
@@ -176,6 +177,20 @@ class EmailServiceImplTest {
         service.sendSuccessRestorePasswordByEmail(email, lang);
 
         verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendNotificationVerifyPasswordTest() {
+        String email = "test@gmail.com";
+        String lang = "en";
+        UserManagementDto dto = UserManagementDto.builder()
+                .id(1L)
+                .name("Test")
+                .email(email)
+                .build();
+
+        service.sendNotificationVerifyPassword(dto, lang, "token");
+
     }
 
 }

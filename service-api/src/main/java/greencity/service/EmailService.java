@@ -10,6 +10,7 @@ import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 
+import greencity.dto.user.UserManagementDto;
 import greencity.dto.violation.UserViolationMailDto;
 import java.util.List;
 import java.util.Map;
@@ -138,4 +139,6 @@ public interface EmailService {
      * @author Pavlo Hural.
      */
     void sendSuccessRestorePasswordByEmail(String email, String language);
+
+    void sendNotificationVerifyPassword(UserManagementDto dto, String language, String token);
 }

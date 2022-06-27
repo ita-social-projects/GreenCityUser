@@ -10,6 +10,7 @@ import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 
+import greencity.dto.user.UserManagementDto;
 import greencity.dto.violation.UserViolationMailDto;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -292,5 +293,20 @@ public class EmailServiceImpl implements EmailService {
             content = "Ваш пароль змінено";
         }
         sendEmail(email, subject, content);
+    }
+
+    @Override
+    public void sendNotificationVerifyPassword(UserManagementDto dto, String language, String token) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, dto.getName());
+        model.put(EmailConstants.RESTORE_PASS,  clientLink + "/#/auth/restore?" + "token=" + token
+                + PARAM_USER_ID + dto.getId());
+        model.put(EmailConstants.LANGUAGE, language);
+        changeLocale(language);
+        log.info(language);
+        String template = createEmailTemplate(model, EmailConstants.VERIFY_PASSWORD_PAGE);
+        sendEmail(dto.getEmail(), EmailConstants.VERIFY_PASSWORD, template);
+
     }
 }
