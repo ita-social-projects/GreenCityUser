@@ -8,6 +8,15 @@ import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
+
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.violation.UserViolationMailDto;
+
+import java.util.*;
+import java.util.concurrent.Executors;
+import javax.mail.Session;
+import javax.mail.internet.MimeMessage;
+
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
@@ -200,4 +209,18 @@ class EmailServiceImplTest {
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
     }
+    @Test
+    void sendNotificationVerifyPasswordTest() {
+        String email = "test@gmail.com";
+        String lang = "en";
+        UserManagementDto dto = UserManagementDto.builder()
+                .id(1L)
+                .name("Test")
+                .email(email)
+                .build();
+
+        service.sendNotificationVerifyPassword(dto, lang, "token");
+
+    }
+
 }
