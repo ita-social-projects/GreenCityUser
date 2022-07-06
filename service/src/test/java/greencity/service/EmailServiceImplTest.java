@@ -209,6 +209,7 @@ class EmailServiceImplTest {
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
     }
+
     @Test
     void sendNotificationVerifyPasswordTest() {
         String email = "test@gmail.com";
