@@ -214,10 +214,10 @@ class EmailServiceImplTest {
         String email = "test@gmail.com";
         String lang = "en";
         UserManagementDto dto = UserManagementDto.builder()
-                .id(1L)
-                .name("Test")
-                .email(email)
-                .build();
+            .id(1L)
+            .name("Test")
+            .email(email)
+            .build();
 
         service.sendNotificationVerifyPassword(dto, lang, "token");
 

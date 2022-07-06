@@ -142,5 +142,14 @@ public interface EmailService {
      */
     void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
 
+    /**
+     * Sends email about verify password for user created from management panel.
+     * 
+     * @param dto      Information about user.
+     * @param language user's language.
+     * @param token    verify token.
+     *
+     * @author Pavlo Hural.
+     */
     void sendNotificationVerifyPassword(UserManagementDto dto, String language, String token);
 }
