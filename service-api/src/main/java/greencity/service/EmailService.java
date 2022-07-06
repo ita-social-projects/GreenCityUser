@@ -144,7 +144,7 @@ public interface EmailService {
 
     /**
      * Sends email about verify password for user created from management panel.
-     * 
+     *
      * @param dto      Information about user.
      * @param language user's language.
      * @param token    verify token.
