@@ -19,7 +19,6 @@ import javax.mail.internet.MimeMessage;
 
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
@@ -30,11 +29,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
-
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-import java.util.*;
-import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
