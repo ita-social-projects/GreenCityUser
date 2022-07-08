@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-greencity-user-service
 spec:
-  type: ClusterIP
+  type: {{ .Values.service.type }}
   ports:
   - name: http
     port: 80
