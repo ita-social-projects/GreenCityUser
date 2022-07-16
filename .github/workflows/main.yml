@@ -86,10 +86,9 @@ jobs:
           cd chart-test
           go test -v ./...
       
-      - name: Kubernetes tests
-        run: |
-          cd chart-test
-          go test -v ./...
+      - name: Post Set up Postgres
+        if: success() || failure()
+        run: kubectl scale deploy postgres --replicas=0 -n test
 
       - name: Deploy 🚀
         if: ${{ github.event_name == 'push' }}
