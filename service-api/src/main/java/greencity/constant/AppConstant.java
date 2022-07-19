@@ -7,6 +7,7 @@ public final class AppConstant {
     public static final String MODERATOR = "MODERATOR";
     public static final String USER = "USER";
     public static final String EMPLOYEE = "EMPLOYEE";
+    public static final String UBS_EMPLOYEE = "UBS_EMPLOYEE";
     public static final String ROLE = "role";
     public static final String AUTHORIZATION = "Authorization";
     public static final String VALIDATION_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
