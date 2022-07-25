@@ -173,14 +173,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/searchBy",
                 "/user/findAll",
                 "/user/{id}/friends")
-            .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 "/user/filter",
                 "/ownSecurity/register")
             .hasAnyRole(ADMIN)
             .antMatchers(HttpMethod.PUT,
                 USER_LINK)
-            .hasAnyRole(ADMIN, UBS_EMPLOYEE, EMPLOYEE)
+            .hasAnyRole(ADMIN, EMPLOYEE)
             .antMatchers(HttpMethod.PATCH,
                 "/user/status",
                 "/user/role",
@@ -195,7 +195,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/css/**",
                 "/img/**")
             .permitAll()
-            .anyRequest().hasAnyRole(ADMIN, UBS_EMPLOYEE);
+            .anyRequest().hasAnyRole(ADMIN);
     }
 
     /**
