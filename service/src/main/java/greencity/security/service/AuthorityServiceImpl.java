@@ -53,7 +53,14 @@ public class AuthorityServiceImpl implements AuthorityService {
         }
     }
 
-    public Boolean checkAuthoritiesEmployee(List<Authority> authorities, Authority authority) {
+    /**
+     * The method checks whether the employee already has this authority.
+     *
+     * @param authority   new authority.
+     * @param authorities employee's authority list.
+     * @author Hlazova Nataliia
+     */
+    private Boolean checkAuthoritiesEmployee(List<Authority> authorities, Authority authority) {
         for (Authority atr : authorities) {
             if (atr.equals(authority)) {
                 return false;
