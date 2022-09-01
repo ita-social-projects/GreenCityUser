@@ -1,9 +1,7 @@
 package greencity.security.service;
 
 import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.entity.*;
-
-import java.util.List;
+import greencity.entity.User;
 import java.util.Set;
 
 public interface AuthorityService {

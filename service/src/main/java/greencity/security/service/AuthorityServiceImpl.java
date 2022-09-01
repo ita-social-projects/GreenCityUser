@@ -43,7 +43,7 @@ public class AuthorityServiceImpl implements AuthorityService {
         for (String name : dto.getAuthorities()) {
             Authority authority = authorityRepo.findByName(name)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_AUTHORITY + name));
-            if (checkAuthoritiesEmployee(authorities, authority)) {
+            if (Boolean.TRUE.equals(checkAuthoritiesEmployee(authorities, authority))) {
                 authorities.add(authority);
                 List<User> users = authority.getEmployees();
                 users.add(employee);
