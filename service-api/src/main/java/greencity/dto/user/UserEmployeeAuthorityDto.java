@@ -1,8 +1,6 @@
 package greencity.dto.user;
 
-import greencity.entity.Authority;
 import lombok.*;
-
 import java.util.List;
 
 @AllArgsConstructor
