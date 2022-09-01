@@ -43,7 +43,7 @@ public class AuthorityServiceImpl implements AuthorityService {
         for (String name : dto.getAuthorities()) {
             Authority authority = authorityRepo.findByName(name)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_AUTHORITY + name));
-            if (Boolean.TRUE.equals(checkAuthoritiesEmployee(authorities, authority))) {
+            if (checkAuthoritiesEmployee(authorities, authority)) {
                 authorities.add(authority);
                 List<User> users = authority.getEmployees();
                 users.add(employee);
@@ -61,11 +61,6 @@ public class AuthorityServiceImpl implements AuthorityService {
      * @author Hlazova Nataliia
      */
     private Boolean checkAuthoritiesEmployee(List<Authority> authorities, Authority authority) {
-        for (Authority atr : authorities) {
-            if (atr.equals(authority)) {
-                return false;
-            }
-        }
-        return true;
+        return authorities.stream().noneMatch(atr -> atr.equals(authority));
     }
 }
