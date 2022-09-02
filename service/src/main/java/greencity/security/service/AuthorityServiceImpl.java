@@ -58,9 +58,9 @@ public class AuthorityServiceImpl implements AuthorityService {
      *
      * @param authority   new authority.
      * @param authorities employee's authority list.
-     * @author Hlazova Nataliia
+     * @author Nataliia Hlazova
      */
-    private Boolean checkAuthoritiesEmployee(List<Authority> authorities, Authority authority) {
+    private boolean checkAuthoritiesEmployee(List<Authority> authorities, Authority authority) {
         return authorities.stream().noneMatch(atr -> atr.equals(authority));
     }
 }

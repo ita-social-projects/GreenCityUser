@@ -786,7 +786,7 @@ class UserControllerTest {
         List<String> list = new ArrayList<>();
         list.add("EDIT_ORDER");
         UserEmployeeAuthorityDto dto = UserEmployeeAuthorityDto.builder()
-            .employeeId(1l)
+            .employeeId(1L)
             .authorities(list)
             .build();
         verify(authorityService).updateEmployeesAuthorities(dto, "testmail@gmail.com");

@@ -1181,7 +1181,7 @@ public class UserController {
      *
      * @return {@link UserEmployeeAuthorityDto}
      *
-     * @author Hlazova Nataliia.
+     * @author Nataliia Hlazova.
      */
     @ApiOperation(value = "Edit an employee`s authorities")
     @ApiResponses(value = {
