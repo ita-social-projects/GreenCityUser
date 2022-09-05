@@ -1,5 +1,7 @@
 package greencity.security.service;
 
+import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.entity.User;
 import java.util.Set;
 
 public interface AuthorityService {
@@ -8,5 +10,12 @@ public interface AuthorityService {
      *
      * @return Set of {@link String}.
      */
-    Set<String> getAllEmploeesAuthorities(String email);
+    Set<String> getAllEmployeesAuthorities(String email);
+
+    /**
+     * Method updates Authority for {@link User}.
+     *
+     * @param dto - instance of {@link UserEmployeeAuthorityDto}.
+     */
+    void updateEmployeesAuthorities(UserEmployeeAuthorityDto dto, String email);
 }

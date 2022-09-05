@@ -17,6 +17,7 @@ import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+import greencity.security.service.AuthorityService;
 import greencity.service.UserService;
 
 import java.security.Principal;
@@ -60,6 +61,8 @@ class UserControllerTest {
     private UserController userController;
     @Mock
     private UserService userService;
+    @Mock
+    private AuthorityService authorityService;
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -763,5 +766,29 @@ class UserControllerTest {
             .content(objectMapper.writeValueAsString(uuids)))
             .andExpect(status().isOk());
         verify(userService).markUserAsDeactivated(uuid);
+    }
+
+    @Test
+    void editAuthoritiesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        String content = "{\n"
+            + "  \"authorities\":[ \"EDIT_ORDER\"],\n"
+            + "  \"employeeId\": 1\n"
+            + "}";
+
+        mockMvc.perform(put(userLink + "/edit-authorities")
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+        List<String> list = new ArrayList<>();
+        list.add("EDIT_ORDER");
+        UserEmployeeAuthorityDto dto = UserEmployeeAuthorityDto.builder()
+            .employeeId(1L)
+            .authorities(list)
+            .build();
+        verify(authorityService).updateEmployeesAuthorities(dto, "testmail@gmail.com");
     }
 }

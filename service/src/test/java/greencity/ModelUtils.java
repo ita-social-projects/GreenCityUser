@@ -115,6 +115,36 @@ public class ModelUtils {
         return list;
     }
 
+    public static List<Authority> authorities() {
+        List<Authority> list = new ArrayList<>();
+        list.add(Authority.builder()
+            .id(1L)
+            .name("test1")
+            .build());
+        list.add(Authority.builder()
+            .id(2L)
+            .name("test2")
+            .build());
+        return list;
+    }
+
+    public static UserEmployeeAuthorityDto getUserEmployeeAuthorityDto() {
+        return UserEmployeeAuthorityDto.builder()
+            .employeeId(2L)
+            .authorities(List.of("test"))
+            .build();
+    }
+
+    public static Authority getAuthority() {
+        List<User> list = new ArrayList<>();
+        list.add(createUser());
+        return Authority.builder()
+            .id(3L)
+            .name("test")
+            .employees(list)
+            .build();
+    }
+
     public static User getUser() {
         return User.builder()
             .id(1L)
@@ -324,12 +354,13 @@ public class ModelUtils {
             .build();
     }
 
-    private static User createAdmin() {
+    public static User createAdmin() {
         return User.builder()
             .id(2L)
             .email("test@mail.com")
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_ADMIN)
+            .authorities(authorities())
             .build();
     }
 
