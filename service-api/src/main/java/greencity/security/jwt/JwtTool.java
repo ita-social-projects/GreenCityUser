@@ -56,7 +56,7 @@ public class JwtTool {
         claims.put(ROLE, Collections.singleton(role.name()));
 
         if (role.equals(Role.ROLE_UBS_EMPLOYEE)) {
-            claims.put("employee_authorities", authorityService.getAllEmploeesAuthorities(email));
+            claims.put("employee_authorities", authorityService.getAllEmployeesAuthorities(email));
         }
 
         Date now = new Date();
