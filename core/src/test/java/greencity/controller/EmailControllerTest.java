@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
@@ -64,6 +65,26 @@ class EmailControllerTest {
         EcoNewsForSendEmailDto message = objectMapper.readValue(content, EcoNewsForSendEmailDto.class);
 
         verify(emailService).sendCreatedNewsForAuthor(message);
+    }
+
+    @Test
+    void addEventComment() throws Exception {
+        String content =
+            "{\"id\":\"1\"}," +
+                "\"createdDate\":\"2021-02-05T15:10:22.434Z\"," +
+                "\"text\":\"string\"," +
+                "\"organizer\":{\"id\":0,\"name\":\"string\",\"userProfilePicturePath\":\"string\" }," +
+                "\"author\":{\"id\":0,\"name\":\"string\",\"organizerRating\":\"1.0\" }," +
+                "\"email\":\"inna@gmail.com\"}";
+
+        mockPerform(content, "/addEventComment");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.registerModule(new JavaTimeModule());
+        EventCommentForSendEmailDto message = objectMapper.readValue(content, EventCommentForSendEmailDto.class);
+
+        verify(emailService).sendNewCommentForEventOrganizer(message);
     }
 
     @Test
