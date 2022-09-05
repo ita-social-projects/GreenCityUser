@@ -1,9 +1,6 @@
 package greencity.controller;
 
-import greencity.annotations.ApiPageable;
-import greencity.annotations.CurrentUser;
-import greencity.annotations.CurrentUserId;
-import greencity.annotations.ImageValidation;
+import greencity.annotations.*;
 import greencity.constant.HttpStatuses;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
@@ -16,13 +13,9 @@ import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
-import greencity.service.AllUsersMutualFriends;
-import greencity.service.EmailService;
-import greencity.service.UserService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import greencity.security.service.AuthorityService;
+import greencity.service.*;
+import io.swagger.annotations.*;
 import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.AllArgsConstructor;
@@ -32,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -52,10 +46,11 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final EmailService emailService;
+    private final AuthorityService authorityService;
     private final AllUsersMutualFriends allUsersMutualFriends;
 
     /**
-     * The method which update user statuss. Parameter principal are ignored because
+     * The method which update user status. Parameter principal are ignored because
      * Spring automatically provide the Principal object.
      *
      * @param userStatusDto - dto with updated filed.
@@ -1178,6 +1173,28 @@ public class UserController {
     public ResponseEntity<Object> markUserAsDeactivated(
         @RequestParam @ApiIgnore String uuid) {
         userService.markUserAsDeactivated(uuid);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Controller edit an employee`s authorities.
+     *
+     * @return {@link UserEmployeeAuthorityDto}
+     *
+     * @author Nataliia Hlazova.
+     */
+    @ApiOperation(value = "Edit an employee`s authorities")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = HttpStatuses.OK, response = UserEmployeeAuthorityDto.class),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @PreAuthorize("@preAuthorizer.hasAuthority('EDIT_EMPLOYEES_AUTHORITIES', authentication)")
+    @PutMapping("/edit-authorities")
+    public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto,
+        @ApiIgnore Principal principal) {
+        authorityService.updateEmployeesAuthorities(dto, principal.getName());
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
