@@ -40,8 +40,8 @@ public interface EmailService {
         AddEcoNewsDtoResponse newsDto);
 
     /**
-     * Method for sending notification to the event organizer about the EventComment.
-     * addition
+     * Method for sending notification to the event organizer about the
+     * EventComment. addition
      *
      * @param dto - includes all information about EventComment and author.
      */
