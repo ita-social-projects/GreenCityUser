@@ -36,6 +36,7 @@ public final class ErrorMessage {
     public static final String LANGUAGE_NOT_FOUND_BY_ID = "The language does not exist by this id: ";
     public static final String USER_DEACTIVATION_REASON_IS_EMPTY = "The User deactivation reasons list is empty";
     public static final String USER_ALREADY_HAS_PASSWORD = "User already has password";
+    public static final String LINK_IS_NO_ACTIVE = "This link is no longer active";
 
     private ErrorMessage() {
     }
