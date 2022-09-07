@@ -1,7 +1,6 @@
 package greencity.security.service;
 
 import greencity.constant.ErrorMessage;
-import greencity.dto.notification.NotificationDto;
 import greencity.entity.OwnSecurity;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
@@ -101,7 +100,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     public void updatePasswordUsingToken(OwnRestoreDto form) {
         RestorePasswordEmail restorePasswordEmail = restorePasswordEmailRepo
             .findByToken(form.getToken())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.LINK_IS_NO_ACTIVE));
         if (!form.getPassword().equals(form.getConfirmPassword())) {
             throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
@@ -119,7 +118,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         } else {
             log.info("Password restoration token of user with email " + restorePasswordEmail.getUser().getEmail()
                 + " has been expired. Token: " + form.getToken());
-            throw new UserActivationEmailTokenExpiredException(ErrorMessage.EMAIL_TOKEN_EXPIRED);
+            throw new UserActivationEmailTokenExpiredException(ErrorMessage.LINK_IS_NO_ACTIVE);
         }
         if (userStatus == UserStatus.CREATED) {
             restorePasswordEmail.getUser().setUserStatus(UserStatus.ACTIVATED);
