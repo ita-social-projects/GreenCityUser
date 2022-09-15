@@ -2,6 +2,7 @@ package greencity.controller;
 
 import greencity.constant.HttpStatuses;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
@@ -33,6 +34,18 @@ public class EmailController {
     @PostMapping("/addEcoNews")
     public ResponseEntity<Object> addEcoNews(@RequestBody EcoNewsForSendEmailDto message) {
         emailService.sendCreatedNewsForAuthor(message);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Method for sending notification to the event organizer about the EventComment
+     * addition.
+     *
+     * @param message - object with all necessary data for sending email
+     */
+    @PostMapping("/addEventComment")
+    public ResponseEntity<Object> addEventComment(@RequestBody EventCommentForSendEmailDto message) {
+        emailService.sendNewCommentForEventOrganizer(message);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
