@@ -769,6 +769,20 @@ class UserControllerTest {
     }
 
     @Test
+    void getAllAuthoritiesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        mockMvc.perform(get(userLink + "/get-all-authorities" + "?email=" + principal.getName())
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(principal.getName())))
+            .andExpect(status().isOk());
+
+        verify(authorityService).getAllEmployeesAuthorities(principal.getName());
+    }
+
+    @Test
     void editAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");

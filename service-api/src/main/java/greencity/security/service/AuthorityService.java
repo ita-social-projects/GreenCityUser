@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface AuthorityService {
     /**
-     * Method gets all Employee authorities.
+     * Method gets all employee's authorities.
      *
      * @return Set of {@link String}.
      */
