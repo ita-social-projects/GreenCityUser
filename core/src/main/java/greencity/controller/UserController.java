@@ -25,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -1191,7 +1190,6 @@ public class UserController {
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PreAuthorize("@preAuthorizer.hasAuthority('EDIT_EMPLOYEES_AUTHORITIES', authentication)")
     @GetMapping("/get-all-authorities")
     public ResponseEntity<Object> getAllAuthorities(@RequestParam String email) {
         Set<String> authorities = authorityService.getAllEmployeesAuthorities(email);
@@ -1207,12 +1205,11 @@ public class UserController {
      */
     @ApiOperation(value = "Edit an employee`s authorities")
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = HttpStatuses.OK, response = UserEmployeeAuthorityDto.class),
+        @ApiResponse(code = 200, message = HttpStatuses.OK, response = UserEmployeeAuthorityDto.class),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PreAuthorize("@preAuthorizer.hasAuthority('EDIT_EMPLOYEES_AUTHORITIES', authentication)")
     @PutMapping("/edit-authorities")
     public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto,
         @ApiIgnore Principal principal) {
