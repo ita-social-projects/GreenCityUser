@@ -37,6 +37,7 @@ import springfox.documentation.annotations.ApiIgnore;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
@@ -1177,6 +1178,26 @@ public class UserController {
     }
 
     /**
+     * Controller to get information about all employee's authorities.
+     *
+     * @return @return Set of {@link String}
+     *
+     * @author Inna Yashna.
+     */
+    @ApiOperation(value = "Get information about all employee's authorities")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/get-all-authorities")
+    public ResponseEntity<Object> getAllAuthorities(@RequestParam String email) {
+        Set<String> authorities = authorityService.getAllEmployeesAuthorities(email);
+        return ResponseEntity.status(HttpStatus.OK).body(authorities);
+    }
+
+    /**
      * Controller edit an employee`s authorities.
      *
      * @return {@link UserEmployeeAuthorityDto}
@@ -1185,12 +1206,11 @@ public class UserController {
      */
     @ApiOperation(value = "Edit an employee`s authorities")
     @ApiResponses(value = {
-        @ApiResponse(code = 201, message = HttpStatuses.OK, response = UserEmployeeAuthorityDto.class),
+        @ApiResponse(code = 200, message = HttpStatuses.OK, response = UserEmployeeAuthorityDto.class),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PreAuthorize("@preAuthorizer.hasAuthority('EDIT_EMPLOYEES_AUTHORITIES', authentication)")
     @PutMapping("/edit-authorities")
     public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto,
         @ApiIgnore Principal principal) {

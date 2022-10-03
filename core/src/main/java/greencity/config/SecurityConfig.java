@@ -178,9 +178,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/filter",
                 "/ownSecurity/register")
             .hasAnyRole(ADMIN)
-            .antMatchers(HttpMethod.PUT,
-                USER_LINK)
-            .hasAnyRole(ADMIN, EMPLOYEE)
             .antMatchers(HttpMethod.PATCH,
                 "/user/status",
                 "/user/role",
