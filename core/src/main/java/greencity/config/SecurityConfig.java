@@ -155,6 +155,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{id}/updateUserLastActivityTime/{date}",
                 "/user/{userId}/language/{languageId}")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.PUT,
+                "/user/edit-authorities")
+            .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.GET,
+                "/user/get-all-authorities")
+            .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PATCH,
                 "/user/shopping-list-items/{userShoppingListItemId}",
                 "/user/profilePicture",
