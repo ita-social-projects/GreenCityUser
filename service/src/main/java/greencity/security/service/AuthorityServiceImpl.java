@@ -2,13 +2,18 @@ package greencity.security.service;
 
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.entity.*;
+import greencity.entity.Authority;
+import greencity.entity.User;
 import greencity.enums.Role;
-import greencity.exception.exceptions.*;
-import greencity.repository.*;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.repository.AuthorityRepo;
+import greencity.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.*;
+
+import java.util.List;
+import java.util.Set;
 
 @Service
 @AllArgsConstructor
@@ -38,29 +43,25 @@ public class AuthorityServiceImpl implements AuthorityService {
             || user.getEmail().equals(employee.getEmail())) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
+        deleteOldAuthorities(employee);
+        saveNewAuthorities(dto, employee);
+    }
 
-        List<Authority> authorities = employee.getAuthorities();
-        for (String name : dto.getAuthorities()) {
-            Authority authority = authorityRepo.findByName(name)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_AUTHORITY + name));
-            if (checkAuthoritiesEmployee(authorities, authority)) {
-                authorities.add(authority);
-                List<User> users = authority.getEmployees();
-                users.add(employee);
-                authority.setEmployees(users);
-                authorityRepo.save(authority);
-            }
+    private void deleteOldAuthorities(User employee) {
+        for (Authority authority : employee.getAuthorities()) {
+            List<User> users = authority.getEmployees();
+            users.removeIf(u -> u.equals(employee));
         }
     }
 
-    /**
-     * The method checks whether the employee already has this authority.
-     *
-     * @param authority   new authority.
-     * @param authorities employee's authority list.
-     * @author Nataliia Hlazova
-     */
-    private boolean checkAuthoritiesEmployee(List<Authority> authorities, Authority authority) {
-        return authorities.stream().noneMatch(atr -> atr.equals(authority));
+    private void saveNewAuthorities(UserEmployeeAuthorityDto dto, User employee) {
+        for (String name : dto.getAuthorities()) {
+            Authority authority = authorityRepo.findByName(name)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_AUTHORITY + name));
+            List<User> users = authority.getEmployees();
+            users.add(employee);
+            authority.setEmployees(users);
+            authorityRepo.save(authority);
+        }
     }
 }
