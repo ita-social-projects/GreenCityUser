@@ -1,7 +1,6 @@
 package greencity.service;
 
 import greencity.entity.*;
-import greencity.enums.Role;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
 import greencity.security.service.AuthorityServiceImpl;
@@ -12,7 +11,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.*;
 import org.mockito.quality.Strictness;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import static greencity.ModelUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,12 +41,14 @@ class AuthorityServiceImplTest {
 
     @Test
     void updateEmployeesAuthoritiesTest() {
-        User user = getUser();
-        user.setRole(Role.ROLE_ADMIN);
+        User user = createAdmin();
+        User employee = createEmployee();
         Authority authority = getAuthority();
-        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.ofNullable(user));
-        when(userRepo.findById(createAdmin().getId())).thenReturn(Optional.of(createAdmin()));
+
+        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.findById(employee.getId())).thenReturn(Optional.of(employee));
         when(authorityRepo.findByName("test")).thenReturn(Optional.of(authority));
+
         authorityService.updateEmployeesAuthorities(getUserEmployeeAuthorityDto(), "taras@gmail.com");
         authority.getEmployees().add(createAdmin());
         verify(authorityRepo).save(authority);

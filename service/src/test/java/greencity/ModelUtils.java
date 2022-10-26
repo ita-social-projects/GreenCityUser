@@ -116,21 +116,29 @@ public class ModelUtils {
     }
 
     public static List<Authority> authorities() {
-        List<Authority> list = new ArrayList<>();
-        list.add(Authority.builder()
+        List<User> users = new ArrayList<>();
+        users.add(User.builder()
+            .id(1L)
+            .email("taras@mail.com")
+            .role(Role.ROLE_UBS_EMPLOYEE)
+            .build());
+        List<Authority> authorities = new ArrayList<>();
+        authorities.add(Authority.builder()
             .id(1L)
             .name("test1")
+            .employees(users)
             .build());
-        list.add(Authority.builder()
+        authorities.add(Authority.builder()
             .id(2L)
             .name("test2")
+            .employees(users)
             .build());
-        return list;
+        return authorities;
     }
 
     public static UserEmployeeAuthorityDto getUserEmployeeAuthorityDto() {
         return UserEmployeeAuthorityDto.builder()
-            .employeeId(2L)
+            .employeeId(1L)
             .authorities(List.of("test"))
             .build();
     }
@@ -351,6 +359,15 @@ public class ModelUtils {
             .email("test@mail.com")
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_USER)
+            .build();
+    }
+
+    public static User createEmployee() {
+        return User.builder()
+            .id(1L)
+            .email("taras@mail.com")
+            .authorities(authorities())
+            .role(Role.ROLE_UBS_EMPLOYEE)
             .build();
     }
 
