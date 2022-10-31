@@ -39,7 +39,7 @@ public class AuthorityServiceImpl implements AuthorityService {
         User employee =
             userRepo.findById(dto.getEmployeeId())
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + dto.getEmployeeId()));
-        if (!user.getRole().equals(Role.ROLE_ADMIN) || employee.getRole().equals(Role.ROLE_USER)
+        if (!user.getRole().equals(Role.ROLE_UBS_EMPLOYEE) || employee.getRole().equals(Role.ROLE_USER)
             || user.getEmail().equals(employee.getEmail())) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
