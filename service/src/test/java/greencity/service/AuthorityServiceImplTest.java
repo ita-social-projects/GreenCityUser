@@ -1,5 +1,6 @@
 package greencity.service;
 
+import greencity.ModelUtils;
 import greencity.entity.*;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
@@ -41,7 +42,7 @@ class AuthorityServiceImplTest {
 
     @Test
     void updateEmployeesAuthoritiesTest() {
-        User user = createAdmin();
+        User user = createUbsAdmin();
         User employee = createEmployee();
         Authority authority = getAuthority();
 
