@@ -406,4 +406,12 @@ public class ModelUtils {
             .role(Role.ROLE_ADMIN)
             .build();
     }
+
+    public static User createUbsAdmin() {
+        return User.builder()
+            .id(2L)
+            .email("email@mail.com")
+            .role(Role.ROLE_UBS_EMPLOYEE)
+            .build();
+    }
 }
