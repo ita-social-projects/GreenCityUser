@@ -75,6 +75,22 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Exception handler for BadUpdateRequestException.
+     * @param exception which is being intercepted
+     * @param request contains details about occurred exception
+     * @return ResponseEntity which contains details about exception
+     *      and 400 status code
+     */
+    @ExceptionHandler(BadUpdateRequestException.class)
+    public final ResponseEntity<?> handleBadUpdateRequestException(
+        BadUpdateRequestException exception, WebRequest request
+    ) {
+        log.trace(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        return ResponseEntity.badRequest().body(exceptionResponse);
+    }
+
+    /**
      * Method intercept exception {@link NotFoundException}.
      *
      * @param ex      Exception witch should be intercepted.
@@ -224,13 +240,13 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * Customize the response for HttpMessageNotReadableException.
      *
      * @param ex the exception
-     * 
+     *
      * @param headers the headers to be written to the response
-     * 
+     *
      * @param status the selected response status
-     * 
+     *
      * @param request the current request
-     * 
+     *
      * @return a {@code ResponseEntity} message
      */
     @Override

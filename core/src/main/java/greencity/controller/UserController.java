@@ -12,6 +12,7 @@ import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
+import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.service.AuthorityService;
 import greencity.service.*;
@@ -78,7 +79,8 @@ public class UserController {
      * The method which update user role. Parameter principal are ignored because
      * Spring automatically provide the Principal object.
      *
-     * @param userRoleDto - dto with updated field.
+     * @param id of updated user
+     * @param body contains new role
      * @return {@link UserRoleDto}
      * @author Rostyslav Khasanov
      */
@@ -90,13 +92,19 @@ public class UserController {
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PatchMapping("role")
+    @PatchMapping("{id}/role")
     public ResponseEntity<UserRoleDto> updateRole(
-        @Valid @RequestBody UserRoleDto userRoleDto, @ApiIgnore Principal principal) {
+        @PathVariable Long id,
+        @Valid @RequestBody Map<String, String> body,
+        @ApiIgnore Principal principal) {
+        Role role = Role.valueOf(body.get("role"));
+        UserRoleDto userRoleDto = new UserRoleDto(id, role);
         return ResponseEntity.status(HttpStatus.OK)
             .body(
                 userService.updateRole(
-                    userRoleDto.getId(), userRoleDto.getRole(), principal.getName()));
+                    userRoleDto.getId(), userRoleDto.getRole(), principal.getName()
+                )
+            );
     }
 
     /**

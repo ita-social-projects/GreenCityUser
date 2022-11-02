@@ -270,28 +270,31 @@ class UserServiceImplTest {
 
     @Test
     void updateRoleTest() {
+        //given
         ReflectionTestUtils.setField(userService, "modelMapper", new ModelMapper());
         UserRoleDto userRoleDto = new UserRoleDto();
         userRoleDto.setRole(Role.ROLE_MODERATOR);
         when(userRepo.findById(any())).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
-        when(modelMapper.map(Optional.of(user2), UserVO.class)).thenReturn(userVO2);
-        user.setRole(Role.ROLE_MODERATOR);
-        when(userRepo.save(any())).thenReturn(user);
         when(modelMapper.map(user, UserRoleDto.class)).thenReturn(userRoleDto);
+        user.setRole(Role.ROLE_MODERATOR);
+
+        //then
         assertEquals(
             Role.ROLE_MODERATOR,
             userService.updateRole(userId, Role.ROLE_MODERATOR, any()).getRole());
-        verify(userRepo, times(1)).save(any());
     }
 
     @Test
     void updateRoleOnTheSameUserTest() {
-        when(userRepo.findByEmail(userEmail)).thenReturn(Optional.of(user));
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         assertThrows(BadUpdateRequestException.class, () -> userService.updateRole(userId, null, userEmail));
+    }
+
+    @Test
+    void updateRoleOfNonExistingUser() {
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class, () -> userService.updateRole(userId, null, userEmail));
     }
 
     @Test

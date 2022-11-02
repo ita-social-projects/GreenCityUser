@@ -430,12 +430,23 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public UserRoleDto updateRole(Long id, Role role, String email) {
-        checkUpdatableUser(id, email);
-        UserVO userVO = findById(id);
-        userVO.setRole(role);
-        User map = modelMapper.map(userVO, User.class);
-        return modelMapper.map(userRepo.save(map), UserRoleDto.class);
+        User user = findUserById(id);
+        checkIfUserCanUpdate(user, email);
+        user.setRole(role);
+        return modelMapper.map(user, UserRoleDto.class);
+    }
+
+    private User findUserById(Long id) {
+        return userRepo.findById(id)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+    }
+
+    private void checkIfUserCanUpdate(User user, String email){
+        if (email.equals(user.getEmail())) {
+            throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_THEMSELVES);
+        }
     }
 
     /**
@@ -552,7 +563,7 @@ public class UserServiceImpl implements UserService {
     private void checkUpdatableUser(Long id, String email) {
         UserVO user = findByEmail(email);
         if (id.equals(user.getId())) {
-            throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_HIMSELF);
+            throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_THEMSELVES);
         }
     }
 
