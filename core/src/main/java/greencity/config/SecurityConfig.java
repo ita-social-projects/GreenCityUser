@@ -174,7 +174,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.GET,
                 "/user/all",
                 "/user/roles",
-                "/user/findById",
                 "/user/findUserForManagement",
                 "/user/searchBy",
                 "/user/findAll",
