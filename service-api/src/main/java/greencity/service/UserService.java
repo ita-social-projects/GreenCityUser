@@ -242,7 +242,7 @@ public interface UserService {
      * @return List of {@link CustomShoppingListItemResponseDto}
      * @author Bogdan Kuzenko
      */
-    List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId);
+    List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId, Long habitID);
 
     /**
      * Counts all users by user {@link UserStatus} ACTIVATED.

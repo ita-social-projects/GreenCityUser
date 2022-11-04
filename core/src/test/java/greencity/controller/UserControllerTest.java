@@ -259,11 +259,11 @@ class UserControllerTest {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
-        mockMvc.perform(get(userLink + "/{userId}/custom-shopping-list-items/available", 1)
+        mockMvc.perform(get(userLink + "/{userId}/{habitId}/custom-shopping-list-items/available", 1, 1)
             .headers(headers))
             .andExpect(status().isOk());
 
-        verify(userService).getAvailableCustomShoppingListItems(1L);
+        verify(userService).getAvailableCustomShoppingListItems(1L, 1L);
     }
 
     @Test

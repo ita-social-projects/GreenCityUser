@@ -63,10 +63,10 @@ public class RestClient {
      * @return list of {@link CustomShoppingListItemResponseDto}
      * @author Orest Mamchuk
      */
-    public List<CustomShoppingListItemResponseDto> getAllAvailableCustomShoppingListItems(Long userId) {
+    public List<CustomShoppingListItemResponseDto> getAllAvailableCustomShoppingListItems(Long userId, Long habitId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         ResponseEntity<CustomShoppingListItemResponseDto[]> exchange = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId, HttpMethod.GET, entity,
+            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
             CustomShoppingListItemResponseDto[].class);
         CustomShoppingListItemResponseDto[] responseDtos = exchange.getBody();
         assert responseDtos != null;
