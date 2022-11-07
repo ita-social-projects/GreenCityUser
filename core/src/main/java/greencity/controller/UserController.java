@@ -729,9 +729,9 @@ public class UserController {
     @ApiOperation(value = "update UserManagement")
     @ApiResponses(value = @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED))
     @PutMapping
-    public ResponseEntity<Object> updateUserManagement(@RequestBody UserManagementDto userDto) {
+    @ResponseStatus(HttpStatus.OK)
+    public void updateUserManagement(@RequestBody UserManagementDto userDto) {
         userService.updateUser(userDto);
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**

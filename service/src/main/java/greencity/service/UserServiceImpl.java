@@ -145,25 +145,25 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public void updateUser(UserManagementDto dto) {
-        UserVO userVO = findById(dto.getId());
-        updateUserFromDto(dto, userVO);
-        userRepo.save(modelMapper.map(userVO, User.class));
+        User user = findUserById(dto.getId());
+        updateUserFromDto(dto, user);
     }
 
     /**
      * Method for setting data from {@link UserManagementDto} to {@link UserVO}.
      *
      * @param dto    - dto {@link UserManagementDto} with updated fields.
-     * @param userVO {@link UserVO} to be updated.
+     * @param user {@link UserVO} to be updated.
      * @author Vasyl Zhovnir
      */
-    private void updateUserFromDto(UserManagementDto dto, UserVO userVO) {
-        userVO.setName(dto.getName());
-        userVO.setEmail(dto.getEmail());
-        userVO.setRole(dto.getRole());
-        userVO.setUserCredo(dto.getUserCredo());
-        userVO.setUserStatus(dto.getUserStatus());
+    private void updateUserFromDto(UserManagementDto dto, User user) {
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setRole(dto.getRole());
+        user.setUserCredo(dto.getUserCredo());
+        user.setUserStatus(dto.getUserStatus());
     }
 
     /**
