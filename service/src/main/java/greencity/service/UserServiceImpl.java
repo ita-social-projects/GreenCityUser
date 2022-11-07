@@ -146,19 +146,19 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public void updateUser(UserManagementDto dto) {
-        User user = findUserById(dto.getId());
+    public void updateUser(Long userId, UserManagementUpdateDto dto) {
+        User user = findUserById(userId);
         updateUserFromDto(dto, user);
     }
 
     /**
      * Method for setting data from {@link UserManagementDto} to {@link UserVO}.
      *
-     * @param dto    - dto {@link UserManagementDto} with updated fields.
+     * @param dto  - dto {@link UserManagementDto} with updated fields.
      * @param user {@link UserVO} to be updated.
      * @author Vasyl Zhovnir
      */
-    private void updateUserFromDto(UserManagementDto dto, User user) {
+    private void updateUserFromDto(UserManagementUpdateDto dto, User user) {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
@@ -443,7 +443,7 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
     }
 
-    private void checkIfUserCanUpdate(User user, String email){
+    private void checkIfUserCanUpdate(User user, String email) {
         if (email.equals(user.getEmail())) {
             throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_THEMSELVES);
         }

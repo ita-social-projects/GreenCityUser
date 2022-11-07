@@ -99,7 +99,7 @@ class UserServiceImplTest {
     private User user2 = User.builder()
         .id(2L)
         .name("Test Testing")
-        .email("test@gmail.com")
+        .email("test2@gmail.com")
         .role(Role.ROLE_MODERATOR)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
@@ -270,7 +270,7 @@ class UserServiceImplTest {
 
     @Test
     void updateRoleTest() {
-        //given
+        // given
         ReflectionTestUtils.setField(userService, "modelMapper", new ModelMapper());
         UserRoleDto userRoleDto = new UserRoleDto();
         userRoleDto.setRole(Role.ROLE_MODERATOR);
@@ -279,10 +279,10 @@ class UserServiceImplTest {
         when(modelMapper.map(user, UserRoleDto.class)).thenReturn(userRoleDto);
         user.setRole(Role.ROLE_MODERATOR);
 
-        //then
+        // then
         assertEquals(
             Role.ROLE_MODERATOR,
-            userService.updateRole(userId, Role.ROLE_MODERATOR, any()).getRole());
+            userService.updateRole(userId, Role.ROLE_MODERATOR, user2.getEmail()).getRole());
     }
 
     @Test
@@ -860,22 +860,16 @@ class UserServiceImplTest {
 
     @Test
     void updateUser() {
-        UserManagementDto userManagementDto = new UserManagementDto();
-        userManagementDto.setId(1L);
-        userManagementDto.setName(user.getName());
-        userManagementDto.setRole(user.getRole());
-        userManagementDto.setUserStatus(user.getUserStatus());
-        userManagementDto.setEmail(user.getEmail());
-        userManagementDto.setUserCredo(user.getUserCredo());
+        UserManagementUpdateDto userManagementUpdateDto = ModelUtils.getUserManagementUpdateDto();
         User excepted = user;
-        excepted.setName(userManagementDto.getName());
-        excepted.setEmail(userManagementDto.getEmail());
-        excepted.setRole(userManagementDto.getRole());
-        excepted.setUserCredo(userManagementDto.getUserCredo());
-        excepted.setUserStatus(userManagementDto.getUserStatus());
+        excepted.setName(userManagementUpdateDto.getName());
+        excepted.setEmail(userManagementUpdateDto.getEmail());
+        excepted.setRole(userManagementUpdateDto.getRole());
+        excepted.setUserCredo(userManagementUpdateDto.getUserCredo());
+        excepted.setUserStatus(userManagementUpdateDto.getUserStatus());
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        userService.updateUser(userManagementDto);
+        userService.updateUser(1L, userManagementUpdateDto);
         assertEquals(excepted, user);
     }
 

@@ -1,6 +1,9 @@
 package greencity.controller;
 
-import greencity.annotations.*;
+import greencity.annotations.ApiPageable;
+import greencity.annotations.CurrentUser;
+import greencity.annotations.CurrentUserId;
+import greencity.annotations.ImageValidation;
 import greencity.constant.HttpStatuses;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
@@ -15,11 +18,22 @@ import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.service.AuthorityService;
-import greencity.service.*;
-import io.swagger.annotations.*;
+import greencity.service.AllUsersMutualFriends;
+import greencity.service.EmailService;
+import greencity.service.UserService;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -30,14 +44,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import lombok.extern.slf4j.Slf4j;
 import springfox.documentation.annotations.ApiIgnore;
-
-import javax.validation.Valid;
-import java.security.Principal;
-import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/user")
@@ -79,7 +86,7 @@ public class UserController {
      * The method which update user role. Parameter principal are ignored because
      * Spring automatically provide the Principal object.
      *
-     * @param id of updated user
+     * @param id   of updated user
      * @param body contains new role
      * @return {@link UserRoleDto}
      * @author Rostyslav Khasanov
@@ -95,16 +102,14 @@ public class UserController {
     @PatchMapping("{id}/role")
     public ResponseEntity<UserRoleDto> updateRole(
         @PathVariable Long id,
-        @Valid @RequestBody Map<String, String> body,
+        @NotNull @RequestBody Map<String, String> body,
         @ApiIgnore Principal principal) {
         Role role = Role.valueOf(body.get("role"));
         UserRoleDto userRoleDto = new UserRoleDto(id, role);
         return ResponseEntity.status(HttpStatus.OK)
             .body(
                 userService.updateRole(
-                    userRoleDto.getId(), userRoleDto.getRole(), principal.getName()
-                )
-            );
+                    userRoleDto.getId(), userRoleDto.getRole(), principal.getName()));
     }
 
     /**
@@ -726,12 +731,14 @@ public class UserController {
      * @param userDto dto with updated fields.
      * @author Orest Mamchuk
      */
-    @ApiOperation(value = "update UserManagement")
+    @ApiOperation(value = "update via UserManagement")
     @ApiResponses(value = @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED))
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void updateUserManagement(@RequestBody UserManagementDto userDto) {
-        userService.updateUser(userDto);
+    public void updateUserManagement(
+        @PathVariable @NotNull Long id,
+        @RequestBody UserManagementUpdateDto userDto) {
+        userService.updateUser(id, userDto);
     }
 
     /**
