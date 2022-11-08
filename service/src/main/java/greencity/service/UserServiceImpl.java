@@ -570,8 +570,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId) {
-        return restClient.getAllAvailableCustomShoppingListItems(userId);
+    public List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId, Long habitId) {
+        return restClient.getAllAvailableCustomShoppingListItems(userId, habitId);
     }
 
     /**

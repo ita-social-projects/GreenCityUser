@@ -126,6 +126,8 @@ class UserServiceImplTest {
 
     private String language = "ua";
     private Long userId = user.getId();
+
+    private Long habitId = 1L;
     private Long userId2 = user2.getId();
     private String userEmail = user.getEmail();
 
@@ -1083,11 +1085,11 @@ class UserServiceImplTest {
     void getAvailableCustomShoppingListItem() {
         CustomShoppingListItemResponseDto customShoppingListItemResponseDto =
             new CustomShoppingListItemResponseDto(1L, "test");
-        when(restClient.getAllAvailableCustomShoppingListItems(userId))
+        when(restClient.getAllAvailableCustomShoppingListItems(userId, habitId))
             .thenReturn(Collections.singletonList(customShoppingListItemResponseDto));
 
         assertEquals(Collections.singletonList(customShoppingListItemResponseDto),
-            userService.getAvailableCustomShoppingListItems(userId));
+            userService.getAvailableCustomShoppingListItems(userId, habitId));
     }
 
     @Test
