@@ -236,12 +236,13 @@ public class UserController {
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
     })
-    @GetMapping("/{userId}/custom-shopping-list-items/available")
+    @GetMapping("/{userId}/{habitId}/custom-shopping-list-items/available")
     public ResponseEntity<List<CustomShoppingListItemResponseDto>> getAvailableCustomShoppingListItems(
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
+        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId,
+        @PathVariable Long habitId) {
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(userService.getAvailableCustomShoppingListItems(userId));
+            .body(userService.getAvailableCustomShoppingListItems(userId, habitId));
     }
 
     /**

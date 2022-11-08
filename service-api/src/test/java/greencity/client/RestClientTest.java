@@ -9,16 +9,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -31,7 +25,7 @@ import java.util.Arrays;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.constant.AppConstant.IMAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,6 +65,7 @@ class RestClientTest {
         headers.set(AUTHORIZATION, accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long userId = 1L;
+        Long habitId = 1L;
         CustomShoppingListItemResponseDto customShoppingListItemResponseDto =
             new CustomShoppingListItemResponseDto(1L, "test");
         CustomShoppingListItemResponseDto[] customShoppingListItemResponseDtos =
@@ -78,12 +73,12 @@ class RestClientTest {
         customShoppingListItemResponseDtos[0] = customShoppingListItemResponseDto;
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId, HttpMethod.GET, entity,
+            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
             CustomShoppingListItemResponseDto[].class))
                 .thenReturn(ResponseEntity.ok(customShoppingListItemResponseDtos));
 
         assertEquals(Arrays.asList(customShoppingListItemResponseDtos),
-            restClient.getAllAvailableCustomShoppingListItems(userId));
+            restClient.getAllAvailableCustomShoppingListItems(userId, habitId));
     }
 
     @Test
