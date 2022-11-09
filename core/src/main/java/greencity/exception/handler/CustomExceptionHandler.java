@@ -83,7 +83,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         code
      */
     @ExceptionHandler(BadUpdateRequestException.class)
-    public final ResponseEntity<?> handleBadUpdateRequestException(
+    public final ResponseEntity<Object> handleBadUpdateRequestException(
         BadUpdateRequestException exception, WebRequest request) {
         log.trace(exception.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
