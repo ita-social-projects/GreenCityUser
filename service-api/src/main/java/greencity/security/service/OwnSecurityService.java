@@ -24,6 +24,15 @@ public interface OwnSecurityService {
     SuccessSignUpDto signUp(OwnSignUpDto dto, String language);
 
     /**
+     * Method that allows you sign-up employee.
+     *
+     * @param dto a value of {@link EmployeeSignUpDto}
+     * @return {@link SuccessSignUpDto}
+     * @author Inna Yashna
+     */
+    SuccessSignUpDto signUpEmployee(EmployeeSignUpDto dto, String language);
+
+    /**
      * Method that allow you sign-in user.
      *
      * @param dto a value of {@link OwnSignInDto}

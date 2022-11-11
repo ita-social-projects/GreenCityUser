@@ -226,6 +226,16 @@ public interface UserService {
     UserUpdateDto update(UserUpdateDto dto, String email);
 
     /**
+     * Update ubs employee {@link UserVO}.
+     *
+     * @param newEmployeeEmail {@link String} - new employee's email.
+     * @param employeeEmail    {@link String} - email of employee that we need to
+     *                         update.
+     * @author Inna Yashna
+     */
+    void updateEmployeeEmail(String employeeEmail, String newEmployeeEmail);
+
+    /**
      * Updates refresh token for a given user.
      *
      * @param refreshTokenKey - new refresh token key

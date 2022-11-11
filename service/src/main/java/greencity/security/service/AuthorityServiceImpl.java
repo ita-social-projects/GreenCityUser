@@ -37,8 +37,9 @@ public class AuthorityServiceImpl implements AuthorityService {
             userRepo.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         User employee =
-            userRepo.findById(dto.getEmployeeId())
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + dto.getEmployeeId()));
+            userRepo.findByEmail(dto.getEmployeeEmail())
+                .orElseThrow(
+                    () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmployeeEmail()));
         if (!user.getRole().equals(Role.ROLE_UBS_EMPLOYEE) || employee.getRole().equals(Role.ROLE_USER)
             || user.getEmail().equals(employee.getEmail())) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);

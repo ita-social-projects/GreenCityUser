@@ -526,6 +526,17 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public void updateEmployeeEmail(String employeeEmail, String newEmployeeEmail) {
+        User user = userRepo.findByEmail(employeeEmail)
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + employeeEmail));
+        user.setEmail(newEmployeeEmail);
+        userRepo.save(user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public int updateUserRefreshToken(String refreshTokenKey, Long id) {
         return userRepo.updateUserRefreshToken(refreshTokenKey, id);
     }

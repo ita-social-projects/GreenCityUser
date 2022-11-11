@@ -8,6 +8,6 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class UserEmployeeAuthorityDto {
-    private Long employeeId;
+    private String employeeEmail;
     private List<String> authorities;
 }

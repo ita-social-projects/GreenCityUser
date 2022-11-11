@@ -224,6 +224,25 @@ public class UserController {
     }
 
     /**
+     * Update ubs employee's email {@link UserVO}.
+     *
+     * @author Inna Yashna
+     */
+    @ApiOperation(value = "Update employee's email")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @PutMapping("/update-employee-email")
+    public ResponseEntity<HttpStatus> updateEmployeeEmail(@RequestParam String employeeEmail,
+        @RequestParam String newEmployeeEmail) {
+        userService.updateEmployeeEmail(employeeEmail, newEmployeeEmail);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
      * Method returns list of available (not ACTIVE) custom shopping list items for
      * user.
      *
