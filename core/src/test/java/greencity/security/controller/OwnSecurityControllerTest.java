@@ -67,6 +67,23 @@ class OwnSecurityControllerTest {
     }
 
     @Test
+    void singUpEmployeeTest() throws Exception {
+        String content = "{\n" +
+            "  \"email\": \"test@mail.com\",\n" +
+            "  \"name\": \"string\",\n" +
+            "  \"isUbs\": true\n" +
+            "}";
+
+        mockMvc.perform(post(LINK + "/sign-up-employee?lang=en")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isCreated());
+
+        EmployeeSignUpDto dto = ModelUtils.getObjectMapper().readValue(content, EmployeeSignUpDto.class);
+        verify(ownSecurityService).signUpEmployee(dto, "en");
+    }
+
+    @Test
     void signInTest() throws Exception {
         String content = "{\n" +
             "  \"email\": \"test@mail.com\",\n" +
