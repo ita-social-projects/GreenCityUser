@@ -2,7 +2,6 @@ package greencity.security.dto.ownsecurity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import greencity.annotations.PasswordValidation;
 import greencity.constant.ValidationConstants;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,7 +11,6 @@ import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 
 @Data
 @Builder
@@ -23,9 +21,6 @@ public class EmployeeSignUpDto {
     @Length(
         min = ValidationConstants.USERNAME_MIN_LENGTH,
         max = ValidationConstants.USERNAME_MAX_LENGTH)
-    @Pattern(
-        regexp = "^[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)++$",
-        message = ValidationConstants.INVALID_USERNAME)
     private String name;
 
     @NotBlank
