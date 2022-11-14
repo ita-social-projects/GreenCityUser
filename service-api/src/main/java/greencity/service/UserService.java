@@ -171,7 +171,7 @@ public interface UserService {
      *            {@link UserVO}.
      * @author Vasyl Zhovnir
      */
-    void updateUser(UserManagementDto dto);
+    void updateUser(Long userId, UserManagementUpdateDto dto);
 
     /**
      * Get all exists roles.

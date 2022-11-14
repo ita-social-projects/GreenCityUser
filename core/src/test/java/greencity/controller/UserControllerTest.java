@@ -118,17 +118,14 @@ class UserControllerTest {
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
         String content = "{\n"
-            + "  \"id\": 1,\n"
             + "  \"role\": \"ROLE_USER\"\n"
             + "}";
 
-        mockMvc.perform(patch(userLink + "/role")
+        mockMvc.perform(patch(userLink + "/1/role")
             .principal(principal)
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
-
-        ObjectMapper mapper = new ObjectMapper();
 
         verify(userService).updateRole(1L, Role.ROLE_USER, "testmail@gmail.com");
     }
@@ -145,10 +142,10 @@ class UserControllerTest {
     }
 
     @Test
-    void updateRoleBadRequestTest() throws Exception {
-        mockMvc.perform(patch(userLink + "/role")
+    void updateRoleBadRequestForEmptyBodyTest() throws Exception {
+        mockMvc.perform(patch(userLink + "/1/role")
             .contentType(MediaType.APPLICATION_JSON)
-            .content("{}"))
+            .content(""))
             .andExpect(status().isBadRequest());
     }
 
@@ -536,21 +533,21 @@ class UserControllerTest {
 
     @Test
     void updateUserManagementTest() throws Exception {
-        String content = objectMapper.writeValueAsString(ModelUtils.getUserManagementDto());
-        mockMvc.perform(put(userLink)
+        UserManagementUpdateDto userManagementDto = ModelUtils.getUserManagementUpdateDto();
+        String content = objectMapper.writeValueAsString(userManagementDto);
+        mockMvc.perform(put(userLink + "/1")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
-        verify(userService).updateUser(ModelUtils.getUserManagementDto());
     }
 
     @Test
     void updateUserManagementBadRequestTest() throws Exception {
-        mockMvc.perform(put(userLink)
+        mockMvc.perform(put(userLink + "/1")
             .contentType(MediaType.APPLICATION_JSON)
             .content(""))
             .andExpect(status().isBadRequest());
-        verify(userService, times(0)).updateUser(ModelUtils.getUserManagementDto());
+        verify(userService, times(0)).updateUser(1L, ModelUtils.getUserManagementUpdateDto());
     }
 
     @Test

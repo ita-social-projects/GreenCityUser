@@ -145,25 +145,25 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public void updateUser(UserManagementDto dto) {
-        UserVO userVO = findById(dto.getId());
-        updateUserFromDto(dto, userVO);
-        userRepo.save(modelMapper.map(userVO, User.class));
+    @Transactional
+    public void updateUser(Long userId, UserManagementUpdateDto dto) {
+        User user = findUserById(userId);
+        updateUserFromDto(dto, user);
     }
 
     /**
      * Method for setting data from {@link UserManagementDto} to {@link UserVO}.
      *
-     * @param dto    - dto {@link UserManagementDto} with updated fields.
-     * @param userVO {@link UserVO} to be updated.
+     * @param dto  - dto {@link UserManagementDto} with updated fields.
+     * @param user {@link UserVO} to be updated.
      * @author Vasyl Zhovnir
      */
-    private void updateUserFromDto(UserManagementDto dto, UserVO userVO) {
-        userVO.setName(dto.getName());
-        userVO.setEmail(dto.getEmail());
-        userVO.setRole(dto.getRole());
-        userVO.setUserCredo(dto.getUserCredo());
-        userVO.setUserStatus(dto.getUserStatus());
+    private void updateUserFromDto(UserManagementUpdateDto dto, User user) {
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setRole(dto.getRole());
+        user.setUserCredo(dto.getUserCredo());
+        user.setUserStatus(dto.getUserStatus());
     }
 
     /**
@@ -430,12 +430,23 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public UserRoleDto updateRole(Long id, Role role, String email) {
-        checkUpdatableUser(id, email);
-        UserVO userVO = findById(id);
-        userVO.setRole(role);
-        User map = modelMapper.map(userVO, User.class);
-        return modelMapper.map(userRepo.save(map), UserRoleDto.class);
+        User user = findUserById(id);
+        checkIfUserCanUpdate(user, email);
+        user.setRole(role);
+        return modelMapper.map(user, UserRoleDto.class);
+    }
+
+    private User findUserById(Long id) {
+        return userRepo.findById(id)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+    }
+
+    private void checkIfUserCanUpdate(User user, String email) {
+        if (email.equals(user.getEmail())) {
+            throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_THEMSELVES);
+        }
     }
 
     /**
@@ -552,7 +563,7 @@ public class UserServiceImpl implements UserService {
     private void checkUpdatableUser(Long id, String email) {
         UserVO user = findByEmail(email);
         if (id.equals(user.getId())) {
-            throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_HIMSELF);
+            throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_THEMSELVES);
         }
     }
 
