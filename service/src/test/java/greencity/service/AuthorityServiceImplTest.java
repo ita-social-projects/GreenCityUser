@@ -46,11 +46,11 @@ class AuthorityServiceImplTest {
         User employee = createEmployee();
         Authority authority = getAuthority();
 
-        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(user));
-        when(userRepo.findById(employee.getId())).thenReturn(Optional.of(employee));
+        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(employee));
+        when(userRepo.findByEmail("email@mail.com")).thenReturn(Optional.of(user));
         when(authorityRepo.findByName("test")).thenReturn(Optional.of(authority));
 
-        authorityService.updateEmployeesAuthorities(getUserEmployeeAuthorityDto(), "taras@gmail.com");
+        authorityService.updateEmployeesAuthorities(getUserEmployeeAuthorityDto(), "email@mail.com");
         authority.getEmployees().add(createAdmin());
         verify(authorityRepo).save(authority);
     }

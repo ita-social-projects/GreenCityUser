@@ -15,8 +15,10 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
+import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+import greencity.repository.UserRepo;
 import greencity.security.service.AuthorityService;
 import greencity.service.UserService;
 
@@ -41,6 +43,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -61,6 +64,8 @@ class UserControllerTest {
     private UserController userController;
     @Mock
     private UserService userService;
+    @Mock
+    private UserRepo userRepo;
     @Mock
     private AuthorityService authorityService;
     private ObjectMapper objectMapper;
@@ -126,6 +131,17 @@ class UserControllerTest {
         ObjectMapper mapper = new ObjectMapper();
 
         verify(userService).updateRole(1L, Role.ROLE_USER, "testmail@gmail.com");
+    }
+
+    @Test
+    void updateEmployeeEmailTest() throws Exception {
+        User user = ModelUtils.getUser();
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+
+        mockMvc.perform(put(userLink + "/update-employee-email")
+            .param("employeeEmail", "old@mail.com")
+            .param("newEmployeeEmail", "new@mail.com"))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -785,11 +801,17 @@ class UserControllerTest {
     @Test
     void editAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
+        List<String> list = new ArrayList<>();
+        list.add("EDIT_ORDER");
+        UserEmployeeAuthorityDto dto = UserEmployeeAuthorityDto.builder()
+            .employeeEmail("test@mail.com")
+            .authorities(list)
+            .build();
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
         String content = "{\n"
             + "  \"authorities\":[ \"EDIT_ORDER\"],\n"
-            + "  \"employeeId\": 1\n"
+            + "  \"employeeEmail\": \"test@mail.com\"\n"
             + "}";
 
         mockMvc.perform(put(userLink + "/edit-authorities")
@@ -797,12 +819,7 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
-        List<String> list = new ArrayList<>();
-        list.add("EDIT_ORDER");
-        UserEmployeeAuthorityDto dto = UserEmployeeAuthorityDto.builder()
-            .employeeId(1L)
-            .authorities(list)
-            .build();
+
         verify(authorityService).updateEmployeesAuthorities(dto, "testmail@gmail.com");
     }
 }

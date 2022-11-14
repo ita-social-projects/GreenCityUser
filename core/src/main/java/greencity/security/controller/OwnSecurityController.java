@@ -84,6 +84,25 @@ public class OwnSecurityController {
     }
 
     /**
+     * Method for signing-up employee by our security logic.
+     *
+     * @param dto - {@link EmployeeSignUpDto} that have sign-up information for
+     *            employee.
+     * @return {@link ResponseEntity}
+     */
+    @ApiOperation("Sign-up employee by own security logic")
+    @ApiResponses(value = {
+        @ApiResponse(code = 201, message = USER_CREATED, response = SuccessSignUpDto.class),
+        @ApiResponse(code = 400, message = USER_ALREADY_REGISTERED_WITH_THIS_EMAIL)
+    })
+    @PostMapping("/sign-up-employee")
+    @ApiLocale
+    public ResponseEntity<SuccessSignUpDto> singUpEmployee(@Valid @RequestBody EmployeeSignUpDto dto,
+        @ApiIgnore @ValidLanguage Locale locale) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.signUpEmployee(dto, locale.getLanguage()));
+    }
+
+    /**
      * Method for sign-in by our security logic.
      *
      * @param dto - {@link OwnSignInDto} that have sign-in information.

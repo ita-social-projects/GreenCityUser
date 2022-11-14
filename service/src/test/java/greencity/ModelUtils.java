@@ -18,7 +18,9 @@ import greencity.enums.AchievementStatus;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
+import greencity.security.dto.ownsecurity.OwnSignUpDto;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -138,7 +140,7 @@ public class ModelUtils {
 
     public static UserEmployeeAuthorityDto getUserEmployeeAuthorityDto() {
         return UserEmployeeAuthorityDto.builder()
-            .employeeId(1L)
+            .employeeEmail("taras@gmail.com")
             .authorities(List.of("test"))
             .build();
     }
@@ -157,6 +159,30 @@ public class ModelUtils {
         return User.builder()
             .id(1L)
             .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .lastActivityTime(LocalDateTime.now())
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .build();
+    }
+
+    public static User getUserWithUbsRole() {
+        return User.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_UBS_EMPLOYEE)
+            .lastActivityTime(LocalDateTime.now())
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .build();
+    }
+
+    public static User getUserWithNewEmail() {
+        return User.builder()
+            .id(1L)
+            .email("test@mail.com")
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
             .lastActivityTime(LocalDateTime.now())
@@ -412,6 +438,23 @@ public class ModelUtils {
             .id(2L)
             .email("email@mail.com")
             .role(Role.ROLE_UBS_EMPLOYEE)
+            .build();
+    }
+
+    public static EmployeeSignUpDto getEmployeeSignUpDto() {
+        return EmployeeSignUpDto.builder()
+            .name("Taras")
+            .email("test@mail.com")
+            .isUbs(true)
+            .build();
+    }
+
+    public static OwnSignUpDto getOwnSignUpDto() {
+        return OwnSignUpDto.builder()
+            .name("Name")
+            .email("test@mail.com")
+            .password("Test@123")
+            .isUbs(true)
             .build();
     }
 }
