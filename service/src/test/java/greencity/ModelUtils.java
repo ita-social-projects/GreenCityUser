@@ -79,6 +79,15 @@ public class ModelUtils {
             .userStatus(UserStatus.ACTIVATED).build();
     }
 
+    public static UserManagementUpdateDto getUserManagementUpdateDto() {
+        return UserManagementUpdateDto.builder()
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .email(TestConst.EMAIL)
+            .userCredo(TestConst.CREDO)
+            .build();
+    }
+
     private static UserProfileStatisticsDto createUserProfileStatisticsDto() {
         return UserProfileStatisticsDto.builder()
             .amountHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER)

@@ -3,6 +3,7 @@ package greencity;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
@@ -43,6 +44,15 @@ public class ModelUtils {
     public static UserManagementDto getUserManagementDto() {
         return UserManagementDto.builder()
             .id(1L)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .email(TestConst.EMAIL)
+            .userCredo(TestConst.CREDO)
+            .build();
+    }
+
+    public static UserManagementUpdateDto getUserManagementUpdateDto() {
+        return UserManagementUpdateDto.builder()
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
             .email(TestConst.EMAIL)
