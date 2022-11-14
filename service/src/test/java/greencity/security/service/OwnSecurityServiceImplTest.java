@@ -22,6 +22,7 @@ import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.repository.UserRepo;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
@@ -154,6 +155,27 @@ class OwnSecurityServiceImplTest {
             refEq(user.getEmail()),
             refEq(user.getVerifyEmail().getToken()),
             refEq("en"), eq(false));
+        verify(jwtTool, times(2)).generateTokenKey();
+    }
+
+    @Test
+    void signUpEmployee() {
+        User user = ModelUtils.getUserWithUbsRole();
+        UserVO userVO = ModelUtils.getUserVO();
+        EmployeeSignUpDto employeeSignUpDto = ModelUtils.getEmployeeSignUpDto();
+        OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        user.setUserAchievements(userAchievementList);
+        when(achievementService.findAll()).thenReturn(achievementVOList);
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
+        when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
+        when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
+        when(userRepo.save(any(User.class))).thenReturn(user);
+        when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
+        ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
         verify(jwtTool, times(2)).generateTokenKey();
     }
 

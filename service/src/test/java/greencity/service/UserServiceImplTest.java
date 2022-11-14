@@ -233,6 +233,15 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateEmployeeEmailTest() {
+        User user = getUser();
+        User updatedUser = getUserWithNewEmail();
+        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(user));
+        userService.updateEmployeeEmail("taras@gmail.com", "test@mail.com");
+        assertEquals(updatedUser.getEmail(), user.getEmail());
+    }
+
+    @Test
     void updateUserStatusDeactivatedTest() {
         when(userRepo.findById(userId2)).thenReturn(Optional.of(user2));
         when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);

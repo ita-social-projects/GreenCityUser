@@ -5,6 +5,7 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.entity.User;
 import greencity.enums.Role;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -22,6 +23,15 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
+            .build();
+    }
+
+    public static User getUser() {
+        return User.builder()
+            .id(1L)
+            .email("mail@gmail.com")
+            .name(TestConst.NAME)
+            .role(Role.ROLE_UBS_EMPLOYEE)
             .build();
     }
 
