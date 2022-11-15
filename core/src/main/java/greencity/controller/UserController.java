@@ -981,16 +981,16 @@ public class UserController {
      *               deleted.
      * @author Orest Mamchuk
      */
-    @ApiOperation(value = "Deactivate all users")
+    @ApiOperation(value = "Deactivate all users with given IDs")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/deactivateAll")
-    public ResponseEntity<List<Long>> deactivateAllUsers(@RequestBody List<Long> listId) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deactivateAllUsers(listId));
+    @PatchMapping("/deactivateListed")
+    public List<Long> deactivateListedUsers(@RequestBody List<Long> listId) {
+        return userService.deactivateListedUsers(listId);
     }
 
     /**

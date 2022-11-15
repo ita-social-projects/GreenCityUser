@@ -49,6 +49,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> findAll(Pageable pageable);
 
     /**
+     * Method to fetch users with ids from given list
+     *
+     * @param ids identifiers of searched users
+     * @return list of users with matching ids
+     */
+    @Query("SELECT u FROM User u WHERE u.id IN :ids")
+    List<User> findAllByIds(List<Long> ids);
+
+    /**
      * Find id by email.
      *
      * @param email - User email
@@ -241,16 +250,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true, value = "DELETE FROM users where status = 1 "
         + "AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP")
     int scheduleDeleteDeactivatedUsers();
-
-    /**
-     * Set {@link User}s' statuses to 'DEACTIVATED'.
-     *
-     * @param ids - {@link List} of ids of {@link User} to be 'DEACTIVATED'
-     * @author Vasyl Zhovnir
-     **/
-    @Modifying
-    @Query(value = "UPDATE User SET userStatus = 1 where id IN(:ids)")
-    void deactivateSelectedUsers(List<Long> ids);
 
     /**
      * Method returns {@link User} by search query and page.

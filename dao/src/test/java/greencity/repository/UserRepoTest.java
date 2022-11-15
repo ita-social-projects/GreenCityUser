@@ -3,6 +3,7 @@ package greencity.repository;
 import greencity.dto.user.UsersFriendDto;
 import greencity.entity.User;
 import greencity.enums.UserStatus;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,8 @@ import static greencity.enums.EmailNotification.DISABLED;
 import static greencity.enums.EmailNotification.IMMEDIATELY;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.springframework.data.domain.Pageable;
 
 @DataJpaTest
@@ -54,6 +55,21 @@ class UserRepoTest {
             .collect(Collectors.toList());
         assertEquals(3, expected.getContent().size());
         assertEquals(expectedIds, actualIds);
+    }
+
+    @Test
+    void findAllByIdsTest() {
+        // given
+        List<Long> ids = List.of(1L, 2L, 5L);
+
+        // when
+        List<User> allByIds = userRepo.findAllByIds(ids);
+
+        // then
+        assertEquals(3, allByIds.size());
+        assertTrue(allByIds.contains(userRepo.findById(1L).get()));
+        assertTrue(allByIds.contains(userRepo.findById(5L).get()));
+        assertFalse(allByIds.contains(userRepo.findById(4L).get()));
     }
 
     @Test
@@ -177,22 +193,6 @@ class UserRepoTest {
     void getAllUserFriendsCountTest() {
         Integer friends = userRepo.getAllUserFriendsCount(1L);
         assertEquals(7, friends);
-    }
-
-    @Test
-    void deactivateSelectedUsersTest() {
-        List<Long> ids = Arrays.asList(1L, 2L, 3L);
-        userRepo.deactivateSelectedUsers(ids);
-        String user1 = userRepo.findByEmail("test@email.com").get().getUserStatus().toString();
-        String user2 = userRepo.findByEmail("test2@email.com").get().getUserStatus().toString();
-        String user3 = userRepo.findByEmail("test3@email.com").get().getUserStatus().toString();
-        String user4 = userRepo.findByEmail("test4@email.com").get().getUserStatus().toString();
-        String userStatus = UserStatus.DEACTIVATED.toString();
-        String userStatus2 = UserStatus.ACTIVATED.toString();
-        assertEquals(user1, userStatus);
-        assertEquals(user2, userStatus);
-        assertEquals(user3, userStatus);
-        assertEquals(user4, userStatus2);
     }
 
     @Test

@@ -1019,9 +1019,14 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public List<Long> deactivateAllUsers(List<Long> listId) {
-        userRepo.deactivateSelectedUsers(listId);
-        return listId;
+    public List<Long> deactivateListedUsers(List<Long> ids) {
+        return userRepo.findAllByIds(ids)
+            .stream()
+            .map(user -> {
+                user.setUserStatus(UserStatus.DEACTIVATED);
+                return user.getId();
+            })
+            .collect(Collectors.toList());
     }
 
     /**

@@ -43,7 +43,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -659,15 +658,19 @@ class UserControllerTest {
     }
 
     @Test
-    void deactivateAllUserTest() throws Exception {
+    void deactivateListedUsersTest() throws Exception {
+        // given
         List<Long> ids = List.of(1L, 2L, 3L, 4L);
-        when(userService.deactivateAllUsers(ids)).thenReturn(ids);
-        mockMvc.perform(put(userLink + "/deactivateAll")
+        String content = objectMapper.writeValueAsString(ids);
+        when(userService.deactivateListedUsers(ids)).thenReturn(ids);
+
+        // expect
+        mockMvc.perform(patch(userLink + "/deactivateListed")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(ids)))
+            .content(content))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(4));
-
+        verify(userService).deactivateListedUsers(ids);
     }
 
     @Test

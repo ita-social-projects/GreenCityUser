@@ -1005,9 +1005,17 @@ class UserServiceImplTest {
     }
 
     @Test
-    void deactivateAllUsers() {
-        List<Long> longList = List.of(1L, 2L);
-        assertEquals(longList, userService.deactivateAllUsers(longList));
+    void deactivateListedUsersUsers() {
+        // given
+        List<Long> longList = List.of(1L, 5L);
+        List<User> users = List.of(ModelUtils.getUserWith(1L), ModelUtils.getUserWith(5L));
+        when(userRepo.findAllByIds(longList)).thenReturn(users);
+
+        // when
+        List<Long> idsOfDeactivatedUsers = userService.deactivateListedUsers(longList);
+
+        // then
+        assertEquals(longList, idsOfDeactivatedUsers);
     }
 
     @Test
