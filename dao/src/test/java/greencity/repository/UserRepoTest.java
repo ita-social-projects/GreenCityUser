@@ -85,6 +85,12 @@ class UserRepoTest {
     }
 
     @Test
+    void checkIfNotDeactivatedTest() {
+        String oneIfNotDeactivated = userRepo.checkIfNotDeactivated("test@email.com").get();
+        assertEquals("1", oneIfNotDeactivated);
+    }
+
+    @Test
     void findNotDeactivatedByEmailTest() {
         User actual = userRepo.findNotDeactivatedByEmail("test@email.com").get();
         assertEquals(1L, actual.getId());

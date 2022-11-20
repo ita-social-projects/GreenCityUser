@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.RestClient;
-import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
@@ -20,6 +19,7 @@ import greencity.entity.UserDeactivationReason;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
@@ -877,22 +877,30 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findNotDeactivatedByEmail() {
-        String email = "test@gmail.com";
-        user.setEmail(email);
-        when(userRepo.findNotDeactivatedByEmail(email)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        assertEquals(Optional.of(userVO), userService.findNotDeactivatedByEmail(email));
+    void isDeactivatedByEmailTest() {
+        // given
+        User user = getUser();
+        when(userRepo.checkIfNotDeactivated(user.getEmail())).thenReturn(Optional.of("1"));
+
+        // when
+        boolean isNotDeactivated = userService.isNotDeactivatedByEmail(user.getEmail());
+
+        // then
+        assertTrue(isNotDeactivated);
     }
 
     @Test
-    void findNotDeactivatedByEmailShouldThrowNotFoundException() {
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+    void isDeactivatedByEmailThrowsExceptionWhenDeactivated() {
+        // given
+        User user = getUser();
+        user.setUserStatus(UserStatus.DEACTIVATED);
+        when(userRepo.checkIfNotDeactivated(user.getEmail())).thenReturn(Optional.empty());
 
-        Exception thrown = assertThrows(NotFoundException.class,
-            () -> userService.findNotDeactivatedByEmail("test@gmail.com"));
+        // when
+        Executable e = () -> userService.isNotDeactivatedByEmail(user.getEmail());
 
-        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL, thrown.getMessage());
+        // then
+        assertThrows(UserDeactivatedException.class, e);
     }
 
     @Test

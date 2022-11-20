@@ -40,6 +40,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Optional<User> findByEmail(String email);
 
     /**
+     * check if {@link User} {@link UserStatus} is not 'DEACTIVATED'.
+     *
+     * @param email - {@link User}'s email
+     * @return optional of 1
+     */
+    @Query("SELECT 1 FROM User u WHERE u.email=:email AND u.userStatus <> 1")
+    Optional<String> checkIfNotDeactivated(String email);
+
+    /**
      * Find {@link User} by page.
      *
      * @param pageable pageable configuration.

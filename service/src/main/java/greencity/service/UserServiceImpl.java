@@ -96,6 +96,17 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
+    public boolean isNotDeactivatedByEmail(String email) {
+        userRepo.checkIfNotDeactivated(email)
+            .orElseThrow(() -> new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED));
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UserVOAchievement findUserForAchievement(Long id) {
         User user = userRepo.findUserForAchievement(id)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
