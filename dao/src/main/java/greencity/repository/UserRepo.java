@@ -58,7 +58,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> findAll(Pageable pageable);
 
     /**
-     * Method to fetch users with ids from given list
+     * Method to fetch users with ids from given list.
      *
      * @param ids identifiers of searched users
      * @return list of users with matching ids
