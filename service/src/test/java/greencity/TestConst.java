@@ -8,4 +8,5 @@ public final class TestConst {
     public static final String CREDO = "Credo";
     public static final Long SIMPLE_LONG_NUMBER = 1L;
     public static final Long SIMPLE_LONG_NUMBER_BAD_VALUE = 100L;
+    public static final String PRINCIPAL_MAIL = "test@admin.com";
 }

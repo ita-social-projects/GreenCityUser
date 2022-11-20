@@ -989,8 +989,8 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PatchMapping("/deactivateListed")
-    public List<Long> deactivateListedUsers(@RequestBody List<Long> listId) {
-        return userService.deactivateListedUsers(listId);
+    public List<Long> deactivateListedUsers(@RequestBody List<Long> listId, @ApiIgnore Principal principal) {
+        return userService.deactivateListedUsers(listId, principal.getName());
     }
 
     /**

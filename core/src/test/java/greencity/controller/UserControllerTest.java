@@ -662,15 +662,17 @@ class UserControllerTest {
         // given
         List<Long> ids = List.of(1L, 2L, 3L, 4L);
         String content = objectMapper.writeValueAsString(ids);
-        when(userService.deactivateListedUsers(ids)).thenReturn(ids);
+        Principal principal = Mockito.mock(Principal.class);
+        when(userService.deactivateListedUsers(ids, principal.getName())).thenReturn(ids);
 
         // expect
         mockMvc.perform(patch(userLink + "/deactivateListed")
+            .principal(principal)
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(4));
-        verify(userService).deactivateListedUsers(ids);
+        verify(userService).deactivateListedUsers(ids, principal.getName());
     }
 
     @Test

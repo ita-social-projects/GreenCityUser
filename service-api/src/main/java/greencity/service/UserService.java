@@ -395,7 +395,7 @@ public interface UserService {
      * @return {@link List} of {@link UserVO}s` ids
      * @author Vasyl Zhovnir
      */
-    List<Long> deactivateListedUsers(List<Long> listId);
+    List<Long> deactivateListedUsers(List<Long> listId, String principalEmail);
 
     /**
      * change {@link UserVO}'s status to ACTIVATED.

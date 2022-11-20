@@ -14,7 +14,10 @@ import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
-import greencity.entity.*;
+import greencity.entity.Language;
+import greencity.entity.User;
+import greencity.entity.UserDeactivationReason;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.exception.exceptions.*;
@@ -22,8 +25,14 @@ import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,18 +47,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static greencity.ModelUtils.*;
+import static greencity.TestConst.PRINCIPAL_MAIL;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -1005,17 +1008,34 @@ class UserServiceImplTest {
     }
 
     @Test
-    void deactivateListedUsersUsers() {
+    void deactivateListedUsersTest() {
         // given
         List<Long> longList = List.of(1L, 5L);
         List<User> users = List.of(ModelUtils.getUserWith(1L), ModelUtils.getUserWith(5L));
         when(userRepo.findAllByIds(longList)).thenReturn(users);
+        String principalEmail = PRINCIPAL_MAIL;
 
         // when
-        List<Long> idsOfDeactivatedUsers = userService.deactivateListedUsers(longList);
+        List<Long> idsOfDeactivatedUsers = userService.deactivateListedUsers(longList, principalEmail);
 
         // then
         assertEquals(longList, idsOfDeactivatedUsers);
+    }
+
+    @Test
+    void deactivateListedUsersThrowsExceptionWhenPrincipalTriesToChangeTheirStatus() {
+        // given
+        List<Long> longList = List.of(1L, 5L);
+        String principalEmail = PRINCIPAL_MAIL;
+        List<User> users =
+            List.of(ModelUtils.getUserWith(1L), ModelUtils.getUserWith(5L), ModelUtils.getUserWith(2L, principalEmail));
+        when(userRepo.findAllByIds(longList)).thenReturn(users);
+
+        // when
+        Executable e = () -> userService.deactivateListedUsers(longList, principalEmail);
+
+        // then
+        assertThrows(BadUpdateRequestException.class, e);
     }
 
     @Test
