@@ -54,8 +54,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param ids identifiers of searched users
      * @return list of users with matching ids
      */
-    @Query("SELECT u FROM User u WHERE u.id IN :ids")
-    List<User> findAllByIds(List<Long> ids);
+    List<User> findAllByIdIn(List<Long> ids);
 
     /**
      * Find id by email.

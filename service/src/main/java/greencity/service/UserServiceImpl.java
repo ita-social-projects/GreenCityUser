@@ -1020,7 +1020,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public List<Long> deactivateListedUsers(List<Long> ids, String principalEmail) {
-        return userRepo.findAllByIds(ids)
+        return userRepo.findAllByIdIn(ids)
             .stream()
             .map(user -> {
                 checkIfUserCanUpdate(user, principalEmail);

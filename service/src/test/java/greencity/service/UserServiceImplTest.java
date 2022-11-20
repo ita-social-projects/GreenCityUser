@@ -1012,7 +1012,7 @@ class UserServiceImplTest {
         // given
         List<Long> longList = List.of(1L, 5L);
         List<User> users = List.of(ModelUtils.getUserWith(1L), ModelUtils.getUserWith(5L));
-        when(userRepo.findAllByIds(longList)).thenReturn(users);
+        when(userRepo.findAllByIdIn(longList)).thenReturn(users);
         String principalEmail = PRINCIPAL_MAIL;
 
         // when
@@ -1029,7 +1029,7 @@ class UserServiceImplTest {
         String principalEmail = PRINCIPAL_MAIL;
         List<User> users =
             List.of(ModelUtils.getUserWith(1L), ModelUtils.getUserWith(5L), ModelUtils.getUserWith(2L, principalEmail));
-        when(userRepo.findAllByIds(longList)).thenReturn(users);
+        when(userRepo.findAllByIdIn(longList)).thenReturn(users);
 
         // when
         Executable e = () -> userService.deactivateListedUsers(longList, principalEmail);

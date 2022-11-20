@@ -990,7 +990,10 @@ public class UserController {
     })
     @PatchMapping("/deactivateListed")
     public List<Long> deactivateListedUsers(@RequestBody List<Long> listId, @ApiIgnore Principal principal) {
-        return userService.deactivateListedUsers(listId, principal.getName());
+        System.out.println("\nDeactivate start\n");
+        List<Long> longs = userService.deactivateListedUsers(listId, principal.getName());
+        System.out.println("\nDeactivate end\n");
+        return longs;
     }
 
     /**

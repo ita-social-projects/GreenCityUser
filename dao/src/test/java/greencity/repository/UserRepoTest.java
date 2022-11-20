@@ -2,8 +2,6 @@ package greencity.repository;
 
 import greencity.dto.user.UsersFriendDto;
 import greencity.entity.User;
-import greencity.enums.UserStatus;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +61,7 @@ class UserRepoTest {
         List<Long> ids = List.of(1L, 2L, 5L);
 
         // when
-        List<User> allByIds = userRepo.findAllByIds(ids);
+        List<User> allByIds = userRepo.findAllByIdIn(ids);
 
         // then
         assertEquals(3, allByIds.size());
