@@ -301,4 +301,20 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ExceptionResponse response = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    /**
+     * Method that intercepts exception {@link UserDeactivatedException}.
+     *
+     * @param ex      intercepted exception.
+     * @param request used to get additional info about the request.
+     * @return ResponseEntity with FORBIDDEN status and {@link ExceptionResponse}
+     *         body.
+     */
+    @ExceptionHandler(UserDeactivatedException.class)
+    public final ResponseEntity<Object> handleUserDeactivatedException(
+        UserDeactivatedException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        log.trace(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
+    }
 }

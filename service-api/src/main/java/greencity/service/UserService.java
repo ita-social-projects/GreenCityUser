@@ -101,7 +101,7 @@ public interface UserService {
     UserVO findByEmail(String email);
 
     /**
-     * Method that returns true if user exists in database and is 'DEACTIVATED'.
+     * Method that returns true if user exists in database and is not 'DEACTIVATED'.
      *
      * @param email - {@link UserVO}'s email
      * @return boolean of activation status of {@link UserVO}.
