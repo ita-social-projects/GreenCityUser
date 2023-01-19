@@ -1134,6 +1134,8 @@ public class UserServiceImpl implements UserService {
             new TypeToken<List<UserAllFriendsDto>>() {
             }.getType());
 
+        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
+
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
             ourUsersList.getTotalElements(),
