@@ -22,10 +22,13 @@ public class Authority {
     @Column
     private String name;
 
+    @ManyToMany(mappedBy = "authorities", cascade = CascadeType.ALL)
+    private List<User> employees;
+
     @ManyToMany
     @JoinTable(
-        name = "employee_authorities_mapping",
-        joinColumns = {@JoinColumn(name = "authority_id")},
-        inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private List<User> employees;
+        name = "positions_authorities_mapping",
+        joinColumns = @JoinColumn(name = "authorities_id"),
+        inverseJoinColumns = @JoinColumn(name = "position_id"))
+    private List<Position> positions;
 }

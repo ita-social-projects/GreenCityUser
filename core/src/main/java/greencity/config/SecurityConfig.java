@@ -153,10 +153,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/ownSecurity/changePassword",
                 "/user/profile",
                 "/user/{id}/updateUserLastActivityTime/{date}",
-                "/user/{userId}/language/{languageId}")
+                "/user/{userId}/language/{languageId}",
+                "/user/update-employee-email")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PUT,
-                "/user/edit-authorities")
+                "/user/edit-authorities",
+                "/user/update-authorities")
             .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
                 "/user/get-all-authorities")
@@ -179,6 +181,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findAll",
                 "/user/{id}/friends")
             .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.POST,
+                "/ownSecurity/sign-up-employee")
+            .hasAnyRole(UBS_EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 "/user/filter",
                 "/ownSecurity/register")

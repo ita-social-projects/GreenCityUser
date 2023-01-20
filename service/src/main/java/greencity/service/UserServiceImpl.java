@@ -540,6 +540,7 @@ public class UserServiceImpl implements UserService {
     public void updateEmployeeEmail(String employeeEmail, String newEmployeeEmail) {
         User user = userRepo.findByEmail(employeeEmail)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + employeeEmail));
+        // проверка на то что юзер с почтой которую я хочу установить уже существует//
         user.setEmail(newEmployeeEmail);
         userRepo.save(user);
     }

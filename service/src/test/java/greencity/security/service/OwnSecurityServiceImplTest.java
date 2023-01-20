@@ -9,7 +9,6 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import greencity.ModelUtils;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
@@ -21,6 +20,7 @@ import greencity.entity.*;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
+import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.ErrorManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -94,13 +93,14 @@ class OwnSecurityServiceImplTest {
     private UserVO notVerifiedUser;
     private UpdatePasswordDto updatePasswordDto;
     private UserManagementDto userManagementDto;
+    private AuthorityRepo authorityRepo;
 
     @BeforeEach
     public void init() {
         initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, userService, passwordEncoder,
             jwtTool, 1, restorePasswordEmailRepo, modelMapper,
-            userRepo, achievementService, emailService, restClient);
+            userRepo, achievementService, emailService, restClient, authorityRepo);
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")

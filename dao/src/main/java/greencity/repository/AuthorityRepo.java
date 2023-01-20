@@ -25,4 +25,13 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
      * @return {@link Authority}
      */
     Optional<Authority> findByName(String name);
+
+    /**
+     * Method that return list of authorities.
+     *
+     * @param name - list of positions name.
+     * @return list of authorities.
+     */
+    @Query(value = "select distinct au from Authority au left join au.positions pos where pos.name in (:name)")
+    List<Authority> findAuthoritiesByPositions(List<String> name);
 }

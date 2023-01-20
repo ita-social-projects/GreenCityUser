@@ -8,6 +8,7 @@ import greencity.constant.HttpStatuses;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
+import greencity.dto.UpdateEmployeeAuthoritiesDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
@@ -1249,6 +1250,25 @@ public class UserController {
     public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto,
         @ApiIgnore Principal principal) {
         authorityService.updateEmployeesAuthorities(dto, principal.getName());
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Controller that update employees authorities.
+     *
+     * @param dto - UpdateEmployeeAuthoritiesDto.
+     * @author Nikita Korzh.
+     */
+    @ApiOperation(value = "Update an employee`s authorities")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+    })
+    @PutMapping("/update-authorities")
+    public ResponseEntity<HttpStatus> updateAuthorities(@Valid @RequestBody UpdateEmployeeAuthoritiesDto dto) {
+        authorityService.updateAuthorities(dto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
