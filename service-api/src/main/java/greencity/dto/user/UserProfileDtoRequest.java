@@ -14,9 +14,9 @@ import javax.validation.constraints.Size;
 @EqualsAndHashCode
 @Builder
 public class UserProfileDtoRequest {
-    @Size(min = 4, max = 30, message = "name must have no less than 4 and no more than 30 symbols")
-    @Pattern(regexp = "[ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'\\s.]{4,30}",
-        message = "name must contain only \"ЁёІіЇїҐґЄєА-Яа-яA-Za-z-' .\"")
+    @Size(min = 6, max = 30, message = "name must have no less than 6 and no more than 30 symbols")
+    @Pattern(regexp = "^(?=.{6,30}$)([ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'\\d\\s]+[.]?[ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'\\d\\s]+)+$",
+        message = "name must contain only \"ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'0-9 .\", dot can only be in the center of the name")
     private String name;
     private String city;
     private String userCredo;
