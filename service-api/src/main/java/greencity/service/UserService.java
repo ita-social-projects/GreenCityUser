@@ -229,7 +229,7 @@ public interface UserService {
      * Update ubs employee {@link UserVO}.
      *
      * @param newEmployeeEmail {@link String} - new employee's email.
-     * @param uuid    {@link String} - uuid of employee.
+     * @param uuid             {@link String} - uuid of employee.
      * @author Inna Yashna
      */
     void updateEmployeeEmail(String newEmployeeEmail, String uuid);

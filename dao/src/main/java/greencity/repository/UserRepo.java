@@ -421,7 +421,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * Method that check if another user with current email already exist.
      *
      * @param email - email of User.
-     * @param uuid - uuid of User.
+     * @param uuid  - uuid of User.
      * @return - list of Users.
      */
     @Query("select u from User u where u.email =:email and not u.uuid =:uuid")
