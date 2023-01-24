@@ -267,9 +267,9 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PutMapping("/update-employee-email")
-    public ResponseEntity<HttpStatus> updateEmployeeEmail(@RequestParam String employeeEmail,
-        @RequestParam String newEmployeeEmail) {
-        userService.updateEmployeeEmail(employeeEmail, newEmployeeEmail);
+    public ResponseEntity<HttpStatus> updateEmployeeEmail(@RequestParam String newEmployeeEmail,
+        @RequestParam String uuid) {
+        userService.updateEmployeeEmail(newEmployeeEmail, uuid);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
