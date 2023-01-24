@@ -39,6 +39,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     Optional<User> findByEmail(String email);
 
+    // Optional<User> findUserByUuid(String uuid);
+
     /**
      * Find {@link User} by page.
      *
@@ -414,4 +416,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true,
         value = "SELECT  FROM users_friends WHERE user_id = :userId AND friend_id = :friendId")
     Integer getStatusUser(Long userId, Long friendId);
+
+    /**
+     * Method that check if another user with current email already exist.
+     *
+     * @param email - email of User.
+     * @param uuid - uuid of User.
+     * @return - list of Users.
+     */
+    @Query("select u from User u where u.email =:email and not u.uuid =:uuid")
+    List<User> getUsersByEmailExceptOne(String email, String uuid);
 }

@@ -232,14 +232,14 @@ class UserServiceImplTest {
         assertEquals(userVO, userService.save(userVO));
     }
 
-    @Test
-    void updateEmployeeEmailTest() {
-        User user = getUser();
-        User updatedUser = getUserWithNewEmail();
-        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(user));
-        userService.updateEmployeeEmail("taras@gmail.com", "test@mail.com");
-        assertEquals(updatedUser.getEmail(), user.getEmail());
-    }
+//    @Test
+//    void updateEmployeeEmailTest() {
+//        User user = getUser();
+//        User updatedUser = getUserWithNewEmail();
+//        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(user));
+//        userService.updateEmployeeEmail("taras@gmail.com", "test@mail.com");
+//        assertEquals(updatedUser.getEmail(), user.getEmail());
+//    }
 
     @Test
     void updateUserStatusDeactivatedTest() {

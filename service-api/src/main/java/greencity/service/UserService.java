@@ -229,11 +229,10 @@ public interface UserService {
      * Update ubs employee {@link UserVO}.
      *
      * @param newEmployeeEmail {@link String} - new employee's email.
-     * @param employeeEmail    {@link String} - email of employee that we need to
-     *                         update.
+     * @param uuid    {@link String} - uuid of employee.
      * @author Inna Yashna
      */
-    void updateEmployeeEmail(String employeeEmail, String newEmployeeEmail);
+    void updateEmployeeEmail(String newEmployeeEmail, String uuid);
 
     /**
      * Updates refresh token for a given user.
