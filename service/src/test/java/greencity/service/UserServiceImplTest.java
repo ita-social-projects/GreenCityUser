@@ -36,6 +36,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Timestamp;
@@ -232,14 +233,36 @@ class UserServiceImplTest {
         assertEquals(userVO, userService.save(userVO));
     }
 
-//    @Test
-//    void updateEmployeeEmailTest() {
-//        User user = getUser();
-//        User updatedUser = getUserWithNewEmail();
-//        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(user));
-//        userService.updateEmployeeEmail("taras@gmail.com", "test@mail.com");
-//        assertEquals(updatedUser.getEmail(), user.getEmail());
-//    }
+    @Test
+    void updateEmployeeEmailTest() {
+        User user = getUser();
+        User updatedUser = getUserWithNewEmail();
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        userService.updateEmployeeEmail("test@mail.com", uuid);
+        assertEquals(updatedUser.getEmail(), user.getEmail());
+        verify(userRepo).findUserByUuid(uuid);
+    }
+
+    @Test
+    void updateEmployeeEmailThrowsUsernameNotFoundExceptionTest() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.empty());
+        assertThrows(UsernameNotFoundException.class,
+            () -> userService.updateEmployeeEmail("test@mail.com", uuid));
+        verify(userRepo).findUserByUuid(uuid);
+    }
+
+    @Test
+    void updateEmployeeEmailThrowsUserAlreadyRegisteredExceptionTest() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        when(userRepo.getUsersByEmailExceptOne("taras@gmail.com", uuid)).thenReturn(List.of(getUser()));
+        assertThrows(UserAlreadyRegisteredException.class,
+            () -> userService.updateEmployeeEmail("taras@gmail.com", uuid));
+        verify(userRepo).findUserByUuid(uuid);
+        verify(userRepo).getUsersByEmailExceptOne("taras@gmail.com", uuid);
+    }
 
     @Test
     void updateUserStatusDeactivatedTest() {

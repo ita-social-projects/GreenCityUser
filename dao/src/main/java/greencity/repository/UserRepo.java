@@ -39,8 +39,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     Optional<User> findByEmail(String email);
 
-    // Optional<User> findUserByUuid(String uuid);
-
     /**
      * Find {@link User} by page.
      *
