@@ -8,6 +8,7 @@ import static greencity.constant.AppConstant.AUTHORIZATION;
 
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.UpdateEmployeeAuthoritiesDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
@@ -43,7 +44,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -818,5 +818,19 @@ class UserControllerTest {
             .andExpect(status().isOk());
 
         verify(authorityService).updateEmployeesAuthorities(dto, "testmail@gmail.com");
+    }
+
+    @Test
+    void updateAuthoritiesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        var dto = new UpdateEmployeeAuthoritiesDto();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(dto);
+        mockMvc.perform(put(userLink + "/update-authorities")
+            .principal(principal)
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+        verify(authorityService).updateAuthorities(dto);
     }
 }

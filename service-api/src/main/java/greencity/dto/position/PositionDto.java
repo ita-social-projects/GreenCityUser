@@ -1,9 +1,6 @@
 package greencity.dto.position;
 
-import greencity.dto.AuthorityDto;
 import lombok.*;
-
-import java.util.List;
 
 @Data
 @NoArgsConstructor
