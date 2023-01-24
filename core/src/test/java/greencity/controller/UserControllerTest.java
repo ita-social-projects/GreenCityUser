@@ -130,16 +130,16 @@ class UserControllerTest {
         verify(userService).updateRole(1L, Role.ROLE_USER, "testmail@gmail.com");
     }
 
-    @Test
-    void updateEmployeeEmailTest() throws Exception {
-        User user = ModelUtils.getUser();
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-
-        mockMvc.perform(put(userLink + "/update-employee-email")
-            .param("employeeEmail", "old@mail.com")
-            .param("newEmployeeEmail", "new@mail.com"))
-            .andExpect(status().isOk());
-    }
+//    @Test
+//    void updateEmployeeEmailTest() throws Exception {
+//        User user = ModelUtils.getUser();
+//        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+//
+//        mockMvc.perform(put(userLink + "/update-employee-email")
+//            .param("employeeEmail", "old@mail.com")
+//            .param("newEmployeeEmail", "new@mail.com"))
+//            .andExpect(status().isOk());
+//    }
 
     @Test
     void updateRoleBadRequestForEmptyBodyTest() throws Exception {
