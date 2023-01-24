@@ -141,6 +141,16 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
+    void handleWrongIdException() {
+        WrongIdException wrongIdException = new WrongIdException("test");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleWrongIdException(wrongIdException, webRequest),
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
+
+    }
+
+    @Test
     void handleHttpMessageNotReadable() {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
