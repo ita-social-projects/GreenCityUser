@@ -108,6 +108,23 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Method intercept exception {@link WrongIdException}.
+     *
+     * @param ex      Exception witch should be intercepted.
+     * @param request contain detail about occur exception
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     * @author Julia Seti
+     */
+
+    @ExceptionHandler(WrongIdException.class)
+    public final ResponseEntity<Object> handleWrongIdException(WrongIdException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        log.trace(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
+    }
+
+    /**
      * Method intercept exception {@link MethodArgumentTypeMismatchException}.
      *
      * @param request contain detail about occur exception
