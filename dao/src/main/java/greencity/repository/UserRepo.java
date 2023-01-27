@@ -424,4 +424,12 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query("select u from User u where u.email =:email and not u.uuid =:uuid")
     List<User> getUsersByEmailExceptOne(String email, String uuid);
+
+    /**
+     * Method that checks if the email user exists.
+     *
+     * @param email - email of User.
+     * @return - return true if User exists and false if not.
+     */
+    boolean existsUserByEmail(String email);
 }

@@ -267,7 +267,7 @@ public class UserController {
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/update-employee-email")
+    @PutMapping("/employee-email")
     public ResponseEntity<HttpStatus> updateEmployeeEmail(@RequestParam String newEmployeeEmail,
         @RequestParam String uuid) {
         userService.updateEmployeeEmail(newEmployeeEmail, uuid);
@@ -1285,7 +1285,7 @@ public class UserController {
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/update-authorities")
+    @PutMapping("/authorities")
     public ResponseEntity<HttpStatus> updateAuthorities(@Valid @RequestBody UpdateEmployeeAuthoritiesDto dto) {
         authorityService.updateAuthorities(dto);
         return ResponseEntity.status(HttpStatus.OK).build();

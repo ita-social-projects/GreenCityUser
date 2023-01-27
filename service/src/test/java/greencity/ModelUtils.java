@@ -465,10 +465,6 @@ public class ModelUtils {
             .email("test@mail.com")
             .password("Test@123")
             .isUbs(true)
-            .positions(List.of(PositionDto.builder()
-                .id(1L)
-                .name("test")
-                .build()))
             .build();
     }
 }

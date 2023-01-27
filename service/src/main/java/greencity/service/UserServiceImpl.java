@@ -541,12 +541,13 @@ public class UserServiceImpl implements UserService {
     public void updateEmployeeEmail(String newEmployeeEmail, String uuid) {
         User user = userRepo.findUserByUuid(uuid).orElseThrow(
             () -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
-
-        if (!userRepo.getUsersByEmailExceptOne(newEmployeeEmail, uuid).isEmpty()) {
-            throw new UserAlreadyRegisteredException("This email is already in use");
+        if (!user.getEmail().equals(newEmployeeEmail)) {
+            if (userRepo.existsUserByEmail(newEmployeeEmail)) {
+                throw new BadRequestException("This email is already in use");
+            }
+            user.setEmail(newEmployeeEmail);
+            userRepo.save(user);
         }
-        user.setEmail(newEmployeeEmail);
-        userRepo.save(user);
     }
 
     /**

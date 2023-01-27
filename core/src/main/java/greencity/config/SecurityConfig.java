@@ -154,11 +154,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/profile",
                 "/user/{id}/updateUserLastActivityTime/{date}",
                 "/user/{userId}/language/{languageId}",
-                "/user/update-employee-email")
+                "/user/employee-email")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PUT,
                 "/user/edit-authorities",
-                "/user/update-authorities")
+                "/user/authorities")
             .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
                 "/user/get-all-authorities")

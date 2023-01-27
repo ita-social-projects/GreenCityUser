@@ -104,6 +104,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     public SuccessSignUpDto signUp(OwnSignUpDto dto, String language) {
         User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         setUsersFields(dto, user);
+        user.setUuid(UUID.randomUUID().toString());
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
@@ -145,7 +146,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setVerifyEmail(verifyEmail);
         employee.setUserAchievements(userAchievementList);
         employee.setUserActions(userActionsList);
-        employee.setUuid(dto.getUuid());
     }
 
     private OwnSecurity createOwnSecurity(OwnSignUpDto dto, User user) {
@@ -183,10 +183,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
         setUsersFields(dto, employee);
+        employee.setUuid(employeeSignUpDto.getUuid());
         employee.setShowLocation(true);
         employee.setShowEcoPlace(true);
         employee.setShowShoppingList(true);
-        List<String> positionNames = dto.getPositions().stream()
+        List<String> positionNames = employeeSignUpDto.getPositions().stream()
             .map(PositionDto::getName).collect(Collectors.toList());
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);

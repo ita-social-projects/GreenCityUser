@@ -34,10 +34,6 @@ public class OwnSignUpDto {
         message = ValidationConstants.INVALID_EMAIL)
     private String email;
 
-    private String uuid;
-
-    private List<PositionDto> positions;
-
     @NotBlank
     @PasswordValidation
     private String password;
