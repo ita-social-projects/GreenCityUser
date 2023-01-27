@@ -238,10 +238,13 @@ class UserServiceImplTest {
         User user = getUser();
         User updatedUser = getUserWithNewEmail();
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        String email = "test@mail.com";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
-        userService.updateEmployeeEmail("test@mail.com", uuid);
+        when(userRepo.existsUserByEmail(email)).thenReturn(false);
+        userService.updateEmployeeEmail(email, uuid);
         assertEquals(updatedUser.getEmail(), user.getEmail());
         verify(userRepo).findUserByUuid(uuid);
+        verify(userRepo).existsUserByEmail(email);
     }
 
     @Test
