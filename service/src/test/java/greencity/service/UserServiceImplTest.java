@@ -253,16 +253,17 @@ class UserServiceImplTest {
         verify(userRepo).findUserByUuid(uuid);
     }
 
-//    @Test
-//    void updateEmployeeEmailThrowsUserAlreadyRegisteredExceptionTest() {
-//        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
-//        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
-//        when(userRepo.getUsersByEmailExceptOne("taras@gmail.com", uuid)).thenReturn(List.of(getUser()));
-//        assertThrows(UserAlreadyRegisteredException.class,
-//            () -> userService.updateEmployeeEmail("taras@gmail.com", uuid));
-//        verify(userRepo).findUserByUuid(uuid);
-//        verify(userRepo).getUsersByEmailExceptOne("taras@gmail.com", uuid);
-//    }
+    @Test
+    void updateEmployeeEmailThrowsUserAlreadyRegisteredExceptionTest() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        String email = "taras@gmail.com";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        when(userRepo.existsUserByEmail(email)).thenReturn(true);
+        assertThrows(BadRequestException.class,
+            () -> userService.updateEmployeeEmail(email, uuid));
+        verify(userRepo).findUserByUuid(uuid);
+        verify(userRepo).existsUserByEmail(email);
+    }
 
     @Test
     void updateUserStatusDeactivatedTest() {

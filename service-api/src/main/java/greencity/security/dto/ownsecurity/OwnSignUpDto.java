@@ -3,14 +3,12 @@ package greencity.security.dto.ownsecurity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import greencity.annotations.PasswordValidation;
 import greencity.constant.ValidationConstants;
-import greencity.dto.position.PositionDto;
 import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
-import java.util.List;
 
 @Getter
 @Setter
