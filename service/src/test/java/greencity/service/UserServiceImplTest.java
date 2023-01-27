@@ -236,7 +236,7 @@ class UserServiceImplTest {
     @Test
     void updateEmployeeEmailTest() {
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
-        String email = "taras1@gmail.com";
+        String email = "test1@gmail.com";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
         when(userRepo.existsUserByEmail(email)).thenReturn(false);
         userService.updateEmployeeEmail(email, uuid);
@@ -248,7 +248,7 @@ class UserServiceImplTest {
     @Test
     void updateEmployeeWithSameEmailTest() {
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
-        String email = "taras@gmail.com";
+        String email = "test@gmail.com";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
         userService.updateEmployeeEmail(email, uuid);
         assertEquals(email, user.getEmail());
@@ -267,7 +267,7 @@ class UserServiceImplTest {
     @Test
     void updateEmployeeEmailThrowsUserAlreadyRegisteredExceptionTest() {
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
-        String email = "taras1@gmail.com";
+        String email = "test1@gmail.com";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
         when(userRepo.existsUserByEmail(email)).thenReturn(true);
         assertThrows(BadRequestException.class,
