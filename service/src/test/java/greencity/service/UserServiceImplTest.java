@@ -246,6 +246,16 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateEmployeeWithSameEmailTest() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        String email = "taras@gmail.com";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        userService.updateEmployeeEmail(email, uuid);
+        assertEquals(email, user.getEmail());
+        verify(userRepo).findUserByUuid(uuid);
+    }
+
+    @Test
     void updateEmployeeEmailThrowsUsernameNotFoundExceptionTest() {
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.empty());
