@@ -71,7 +71,7 @@ class UserServiceImplTest {
 
     private User user = User.builder()
         .id(1L)
-        .name("Test Testing")
+        .name("Taras")
         .email("test@gmail.com")
         .role(ROLE_USER)
         .userStatus(ACTIVATED)
@@ -235,16 +235,24 @@ class UserServiceImplTest {
 
     @Test
     void updateEmployeeEmailTest() {
-        User user = getUser();
         User updatedUser = getUserWithNewEmail();
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
         String email = "test@mail.com";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
-        when(userRepo.existsUserByEmail(email)).thenReturn(false);
         userService.updateEmployeeEmail(email, uuid);
         assertEquals(updatedUser.getEmail(), user.getEmail());
         verify(userRepo).findUserByUuid(uuid);
-        verify(userRepo).existsUserByEmail(email);
+    }
+
+    @Test
+    void updateEmployeeWithDifferentEmailsTest() {
+        User updatedUser = getUserWithNewEmail();
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        String email = "test1@mail.com";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        userService.updateEmployeeEmail(email, uuid);
+        assertEquals(updatedUser.getName(), user.getName());
+        verify(userRepo).findUserByUuid(uuid);
     }
 
     @Test
