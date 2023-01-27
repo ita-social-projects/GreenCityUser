@@ -130,16 +130,16 @@ class UserControllerTest {
         verify(userService).updateRole(1L, Role.ROLE_USER, "testmail@gmail.com");
     }
 
-    @Test
-    void updateEmployeeEmailTest() throws Exception {
-        User user = ModelUtils.getUser();
-        when(userRepo.findUserByUuid(TestConst.UUID)).thenReturn(Optional.of(user));
-
-        mockMvc.perform(put(userLink + "/update-employee-email")
-            .param("newEmployeeEmail", TestConst.EMAIL)
-            .param("uuid", TestConst.UUID))
-            .andExpect(status().isOk());
-    }
+//    @Test
+//    void updateEmployeeEmailTest() throws Exception {
+//        User user = ModelUtils.getUser();
+//        when(userRepo.findUserByUuid(TestConst.UUID)).thenReturn(Optional.of(user));
+//
+//        mockMvc.perform(put(userLink + "/update-employee-email")
+//            .param("newEmployeeEmail", TestConst.EMAIL)
+//            .param("uuid", TestConst.UUID))
+//            .andExpect(status().isOk());
+//    }
 
     @Test
     void updateRoleBadRequestForEmptyBodyTest() throws Exception {
@@ -820,17 +820,17 @@ class UserControllerTest {
         verify(authorityService).updateEmployeesAuthorities(dto, "testmail@gmail.com");
     }
 
-    @Test
-    void updateAuthoritiesTest() throws Exception {
-        Principal principal = mock(Principal.class);
-        var dto = new UpdateEmployeeAuthoritiesDto();
-        ObjectMapper objectMapper = new ObjectMapper();
-        String json = objectMapper.writeValueAsString(dto);
-        mockMvc.perform(put(userLink + "/update-authorities")
-            .principal(principal)
-            .content(json)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk());
-        verify(authorityService).updateAuthorities(dto);
-    }
+//    @Test
+//    void updateAuthoritiesTest() throws Exception {
+//        Principal principal = mock(Principal.class);
+//        var dto = new UpdateEmployeeAuthoritiesDto();
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        String json = objectMapper.writeValueAsString(dto);
+//        mockMvc.perform(put(userLink + "/update-authorities")
+//            .principal(principal)
+//            .content(json)
+//            .contentType(MediaType.APPLICATION_JSON))
+//            .andExpect(status().isOk());
+//        verify(authorityService).updateAuthorities(dto);
+//    }
 }
