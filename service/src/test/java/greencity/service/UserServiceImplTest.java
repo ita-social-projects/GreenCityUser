@@ -265,7 +265,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateEmployeeEmailThrowsUserAlreadyRegisteredExceptionTest() {
+    void updateEmployeeEmailThrowsBadRequestExceptionTest() {
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
         String email = "test1@gmail.com";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));

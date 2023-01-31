@@ -3,7 +3,8 @@ package greencity.security.service;
 import greencity.dto.UpdateEmployeeAuthoritiesDto;
 import greencity.dto.position.PositionDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.entity.*;
+import greencity.entity.Authority;
+import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.AuthorityRepo;
@@ -29,9 +30,9 @@ import static org.mockito.Mockito.*;
 @MockitoSettings(strictness = Strictness.LENIENT)
 class AuthorityServiceImplTest {
     @Mock
-    UserRepo userRepo;
+    private UserRepo userRepo;
     @Mock
-    AuthorityRepo authorityRepo;
+    private AuthorityRepo authorityRepo;
     @InjectMocks
     private AuthorityServiceImpl authorityService;
 
@@ -43,6 +44,9 @@ class AuthorityServiceImplTest {
         when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.ofNullable(getUser()));
         when(authorityRepo.getAuthoritiesByEmployeeId(getUser().getId())).thenReturn(expected);
         assertEquals(expected, authorityService.getAllEmployeesAuthorities("taras@gmail.com"));
+
+        verify(userRepo).findByEmail("taras@gmail.com");
+        verify(authorityRepo).getAuthoritiesByEmployeeId(getUser().getId());
     }
 
     @Test
