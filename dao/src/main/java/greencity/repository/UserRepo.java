@@ -416,16 +416,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Integer getStatusUser(Long userId, Long friendId);
 
     /**
-     * Method that check if another user with current email already exist.
-     *
-     * @param email - email of User.
-     * @param uuid  - uuid of User.
-     * @return - list of Users.
-     */
-    @Query("select u from User u where u.email =:email and not u.uuid =:uuid")
-    List<User> getUsersByEmailExceptOne(String email, String uuid);
-
-    /**
      * Method that checks if the email user exists.
      *
      * @param email - email of User.
