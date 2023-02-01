@@ -15,8 +15,14 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
-import greencity.entity.User;
+import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserUpdateDto;
+import greencity.dto.user.UserVO;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.repository.UserRepo;
@@ -132,13 +138,11 @@ class UserControllerTest {
 
     @Test
     void updateEmployeeEmailTest() throws Exception {
-        User user = ModelUtils.getUser();
-        when(userRepo.findUserByUuid(TestConst.UUID)).thenReturn(Optional.of(user));
-
         mockMvc.perform(put(userLink + "/employee-email")
             .param("newEmployeeEmail", TestConst.EMAIL)
             .param("uuid", TestConst.UUID))
             .andExpect(status().isOk());
+        verify(userService).updateEmployeeEmail("taras@gmail.com", "TarasUUID");
     }
 
     @Test
