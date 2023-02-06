@@ -39,6 +39,8 @@ public final class ErrorMessage {
     public static final String USER_ALREADY_HAS_PASSWORD = "User already has password";
     public static final String USER_HAS_NO_PERMISSION = "Current user has no permission for this action";
     public static final String LINK_IS_NO_ACTIVE = "This link is no longer active";
+    public static final String USER_BLOCKED = "User is blocked";
+    public static final String USER_CREATED = "User is not activated";
 
     private ErrorMessage() {
     }
