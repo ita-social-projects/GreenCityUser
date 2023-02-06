@@ -6,7 +6,7 @@ package greencity.exception.exceptions;
  * @author Volodymyr Kharchenko
  * @version 1.0
  */
-public class BadUserStatusException extends RuntimeException{
+public class BadUserStatusException extends RuntimeException {
     /**
      * Constructor for BadUserStatusException.
      *

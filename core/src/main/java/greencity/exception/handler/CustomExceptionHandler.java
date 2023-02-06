@@ -329,7 +329,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadUserStatusException.class)
     public final ResponseEntity<Object> handleBadUserStatusException(BadUserStatusException ex) {
         ValidationExceptionDto validationExceptionDto =
-                new ValidationExceptionDto(AppConstant.USER_STATUS, ex.getMessage());
+            new ValidationExceptionDto(AppConstant.USER_STATUS, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
     }
 }
