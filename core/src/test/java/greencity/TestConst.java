@@ -7,4 +7,5 @@ public final class TestConst {
     public static final String IMG_NAME = "Screenshot.png";
     public static final String CREDO = "Credo";
     public static final String UUID = "TarasUUID";
+    public static final String TOKEN = "SuperSecretAccessToken";
 }

@@ -40,6 +40,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Optional<User> findByEmail(String email);
 
     /**
+     * check if {@link User} {@link UserStatus} is not 'DEACTIVATED'.
+     *
+     * @param email - {@link User}'s email
+     * @return optional of 1
+     */
+    @Query("SELECT 1 FROM User u WHERE u.email=:email AND u.userStatus <> 1")
+    Optional<String> checkIfNotDeactivated(String email);
+
+    /**
      * Find {@link User} by page.
      *
      * @param pageable pageable configuration.
@@ -47,6 +56,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @author Rostyslav Khasanov
      */
     Page<User> findAll(Pageable pageable);
+
+    /**
+     * Method to fetch users with ids from given list.
+     *
+     * @param ids identifiers of searched users
+     * @return list of users with matching ids
+     */
+    List<User> findAllByIdIn(List<Long> ids);
 
     /**
      * Find id by email.
@@ -241,16 +258,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true, value = "DELETE FROM users where status = 1 "
         + "AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP")
     int scheduleDeleteDeactivatedUsers();
-
-    /**
-     * Set {@link User}s' statuses to 'DEACTIVATED'.
-     *
-     * @param ids - {@link List} of ids of {@link User} to be 'DEACTIVATED'
-     * @author Vasyl Zhovnir
-     **/
-    @Modifying
-    @Query(value = "UPDATE User SET userStatus = 1 where id IN(:ids)")
-    void deactivateSelectedUsers(List<Long> ids);
 
     /**
      * Method returns {@link User} by search query and page.

@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.RestClient;
-import greencity.constant.ErrorMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
@@ -14,16 +13,26 @@ import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.*;
-import greencity.entity.*;
+import greencity.entity.Language;
+import greencity.entity.User;
+import greencity.entity.UserDeactivationReason;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,18 +47,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.*;
-import java.util.stream.Collectors;
-
 import static greencity.ModelUtils.*;
+import static greencity.TestConst.PRINCIPAL_MAIL;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -874,22 +877,30 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findNotDeactivatedByEmail() {
-        String email = "test@gmail.com";
-        user.setEmail(email);
-        when(userRepo.findNotDeactivatedByEmail(email)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        assertEquals(Optional.of(userVO), userService.findNotDeactivatedByEmail(email));
+    void isDeactivatedByEmailTest() {
+        // given
+        User user = getUser();
+        when(userRepo.checkIfNotDeactivated(user.getEmail())).thenReturn(Optional.of("1"));
+
+        // when
+        boolean isNotDeactivated = userService.isNotDeactivatedByEmail(user.getEmail());
+
+        // then
+        assertTrue(isNotDeactivated);
     }
 
     @Test
-    void findNotDeactivatedByEmailShouldThrowNotFoundException() {
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+    void isDeactivatedByEmailThrowsExceptionWhenDeactivated() {
+        // given
+        User user = getUser();
+        user.setUserStatus(UserStatus.DEACTIVATED);
+        when(userRepo.checkIfNotDeactivated(user.getEmail())).thenReturn(Optional.empty());
 
-        Exception thrown = assertThrows(NotFoundException.class,
-            () -> userService.findNotDeactivatedByEmail("test@gmail.com"));
+        // when
+        Executable e = () -> userService.isNotDeactivatedByEmail(user.getEmail());
 
-        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL, thrown.getMessage());
+        // then
+        assertThrows(UserDeactivatedException.class, e);
     }
 
     @Test
@@ -1005,9 +1016,34 @@ class UserServiceImplTest {
     }
 
     @Test
-    void deactivateAllUsers() {
-        List<Long> longList = List.of(1L, 2L);
-        assertEquals(longList, userService.deactivateAllUsers(longList));
+    void deactivateListedUsersTest() {
+        // given
+        List<Long> longList = List.of(1L, 5L);
+        List<User> users = List.of(ModelUtils.getUserWith(1L), ModelUtils.getUserWith(5L));
+        when(userRepo.findAllByIdIn(longList)).thenReturn(users);
+        String principalEmail = PRINCIPAL_MAIL;
+
+        // when
+        List<Long> idsOfDeactivatedUsers = userService.deactivateListedUsers(longList, principalEmail);
+
+        // then
+        assertEquals(longList, idsOfDeactivatedUsers);
+    }
+
+    @Test
+    void deactivateListedUsersThrowsExceptionWhenPrincipalTriesToChangeTheirStatus() {
+        // given
+        List<Long> longList = List.of(1L, 5L);
+        String principalEmail = PRINCIPAL_MAIL;
+        List<User> users =
+            List.of(ModelUtils.getUserWith(1L), ModelUtils.getUserWith(5L), ModelUtils.getUserWith(2L, principalEmail));
+        when(userRepo.findAllByIdIn(longList)).thenReturn(users);
+
+        // when
+        Executable e = () -> userService.deactivateListedUsers(longList, principalEmail);
+
+        // then
+        assertThrows(BadUpdateRequestException.class, e);
     }
 
     @Test

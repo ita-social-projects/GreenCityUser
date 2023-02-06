@@ -101,6 +101,14 @@ public interface UserService {
     UserVO findByEmail(String email);
 
     /**
+     * Method that returns true if user exists in database and is not 'DEACTIVATED'.
+     *
+     * @param email - {@link UserVO}'s email
+     * @return boolean of activation status of {@link UserVO}.
+     */
+    boolean isNotDeactivatedByEmail(String email);
+
+    /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
      *
      * @param email - {@link UserVO}'s email
@@ -395,7 +403,7 @@ public interface UserService {
      * @return {@link List} of {@link UserVO}s` ids
      * @author Vasyl Zhovnir
      */
-    List<Long> deactivateAllUsers(List<Long> listId);
+    List<Long> deactivateListedUsers(List<Long> listId, String principalEmail);
 
     /**
      * change {@link UserVO}'s status to ACTIVATED.

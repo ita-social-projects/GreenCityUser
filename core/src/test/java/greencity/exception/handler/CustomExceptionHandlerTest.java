@@ -190,4 +190,20 @@ class CustomExceptionHandlerTest {
         assertEquals(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse),
             customExceptionHandler.handleUserAlreadyHasPasswordException(webRequest));
     }
+
+    @Test
+    void handleUserDeactivatedException() {
+        // given
+        UserDeactivatedException userDeactivatedException = new UserDeactivatedException("test");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        ResponseEntity<Object> expected = ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
+        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
+
+        // when
+        ResponseEntity<Object> actual =
+            customExceptionHandler.handleUserDeactivatedException(userDeactivatedException, webRequest);
+
+        // then
+        assertEquals(expected, actual);
+    }
 }

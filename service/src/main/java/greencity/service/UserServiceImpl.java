@@ -96,6 +96,17 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional(readOnly = true)
+    public boolean isNotDeactivatedByEmail(String email) {
+        userRepo.checkIfNotDeactivated(email)
+            .orElseThrow(() -> new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED));
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public UserVOAchievement findUserForAchievement(Long id) {
         User user = userRepo.findUserForAchievement(id)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
@@ -1019,9 +1030,15 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public List<Long> deactivateAllUsers(List<Long> listId) {
-        userRepo.deactivateSelectedUsers(listId);
-        return listId;
+    public List<Long> deactivateListedUsers(List<Long> ids, String principalEmail) {
+        return userRepo.findAllByIdIn(ids)
+            .stream()
+            .map(user -> {
+                checkIfUserCanUpdate(user, principalEmail);
+                user.setUserStatus(UserStatus.DEACTIVATED);
+                return user.getId();
+            })
+            .collect(Collectors.toList());
     }
 
     /**

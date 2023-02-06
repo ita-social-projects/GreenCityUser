@@ -176,6 +176,30 @@ public class ModelUtils {
             .build();
     }
 
+    public static User getUserWith(Long id) {
+        return User.builder()
+            .id(id)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .lastActivityTime(LocalDateTime.now())
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .build();
+    }
+
+    public static User getUserWith(Long id, String email) {
+        return User.builder()
+            .id(id)
+            .email(email)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .lastActivityTime(LocalDateTime.now())
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .build();
+    }
+
     public static User getUserWithUbsRole() {
         return User.builder()
             .id(1L)
