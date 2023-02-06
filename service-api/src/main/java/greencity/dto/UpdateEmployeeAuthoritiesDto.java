@@ -13,6 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateEmployeeAuthoritiesDto {
-    String email;
-    List<PositionDto> positions;
+    private String email;
+    private List<PositionDto> positions;
 }
