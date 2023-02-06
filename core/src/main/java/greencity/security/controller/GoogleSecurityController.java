@@ -8,6 +8,7 @@ import greencity.security.service.GoogleSecurityService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,6 +32,7 @@ import static greencity.constant.ErrorMessage.BAD_GOOGLE_TOKEN;
 @RestController
 @RequestMapping("/googleSecurity")
 @Validated
+@Slf4j
 public class GoogleSecurityController {
     private final GoogleSecurityService googleSecurityService;
 
@@ -57,8 +59,10 @@ public class GoogleSecurityController {
     })
     @GetMapping
     @ApiLocale
+
     public SuccessSignInDto authenticate(@RequestParam @NotBlank String idToken,
         @ApiIgnore @ValidLanguage Locale locale) {
+        log.info("Success Google");
         return googleSecurityService.authenticate(idToken, locale.getLanguage());
     }
 }
