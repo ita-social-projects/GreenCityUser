@@ -190,4 +190,13 @@ class CustomExceptionHandlerTest {
         assertEquals(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse),
             customExceptionHandler.handleUserAlreadyHasPasswordException(webRequest));
     }
+
+    @Test
+    void handleUserStatusException(){
+        BadUserStatusException actual = new BadUserStatusException("user_status");
+        ValidationExceptionDto validationDto = new ValidationExceptionDto(actual.getMessage(), "user_status");
+        ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
+        ResponseEntity<Object> body = status.body(validationDto);
+        assertEquals(customExceptionHandler.handleBadUserStatusException(actual), body);
+    }
 }
