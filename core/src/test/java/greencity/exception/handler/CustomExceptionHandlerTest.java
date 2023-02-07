@@ -192,7 +192,7 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleUserStatusException(){
+    void handleUserStatusException() {
         BadUserStatusException actual = new BadUserStatusException("user_status");
         ValidationExceptionDto validationDto = new ValidationExceptionDto(actual.getMessage(), "user_status");
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
