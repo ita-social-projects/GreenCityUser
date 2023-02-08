@@ -23,7 +23,7 @@ import javax.validation.constraints.Pattern;
 public class OwnSignUpDto {
     @Pattern(
         regexp = ValidationConstants.USERNAME_REGEXP,
-        message = ValidationConstants.INVALID_USERNAME)
+        message = ValidationConstants.USERNAME_MESSAGE)
     private String name;
 
     @NotBlank
