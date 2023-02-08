@@ -253,7 +253,35 @@ class OwnSecurityServiceImplTest {
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
-        assertThrows(UserDeactivatedException.class, () -> ownSecurityService.signIn(ownSignInDto));
+        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void signInBlockedUserTest() {
+        UserVO user = UserVO.builder()
+            .email("test@gmail.com")
+            .id(1L)
+            .userStatus(UserStatus.BLOCKED)
+            .ownSecurity(OwnSecurityVO.builder().password("password").build())
+            .role(Role.ROLE_USER)
+            .build();
+        when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+        when(passwordEncoder.matches("password", "password")).thenReturn(true);
+        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void signInCreatedUserTest() {
+        UserVO user = UserVO.builder()
+            .email("test@gmail.com")
+            .id(1L)
+            .userStatus(UserStatus.CREATED)
+            .ownSecurity(OwnSecurityVO.builder().password("password").build())
+            .role(Role.ROLE_USER)
+            .build();
+        when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+        when(passwordEncoder.matches("password", "password")).thenReturn(true);
+        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
     }
 
     @Test
