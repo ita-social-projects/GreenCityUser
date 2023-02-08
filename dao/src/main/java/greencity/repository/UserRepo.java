@@ -414,4 +414,12 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true,
         value = "SELECT  FROM users_friends WHERE user_id = :userId AND friend_id = :friendId")
     Integer getStatusUser(Long userId, Long friendId);
+
+    /**
+     * Method that checks if the email user exists.
+     *
+     * @param email - email of User.
+     * @return - return true if User exists and false if not.
+     */
+    boolean existsUserByEmail(String email);
 }

@@ -9,7 +9,6 @@ import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import greencity.ModelUtils;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
@@ -21,6 +20,7 @@ import greencity.entity.*;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
+import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.ErrorManager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,6 +86,9 @@ class OwnSecurityServiceImplTest {
     @Mock
     RestClient restClient;
 
+    @Mock
+    private AuthorityRepo authorityRepo;
+
     private OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -100,7 +102,7 @@ class OwnSecurityServiceImplTest {
         initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, userService, passwordEncoder,
             jwtTool, 1, restorePasswordEmailRepo, modelMapper,
-            userRepo, achievementService, emailService, restClient);
+            userRepo, achievementService, emailService, restClient, authorityRepo);
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")
@@ -159,7 +161,7 @@ class OwnSecurityServiceImplTest {
     }
 
     @Test
-    void signUpEmployee() {
+    void signUpEmployeeTest() {
         User user = ModelUtils.getUserWithUbsRole();
         UserVO userVO = ModelUtils.getUserVO();
         EmployeeSignUpDto employeeSignUpDto = ModelUtils.getEmployeeSignUpDto();
@@ -176,6 +178,10 @@ class OwnSecurityServiceImplTest {
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
+
+        verify(achievementService, times(2)).findAll();
+        verify(modelMapper, times(2)).map(any(), any());
+        verify(userRepo).save(any());
         verify(jwtTool, times(2)).generateTokenKey();
     }
 
