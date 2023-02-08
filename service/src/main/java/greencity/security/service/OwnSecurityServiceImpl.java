@@ -250,7 +250,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             throw new EmailNotVerified("You should verify the email first, check your email box!");
         }
         if (user.getUserStatus() == UserStatus.DEACTIVATED) {
-            throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
+            throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED);
+        }
+        if (user.getUserStatus() == UserStatus.BLOCKED) {
+            throw new BadUserStatusException(ErrorMessage.USER_BLOCKED);
+        }
+        if (user.getUserStatus() == UserStatus.CREATED) {
+            throw new BadUserStatusException(ErrorMessage.USER_CREATED);
         }
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
