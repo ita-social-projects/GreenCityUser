@@ -1,6 +1,8 @@
 package greencity.security.service;
 
 import greencity.constant.ErrorMessage;
+import greencity.dto.UpdateEmployeeAuthoritiesDto;
+import greencity.dto.position.PositionDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.entity.Authority;
 import greencity.entity.User;
@@ -10,10 +12,12 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -46,6 +50,18 @@ public class AuthorityServiceImpl implements AuthorityService {
         }
         deleteOldAuthorities(employee);
         saveNewAuthorities(dto, employee);
+    }
+
+    @Override
+    public void updateAuthorities(UpdateEmployeeAuthoritiesDto dto) {
+        User employee = userRepo.findByEmail(dto.getEmail()).orElseThrow(
+            () -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail()));
+        deleteOldAuthorities(employee);
+        List<String> positionNames = dto.getPositions().stream()
+            .map(PositionDto::getName).collect(Collectors.toList());
+        List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
+        employee.setAuthorities(list);
+        userRepo.save(employee);
     }
 
     private void deleteOldAuthorities(User employee) {

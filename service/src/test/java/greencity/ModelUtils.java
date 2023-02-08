@@ -8,6 +8,7 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
+import greencity.dto.position.PositionDto;
 import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
@@ -454,6 +455,10 @@ public class ModelUtils {
         return EmployeeSignUpDto.builder()
             .name("Taras")
             .email("test@mail.com")
+            .positions(List.of(PositionDto.builder()
+                .id(1L)
+                .name("test")
+                .build()))
             .isUbs(true)
             .build();
     }

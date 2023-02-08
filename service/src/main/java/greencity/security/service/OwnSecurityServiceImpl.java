@@ -4,6 +4,7 @@ import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
+import greencity.dto.position.PositionDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -12,6 +13,7 @@ import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
+import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
@@ -63,6 +65,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final AchievementService achievementService;
     private final EmailService emailService;
 
+    private final AuthorityRepo authorityRepo;
+
     /**
      * Constructor.
      */
@@ -75,7 +79,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         ModelMapper modelMapper,
         UserRepo userRepo,
-        AchievementService achievementService, EmailService emailService, RestClient restClient) {
+        AchievementService achievementService, EmailService emailService, RestClient restClient,
+        AuthorityRepo authorityRepo) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -86,6 +91,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         this.userRepo = userRepo;
         this.achievementService = achievementService;
         this.emailService = emailService;
+        this.authorityRepo = authorityRepo;
     }
 
     /**
@@ -98,6 +104,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     public SuccessSignUpDto signUp(OwnSignUpDto dto, String language) {
         User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         setUsersFields(dto, user);
+        user.setUuid(UUID.randomUUID().toString());
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
@@ -139,7 +146,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setVerifyEmail(verifyEmail);
         employee.setUserAchievements(userAchievementList);
         employee.setUserActions(userActionsList);
-        employee.setUuid(UUID.randomUUID().toString());
     }
 
     private OwnSecurity createOwnSecurity(OwnSignUpDto dto, User user) {
@@ -177,6 +183,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
         setUsersFields(dto, employee);
+        employee.setUuid(employeeSignUpDto.getUuid());
+        employee.setShowLocation(true);
+        employee.setShowEcoPlace(true);
+        employee.setShowShoppingList(true);
+        List<String> positionNames = employeeSignUpDto.getPositions().stream()
+            .map(PositionDto::getName).collect(Collectors.toList());
+        List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
+        employee.setAuthorities(list);
         try {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());
@@ -185,9 +199,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
-        employee.setShowLocation(true);
-        employee.setShowEcoPlace(true);
-        employee.setShowShoppingList(true);
+
         return new SuccessSignUpDto(employee.getId(), employee.getName(), employee.getEmail(), true);
     }
 
