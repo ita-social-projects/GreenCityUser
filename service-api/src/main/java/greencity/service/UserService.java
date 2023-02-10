@@ -588,4 +588,12 @@ public interface UserService {
      * @author Stepan Omeliukh
      */
     PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId);
+
+    /**
+     * Method that deactivate employee by uuid.
+     *
+     * @param uuid - uuid.
+     * @author - Nikita Korzh.
+     */
+    void deactivateEmployee(String uuid);
 }

@@ -1238,4 +1238,17 @@ public class UserServiceImpl implements UserService {
             allUsers.getPageable().getPageNumber(),
             allUsers.getTotalPages());
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    @Override
+    public void deactivateEmployee(String uuid) {
+        User user = userRepo.findUserByUuid(uuid).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
+        user.setUserStatus(UserStatus.DEACTIVATED);
+        userRepo.save(user);
+    }
 }
