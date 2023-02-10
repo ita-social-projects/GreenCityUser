@@ -2,9 +2,12 @@ package greencity.security.service;
 
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
+import greencity.entity.User;
 import greencity.entity.VerifyEmail;
+import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadVerifyEmailTokenException;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
+import greencity.repository.UserRepo;
 import greencity.security.repository.VerifyEmailRepo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class VerifyEmailServiceImpl implements VerifyEmailService {
     private final VerifyEmailRepo verifyEmailRepo;
+    private final UserRepo userRepo;
     private final RestClient restClient;
 
     /**
@@ -28,9 +32,10 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
      * @param verifyEmailRepo {@link VerifyEmailRepo}
      */
     @Autowired
-    public VerifyEmailServiceImpl(VerifyEmailRepo verifyEmailRepo, RestClient restClient) {
+    public VerifyEmailServiceImpl(VerifyEmailRepo verifyEmailRepo, RestClient restClient, UserRepo userRepo) {
         this.verifyEmailRepo = verifyEmailRepo;
         this.restClient = restClient;
+        this.userRepo = userRepo;
     }
 
     /**
@@ -42,10 +47,13 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
         VerifyEmail verifyEmail = verifyEmailRepo
             .findByTokenAndUserId(userId, token)
             .orElseThrow(() -> new BadVerifyEmailTokenException(ErrorMessage.NO_ANY_EMAIL_TO_VERIFY_BY_THIS_TOKEN));
+        User user = userRepo.findById(userId).orElseThrow(() -> new RuntimeException());
         if (isNotExpired(verifyEmail.getExpiryDate())) {
             int rows = verifyEmailRepo.deleteVerifyEmailByTokenAndUserId(userId, token);
+            user.setUserStatus(UserStatus.ACTIVATED);
+            userRepo.save(user);
             log.info("User has successfully verify the email by token {}. Records deleted {}.", token, rows);
-            restClient.addUserToSystemChat(userId);
+//            restClient.addUserToSystemChat(userId);
             log.info("The user has been added to the system chats");
             return true;
         } else {

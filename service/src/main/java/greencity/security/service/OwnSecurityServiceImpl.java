@@ -128,7 +128,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .role(Role.ROLE_USER)
             .refreshTokenKey(refreshTokenKey)
             .lastActivityTime(LocalDateTime.now())
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
             .language(Language.builder()
