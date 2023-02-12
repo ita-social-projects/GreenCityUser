@@ -6,13 +6,13 @@ public final class ValidationConstants {
     public static final String INVALID_EMAIL = "{greenCity.validation.invalid.email}";
     public static final String USERNAME_MESSAGE =
         "The name ${validatedValue} cannot be empty, "
-                + "starts with a number or not a capital letter, "
-                + "ends with dot, "
-                + "contain 2 consecutive dots or dashes and symbols like @#$. "
-                + "Use English or Ukrainian letters, "
-                + "no longer than 30 symbols, "
-                + "the name ${validatedValue} could contain numbers, "
-                + "dot in the middle of the name, dash and whitespaces.";
+            + "starts with a number or not a capital letter, "
+            + "ends with dot, "
+            + "contain 2 consecutive dots or dashes and symbols like @#$. "
+            + "Use English or Ukrainian letters, "
+            + "no longer than 30 symbols, "
+            + "the name ${validatedValue} could contain numbers, "
+            + "dot in the middle of the name, dash and whitespaces.";
 
     public static final String USER_CREATED = "{greenCity.validation.user.created}";
     public static final int MAX_AMOUNT_OF_SOCIAL_NETWORK_LINKS = 5;
