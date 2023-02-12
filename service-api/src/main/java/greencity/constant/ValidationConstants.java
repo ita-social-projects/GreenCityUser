@@ -4,9 +4,16 @@ public final class ValidationConstants {
     public static final int USERNAME_MIN_LENGTH = 0;
     public static final int USERNAME_MAX_LENGTH = 29;
     public static final String INVALID_EMAIL = "{greenCity.validation.invalid.email}";
-    public static final String USERNAME_MESSAGE = "use English or Ukrainian letters, no longer than 30 "
-        + "symbols, name cannot be empty, contain 2 consecutive dots or --, starts with a number or "
-        + "not a capital letter and could contain numbers and whitespaces";
+    public static final String USERNAME_MESSAGE =
+        "The name ${validatedValue} cannot be empty, "
+                + "starts with a number or not a capital letter, "
+                + "ends with dot, "
+                + "contain 2 consecutive dots or dashes and symbols like @#$. "
+                + "Use English or Ukrainian letters, "
+                + "no longer than 30 symbols, "
+                + "the name ${validatedValue} could contain numbers, "
+                + "dot in the middle of the name, dash and whitespaces.";
+
     public static final String USER_CREATED = "{greenCity.validation.user.created}";
     public static final int MAX_AMOUNT_OF_SOCIAL_NETWORK_LINKS = 5;
     public static final int CATEGORY_NAME_MIN_LENGTH = 3;
