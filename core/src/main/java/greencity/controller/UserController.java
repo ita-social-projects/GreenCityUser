@@ -1306,9 +1306,9 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
         @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
     })
-    @PutMapping("/user/deactivate-employee")
+    @PutMapping("/deactivate-employee")
     public ResponseEntity<HttpStatus> deactivateEmployee(@RequestParam String uuid) {
-        userService.deactivateEmployee(uuid);
+        userService.markUserAsDeactivated(uuid);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

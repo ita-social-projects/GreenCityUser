@@ -837,4 +837,12 @@ class UserControllerTest {
             .andExpect(status().isOk());
         verify(authorityService).updateAuthorities(dto);
     }
+
+    @Test
+    void deactivateEmployeeByUUID() throws Exception {
+        String uuid = "87df9ad5-6393-441f-8423-8b2e770b01a8";
+        mockMvc.perform(put(userLink + "/deactivate-employee").param("uuid", uuid))
+            .andExpect(status().isOk());
+        verify(userService).markUserAsDeactivated(uuid);
+    }
 }
