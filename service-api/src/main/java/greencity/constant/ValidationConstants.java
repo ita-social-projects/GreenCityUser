@@ -1,8 +1,8 @@
 package greencity.constant;
 
 public final class ValidationConstants {
-    public static final int USERNAME_MIN_LENGTH = 0;
-    public static final int USERNAME_MAX_LENGTH = 29;
+    public static final int USERNAME_MIN_LENGTH = 6;
+    public static final int USERNAME_MAX_LENGTH = 30;
     public static final String INVALID_EMAIL = "{greenCity.validation.invalid.email}";
     public static final String USERNAME_MESSAGE =
         "The name ${validatedValue} cannot be empty, "
