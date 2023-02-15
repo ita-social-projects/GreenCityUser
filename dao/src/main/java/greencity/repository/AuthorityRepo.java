@@ -37,6 +37,7 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
 
     /**
      * Method that return list of authorities by names.
+     * 
      * @param name - list of authorities name.
      * @return - list of authorities.
      */
