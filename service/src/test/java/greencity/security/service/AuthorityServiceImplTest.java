@@ -71,7 +71,7 @@ class AuthorityServiceImplTest {
     void updateEmployeesAuthoritiesTestBadRequestException() {
         User employee = createEmployee();
         employee.setRole(Role.ROLE_USER);
-        
+
         when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(employee));
 
         assertEquals(Role.ROLE_USER, employee.getRole());
