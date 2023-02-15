@@ -118,10 +118,9 @@ public class JwtTool {
         try {
             Jwts.parser().setSigningKey(tokenKey).parseClaimsJws(token);
             isValid = true;
-
         } catch (Exception e) {
             log.info("Given token is not valid: " + e.getMessage());
-            log.error("Exception:",e);
+            log.error("Exception:", e);
             log.info("token " + token + "token key " + tokenKey);
         }
         return isValid;
