@@ -59,7 +59,7 @@ class AuthorityServiceImplTest {
         when(userRepo.findByEmail("email@mail.com")).thenReturn(Optional.of(user));
         when(authorityRepo.findByName("test")).thenReturn(Optional.of(authority));
 
-        authorityService.updateEmployeesAuthorities(getUserEmployeeAuthorityDto(), "email@mail.com");
+        authorityService.updateEmployeesAuthorities(getUserEmployeeAuthorityDto());
         authority.getEmployees().add(createAdmin());
         verify(authorityRepo).save(authority);
     }
@@ -96,7 +96,7 @@ class AuthorityServiceImplTest {
         when(userRepo.findByEmail("test@mail.com")).thenReturn(Optional.of(employee));
         when(userRepo.findByEmail(dto.getEmployeeEmail())).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class,
-            () -> authorityService.updateEmployeesAuthorities(dto, "test@mail.com"));
+            () -> authorityService.updateEmployeesAuthorities(dto));
         verify(userRepo).findByEmail("test@mail.com");
     }
 
@@ -111,7 +111,7 @@ class AuthorityServiceImplTest {
             .authorities(List.of("test"))
             .build();
         assertThrows(BadRequestException.class,
-            () -> authorityService.updateEmployeesAuthorities(dto, "email@mail.com"));
+            () -> authorityService.updateEmployeesAuthorities(dto));
         verify(userRepo, times(2)).findByEmail("email@mail.com");
     }
 }

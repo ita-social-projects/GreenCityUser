@@ -36,49 +36,26 @@ public class AuthorityServiceImpl implements AuthorityService {
      * {@inheritDoc}
      */
     @Override
-    public void updateEmployeesAuthorities(UserEmployeeAuthorityDto dto, String email) {
-        User user =
-            userRepo.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        User employee =
-            userRepo.findByEmail(dto.getEmployeeEmail())
-                .orElseThrow(
-                    () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmployeeEmail()));
-        if (!user.getRole().equals(Role.ROLE_UBS_EMPLOYEE) || employee.getRole().equals(Role.ROLE_USER)
-            || user.getEmail().equals(employee.getEmail())) {
+    public void updateEmployeesAuthorities(UserEmployeeAuthorityDto dto) {
+        User employee = userRepo.findByEmail(dto.getEmployeeEmail())
+            .orElseThrow(
+                () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmployeeEmail()));
+        if (!employee.getRole().equals(Role.ROLE_UBS_EMPLOYEE)) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
-        deleteOldAuthorities(employee);
-        saveNewAuthorities(dto, employee);
+        List<Authority> list = authorityRepo.findAuthoritiesByNames(dto.getAuthorities());
+        employee.setAuthorities(list);
+        userRepo.save(employee);
     }
 
     @Override
     public void updateAuthorities(UpdateEmployeeAuthoritiesDto dto) {
         User employee = userRepo.findByEmail(dto.getEmail()).orElseThrow(
             () -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail()));
-        deleteOldAuthorities(employee);
         List<String> positionNames = dto.getPositions().stream()
             .map(PositionDto::getName).collect(Collectors.toList());
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);
         userRepo.save(employee);
-    }
-
-    private void deleteOldAuthorities(User employee) {
-        for (Authority authority : employee.getAuthorities()) {
-            List<User> users = authority.getEmployees();
-            users.removeIf(u -> u.equals(employee));
-        }
-    }
-
-    private void saveNewAuthorities(UserEmployeeAuthorityDto dto, User employee) {
-        for (String name : dto.getAuthorities()) {
-            Authority authority = authorityRepo.findByName(name)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.NOT_FOUND_AUTHORITY + name));
-            List<User> users = authority.getEmployees();
-            users.add(employee);
-            authority.setEmployees(users);
-            authorityRepo.save(authority);
-        }
     }
 }
