@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UserUpdateDtoTest {
+class UserUpdateDtoTest {
 
     @SneakyThrows
     @ParameterizedTest
