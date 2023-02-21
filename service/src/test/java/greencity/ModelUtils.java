@@ -473,11 +473,11 @@ public class ModelUtils {
             .build();
     }
 
-    public static UbsProfileCreationDto getUbsProfileCreationDto(){
+    public static UbsProfileCreationDto getUbsProfileCreationDto() {
         return UbsProfileCreationDto.builder()
-                .name("UbsProfile")
-                .email("ubsuser@mail.com")
-                .uuid("f81d4fae-7dec-11d0-a765-00a0c91e6bf6")
-                .build();
+            .name("UbsProfile")
+            .email("ubsuser@mail.com")
+            .uuid("f81d4fae-7dec-11d0-a765-00a0c91e6bf6")
+            .build();
     }
 }
