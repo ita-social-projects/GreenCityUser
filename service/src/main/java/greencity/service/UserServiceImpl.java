@@ -39,6 +39,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -399,8 +400,10 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Optional<UserVO> findNotDeactivatedByEmail(String email) {
+        log.info("email {}", email);
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        log.info("user: {}", notDeactivatedByEmail);
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVO.class));
     }
 
@@ -537,11 +540,16 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public void updateEmployeeEmail(String employeeEmail, String newEmployeeEmail) {
-        User user = userRepo.findByEmail(employeeEmail)
-            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + employeeEmail));
-        user.setEmail(newEmployeeEmail);
-        userRepo.save(user);
+    public void updateEmployeeEmail(String newEmployeeEmail, String uuid) {
+        User user = userRepo.findUserByUuid(uuid).orElseThrow(
+            () -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+        if (!user.getEmail().equals(newEmployeeEmail)) {
+            if (userRepo.existsUserByEmail(newEmployeeEmail)) {
+                throw new BadRequestException("This email is already in use");
+            }
+            user.setEmail(newEmployeeEmail);
+            userRepo.save(user);
+        }
     }
 
     /**

@@ -8,14 +8,21 @@ import static greencity.constant.AppConstant.AUTHORIZATION;
 
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.UpdateEmployeeAuthoritiesDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
-import greencity.entity.User;
+import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserUpdateDto;
+import greencity.dto.user.UserVO;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.repository.UserRepo;
@@ -43,7 +50,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -132,13 +138,11 @@ class UserControllerTest {
 
     @Test
     void updateEmployeeEmailTest() throws Exception {
-        User user = ModelUtils.getUser();
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-
-        mockMvc.perform(put(userLink + "/update-employee-email")
-            .param("employeeEmail", "old@mail.com")
-            .param("newEmployeeEmail", "new@mail.com"))
+        mockMvc.perform(put(userLink + "/employee-email")
+            .param("newEmployeeEmail", TestConst.EMAIL)
+            .param("uuid", TestConst.UUID))
             .andExpect(status().isOk());
+        verify(userService).updateEmployeeEmail("taras@gmail.com", "TarasUUID");
     }
 
     @Test
@@ -818,5 +822,27 @@ class UserControllerTest {
             .andExpect(status().isOk());
 
         verify(authorityService).updateEmployeesAuthorities(dto, "testmail@gmail.com");
+    }
+
+    @Test
+    void updateAuthoritiesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        var dto = new UpdateEmployeeAuthoritiesDto();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(dto);
+        mockMvc.perform(put(userLink + "/authorities")
+            .principal(principal)
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+        verify(authorityService).updateAuthorities(dto);
+    }
+
+    @Test
+    void deactivateEmployeeByUUID() throws Exception {
+        String uuid = "87df9ad5-6393-441f-8423-8b2e770b01a8";
+        mockMvc.perform(put(userLink + "/deactivate-employee").param("uuid", uuid))
+            .andExpect(status().isOk());
+        verify(userService).markUserAsDeactivated(uuid);
     }
 }

@@ -318,4 +318,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ExceptionResponse response = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
+
+    /**
+     * Method interceptor exception {@link BadUserStatusException}.
+     *
+     * @param ex Exception witch should be intercepted
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     */
+    @ExceptionHandler(BadUserStatusException.class)
+    public final ResponseEntity<Object> handleBadUserStatusException(BadUserStatusException ex) {
+        ValidationExceptionDto validationExceptionDto =
+            new ValidationExceptionDto(AppConstant.USER_STATUS, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
+    }
 }
