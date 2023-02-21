@@ -1,8 +1,6 @@
 package greencity.constant;
 
 public final class ValidationConstants {
-    public static final int USERNAME_MIN_LENGTH = 6;
-    public static final int USERNAME_MAX_LENGTH = 30;
     public static final String INVALID_EMAIL = "{greenCity.validation.invalid.email}";
     public static final String USERNAME_MESSAGE =
         "The name ${validatedValue} cannot be empty, "
@@ -11,7 +9,7 @@ public final class ValidationConstants {
             + "contain 2 consecutive dots or dashes and symbols like @#$. "
             + "Use English or Ukrainian letters, "
             + "no longer than 30 symbols, "
-            + "the name ${validatedValue} could contain numbers, "
+            + "the name ${validatedValue} could contain numbers, symbols '’, "
             + "dot in the middle of the name, dash and whitespaces.";
 
     public static final String USER_CREATED = "{greenCity.validation.user.created}";
@@ -21,7 +19,11 @@ public final class ValidationConstants {
     public static final String CATEGORY_NAME_BAD_FORMED = "{greenCity.validation.bad.formed.category.name}";
     public static final int PLACE_NAME_MAX_LENGTH = 30;
     public static final String USERNAME_REGEXP =
-        "^(?!.*\\.\\.)(?!.*\\.$)(?!.*\\-\\-)(?=[ЁІЇҐЄА-Я-A-Z])[ЁёІіЇїҐґЄєА-Яа-яA-Za-z0-9\\s-ʼ'`ʹ,.\\\"]{1,30}$";
+        "^(?!.*\\.\\.)(?!.*\\.$)(?!.*\\-\\-)"
+            + "(?=[ЁІЇҐЄА-ЯA-Z])"
+            + "[ЁёІіЇїҐґЄєА-Яа-яA-Za-z0-9\\s-'’.\\\"]"
+            + "{1,30}"
+            + "(?<![ЭэЁёъЪЫы])$";
 
     private ValidationConstants() {
     }

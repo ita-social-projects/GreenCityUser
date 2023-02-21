@@ -1,6 +1,7 @@
-package greencity.security.jwt.dto.ownsecurity;
+package greencity.dto.user;
 
-import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.enums.Role;
+import greencity.enums.UserStatus;
 import lombok.SneakyThrows;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,23 +16,24 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OwnSignUpDtoTest {
+public class UserManagementDtoTest {
 
     @SneakyThrows
     @ParameterizedTest
     @MethodSource("provideFieldsAndValidValues")
-    void validNameInOwnSignUpDtoTest(String name) {
-        var dto = OwnSignUpDto.builder()
+    void validNameInUserManagementDtoTest(String name) {
+        var dto = UserManagementDto.builder()
+            .id(1L)
             .name(name)
             .email("test@gmail.com")
-            .password("1Test-test")
-            .isUbs(true)
+            .userStatus(UserStatus.ACTIVATED)
+            .role(Role.ROLE_USER)
             .build();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         final Validator validator = factory.getValidator();
 
-        Set<ConstraintViolation<OwnSignUpDto>> constraintViolations =
+        Set<ConstraintViolation<UserManagementDto>> constraintViolations =
             validator.validate(dto);
 
         assertThat(constraintViolations).isEmpty();
@@ -40,18 +42,19 @@ class OwnSignUpDtoTest {
     @SneakyThrows
     @ParameterizedTest
     @MethodSource("provideFieldsAndInvalidValues")
-    void invalidNameInOwnSignUpDtoTest(String name) {
-        var dto = OwnSignUpDto.builder()
+    void invalidNameInUserManagementDtoTest(String name) {
+        var dto = UserForListDto.builder()
+            .id(1L)
             .name(name)
             .email("test@gmail.com")
-            .password("1Test-test")
-            .isUbs(true)
+            .userStatus(UserStatus.ACTIVATED)
+            .role(Role.ROLE_USER)
             .build();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         final Validator validator = factory.getValidator();
 
-        Set<ConstraintViolation<OwnSignUpDto>> constraintViolations =
+        Set<ConstraintViolation<UserForListDto>> constraintViolations =
             validator.validate(dto);
 
         assertThat(constraintViolations).hasSize(1);

@@ -1,6 +1,6 @@
 package greencity.security.jwt.dto.ownsecurity;
 
-import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import lombok.SneakyThrows;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,23 +15,21 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OwnSignUpDtoTest {
+public class EmployeeSignUpDtoTest {
 
     @SneakyThrows
     @ParameterizedTest
     @MethodSource("provideFieldsAndValidValues")
-    void validNameInOwnSignUpDtoTest(String name) {
-        var dto = OwnSignUpDto.builder()
+    void validNameInEmployeeSignUpDtoTest(String name) {
+        var dto = EmployeeSignUpDto.builder()
             .name(name)
             .email("test@gmail.com")
-            .password("1Test-test")
-            .isUbs(true)
             .build();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         final Validator validator = factory.getValidator();
 
-        Set<ConstraintViolation<OwnSignUpDto>> constraintViolations =
+        Set<ConstraintViolation<EmployeeSignUpDto>> constraintViolations =
             validator.validate(dto);
 
         assertThat(constraintViolations).isEmpty();
@@ -40,18 +38,16 @@ class OwnSignUpDtoTest {
     @SneakyThrows
     @ParameterizedTest
     @MethodSource("provideFieldsAndInvalidValues")
-    void invalidNameInOwnSignUpDtoTest(String name) {
-        var dto = OwnSignUpDto.builder()
+    void invalidNameInEmployeeSignUpDtoTest(String name) {
+        var dto = EmployeeSignUpDto.builder()
             .name(name)
             .email("test@gmail.com")
-            .password("1Test-test")
-            .isUbs(true)
             .build();
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         final Validator validator = factory.getValidator();
 
-        Set<ConstraintViolation<OwnSignUpDto>> constraintViolations =
+        Set<ConstraintViolation<EmployeeSignUpDto>> constraintViolations =
             validator.validate(dto);
 
         assertThat(constraintViolations).hasSize(1);

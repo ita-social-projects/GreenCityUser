@@ -2,22 +2,22 @@ package greencity.dto.user;
 
 import greencity.constant.ValidationConstants;
 import greencity.enums.EmailNotification;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 
 @Getter
 @Setter
 @EqualsAndHashCode
+@Builder
 public class UserUpdateDto {
-    @NotBlank
-    @Size(
-        min = ValidationConstants.USERNAME_MIN_LENGTH,
-        max = ValidationConstants.USERNAME_MAX_LENGTH)
+    @Pattern(
+        regexp = ValidationConstants.USERNAME_REGEXP,
+        message = ValidationConstants.USERNAME_MESSAGE)
     private String name;
 
     @NotNull
