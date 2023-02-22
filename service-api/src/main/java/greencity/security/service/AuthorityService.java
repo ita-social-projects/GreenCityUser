@@ -18,7 +18,7 @@ public interface AuthorityService {
      *
      * @param dto - instance of {@link UserEmployeeAuthorityDto}.
      */
-    void updateEmployeesAuthorities(UserEmployeeAuthorityDto dto, String email);
+    void updateEmployeesAuthorities(UserEmployeeAuthorityDto dto);
 
     /**
      * Method that update authorities for employee.

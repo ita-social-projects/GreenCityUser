@@ -821,7 +821,7 @@ class UserControllerTest {
             .content(content))
             .andExpect(status().isOk());
 
-        verify(authorityService).updateEmployeesAuthorities(dto, "testmail@gmail.com");
+        verify(authorityService).updateEmployeesAuthorities(dto);
     }
 
     @Test
