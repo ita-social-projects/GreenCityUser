@@ -72,11 +72,13 @@ class AuthorityServiceImplTest {
         User employee = createEmployee();
         employee.setRole(Role.ROLE_USER);
 
+        var dto = getUserEmployeeAuthorityDto();
+
         when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(employee));
 
         assertEquals(Role.ROLE_USER, employee.getRole());
         assertThrows(BadRequestException.class,
-            () -> authorityService.updateEmployeesAuthorities(getUserEmployeeAuthorityDto()));
+            () -> authorityService.updateEmployeesAuthorities(dto));
     }
 
     @Test
