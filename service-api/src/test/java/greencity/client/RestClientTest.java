@@ -26,7 +26,9 @@ import java.util.Arrays;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.constant.AppConstant.IMAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class RestClientTest {
