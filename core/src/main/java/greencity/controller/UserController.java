@@ -1266,9 +1266,8 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PutMapping("/edit-authorities")
-    public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto,
-        @ApiIgnore Principal principal) {
-        authorityService.updateEmployeesAuthorities(dto, principal.getName());
+    public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto) {
+        authorityService.updateEmployeesAuthorities(dto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
