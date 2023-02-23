@@ -120,6 +120,8 @@ public class JwtTool {
             isValid = true;
         } catch (Exception e) {
             log.info("Given token is not valid: " + e.getMessage());
+            log.error("Exception:", e);
+            log.info("token " + token + "token key " + tokenKey);
         }
         return isValid;
     }

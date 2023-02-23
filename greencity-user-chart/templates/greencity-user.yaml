@@ -41,12 +41,6 @@ spec:
               name: {{ .Values.externalSecret.secretName }}
               key: BACKEND-ADDRESS-USER
 
-        - name: APPLICATIONINSIGHTS_CONNECTION_STRING
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.externalSecret.secretName }}
-              key: APPLICATIONINSIGHTS-CONNECTION-STRING
-
         - name: AZURE_CONNECTION_STRING
           valueFrom:
             secretKeyRef:
@@ -58,12 +52,6 @@ spec:
             secretKeyRef:
               name: {{ .Values.externalSecret.secretName }}
               key: AZURE-CONTAINER-NAME
-
-        - name: BUCKET_NAME
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.externalSecret.secretName }}
-              key: BUCKET-NAME
 
         - name: CACHE_SPEC
           valueFrom:
@@ -89,12 +77,6 @@ spec:
               name: {{ .Values.externalSecret.secretName }}
               key: DATABASE-USER
 
-        # - name: DATASOURCE_URL
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: {{ .Values.externalSecret.secretName }}
-        #       key: API-KEY
-
         - name: DIALECT
           valueFrom:
             secretKeyRef:
@@ -112,12 +94,6 @@ spec:
             secretKeyRef:
               name: {{ .Values.externalSecret.secretName }}
               key: ECO-NEWS-ADDRESS
-
-        - name: EMAIL_TOPIC
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.externalSecret.secretName }}
-              key: EMAIL-TOPIC
 
         - name: FACEBOOK_APP_ID
           valueFrom:
@@ -221,12 +197,6 @@ spec:
               name: {{ .Values.externalSecret.secretName }}
               key: SENDER-EMAIL-ADDRESS
 
-        # - name: MAX_FILE_SIZE
-        #   valueFrom:
-        #     secretKeyRef:
-        #       name: {{ .Values.externalSecret.secretName }}
-        #       key: API-KEY
-
         - name: POOL_SIZE
           valueFrom:
             secretKeyRef:
@@ -305,8 +275,6 @@ spec:
               name: {{ .Values.externalSecret.secretName }}
               key: GOOGLE-CLIENT-ID
 
-        # - name: JAVA_TOOL_OPTIONS
-        #   value: "-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005"
         ports:
         - containerPort: 8060
           name: tomcat

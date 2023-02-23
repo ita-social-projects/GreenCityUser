@@ -8,6 +8,7 @@ import greencity.constant.HttpStatuses;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
+import greencity.dto.UpdateEmployeeAuthoritiesDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
@@ -266,10 +267,10 @@ public class UserController {
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/update-employee-email")
-    public ResponseEntity<HttpStatus> updateEmployeeEmail(@RequestParam String employeeEmail,
-        @RequestParam String newEmployeeEmail) {
-        userService.updateEmployeeEmail(employeeEmail, newEmployeeEmail);
+    @PutMapping("/employee-email")
+    public ResponseEntity<HttpStatus> updateEmployeeEmail(@RequestParam String newEmployeeEmail,
+        @RequestParam String uuid) {
+        userService.updateEmployeeEmail(newEmployeeEmail, uuid);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -1265,9 +1266,48 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PutMapping("/edit-authorities")
-    public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto,
-        @ApiIgnore Principal principal) {
-        authorityService.updateEmployeesAuthorities(dto, principal.getName());
+    public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto) {
+        authorityService.updateEmployeesAuthorities(dto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Controller that update employees authorities.
+     *
+     * @param dto - UpdateEmployeeAuthoritiesDto.
+     * @author Nikita Korzh.
+     */
+    @ApiOperation(value = "Update an employee`s authorities")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
+    })
+    @PutMapping("/authorities")
+    public ResponseEntity<HttpStatus> updateAuthorities(@Valid @RequestBody UpdateEmployeeAuthoritiesDto dto) {
+        authorityService.updateAuthorities(dto);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Controller that deactivate employee by uuid.
+     *
+     * @param uuid - uuid of Employee.
+     * @author Nikita Korzh.
+     */
+    @ApiOperation(value = "Deactivate employee by uuid")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
+    })
+    @PutMapping("/deactivate-employee")
+    public ResponseEntity<HttpStatus> deactivateEmployee(@RequestParam String uuid) {
+        userService.markUserAsDeactivated(uuid);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
