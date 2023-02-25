@@ -212,13 +212,6 @@ public class RestClient {
     }
 
     /**
-     * Method for add new user to system chat.
-     */
-    public void addUserToSystemChat(Long userId) {
-        restTemplate.postForEntity(greenCityChatServerAddress + "/chat/user", userId, Long.class);
-    }
-
-    /**
      * Method for creating an ubs profile for a user.
      *
      * @param ubsProfile of {@link UbsProfileCreationDto};

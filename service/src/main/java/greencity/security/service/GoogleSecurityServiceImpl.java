@@ -2,7 +2,11 @@ package greencity.security.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
@@ -18,10 +22,12 @@ import greencity.security.jwt.JwtTool;
 import greencity.service.AchievementService;
 import greencity.service.UserService;
 import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -45,6 +51,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final ModelMapper modelMapper;
     private final AchievementService achievementService;
     private final UserRepo userRepo;
+    private final RestClient restClient;
 
     /**
      * Constructor.
@@ -60,19 +67,20 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         GoogleIdTokenVerifier googleIdTokenVerifier,
         ModelMapper modelMapper,
         AchievementService achievementService,
-        UserRepo userRepo) {
+        UserRepo userRepo,
+        RestClient restClient) {
         this.userService = userService;
         this.jwtTool = jwtTool;
         this.googleIdTokenVerifier = googleIdTokenVerifier;
         this.modelMapper = modelMapper;
         this.achievementService = achievementService;
         this.userRepo = userRepo;
+        this.restClient = restClient;
     }
 
     /**
      * {@inheritDoc}
      */
-    @Transactional
     @Override
     public SuccessSignInDto authenticate(String idToken, String language) {
         try {
@@ -85,14 +93,8 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                 if (userVO == null) {
                     log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
                     String profilePicture = (String) payload.get(GOOGLE_PICTURE);
-                    User user = createNewUser(email, userName, profilePicture, language);
-                    List<UserAchievement> userAchievementList = createUserAchievements(user);
-                    List<UserAction> userActionsList = createUserActions(user);
-                    user.setUserAchievements(userAchievementList);
-                    user.setUserActions(userActionsList);
-                    user.setUuid(UUID.randomUUID().toString());
-                    User savedUser = userRepo.save(user);
-                    user.setId(savedUser.getId());
+                    User user = saveNewUser(email, userName, profilePicture, language);
+                    restClient.createUbsProfile(modelMapper.map(user, UbsProfileCreationDto.class));
                     userVO = modelMapper.map(user, UserVO.class);
                     log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
                     return getSuccessSignInDto(userVO);
@@ -109,6 +111,29 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         } catch (GeneralSecurityException | IOException e) {
             throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN + ". " + e.getMessage());
         }
+    }
+
+    /**
+     * Method that allow save new user during registration via Google with extracted
+     * payload from token.
+     *
+     * @param email          {@link String} - email.
+     * @param userName       {@link String} - name of user.
+     * @param profilePicture {@link String} - profile picture link.
+     * @param language       {@link String} - language.
+     * @return Saved user {@link User}
+     * @author Maksym Golik
+     */
+    @Transactional
+    public User saveNewUser(String email, String userName, String profilePicture,
+        String language) {
+        User user = createNewUser(email, userName, profilePicture, language);
+        user.setUserAchievements(createUserAchievements(user));
+        user.setUserActions(createUserActions(user));
+        user.setUuid(UUID.randomUUID().toString());
+        User savedUser = userRepo.save(user);
+        user.setId(savedUser.getId());
+        return user;
     }
 
     private User createNewUser(String email, String userName, String profilePicture,

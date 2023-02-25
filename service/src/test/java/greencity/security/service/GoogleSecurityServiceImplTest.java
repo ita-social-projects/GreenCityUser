@@ -4,7 +4,9 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.ModelUtils;
 import greencity.TestConst;
+import greencity.client.RestClient;
 import greencity.dto.achievement.AchievementVO;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Achievement;
 import greencity.entity.User;
@@ -34,12 +36,14 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
+import static greencity.constant.AppConstant.GOOGLE_PICTURE;
+import static greencity.constant.AppConstant.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -60,6 +64,8 @@ class GoogleSecurityServiceImplTest {
     GoogleIdToken.Payload payload;
     @Mock
     AchievementService achievementService;
+    @Mock
+    RestClient restClient;
 
     @InjectMocks
     GoogleSecurityServiceImpl googleSecurityService;
@@ -105,6 +111,10 @@ class GoogleSecurityServiceImplTest {
         when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
+        when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
+        doReturn(1L).when(restClient).createUbsProfile(any(UbsProfileCreationDto.class));
+        when(googleSecurityService.saveNewUser(payload.getEmail(), (String) payload.get(USERNAME),
+            (String) payload.get(GOOGLE_PICTURE), "ua")).thenReturn(user);
         SuccessSignInDto result =
             googleSecurityService.authenticate("1234", "ua");
         assertNull(result.getUserId());

@@ -220,16 +220,6 @@ class RestClientTest {
     }
 
     @Test
-    void addUserToSystemChat() {
-        Long userId = 1L;
-        ResponseEntity<Long> responseEntity = ResponseEntity.ok().body(userId);
-        when(restTemplate.postForEntity(greenCityChatServerAddress + "/chat/user", 1L, Long.class))
-            .thenReturn(responseEntity);
-        restClient.addUserToSystemChat(userId);
-        verify(restTemplate).postForEntity(greenCityChatServerAddress + "/chat/user", 1L, Long.class);
-    }
-
-    @Test
     void createUbsProfileTest() {
         UbsProfileCreationDto ubsProfileCreationDto =
             UbsProfileCreationDto.builder()

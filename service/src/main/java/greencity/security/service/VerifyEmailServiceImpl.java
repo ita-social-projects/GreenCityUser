@@ -41,12 +41,9 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
         VerifyEmail verifyEmail = verifyEmailRepo
             .findByTokenAndUserId(userId, token)
             .orElseThrow(() -> new BadVerifyEmailTokenException(ErrorMessage.NO_ANY_EMAIL_TO_VERIFY_BY_THIS_TOKEN));
-
         if (isNotExpired(verifyEmail.getExpiryDate())) {
             int rows = verifyEmailRepo.deleteVerifyEmailByTokenAndUserId(userId, token);
             log.info("User has successfully verify the email by token {}. Records deleted {}.", token, rows);
-            restClient.addUserToSystemChat(userId);
-            log.info("The user has been added to the system chats");
             User user = userRepo.findById(userId)
                 .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
             UbsProfileCreationDto ubsProfile = modelMapper.map(user, UbsProfileCreationDto.class);
