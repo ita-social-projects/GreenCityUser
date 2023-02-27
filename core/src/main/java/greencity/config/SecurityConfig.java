@@ -261,17 +261,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * Bean {@link GoogleIdTokenVerifier} that uses in verify googleIdToken.
-     *
-     * @param clientId {@link String} - google client id.
      */
     @Bean
-    public GoogleIdTokenVerifier googleIdTokenVerifier(@Value("${google.clientId}") String clientId,
-        @Value("${google.clientId.manager}") String managerClientId) {
-        List<String> audience = new ArrayList<>();
-        audience.add(clientId);
-        audience.add(managerClientId);
-        return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
-            .setAudience(audience)
-            .build();
+    public GoogleIdTokenVerifier googleIdTokenVerifier() {
+        return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
+            JacksonFactory.getDefaultInstance()).build();
     }
 }
