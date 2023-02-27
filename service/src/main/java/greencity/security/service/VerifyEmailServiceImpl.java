@@ -53,7 +53,7 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
             user.setUserStatus(UserStatus.ACTIVATED);
             userRepo.save(user);
             log.info("User has successfully verify the email by token {}. Records deleted {}.", token, rows);
-//            restClient.addUserToSystemChat(userId);
+            restClient.addUserToSystemChat(userId);
             log.info("The user has been added to the system chats");
             return true;
         } else {
