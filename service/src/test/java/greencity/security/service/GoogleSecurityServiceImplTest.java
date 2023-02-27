@@ -36,14 +36,12 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
-import static greencity.constant.AppConstant.GOOGLE_PICTURE;
-import static greencity.constant.AppConstant.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -51,21 +49,23 @@ class GoogleSecurityServiceImplTest {
     @Mock
     private UserService userService;
     @Mock
-    UserRepo userRepo;
+    private UserRepo userRepo;
     @Mock
     private GoogleIdTokenVerifier googleIdTokenVerifier;
     @Mock
     private JwtTool jwtTool;
     @Mock
-    GoogleIdToken googleIdToken;
+    private GoogleIdToken googleIdToken;
     @Mock
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
     @Spy
-    GoogleIdToken.Payload payload;
+    private GoogleIdToken.Payload payload;
     @Mock
-    AchievementService achievementService;
+    private AchievementService achievementService;
     @Mock
-    RestClient restClient;
+    private RestClient restClient;
+    @Mock
+    private GoogleSecurityTransactionalService googleSecurityTransactionalService;
 
     @InjectMocks
     GoogleSecurityServiceImpl googleSecurityService;
@@ -112,9 +112,8 @@ class GoogleSecurityServiceImplTest {
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
-        doReturn(1L).when(restClient).createUbsProfile(any(UbsProfileCreationDto.class));
-        when(googleSecurityService.saveNewUser(payload.getEmail(), (String) payload.get(USERNAME),
-            (String) payload.get(GOOGLE_PICTURE), "ua")).thenReturn(user);
+        when(googleSecurityTransactionalService.signUp(payload, "ua")).thenReturn(user);
+        when(restClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
         SuccessSignInDto result =
             googleSecurityService.authenticate("1234", "ua");
         assertNull(result.getUserId());
