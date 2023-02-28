@@ -24,6 +24,9 @@ import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,6 +47,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static greencity.ModelUtils.*;
 import static greencity.enums.Role.ROLE_USER;
@@ -1253,5 +1257,18 @@ class UserServiceImplTest {
 
         assertThrows(LowRoleLevelException.class,
             () -> userService.findAdminById(2L));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideUuidOptionalUserResultForCheckIfUserExistsByUuidTest")
+    void checkIfUserExistsByUuidTest(String uuid, Optional<User> user, boolean existence) {
+        when(userRepo.findUserByUuid(uuid)).thenReturn(user);
+        assertEquals(existence, userService.checkIfUserExistsByUuid(uuid));
+    }
+
+    private static Stream<Arguments> provideUuidOptionalUserResultForCheckIfUserExistsByUuidTest() {
+        return Stream.of(
+            Arguments.of("444e66e8-8daa-4cb0-8269-a8d856e7dd15", Optional.of(getUser()), true),
+            Arguments.of("uuid", Optional.empty(), false));
     }
 }
