@@ -142,6 +142,26 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setUuid(UUID.randomUUID().toString());
     }
 
+    private void setUsersFieldsEmployee(OwnSignUpDto dto, User employee) {
+        OwnSecurity ownSecurity = createOwnSecurity(dto, employee);
+        RestorePasswordEmail restorePasswordEmail = createRestorePasswordEmail(employee, jwtTool.generateTokenKey());
+        List<UserAchievement> userAchievementList = createUserAchievements(employee);
+        List<UserAction> userActionsList = createUserActions(employee);
+        employee.setOwnSecurity(ownSecurity);
+        employee.setRestorePasswordEmail(restorePasswordEmail);
+        employee.setUserAchievements(userAchievementList);
+        employee.setUserActions(userActionsList);
+        employee.setUuid(UUID.randomUUID().toString());
+    }
+
+    private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
+        return RestorePasswordEmail.builder()
+                .user(user)
+                .token(emailVerificationToken)
+                .expiryDate(calculateExpirationDateTime())
+                .build();
+    }
+
     private OwnSecurity createOwnSecurity(OwnSignUpDto dto, User user) {
         return OwnSecurity.builder()
             .password(passwordEncoder.encode(dto.getPassword()))
@@ -176,7 +196,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         OwnSignUpDto dto = modelMapper.map(employeeSignUpDto, OwnSignUpDto.class);
         User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
-        setUsersFields(dto, employee);
+
+        setUsersFieldsEmployee(dto, employee);
+
+        employee.setShowLocation(true);
+        employee.setShowEcoPlace(true);
+        employee.setShowShoppingList(true);
+
         try {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());

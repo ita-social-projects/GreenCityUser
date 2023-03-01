@@ -180,6 +180,31 @@ class OwnSecurityServiceImplTest {
     }
 
     @Test
+    void signUpWithDuplicatedEmployee() {
+        User user = ModelUtils.getUserWithUbsRole();
+        UserVO userVO = ModelUtils.getUserVO();
+        EmployeeSignUpDto employeeSignUpDto = ModelUtils.getEmployeeSignUpDto();
+        OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        user.setUserAchievements(userAchievementList);
+        when(achievementService.findAll()).thenReturn(achievementVOList);
+
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
+        when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
+        when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
+
+        when(userRepo.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
+        when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
+
+        assertThrows(UserAlreadyRegisteredException.class, ()->ownSecurityService.signUpEmployee(employeeSignUpDto, "en"));
+
+        verify(jwtTool, times(2)).generateTokenKey();
+    }
+
+    @Test
     void signUpThrowsUserAlreadyRegisteredExceptionTest() {
         OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
         User user = User.builder().verifyEmail(new VerifyEmail()).build();
