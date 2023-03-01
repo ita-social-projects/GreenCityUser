@@ -43,7 +43,7 @@ class UserManagementDtoTest {
     @ParameterizedTest
     @MethodSource("provideFieldsAndInvalidValues")
     void invalidNameInUserManagementDtoTest(String name) {
-        var dto = UserForListDto.builder()
+        var dto = UserManagementDto.builder()
             .id(1L)
             .name(name)
             .email("test@gmail.com")
@@ -54,7 +54,7 @@ class UserManagementDtoTest {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         final Validator validator = factory.getValidator();
 
-        Set<ConstraintViolation<UserForListDto>> constraintViolations =
+        Set<ConstraintViolation<UserManagementDto>> constraintViolations =
             validator.validate(dto);
 
         assertThat(constraintViolations).hasSize(1);
