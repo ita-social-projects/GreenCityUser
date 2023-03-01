@@ -1,10 +1,14 @@
 package greencity.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,10 +26,13 @@ public class Authority {
     @Column
     private String name;
 
+    @ManyToMany(mappedBy = "authorities", cascade = CascadeType.ALL)
+    private List<User> employees;
+
     @ManyToMany
     @JoinTable(
-        name = "employee_authorities_mapping",
-        joinColumns = {@JoinColumn(name = "authority_id")},
-        inverseJoinColumns = {@JoinColumn(name = "user_id")})
-    private List<User> employees;
+        name = "positions_authorities_mapping",
+        joinColumns = @JoinColumn(name = "authorities_id"),
+        inverseJoinColumns = @JoinColumn(name = "position_id"))
+    private List<Position> positions;
 }

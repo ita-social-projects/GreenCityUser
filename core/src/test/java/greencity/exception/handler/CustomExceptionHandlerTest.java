@@ -141,6 +141,16 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
+    void handleWrongIdException() {
+        WrongIdException wrongIdException = new WrongIdException("test");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleWrongIdException(wrongIdException, webRequest),
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
+
+    }
+
+    @Test
     void handleHttpMessageNotReadable() {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
@@ -179,5 +189,14 @@ class CustomExceptionHandlerTest {
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
         assertEquals(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse),
             customExceptionHandler.handleUserAlreadyHasPasswordException(webRequest));
+    }
+
+    @Test
+    void handleUserStatusException() {
+        BadUserStatusException actual = new BadUserStatusException("user_status");
+        ValidationExceptionDto validationDto = new ValidationExceptionDto(actual.getMessage(), "user_status");
+        ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
+        ResponseEntity<Object> body = status.body(validationDto);
+        assertEquals(customExceptionHandler.handleBadUserStatusException(actual), body);
     }
 }

@@ -368,7 +368,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users U\n"
         + "    LEFT JOIN users_friends F ON U.id = F.friend_id\n"
-        + "WHERE F.user_id = :userId AND LOWER(U.name) LIKE LOWER(CONCAT('%', :name, '%')) AND F.status = 1")
+        + "WHERE F.user_id = :userId AND LOWER(U.name) LIKE LOWER(CONCAT('%', :name, '%')) AND F.status = 'FRIEND'")
     Page<User> findFriendsByName(String name, Pageable page, Long userId);
 
     /**
@@ -414,4 +414,12 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true,
         value = "SELECT  FROM users_friends WHERE user_id = :userId AND friend_id = :friendId")
     Integer getStatusUser(Long userId, Long friendId);
+
+    /**
+     * Method that checks if the email user exists.
+     *
+     * @param email - email of User.
+     * @return - return true if User exists and false if not.
+     */
+    boolean existsUserByEmail(String email);
 }

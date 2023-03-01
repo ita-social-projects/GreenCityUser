@@ -108,6 +108,23 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Method intercept exception {@link WrongIdException}.
+     *
+     * @param ex      Exception witch should be intercepted.
+     * @param request contain detail about occur exception
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     * @author Julia Seti
+     */
+
+    @ExceptionHandler(WrongIdException.class)
+    public final ResponseEntity<Object> handleWrongIdException(WrongIdException ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        log.trace(ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
+    }
+
+    /**
      * Method intercept exception {@link MethodArgumentTypeMismatchException}.
      *
      * @param request contain detail about occur exception
@@ -300,5 +317,19 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<Object> handleUserAlreadyHasPasswordException(WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    /**
+     * Method interceptor exception {@link BadUserStatusException}.
+     *
+     * @param ex Exception witch should be intercepted
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     */
+    @ExceptionHandler(BadUserStatusException.class)
+    public final ResponseEntity<Object> handleBadUserStatusException(BadUserStatusException ex) {
+        ValidationExceptionDto validationExceptionDto =
+            new ValidationExceptionDto(AppConstant.USER_STATUS, ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
     }
 }

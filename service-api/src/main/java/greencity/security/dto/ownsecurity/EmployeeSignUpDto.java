@@ -7,20 +7,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeSignUpDto {
-    @NotBlank
-    @Length(
-        min = ValidationConstants.USERNAME_MIN_LENGTH,
-        max = ValidationConstants.USERNAME_MAX_LENGTH)
+    @Pattern(
+            regexp = ValidationConstants.USERNAME_REGEXP,
+            message = ValidationConstants.USERNAME_MESSAGE)
     private String name;
 
     @NotBlank

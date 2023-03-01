@@ -1,13 +1,13 @@
 trigger:
+  batch: true
   branches:
     include:
-    - dev, master
+    - prod
   paths:
     exclude:
     - README.md
-    
-pr: none
 
+pr: none
 
 variables:
   agentOS: ubuntu-latest
@@ -31,23 +31,7 @@ stages:
   - job: Build
     pool:
       vmImage: $(agentOS)
-    steps:
-    - task: AzureCLI@2
-      displayName: Get GOOGLE_APPLICATION_CREDENTIALS from Azure Key Vault
-      inputs:
-        azureSubscription: '$(azureSub)'
-        scriptType: 'bash'
-        scriptLocation: inlineScript
-        inlineScript: |
-          az keyvault secret download --name $(jsonSecret) --vault-name $(azKeyVault) --file $(jsonFile)
-          
-    - task: AzureKeyVault@1
-      displayName: Get FTP credentials from Azure Key Vault
-      inputs:
-        azureSubscription: '$(azureSub)'
-        KeyVaultName: '$(azKeyVault)'
-        SecretsFilter: 'ftpHost, ftpUser, ftpPass'
-
+    steps:        
     - task: Maven@3
       displayName: Maven package
       inputs:
@@ -89,6 +73,7 @@ stages:
         Dockerfile: 'Dockerfile'
         tags: |
           $(Build.BuildId)
+          latest
 
 - stage: Deploy
   jobs:
@@ -96,7 +81,7 @@ stages:
       displayName: Deploy User app service
       pool:
         vmImage: $(agentOS)
-      environment: 'prod'
+      environment: 'production'
       strategy:
         runOnce:
           deploy:
@@ -118,11 +103,11 @@ stages:
             - task: HelmDeploy@0
               inputs:
                 connectionType: 'Kubernetes Service Connection'
-                kubernetesServiceConnection: 'k8s-stage'
+                kubernetesServiceConnection: 'production'
                 namespace: 'default'
                 command: 'upgrade'
                 chartType: 'FilePath'
                 chartPath: '$(System.ArtifactsDirectory)/drop/greencity-user-chart'
                 releaseName: 'user'
-                overrideValues: 'deployment.image=skyere/greencityuser:$(Build.BuildId)'
+                overrideValues: 'ingress.hostname=greencity-user.pick-up.city,deployment.image=skyere/greencityuser:$(Build.BuildId)'
                 arguments: '--debug'

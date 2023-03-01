@@ -36,6 +36,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.sql.Timestamp;
@@ -70,7 +71,7 @@ class UserServiceImplTest {
 
     private User user = User.builder()
         .id(1L)
-        .name("Test Testing")
+        .name("Taras")
         .email("test@gmail.com")
         .role(ROLE_USER)
         .userStatus(ACTIVATED)
@@ -234,11 +235,45 @@ class UserServiceImplTest {
 
     @Test
     void updateEmployeeEmailTest() {
-        User user = getUser();
-        User updatedUser = getUserWithNewEmail();
-        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(user));
-        userService.updateEmployeeEmail("taras@gmail.com", "test@mail.com");
-        assertEquals(updatedUser.getEmail(), user.getEmail());
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        String email = "test1@gmail.com";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        when(userRepo.existsUserByEmail(email)).thenReturn(false);
+        userService.updateEmployeeEmail(email, uuid);
+        assertEquals(email, user.getEmail());
+        verify(userRepo).findUserByUuid(uuid);
+        verify(userRepo).existsUserByEmail(email);
+    }
+
+    @Test
+    void updateEmployeeWithSameEmailTest() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        String email = "test@gmail.com";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        userService.updateEmployeeEmail(email, uuid);
+        assertEquals(email, user.getEmail());
+        verify(userRepo).findUserByUuid(uuid);
+    }
+
+    @Test
+    void updateEmployeeEmailThrowsUsernameNotFoundExceptionTest() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.empty());
+        assertThrows(UsernameNotFoundException.class,
+            () -> userService.updateEmployeeEmail("test@mail.com", uuid));
+        verify(userRepo).findUserByUuid(uuid);
+    }
+
+    @Test
+    void updateEmployeeEmailThrowsBadRequestExceptionTest() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        String email = "test1@gmail.com";
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        when(userRepo.existsUserByEmail(email)).thenReturn(true);
+        assertThrows(BadRequestException.class,
+            () -> userService.updateEmployeeEmail(email, uuid));
+        verify(userRepo).findUserByUuid(uuid);
+        verify(userRepo).existsUserByEmail(email);
     }
 
     @Test
