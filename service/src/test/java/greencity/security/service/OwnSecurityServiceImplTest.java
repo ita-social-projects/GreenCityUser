@@ -86,9 +86,6 @@ class OwnSecurityServiceImplTest {
     @Mock
     RestClient restClient;
 
-    @Mock
-    private AuthorityRepo authorityRepo;
-
     private OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -102,7 +99,7 @@ class OwnSecurityServiceImplTest {
         initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, userService, passwordEncoder,
             jwtTool, 1, restorePasswordEmailRepo, modelMapper,
-            userRepo, achievementService, emailService, restClient, authorityRepo);
+            userRepo, achievementService, emailService, restClient);
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")
