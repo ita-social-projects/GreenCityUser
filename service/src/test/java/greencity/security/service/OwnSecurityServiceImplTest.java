@@ -205,7 +205,8 @@ class OwnSecurityServiceImplTest {
         when(userRepo.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
 
-        assertThrows(UserAlreadyRegisteredException.class, ()->ownSecurityService.signUpEmployee(employeeSignUpDto, "en"));
+        assertThrows(UserAlreadyRegisteredException.class,
+            () -> ownSecurityService.signUpEmployee(employeeSignUpDto, "en"));
 
         verify(jwtTool, times(2)).generateTokenKey();
     }

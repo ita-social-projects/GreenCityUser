@@ -162,10 +162,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
         return RestorePasswordEmail.builder()
-                .user(user)
-                .token(emailVerificationToken)
-                .expiryDate(calculateExpirationDateTime())
-                .build();
+            .user(user)
+            .token(emailVerificationToken)
+            .expiryDate(calculateExpirationDateTime())
+            .build();
     }
 
     private OwnSecurity createOwnSecurity(OwnSignUpDto dto, User user) {

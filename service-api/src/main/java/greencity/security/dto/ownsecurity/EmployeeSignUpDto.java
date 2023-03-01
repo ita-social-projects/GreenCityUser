@@ -18,8 +18,8 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 public class EmployeeSignUpDto {
     @Pattern(
-            regexp = ValidationConstants.USERNAME_REGEXP,
-            message = ValidationConstants.USERNAME_MESSAGE)
+        regexp = ValidationConstants.USERNAME_REGEXP,
+        message = ValidationConstants.USERNAME_MESSAGE)
     private String name;
 
     @NotBlank
