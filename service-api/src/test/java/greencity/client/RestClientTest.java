@@ -3,7 +3,6 @@ package greencity.client;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
-import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.enums.AchievementCategoryType;
 import greencity.enums.AchievementType;
 import org.junit.jupiter.api.Test;
@@ -26,9 +25,8 @@ import java.util.Arrays;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.constant.AppConstant.IMAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RestClientTest {
@@ -40,8 +38,6 @@ class RestClientTest {
     private String greenCityServerAddress;
     @Value("${greencitychat.server.address}")
     private String greenCityChatServerAddress;
-    @Value("${greencityubs.server.address}")
-    private String greenCityUbsServerAddress;
     @InjectMocks
     private RestClient restClient;
 
@@ -220,20 +216,13 @@ class RestClientTest {
     }
 
     @Test
-    void createUbsProfileTest() {
-        UbsProfileCreationDto ubsProfileCreationDto =
-            UbsProfileCreationDto.builder()
-                .uuid("f81d4fae-7dec-11d0-a765-00a0c91e6bf6")
-                .email("ubsemail@mail.com")
-                .name("UBS")
-                .build();
-        ResponseEntity<Long> responseEntity = ResponseEntity.status(HttpStatus.CREATED).body(1L);
-        when(restTemplate.postForEntity(greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-            ubsProfileCreationDto, Long.class)).thenReturn(responseEntity);
-        Long id = restClient.createUbsProfile(ubsProfileCreationDto);
-        verify(restTemplate, times(1)).postForEntity(
-            greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-            ubsProfileCreationDto, Long.class);
-        assertEquals(1L, id);
+    void addUserToSystemChat() {
+        Long userId = 1L;
+        ResponseEntity<Long> responseEntity = ResponseEntity.ok().body(userId);
+        when(restTemplate.postForEntity(greenCityChatServerAddress + "/chat/user", 1L, Long.class))
+            .thenReturn(responseEntity);
+        restClient.addUserToSystemChat(userId);
+        verify(restTemplate).postForEntity(greenCityChatServerAddress + "/chat/user", 1L, Long.class);
+
     }
 }

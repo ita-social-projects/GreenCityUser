@@ -99,8 +99,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/{userId}/habit/assign",
                 "/token",
                 "/socket/**",
-                "/user/findAllByEmailNotification",
-                "/user/checkByUuid")
+                "/user/findAllByEmailNotification")
             .permitAll()
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
