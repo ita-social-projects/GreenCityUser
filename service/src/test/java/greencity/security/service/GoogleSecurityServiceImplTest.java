@@ -29,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -65,8 +66,7 @@ class GoogleSecurityServiceImplTest {
     @Mock
     private RestClient restClient;
     @Mock
-    private GoogleSecurityTransactionalService googleSecurityTransactionalService;
-
+    private PlatformTransactionManager platformTransactionManager;
     @InjectMocks
     GoogleSecurityServiceImpl googleSecurityService;
 
@@ -112,7 +112,6 @@ class GoogleSecurityServiceImplTest {
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
-        when(googleSecurityTransactionalService.signUp(payload, "ua")).thenReturn(user);
         when(restClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
         SuccessSignInDto result =
             googleSecurityService.authenticate("1234", "ua");
