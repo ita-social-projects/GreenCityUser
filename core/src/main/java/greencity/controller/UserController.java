@@ -1189,6 +1189,23 @@ public class UserController {
     }
 
     /**
+     * Check the existence of the user by uuid.
+     *
+     * @param uuid {@link String} - for found user.
+     * @return {@link Boolean}.
+     * @author Maksym Golik
+     */
+    @ApiOperation(value = "Check the existence of the user by uuid")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST)
+    })
+    @GetMapping("/checkByUuid")
+    public ResponseEntity<Boolean> checkIfUserExistsByUuId(@RequestParam String uuid) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.checkIfUserExistsByUuid(uuid));
+    }
+
+    /**
      * Get {@link UserAllFriendsDto} by uuid.
      *
      * @return {@link UserAllFriendsDto }.
