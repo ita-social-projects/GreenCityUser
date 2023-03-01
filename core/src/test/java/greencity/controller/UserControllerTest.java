@@ -255,7 +255,7 @@ class UserControllerTest {
 
         String content = "{\n"
             + "  \"emailNotification\": \"DISABLED\",\n"
-            + "  \"name\": \"string\"\n"
+            + "  \"name\": \"String\"\n"
             + "}";
 
         ObjectMapper mapper = new ObjectMapper();

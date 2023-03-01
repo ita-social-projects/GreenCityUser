@@ -52,7 +52,7 @@ class OwnSecurityControllerTest {
     void singUpTest() throws Exception {
         String content = "{\n" +
             "  \"email\": \"test@mail.com\",\n" +
-            "  \"name\": \"string\",\n" +
+            "  \"name\": \"String\",\n" +
             "  \"password\": \"String123=\",\n" +
             "  \"isUbs\": false\n" +
             "}";
@@ -70,7 +70,7 @@ class OwnSecurityControllerTest {
     void singUpEmployeeTest() throws Exception {
         String content = "{\n" +
             "  \"email\": \"test@mail.com\",\n" +
-            "  \"name\": \"string\",\n" +
+            "  \"name\": \"String\",\n" +
             "  \"isUbs\": true\n" +
             "}";
 
