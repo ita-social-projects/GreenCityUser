@@ -4,7 +4,6 @@ import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
-import greencity.dto.position.PositionDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -65,8 +64,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final AchievementService achievementService;
     private final EmailService emailService;
 
-    private final AuthorityRepo authorityRepo;
-
     /**
      * Constructor.
      */
@@ -79,8 +76,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         ModelMapper modelMapper,
         UserRepo userRepo,
-        AchievementService achievementService, EmailService emailService, RestClient restClient,
-        AuthorityRepo authorityRepo) {
+        AchievementService achievementService, EmailService emailService, RestClient restClient) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -91,7 +87,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         this.userRepo = userRepo;
         this.achievementService = achievementService;
         this.emailService = emailService;
-        this.authorityRepo = authorityRepo;
     }
 
     /**
@@ -202,7 +197,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         OwnSignUpDto dto = modelMapper.map(employeeSignUpDto, OwnSignUpDto.class);
         User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
-        setUsersFields(dto, employee);
+        setUsersFieldsEmployee(dto, employee);
 
         employee.setShowLocation(true);
         employee.setShowEcoPlace(true);
