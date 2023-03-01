@@ -588,13 +588,4 @@ public interface UserService {
      * @author Stepan Omeliukh
      */
     PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId);
-
-    /**
-     * Method checks the existence of the user by uuid.
-     *
-     * @param uuid {@link String} - for found user.
-     * @return {@link Boolean}.
-     * @author Maksym Golik
-     */
-    Boolean checkIfUserExistsByUuid(String uuid);
 }
