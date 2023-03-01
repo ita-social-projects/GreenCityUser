@@ -4,9 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.ModelUtils;
 import greencity.TestConst;
-import greencity.client.RestClient;
 import greencity.dto.achievement.AchievementVO;
-import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Achievement;
 import greencity.entity.User;
@@ -29,7 +27,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -50,23 +47,20 @@ class GoogleSecurityServiceImplTest {
     @Mock
     private UserService userService;
     @Mock
-    private UserRepo userRepo;
+    UserRepo userRepo;
     @Mock
     private GoogleIdTokenVerifier googleIdTokenVerifier;
     @Mock
     private JwtTool jwtTool;
     @Mock
-    private GoogleIdToken googleIdToken;
+    GoogleIdToken googleIdToken;
     @Mock
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
     @Spy
-    private GoogleIdToken.Payload payload;
+    GoogleIdToken.Payload payload;
     @Mock
-    private AchievementService achievementService;
-    @Mock
-    private RestClient restClient;
-    @Mock
-    private PlatformTransactionManager platformTransactionManager;
+    AchievementService achievementService;
+
     @InjectMocks
     GoogleSecurityServiceImpl googleSecurityService;
 
@@ -111,8 +105,6 @@ class GoogleSecurityServiceImplTest {
         when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
-        when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
-        when(restClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
         SuccessSignInDto result =
             googleSecurityService.authenticate("1234", "ua");
         assertNull(result.getUserId());

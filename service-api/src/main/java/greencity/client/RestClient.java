@@ -4,7 +4,6 @@ import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
-import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import greencity.enums.AchievementCategoryType;
 import greencity.enums.AchievementType;
@@ -41,8 +40,6 @@ public class RestClient {
     private final HttpServletRequest httpServletRequest;
     @Value("${greencitychat.server.address}")
     private String greenCityChatServerAddress;
-    @Value("${greencityubs.server.address}")
-    private String greenCityUbsServerAddress;
 
     /**
      * Method for sending request for achievement calculation.
@@ -212,18 +209,10 @@ public class RestClient {
     }
 
     /**
-     * Method for creating an ubs profile for a user.
-     *
-     * @param ubsProfile of {@link UbsProfileCreationDto};
-     * @return id of ubs profile {@link Long};
-     * @author Maksym Golik
+     * Method for add new user to system chat.
      */
-
-    public Long createUbsProfile(UbsProfileCreationDto ubsProfile) {
-        return restTemplate
-            .postForEntity(greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-                ubsProfile, Long.class)
-            .getBody();
+    public void addUserToSystemChat(Long userId) {
+        restTemplate.postForEntity(greenCityChatServerAddress + "/chat/user", userId, Long.class);
     }
 
     /**

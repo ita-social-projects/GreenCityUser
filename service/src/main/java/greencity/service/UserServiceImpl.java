@@ -1240,12 +1240,4 @@ public class UserServiceImpl implements UserService {
             allUsers.getPageable().getPageNumber(),
             allUsers.getTotalPages());
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Boolean checkIfUserExistsByUuid(String uuid) {
-        return userRepo.findUserByUuid(uuid).isPresent();
-    }
 }

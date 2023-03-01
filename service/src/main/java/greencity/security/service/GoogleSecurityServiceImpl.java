@@ -2,9 +2,7 @@ package greencity.security.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
-import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
@@ -19,19 +17,17 @@ import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.AchievementService;
 import greencity.service.UserService;
-
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 import static greencity.constant.AppConstant.*;
 import static greencity.security.service.OwnSecurityServiceImpl.getUserAchievements;
@@ -49,8 +45,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final ModelMapper modelMapper;
     private final AchievementService achievementService;
     private final UserRepo userRepo;
-    private final RestClient restClient;
-    private final PlatformTransactionManager transactionManager;
 
     /**
      * Constructor.
@@ -58,11 +52,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
      * @param userService           {@link UserService} - service of {@link User}
      *                              logic.
      * @param jwtTool               {@link JwtTool} - tool for jwt logic.
-     * @param googleIdTokenVerifier {@link GoogleIdTokenVerifier} - tool for verify.
-     * @param modelMapper           {@link ModelMapper} - tool for mapping models.
-     * @param restClient            {@link RestClient} - tool for sending requests
-     * @param transactionManager    {@link PlatformTransactionManager} - tool for
-     *                              transaction management
+     * @param googleIdTokenVerifier {@link GoogleIdTokenVerifier} - tool for verify
      */
     @Autowired
     public GoogleSecurityServiceImpl(UserService userService,
@@ -70,22 +60,19 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         GoogleIdTokenVerifier googleIdTokenVerifier,
         ModelMapper modelMapper,
         AchievementService achievementService,
-        UserRepo userRepo,
-        RestClient restClient,
-        PlatformTransactionManager transactionManager) {
+        UserRepo userRepo) {
         this.userService = userService;
         this.jwtTool = jwtTool;
         this.googleIdTokenVerifier = googleIdTokenVerifier;
         this.modelMapper = modelMapper;
         this.achievementService = achievementService;
         this.userRepo = userRepo;
-        this.restClient = restClient;
-        this.transactionManager = transactionManager;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Transactional
     @Override
     public SuccessSignInDto authenticate(String idToken, String language) {
         try {
@@ -98,17 +85,14 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                 if (userVO == null) {
                     log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
                     String profilePicture = (String) payload.get(GOOGLE_PICTURE);
-                    TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
-                    User user = transactionTemplate.execute(status -> {
-                        User savedUser = createNewUser(email, userName, profilePicture, language);
-                        savedUser.setUserAchievements(createUserAchievements(savedUser));
-                        savedUser.setUserActions(createUserActions(savedUser));
-                        savedUser.setUuid(UUID.randomUUID().toString());
-                        Long id = userRepo.save(savedUser).getId();
-                        savedUser.setId(id);
-                        return savedUser;
-                    });
-                    restClient.createUbsProfile(modelMapper.map(user, UbsProfileCreationDto.class));
+                    User user = createNewUser(email, userName, profilePicture, language);
+                    List<UserAchievement> userAchievementList = createUserAchievements(user);
+                    List<UserAction> userActionsList = createUserActions(user);
+                    user.setUserAchievements(userAchievementList);
+                    user.setUserActions(userActionsList);
+                    user.setUuid(UUID.randomUUID().toString());
+                    User savedUser = userRepo.save(user);
+                    user.setId(savedUser.getId());
                     userVO = modelMapper.map(user, UserVO.class);
                     log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
                     return getSuccessSignInDto(userVO);

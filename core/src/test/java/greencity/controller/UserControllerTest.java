@@ -845,13 +845,4 @@ class UserControllerTest {
             .andExpect(status().isOk());
         verify(userService).markUserAsDeactivated(uuid);
     }
-
-    @Test
-    void checkIfUserExistsByUuidTest() throws Exception {
-        when(userService.checkIfUserExistsByUuid(TestConst.UUID)).thenReturn(true);
-        mockMvc.perform(get(userLink + "/checkByUuid")
-            .param("uuid", TestConst.UUID))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$").value(true));
-    }
 }
