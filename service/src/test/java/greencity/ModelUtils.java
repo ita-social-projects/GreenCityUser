@@ -9,6 +9,7 @@ import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.position.PositionDto;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
@@ -469,6 +470,14 @@ public class ModelUtils {
             .email("test@mail.com")
             .password("Test@123")
             .isUbs(true)
+            .build();
+    }
+
+    public static UbsProfileCreationDto getUbsProfileCreationDto() {
+        return UbsProfileCreationDto.builder()
+            .name("UbsProfile")
+            .email("ubsuser@mail.com")
+            .uuid("f81d4fae-7dec-11d0-a765-00a0c91e6bf6")
             .build();
     }
 }
