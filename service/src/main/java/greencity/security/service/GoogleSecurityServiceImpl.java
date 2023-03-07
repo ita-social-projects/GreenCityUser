@@ -104,6 +104,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                         savedUser.setUserAchievements(createUserAchievements(savedUser));
                         savedUser.setUserActions(createUserActions(savedUser));
                         savedUser.setUuid(UUID.randomUUID().toString());
+                        savedUser.setFirstName(userName);
                         Long id = userRepo.save(savedUser).getId();
                         savedUser.setId(id);
                         return savedUser;
