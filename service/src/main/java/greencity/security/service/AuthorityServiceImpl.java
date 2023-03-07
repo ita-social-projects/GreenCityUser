@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,8 +44,12 @@ public class AuthorityServiceImpl implements AuthorityService {
         if (!employee.getRole().equals(Role.ROLE_UBS_EMPLOYEE)) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
-        List<Authority> list = authorityRepo.findAuthoritiesByNames(dto.getAuthorities());
-        employee.setAuthorities(list);
+
+        List<Authority> authorities = new ArrayList<>();
+        if (!dto.getAuthorities().isEmpty()) {
+            authorities = authorityRepo.findAuthoritiesByNames(dto.getAuthorities());
+        }
+        employee.setAuthorities(authorities);
         userRepo.save(employee);
     }
 
