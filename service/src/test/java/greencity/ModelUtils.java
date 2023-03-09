@@ -156,6 +156,13 @@ public class ModelUtils {
             .build();
     }
 
+    public static UserEmployeeAuthorityDto getUserEmployeeWithNoAuthorityDto() {
+        return UserEmployeeAuthorityDto.builder()
+            .employeeEmail("taras@gmail.com")
+            .authorities(Collections.emptyList())
+            .build();
+    }
+
     public static Authority getAuthority() {
         List<User> list = new ArrayList<>();
         list.add(createUser());
