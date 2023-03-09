@@ -12,6 +12,7 @@
     <properties>
         <jjwt.version>0.9.1</jjwt.version>
         <passay.version>1.6.0</passay.version>
+        <apache.commons.version>4.4</apache.commons.version>
     </properties>
 
     <artifactId>service-api</artifactId>
@@ -108,6 +109,11 @@
             <artifactId>dao</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${apache.commons.version}</version>
         </dependency>
     </dependencies>
 

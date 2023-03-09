@@ -68,6 +68,21 @@ class AuthorityServiceImplTest {
     }
 
     @Test
+    void updateEmployeesWithEmptyAuthoritiesListTest() {
+        User employee = createEmployee();
+        List<Authority> authority = List.of(getAuthority());
+        List<String> authoritiesName = authority.stream().map(Authority::getName)
+            .collect(Collectors.toList());
+
+        when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(employee));
+        when(authorityRepo.findAuthoritiesByNames(authoritiesName)).thenReturn(authority);
+        employee.setAuthorities(authority);
+        authorityService.updateEmployeesAuthorities(getUserEmployeeWithNoAuthorityDto());
+
+        verify(userRepo).save(employee);
+    }
+
+    @Test
     void updateEmployeesAuthoritiesTestBadRequestException() {
         User employee = createEmployee();
         employee.setRole(Role.ROLE_USER);
