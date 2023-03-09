@@ -72,7 +72,7 @@ class AuthorityServiceImplTest {
         User employee = createEmployee();
         List<Authority> authority = List.of(getAuthority());
         List<String> authoritiesName = authority.stream().map(Authority::getName)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
 
         when(userRepo.findByEmail("taras@gmail.com")).thenReturn(Optional.of(employee));
         when(authorityRepo.findAuthoritiesByNames(authoritiesName)).thenReturn(authority);

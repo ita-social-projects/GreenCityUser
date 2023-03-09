@@ -158,9 +158,9 @@ public class ModelUtils {
 
     public static UserEmployeeAuthorityDto getUserEmployeeWithNoAuthorityDto() {
         return UserEmployeeAuthorityDto.builder()
-                .employeeEmail("taras@gmail.com")
-                .authorities(List.of("test"))
-                .build();
+            .employeeEmail("taras@gmail.com")
+            .authorities(Collections.emptyList())
+            .build();
     }
 
     public static Authority getAuthority() {
