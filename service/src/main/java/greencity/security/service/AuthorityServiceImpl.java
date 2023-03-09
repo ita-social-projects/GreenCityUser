@@ -14,7 +14,7 @@ import greencity.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
+import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -46,7 +46,7 @@ public class AuthorityServiceImpl implements AuthorityService {
         }
 
         List<Authority> authorities = new ArrayList<>();
-        if (!dto.getAuthorities().isEmpty()) {
+        if (CollectionUtils.isNotEmpty(dto.getAuthorities())) {
             authorities = authorityRepo.findAuthoritiesByNames(dto.getAuthorities());
         }
         employee.setAuthorities(authorities);
