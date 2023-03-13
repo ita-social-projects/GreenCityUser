@@ -463,6 +463,10 @@ public class ModelUtils {
         return EmployeeSignUpDto.builder()
             .name("Taras")
             .email("test@mail.com")
+            .positions(List.of(PositionDto.builder()
+                .id(1L)
+                .name("test")
+                .build()))
             .isUbs(true)
             .build();
     }
