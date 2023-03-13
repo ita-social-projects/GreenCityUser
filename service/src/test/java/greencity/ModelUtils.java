@@ -193,6 +193,7 @@ public class ModelUtils {
             .role(Role.ROLE_UBS_EMPLOYEE)
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
+            .restorePasswordEmail(new RestorePasswordEmail())
             .dateOfRegistration(LocalDateTime.now())
             .build();
     }
@@ -463,6 +464,10 @@ public class ModelUtils {
         return EmployeeSignUpDto.builder()
             .name("Taras")
             .email("test@mail.com")
+            .positions(List.of(PositionDto.builder()
+                .id(1L)
+                .name("test")
+                .build()))
             .isUbs(true)
             .build();
     }
