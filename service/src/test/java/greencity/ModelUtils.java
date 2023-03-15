@@ -185,6 +185,25 @@ public class ModelUtils {
             .build();
     }
 
+    public static User getUserWithSocialNetworks() {
+        List<SocialNetwork> socialNetwork = new ArrayList<>();
+        socialNetwork.add(SocialNetwork.builder()
+            .id(1L)
+            .url("https://www.facebook.com")
+            .build());
+        return User.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .language(ModelUtils.getLanguage())
+            .socialNetworks(socialNetwork)
+            .lastActivityTime(LocalDateTime.now())
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .build();
+    }
+
     public static User getUserWithUbsRole() {
         return User.builder()
             .id(1L)
@@ -306,6 +325,23 @@ public class ModelUtils {
                 .id(1L)
                 .code("ua")
                 .build())
+            .build();
+    }
+
+    public static UserProfileDtoRequest getUserProfileDtoRequest() {
+        return UserProfileDtoRequest.builder()
+            .name("Name")
+            .city("City")
+            .userCredo("userCredo")
+            .socialNetworks(List.of(
+                "https://www.facebook.com",
+                "https://www.instagram.com",
+                "https://www.youtube.com",
+                "https://www.gmail.com",
+                "https://www.google.com"))
+            .showLocation(true)
+            .showEcoPlace(true)
+            .showShoppingList(true)
             .build();
     }
 
