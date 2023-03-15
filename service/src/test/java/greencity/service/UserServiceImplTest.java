@@ -4,6 +4,7 @@ import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
+import greencity.constant.UpdateConstants;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
@@ -813,6 +814,27 @@ class UserServiceImplTest {
     }
 
     @Test
+    void saveUserProfileTest() {
+        var request = ModelUtils.getUserProfileDtoRequest();
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void saveUserProfileThrowWrongEmailExceptionTest() {
+        var request = UserProfileDtoRequest.builder().build();
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+        Exception thrown = assertThrows(WrongEmailException.class,
+            () -> userService.saveUserProfile(request, "test@gmail.com"));
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "test@gmail.com", thrown.getMessage());
+        verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
     void getSixFriendsWithTheHighestRatingTest() {
         UserProfilePictureDto e = new UserProfilePictureDto();
         List<UserProfilePictureDto> list = Collections.singletonList(e);
@@ -1226,6 +1248,15 @@ class UserServiceImplTest {
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         UbsTableCreationDto actual = UbsTableCreationDto.builder().uuid(user.getUuid()).build();
         assertEquals(actual, userService.createUbsRecord(userVO));
+    }
+
+    @Test
+    void createUbsRecordThrowNotFoundExceptionTest() {
+        when(userRepo.findById(1L)).thenReturn(Optional.empty());
+        Exception thrown = assertThrows(NotFoundException.class,
+            () -> userService.createUbsRecord(userVO));
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, thrown.getMessage());
+        verify(userRepo).findById(1L);
     }
 
     @Test
