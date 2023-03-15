@@ -20,8 +20,8 @@ public final class ValidationConstants {
     public static final int PLACE_NAME_MAX_LENGTH = 30;
     public static final String USERNAME_REGEXP =
         "^(?!.*\\.\\.)(?!.*\\.$)(?!.*\\-\\-)"
-            + "(?=[ЁІЇҐЄА-ЯA-Z])"
-            + "[ЁёІіЇїҐґЄєА-Яа-яA-Za-z0-9\\s-'’.\\\"]"
+            + "(?=[ЄІЇҐЁА-Яа-яA-Za-z])"
+            + "[ЄІЇҐЁєіїґёА-Яа-яA-Za-z0-9\\s-'’.\\\"]"
             + "{1,30}"
             + "(?<![ЭэЁёъЪЫы])$";
 
