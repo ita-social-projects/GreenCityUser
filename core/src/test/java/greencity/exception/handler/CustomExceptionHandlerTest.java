@@ -17,6 +17,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartException;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -198,5 +199,13 @@ class CustomExceptionHandlerTest {
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
         ResponseEntity<Object> body = status.body(validationDto);
         assertEquals(customExceptionHandler.handleBadUserStatusException(actual), body);
+    }
+
+    @Test
+    void handleProfilePictureSizeExceededException(){
+        MultipartException multipartException= new MultipartException("Maximum upload size exceeded; nested exception is java.lang.IllegalStateException: org.apache.tomcat.util.http.fileupload.FileUploadBase$SizeLimitExceededException: the request was rejected because its size (15478446) exceeds the configured maximum (10485760)");
+        ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
+        ResponseEntity<Object> body = status.body(multipartException.getMessage());
+        assertEquals(customExceptionHandler.handleBadRequestWhenProfilePictureExceeded(multipartException), body);
     }
 }
