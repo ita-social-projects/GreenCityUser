@@ -202,8 +202,9 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleProfilePictureSizeExceededException(){
-        MultipartException multipartException= new MultipartException("Maximum upload size exceeded; nested exception is java.lang.IllegalStateException: org.apache.tomcat.util.http.fileupload.FileUploadBase$SizeLimitExceededException: the request was rejected because its size (15478446) exceeds the configured maximum (10485760)");
+    void handleProfilePictureSizeExceededException() {
+        MultipartException multipartException = new MultipartException(
+            "Maximum upload size exceeded; nested exception is java.lang.IllegalStateException: org.apache.tomcat.util.http.fileupload.FileUploadBase$SizeLimitExceededException: the request was rejected because its size (15478446) exceeds the configured maximum (10485760)");
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
         ResponseEntity<Object> body = status.body(multipartException.getMessage());
         assertEquals(customExceptionHandler.handleBadRequestWhenProfilePictureExceeded(multipartException), body);
