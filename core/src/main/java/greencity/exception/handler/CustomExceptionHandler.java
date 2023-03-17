@@ -334,6 +334,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
     }
 
+    /**
+     * Method interceptor exception {@link MultipartException}
+     * @param me Exception witch should be intercepted
+     * @return {@link ResponseEntity} witch contain http status and body with message of exception.
+     */
     @ExceptionHandler(MultipartException.class)
     public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(MultipartException me) {
         log.error("Error when profile picture was being uploaded {}", me);
