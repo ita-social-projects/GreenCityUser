@@ -335,7 +335,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(MultipartException.class)
-    public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(MultipartException me){
+    public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(MultipartException me) {
         log.error("Error when profile picture was being uploaded {}", me);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(me.getMessage());
     }

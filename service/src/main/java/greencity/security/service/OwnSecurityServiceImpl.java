@@ -60,7 +60,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final ModelMapper modelMapper;
     private final UserRepo userRepo;
     private static final String VALID_PW_CHARS =
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final AchievementService achievementService;
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
@@ -70,14 +70,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Autowired
     public OwnSecurityServiceImpl(OwnSecurityRepo ownSecurityRepo,
-                                  UserService userService,
-                                  PasswordEncoder passwordEncoder,
-                                  JwtTool jwtTool,
-                                  @Value("${verifyEmailTimeHour}") Integer expirationTime,
-                                  RestorePasswordEmailRepo restorePasswordEmailRepo,
-                                  ModelMapper modelMapper,
-                                  UserRepo userRepo,
-                                  AchievementService achievementService, EmailService emailService, AuthorityRepo authorityRepo) {
+        UserService userService,
+        PasswordEncoder passwordEncoder,
+        JwtTool jwtTool,
+        @Value("${verifyEmailTimeHour}") Integer expirationTime,
+        RestorePasswordEmailRepo restorePasswordEmailRepo,
+        ModelMapper modelMapper,
+        UserRepo userRepo,
+        AchievementService achievementService, EmailService emailService, AuthorityRepo authorityRepo) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -107,7 +107,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
             emailService.sendVerificationEmail(savedUser.getId(), savedUser.getName(), savedUser.getEmail(),
-                    savedUser.getVerifyEmail().getToken(), language, dto.isUbs());
+                savedUser.getVerifyEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
@@ -119,20 +119,20 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     private User createNewRegisteredUser(OwnSignUpDto dto, String refreshTokenKey, String language) {
         return User.builder()
-                .name(dto.getName())
-                .firstName(dto.getName())
-                .email(dto.getEmail())
-                .dateOfRegistration(LocalDateTime.now())
-                .role(Role.ROLE_USER)
-                .refreshTokenKey(refreshTokenKey)
-                .lastActivityTime(LocalDateTime.now())
-                .userStatus(UserStatus.CREATED)
-                .emailNotification(EmailNotification.DISABLED)
-                .rating(AppConstant.DEFAULT_RATING)
-                .language(Language.builder()
-                        .id(modelMapper.map(language, Long.class))
-                        .build())
-                .build();
+            .name(dto.getName())
+            .firstName(dto.getName())
+            .email(dto.getEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .role(Role.ROLE_USER)
+            .refreshTokenKey(refreshTokenKey)
+            .lastActivityTime(LocalDateTime.now())
+            .userStatus(UserStatus.CREATED)
+            .emailNotification(EmailNotification.DISABLED)
+            .rating(AppConstant.DEFAULT_RATING)
+            .language(Language.builder()
+                .id(modelMapper.map(language, Long.class))
+                .build())
+            .build();
     }
 
     private void setUsersFields(OwnSignUpDto dto, User user) {
@@ -146,11 +146,12 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
         return RestorePasswordEmail.builder()
-                .user(user)
-                .token(emailVerificationToken)
-                .expiryDate(calculateExpirationDateTime())
-                .build();
+            .user(user)
+            .token(emailVerificationToken)
+            .expiryDate(calculateExpirationDateTime())
+            .build();
     }
+
     private void setUsersFieldsEmployee(OwnSignUpDto dto, User employee) {
         OwnSecurity ownSecurity = createOwnSecurity(dto, employee);
         RestorePasswordEmail restorePasswordEmail = createRestorePasswordEmail(employee, jwtTool.generateTokenKey());
@@ -165,17 +166,17 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     private OwnSecurity createOwnSecurity(OwnSignUpDto dto, User user) {
         return OwnSecurity.builder()
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .user(user)
-                .build();
+            .password(passwordEncoder.encode(dto.getPassword()))
+            .user(user)
+            .build();
     }
 
     private VerifyEmail createVerifyEmail(User user, String emailVerificationToken) {
         return VerifyEmail.builder()
-                .user(user)
-                .token(emailVerificationToken)
-                .expiryDate(calculateExpirationDateTime())
-                .build();
+            .user(user)
+            .token(emailVerificationToken)
+            .expiryDate(calculateExpirationDateTime())
+            .build();
     }
 
     private List<UserAchievement> createUserAchievements(User user) {
@@ -208,7 +209,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setShowEcoPlace(true);
         employee.setShowShoppingList(true);
         List<String> positionNames = employeeSignUpDto.getPositions().stream()
-                .map(PositionDto::getName).collect(Collectors.toList());
+            .map(PositionDto::getName).collect(Collectors.toList());
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);
 
@@ -216,7 +217,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());
             emailService.sendRestoreEmail(savedUser.getId(), savedUser.getFirstName(), employee.getEmail(),
-                    savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
+                savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
@@ -227,37 +228,37 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     static List<UserAchievement> getUserAchievements(User user, AchievementService achievementService) {
         List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
         return achievementList.stream()
-                .map(a -> {
-                    UserAchievement userAchievement = new UserAchievement();
-                    userAchievement.setAchievement(a);
-                    userAchievement.setUser(user);
-                    return userAchievement;
-                })
-                .collect(Collectors.toList());
+            .map(a -> {
+                UserAchievement userAchievement = new UserAchievement();
+                userAchievement.setAchievement(a);
+                userAchievement.setUser(user);
+                return userAchievement;
+            })
+            .collect(Collectors.toList());
     }
 
     static List<UserAction> getUserActions(User user, AchievementService achievementService) {
         List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
         return achievementList.stream()
-                .map(a -> {
-                    UserAction userAction = new UserAction();
-                    userAction.setAchievementCategory(a.getAchievementCategory());
-                    userAction.setUser(user);
-                    return userAction;
-                })
-                .collect(Collectors.toList());
+            .map(a -> {
+                UserAction userAction = new UserAction();
+                userAction.setAchievementCategory(a.getAchievementCategory());
+                userAction.setUser(user);
+                return userAction;
+            })
+            .collect(Collectors.toList());
     }
 
     static List<Achievement> buildAchievementList(List<AchievementVO> achievementVOList) {
         List<Achievement> achievements = new ArrayList<>();
         for (AchievementVO achievementVO : achievementVOList) {
             achievements.add(Achievement.builder()
-                    .id(achievementVO.getId())
-                    .achievementCategory(AchievementCategory.builder()
-                            .id(achievementVO.getAchievementCategory().getId())
-                            .name(achievementVO.getAchievementCategory().getName())
-                            .build())
-                    .build());
+                .id(achievementVO.getId())
+                .achievementCategory(AchievementCategory.builder()
+                    .id(achievementVO.getAchievementCategory().getId())
+                    .name(achievementVO.getAchievementCategory().getName())
+                    .build())
+                .build());
         }
         return achievements;
     }
@@ -322,8 +323,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         if (jwtTool.isTokenValid(refreshToken, user.getRefreshTokenKey())) {
             user.setRefreshTokenKey(newRefreshTokenKey);
             return new AccessRefreshTokensDto(
-                    jwtTool.createAccessToken(user.getEmail(), user.getRole()),
-                    jwtTool.createRefreshToken(user));
+                jwtTool.createAccessToken(user.getEmail(), user.getRole()),
+                jwtTool.createRefreshToken(user));
         }
         throw new BadRefreshTokenException(ErrorMessage.REFRESH_TOKEN_NOT_VALID);
     }
@@ -377,32 +378,32 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         OwnSecurity ownSecurity = managementCreateOwnSecurity(user);
         user.setOwnSecurity(ownSecurity);
         return modelMapper.map(
-                savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey()), UserAdminRegistrationDto.class);
+            savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey()), UserAdminRegistrationDto.class);
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
         return User.builder()
-                .name(dto.getName())
-                .email(dto.getEmail())
-                .dateOfRegistration(LocalDateTime.now())
-                .role(dto.getRole())
-                .refreshTokenKey(refreshTokenKey)
-                .lastActivityTime(LocalDateTime.now())
-                .userStatus(dto.getUserStatus())
-                .emailNotification(EmailNotification.DISABLED)
-                .rating(AppConstant.DEFAULT_RATING)
-                .language(Language.builder()
-                        .id(2L)
-                        .code("en")
-                        .build())
-                .build();
+            .name(dto.getName())
+            .email(dto.getEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .role(dto.getRole())
+            .refreshTokenKey(refreshTokenKey)
+            .lastActivityTime(LocalDateTime.now())
+            .userStatus(dto.getUserStatus())
+            .emailNotification(EmailNotification.DISABLED)
+            .rating(AppConstant.DEFAULT_RATING)
+            .language(Language.builder()
+                .id(2L)
+                .code("en")
+                .build())
+            .build();
     }
 
     private OwnSecurity managementCreateOwnSecurity(User user) {
         return OwnSecurity.builder()
-                .password(passwordEncoder.encode(generatePassword()))
-                .user(user)
-                .build();
+            .password(passwordEncoder.encode(generatePassword()))
+            .user(user)
+            .build();
     }
 
     /**
@@ -413,26 +414,26 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private String generatePassword() {
         SecureRandom secureRandom = new SecureRandom();
         String upperCaseLetters =
-                RandomStringUtils.random(2, 0, 27, true, true, VALID_PW_CHARS.toCharArray(), secureRandom);
+            RandomStringUtils.random(2, 0, 27, true, true, VALID_PW_CHARS.toCharArray(), secureRandom);
         String lowerCaseLetters =
-                RandomStringUtils.random(2, 27, 53, true, true, VALID_PW_CHARS.toCharArray(), secureRandom);
+            RandomStringUtils.random(2, 27, 53, true, true, VALID_PW_CHARS.toCharArray(), secureRandom);
         String numbers = String.valueOf(secureRandom.nextInt(100));
         String specialChar =
-                RandomStringUtils
-                        .random(2, 0, 0, false, false, "!@#$%^&*()-_=+{}[]|:;<>?,./".toCharArray(), secureRandom);
+            RandomStringUtils
+                .random(2, 0, 0, false, false, "!@#$%^&*()-_=+{}[]|:;<>?,./".toCharArray(), secureRandom);
         String totalChars = RandomStringUtils.random(2, 0, 0, true, true,
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray(), secureRandom);
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray(), secureRandom);
         String combinedChars = upperCaseLetters.concat(lowerCaseLetters)
-                .concat(numbers)
-                .concat(specialChar)
-                .concat(totalChars);
+            .concat(numbers)
+            .concat(specialChar)
+            .concat(totalChars);
         List<Character> pwdChars = combinedChars.chars()
-                .mapToObj(c -> (char) c)
-                .collect(Collectors.toList());
+            .mapToObj(c -> (char) c)
+            .collect(Collectors.toList());
         Collections.shuffle(pwdChars);
         return pwdChars.stream()
-                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
-                .toString();
+            .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+            .toString();
     }
 
     /**
@@ -444,11 +445,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     private User savePasswordRestorationTokenForUser(User user, String token) {
         RestorePasswordEmail restorePasswordEmail =
-                RestorePasswordEmail.builder()
-                        .user(user)
-                        .token(token)
-                        .expiryDate(calculateExpirationDate(expirationTime))
-                        .build();
+            RestorePasswordEmail.builder()
+                .user(user)
+                .token(token)
+                .expiryDate(calculateExpirationDate(expirationTime))
+                .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
         user = userRepo.save(user);
         emailService.sendApprovalEmail(user.getId(), user.getName(), user.getEmail(), token);
@@ -472,7 +473,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     public boolean hasPassword(String email) {
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return user.getOwnSecurity() != null;
     }
 
@@ -481,7 +482,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     public void setPassword(SetPasswordDto dto, String email) {
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         if (hasPassword(email)) {
             throw new UserAlreadyHasPasswordException(ErrorMessage.USER_ALREADY_HAS_PASSWORD);
         }
@@ -489,9 +490,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
         user.setOwnSecurity(OwnSecurity.builder()
-                .password(passwordEncoder.encode(dto.getPassword()))
-                .user(user)
-                .build());
+            .password(passwordEncoder.encode(dto.getPassword()))
+            .user(user)
+            .build());
         userRepo.save(user);
     }
 }
