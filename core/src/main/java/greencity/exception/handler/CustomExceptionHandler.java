@@ -335,11 +335,11 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Method interceptor exception {@link MultipartException}
-     * 
+     * Method interceptor exception {@link MultipartException}.
+     *
      * @param me Exception witch should be intercepted
-     * @return ResponseEntity witch contain http status and body with
-     *         message of exception.
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
      */
     @ExceptionHandler(MultipartException.class)
     public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(MultipartException me) {
