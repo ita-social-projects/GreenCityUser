@@ -177,11 +177,10 @@ class OwnSecurityServiceImplTest {
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn("New-token-key");
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(achievementService, times(4)).findAll();
+        verify(achievementService, times(2)).findAll();
         verify(modelMapper, times(2)).map(any(), any());
         verify(userRepo).save(any());
-        verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
-        verify(jwtTool, times(2)).generateTokenKey();
+        verify(jwtTool, times(1)).generateTokenKey();
     }
 
     @Test
