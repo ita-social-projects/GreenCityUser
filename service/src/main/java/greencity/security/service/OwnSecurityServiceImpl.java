@@ -144,14 +144,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setUserActions(userActionsList);
     }
 
-    private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
-        return RestorePasswordEmail.builder()
-            .user(user)
-            .token(emailVerificationToken)
-            .expiryDate(calculateExpirationDateTime())
-            .build();
-    }
-
     private OwnSecurity createOwnSecurity(OwnSignUpDto dto, User user) {
         return OwnSecurity.builder()
             .password(passwordEncoder.encode(dto.getPassword()))
@@ -185,11 +177,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employeeSignUpDto.setPassword(password);
         OwnSignUpDto dto = modelMapper.map(employeeSignUpDto, OwnSignUpDto.class);
         User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
-        setUsersFields(dto, employee);
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
+        setUsersFields(dto, employee);
         employee.setUuid(employeeSignUpDto.getUuid());
-        employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate()));
-
         employee.setShowLocation(true);
         employee.setShowEcoPlace(true);
         employee.setShowShoppingList(true);
@@ -201,7 +191,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());
             emailService.sendRestoreEmail(savedUser.getId(), savedUser.getFirstName(), employee.getEmail(),
-                savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
+                savedUser.getVerifyEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
