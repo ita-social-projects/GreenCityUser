@@ -208,8 +208,7 @@ class OwnSecurityServiceImplTest {
         assertThrows(UserAlreadyRegisteredException.class,
             () -> ownSecurityService.signUpEmployee(employeeSignUpDto, "en"));
 
-        verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
-        verify(jwtTool, times(2)).generateTokenKey();
+        verify(jwtTool, times(1)).generateTokenKey();
     }
 
     @Test

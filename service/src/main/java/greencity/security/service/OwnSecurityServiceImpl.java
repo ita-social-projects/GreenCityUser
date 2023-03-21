@@ -144,26 +144,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setUserActions(userActionsList);
     }
 
-    private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
-        return RestorePasswordEmail.builder()
-            .user(user)
-            .token(emailVerificationToken)
-            .expiryDate(calculateExpirationDateTime())
-            .build();
-    }
-
-    private void setUsersFieldsEmployee(OwnSignUpDto dto, User employee) {
-        OwnSecurity ownSecurity = createOwnSecurity(dto, employee);
-        RestorePasswordEmail restorePasswordEmail = createRestorePasswordEmail(employee, jwtTool.generateTokenKey());
-        List<UserAchievement> userAchievementList = createUserAchievements(employee);
-        List<UserAction> userActionsList = createUserActions(employee);
-        employee.setOwnSecurity(ownSecurity);
-        employee.setRestorePasswordEmail(restorePasswordEmail);
-        employee.setUserAchievements(userAchievementList);
-        employee.setUserActions(userActionsList);
-        employee.setUuid(UUID.randomUUID().toString());
-    }
-
     private OwnSecurity createOwnSecurity(OwnSignUpDto dto, User user) {
         return OwnSecurity.builder()
             .password(passwordEncoder.encode(dto.getPassword()))
@@ -196,15 +176,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         String password = generatePassword();
         employeeSignUpDto.setPassword(password);
         OwnSignUpDto dto = modelMapper.map(employeeSignUpDto, OwnSignUpDto.class);
-
         User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
-        setUsersFieldsEmployee(dto, employee);
         setUsersFields(dto, employee);
-        employee.setRole(Role.ROLE_UBS_EMPLOYEE);
         employee.setUuid(employeeSignUpDto.getUuid());
-        employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate()));
-
         employee.setShowLocation(true);
         employee.setShowEcoPlace(true);
         employee.setShowShoppingList(true);
@@ -212,12 +187,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .map(PositionDto::getName).collect(Collectors.toList());
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);
-
         try {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());
             emailService.sendRestoreEmail(savedUser.getId(), savedUser.getFirstName(), employee.getEmail(),
-                savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
+                savedUser.getVerifyEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
