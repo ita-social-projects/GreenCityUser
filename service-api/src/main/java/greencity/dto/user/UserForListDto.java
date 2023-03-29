@@ -3,27 +3,32 @@ package greencity.dto.user;
 import greencity.constant.ValidationConstants;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 @EqualsAndHashCode
 public class UserForListDto {
     @NotNull
     private Long id;
 
-    @NotBlank
-    @Size(
-        min = ValidationConstants.USERNAME_MIN_LENGTH,
-        max = ValidationConstants.USERNAME_MAX_LENGTH)
+    @Pattern(
+        regexp = ValidationConstants.USERNAME_REGEXP,
+        message = ValidationConstants.USERNAME_MESSAGE)
     private String name;
 
     private LocalDateTime dateOfRegistration;

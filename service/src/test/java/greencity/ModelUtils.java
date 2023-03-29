@@ -9,6 +9,7 @@ import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.position.PositionDto;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
@@ -155,6 +156,13 @@ public class ModelUtils {
             .build();
     }
 
+    public static UserEmployeeAuthorityDto getUserEmployeeWithNoAuthorityDto() {
+        return UserEmployeeAuthorityDto.builder()
+            .employeeEmail("taras@gmail.com")
+            .authorities(Collections.emptyList())
+            .build();
+    }
+
     public static Authority getAuthority() {
         List<User> list = new ArrayList<>();
         list.add(createUser());
@@ -177,6 +185,25 @@ public class ModelUtils {
             .build();
     }
 
+    public static User getUserWithSocialNetworks() {
+        List<SocialNetwork> socialNetwork = new ArrayList<>();
+        socialNetwork.add(SocialNetwork.builder()
+            .id(1L)
+            .url("https://www.facebook.com")
+            .build());
+        return User.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .language(ModelUtils.getLanguage())
+            .socialNetworks(socialNetwork)
+            .lastActivityTime(LocalDateTime.now())
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .build();
+    }
+
     public static User getUserWithUbsRole() {
         return User.builder()
             .id(1L)
@@ -185,6 +212,7 @@ public class ModelUtils {
             .role(Role.ROLE_UBS_EMPLOYEE)
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
+            .restorePasswordEmail(new RestorePasswordEmail())
             .dateOfRegistration(LocalDateTime.now())
             .build();
     }
@@ -297,6 +325,23 @@ public class ModelUtils {
                 .id(1L)
                 .code("ua")
                 .build())
+            .build();
+    }
+
+    public static UserProfileDtoRequest getUserProfileDtoRequest() {
+        return UserProfileDtoRequest.builder()
+            .name("Name")
+            .city("City")
+            .userCredo("userCredo")
+            .socialNetworks(List.of(
+                "https://www.facebook.com",
+                "https://www.instagram.com",
+                "https://www.youtube.com",
+                "https://www.gmail.com",
+                "https://www.google.com"))
+            .showLocation(true)
+            .showEcoPlace(true)
+            .showShoppingList(true)
             .build();
     }
 
@@ -469,6 +514,14 @@ public class ModelUtils {
             .email("test@mail.com")
             .password("Test@123")
             .isUbs(true)
+            .build();
+    }
+
+    public static UbsProfileCreationDto getUbsProfileCreationDto() {
+        return UbsProfileCreationDto.builder()
+            .name("UbsProfile")
+            .email("ubsuser@mail.com")
+            .uuid("f81d4fae-7dec-11d0-a765-00a0c91e6bf6")
             .build();
     }
 }

@@ -255,7 +255,7 @@ class UserControllerTest {
 
         String content = "{\n"
             + "  \"emailNotification\": \"DISABLED\",\n"
-            + "  \"name\": \"string\"\n"
+            + "  \"name\": \"String\"\n"
             + "}";
 
         ObjectMapper mapper = new ObjectMapper();
@@ -844,5 +844,14 @@ class UserControllerTest {
         mockMvc.perform(put(userLink + "/deactivate-employee").param("uuid", uuid))
             .andExpect(status().isOk());
         verify(userService).markUserAsDeactivated(uuid);
+    }
+
+    @Test
+    void checkIfUserExistsByUuidTest() throws Exception {
+        when(userService.checkIfUserExistsByUuid(TestConst.UUID)).thenReturn(true);
+        mockMvc.perform(get(userLink + "/checkByUuid")
+            .param("uuid", TestConst.UUID))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value(true));
     }
 }

@@ -4,6 +4,7 @@ import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
+import greencity.constant.UpdateConstants;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
@@ -24,6 +25,9 @@ import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,6 +48,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static greencity.ModelUtils.*;
 import static greencity.enums.Role.ROLE_USER;
@@ -809,6 +814,27 @@ class UserServiceImplTest {
     }
 
     @Test
+    void saveUserProfileTest() {
+        var request = ModelUtils.getUserProfileDtoRequest();
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void saveUserProfileThrowWrongEmailExceptionTest() {
+        var request = UserProfileDtoRequest.builder().build();
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+        Exception thrown = assertThrows(WrongEmailException.class,
+            () -> userService.saveUserProfile(request, "test@gmail.com"));
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "test@gmail.com", thrown.getMessage());
+        verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
     void getSixFriendsWithTheHighestRatingTest() {
         UserProfilePictureDto e = new UserProfilePictureDto();
         List<UserProfilePictureDto> list = Collections.singletonList(e);
@@ -1225,6 +1251,15 @@ class UserServiceImplTest {
     }
 
     @Test
+    void createUbsRecordThrowNotFoundExceptionTest() {
+        when(userRepo.findById(1L)).thenReturn(Optional.empty());
+        Exception thrown = assertThrows(NotFoundException.class,
+            () -> userService.createUbsRecord(userVO));
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, thrown.getMessage());
+        verify(userRepo).findById(1L);
+    }
+
+    @Test
     void deleteUserProfilePictureTest() {
         String email = "test@gmail.com";
         String picture = "picture";
@@ -1253,5 +1288,18 @@ class UserServiceImplTest {
 
         assertThrows(LowRoleLevelException.class,
             () -> userService.findAdminById(2L));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideUuidOptionalUserResultForCheckIfUserExistsByUuidTest")
+    void checkIfUserExistsByUuidTest(String uuid, Optional<User> user, boolean existence) {
+        when(userRepo.findUserByUuid(uuid)).thenReturn(user);
+        assertEquals(existence, userService.checkIfUserExistsByUuid(uuid));
+    }
+
+    private static Stream<Arguments> provideUuidOptionalUserResultForCheckIfUserExistsByUuidTest() {
+        return Stream.of(
+            Arguments.of("444e66e8-8daa-4cb0-8269-a8d856e7dd15", Optional.of(getUser()), true),
+            Arguments.of("uuid", Optional.empty(), false));
     }
 }

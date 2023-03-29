@@ -262,6 +262,12 @@ spec:
             secretKeyRef:
               name: {{ .Values.externalSecret.secretName }}
               key: GREENCITY-CHAT-SERVER-ADDRESS
+        
+        - name: GREENCITY_UBS_SERVER_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.externalSecret.secretName }}
+              key: GREENCITY-UBS-SERVER-ADDRESS
 
         - name: GOOGLE_CLIENT_ID_MANAGER
           valueFrom:

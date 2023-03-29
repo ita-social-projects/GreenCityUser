@@ -1,6 +1,5 @@
 package greencity.security.service;
 
-import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
@@ -64,7 +63,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final AchievementService achievementService;
     private final EmailService emailService;
-
     private final AuthorityRepo authorityRepo;
 
     /**
@@ -79,8 +77,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         ModelMapper modelMapper,
         UserRepo userRepo,
-        AchievementService achievementService, EmailService emailService, RestClient restClient,
-        AuthorityRepo authorityRepo) {
+        AchievementService achievementService, EmailService emailService, AuthorityRepo authorityRepo) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
@@ -104,6 +101,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     public SuccessSignUpDto signUp(OwnSignUpDto dto, String language) {
         User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
         setUsersFields(dto, user);
+        user.setVerifyEmail(createVerifyEmail(user, jwtTool.generateTokenKey()));
         user.setUuid(UUID.randomUUID().toString());
         try {
             User savedUser = userRepo.save(user);
@@ -128,7 +126,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .role(Role.ROLE_USER)
             .refreshTokenKey(refreshTokenKey)
             .lastActivityTime(LocalDateTime.now())
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
             .language(Language.builder()
@@ -137,15 +135,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .build();
     }
 
-    private void setUsersFields(OwnSignUpDto dto, User employee) {
-        OwnSecurity ownSecurity = createOwnSecurity(dto, employee);
-        VerifyEmail verifyEmail = createVerifyEmail(employee, jwtTool.generateTokenKey());
-        List<UserAchievement> userAchievementList = createUserAchievements(employee);
-        List<UserAction> userActionsList = createUserActions(employee);
-        employee.setOwnSecurity(ownSecurity);
-        employee.setVerifyEmail(verifyEmail);
-        employee.setUserAchievements(userAchievementList);
-        employee.setUserActions(userActionsList);
+    private void setUsersFields(OwnSignUpDto dto, User user) {
+        OwnSecurity ownSecurity = createOwnSecurity(dto, user);
+        List<UserAchievement> userAchievementList = createUserAchievements(user);
+        List<UserAction> userActionsList = createUserActions(user);
+        user.setOwnSecurity(ownSecurity);
+        user.setUserAchievements(userAchievementList);
+        user.setUserActions(userActionsList);
     }
 
     private OwnSecurity createOwnSecurity(OwnSignUpDto dto, User user) {

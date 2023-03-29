@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolation;
@@ -331,5 +332,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ValidationExceptionDto validationExceptionDto =
             new ValidationExceptionDto(AppConstant.USER_STATUS, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
+    }
+
+    /**
+     * Method interceptor exception {@link MultipartException}.
+     *
+     * @param me Exception witch should be intercepted
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     */
+    @ExceptionHandler(MultipartException.class)
+    public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(MultipartException me) {
+        log.error("Error when profile picture was being uploaded {}", me);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(me.getMessage());
     }
 }
