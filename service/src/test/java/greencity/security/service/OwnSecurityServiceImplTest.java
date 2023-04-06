@@ -180,6 +180,7 @@ class OwnSecurityServiceImplTest {
         verify(achievementService, times(2)).findAll();
         verify(modelMapper, times(2)).map(any(), any());
         verify(userRepo).save(any());
+        verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
         verify(jwtTool, times(1)).generateTokenKey();
     }
 
@@ -208,6 +209,7 @@ class OwnSecurityServiceImplTest {
             () -> ownSecurityService.signUpEmployee(employeeSignUpDto, "en"));
 
         verify(jwtTool, times(1)).generateTokenKey();
+        verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
     }
 
     @Test
