@@ -342,9 +342,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         if (!updatePasswordDto.getPassword().equals(updatePasswordDto.getConfirmPassword())) {
             throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
-        if (!passwordEncoder.matches(updatePasswordDto.getCurrentPassword(), user.getOwnSecurity().getPassword())) {
-            throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
-        }
         updatePassword(updatePasswordDto.getPassword(), user.getId());
     }
 

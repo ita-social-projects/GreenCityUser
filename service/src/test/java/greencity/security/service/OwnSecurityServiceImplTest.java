@@ -1,7 +1,6 @@
 package greencity.security.service;
 
 import greencity.TestConst;
-import greencity.client.RestClient;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -121,7 +120,6 @@ class OwnSecurityServiceImplTest {
             .role(Role.ROLE_USER)
             .build();
         updatePasswordDto = UpdatePasswordDto.builder()
-            .currentPassword("password")
             .password("newPassword")
             .confirmPassword("newPassword")
             .build();
@@ -372,8 +370,6 @@ class OwnSecurityServiceImplTest {
     @Test
     void updateCurrentPasswordTest() {
         when(userService.findByEmail("test@gmail.com")).thenReturn(verifiedUser);
-        when(passwordEncoder.matches(updatePasswordDto.getCurrentPassword(),
-            verifiedUser.getOwnSecurity().getPassword())).thenReturn(true);
         when(passwordEncoder.encode(updatePasswordDto.getPassword())).thenReturn(updatePasswordDto.getPassword());
         ownSecurityService.updateCurrentPassword(updatePasswordDto, "test@gmail.com");
         verify(ownSecurityRepo).updatePassword(updatePasswordDto.getPassword(), 1L);
@@ -384,15 +380,6 @@ class OwnSecurityServiceImplTest {
         updatePasswordDto.setPassword("123");
         when(userService.findByEmail("test@gmail.com")).thenReturn(verifiedUser);
         assertThrows(PasswordsDoNotMatchesException.class,
-            () -> ownSecurityService.updateCurrentPassword(updatePasswordDto, "test@gmail.com"));
-    }
-
-    @Test
-    void updateCurrentPasswordPasswordsDoNotMatchTest() {
-        when(userService.findByEmail("test@gmail.com")).thenReturn(verifiedUser);
-        when(passwordEncoder.matches(updatePasswordDto.getCurrentPassword(),
-            verifiedUser.getOwnSecurity().getPassword())).thenReturn(false);
-        assertThrows(WrongPasswordException.class,
             () -> ownSecurityService.updateCurrentPassword(updatePasswordDto, "test@gmail.com"));
     }
 
