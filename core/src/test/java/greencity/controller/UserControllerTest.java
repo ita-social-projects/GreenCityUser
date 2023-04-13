@@ -6,6 +6,7 @@ import greencity.TestConst;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
 
+import greencity.constant.AppConstant;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.UpdateEmployeeAuthoritiesDto;
@@ -14,6 +15,7 @@ import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserManagementUpdateDto;
@@ -635,21 +637,44 @@ class UserControllerTest {
 
     @Test
     void updateUserLanguageTest() throws Exception {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        mockMvc.perform(put(userLink + "/{userId}/language/{languageId}", 1, 1)
-            .headers(headers))
+        Principal principal = mock(Principal.class);
+        String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
+        long userId = 1L;
+        UserVO userVO = UserVO.builder()
+            .id(userId)
+            .languageVO(LanguageVO.builder()
+                .id(2L)
+                .code(languageCode)
+                .build())
+            .build();
+
+        when(principal.getName()).thenReturn(TestConst.EMAIL);
+        when(userService.findByEmail(principal.getName())).thenReturn(userVO);
+
+        mockMvc.perform(put(userLink + "/language/{languageId}", 1)
+            .principal(principal))
             .andExpect(status().isOk());
-        verify(userService).updateUserLanguage(1L, 1L);
+
+        verify(userService).updateUserLanguage(userId, 1L);
     }
 
     @Test
     void getUserLang() throws Exception {
+        Principal principal = mock(Principal.class);
+        String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
+        UserVO userVO = ModelUtils.TEST_USER_VO;
+        userVO.setLanguageVO(LanguageVO.builder()
+            .id(2L)
+            .code(languageCode)
+            .build());
+
+        when(principal.getName()).thenReturn(TestConst.EMAIL);
+        when(userService.findByEmail(principal.getName())).thenReturn(userVO);
+
         this.mockMvc.perform(get(userLink + "/lang" + "?id=1")
-            .contentType(MediaType.APPLICATION_JSON))
+            .principal(principal))
+            .andExpect(content().string(languageCode))
             .andExpect(status().isOk());
-        verify(userService).getUserLang(1L);
     }
 
     @Test

@@ -544,15 +544,6 @@ public interface UserService {
     List<String> getDeactivationReason(Long id, String adminLang);
 
     /**
-     * Method for getting {@link String} user language.
-     *
-     * @param id of the searched {@link UserVO}.
-     * @return current user language {@link String}.
-     * @author Vlad Pikhotskyi
-     */
-    String getUserLang(Long id);
-
-    /**
      * Method that update user language column.
      *
      * @param userId     {@link Long} -current user's id.
