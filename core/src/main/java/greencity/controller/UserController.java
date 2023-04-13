@@ -916,7 +916,8 @@ public class UserController {
     /**
      * Method for getting {@link String} user language.
      *
-     * @param id of the searched {@link UserVO}.
+     * @param userVO {@link UserVO} the current user that wants to get his profile
+     *               language
      * @return current user language {@link String}.
      * @author Vlad Pikhotskyi
      */
@@ -927,8 +928,8 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/lang")
-    public ResponseEntity<String> getUserLang(@RequestParam Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserLang(id));
+    public ResponseEntity<String> getUserLang(@ApiIgnore @CurrentUser UserVO userVO) {
+        return ResponseEntity.status(HttpStatus.OK).body(userVO.getLanguageVO().getCode());
     }
 
     /**
@@ -957,7 +958,8 @@ public class UserController {
     /**
      * Method that change user language.
      *
-     * @param userId     {@link Long } user id
+     * @param userVO     {@link UserVO} the current user that wants to change his
+     *                   profile language
      * @param languageId {@link Long} language id.
      */
     @ApiOperation(value = "Update user language")
@@ -966,10 +968,10 @@ public class UserController {
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/{userId}/language/{languageId}")
-    public ResponseEntity<Object> setUserLanguage(@PathVariable @CurrentUserId Long userId,
+    @PutMapping("/language/{languageId}")
+    public ResponseEntity<Object> setUserLanguage(@ApiIgnore @CurrentUser UserVO userVO,
         @PathVariable Long languageId) {
-        userService.updateUserLanguage(userId, languageId);
+        userService.updateUserLanguage(userVO.getId(), languageId);
         return ResponseEntity.ok().build();
     }
 

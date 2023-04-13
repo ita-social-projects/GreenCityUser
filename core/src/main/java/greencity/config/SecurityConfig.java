@@ -135,6 +135,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findFriendByName/**",
                 "/user/findByUuId",
                 "/user/findUuidByEmail",
+                "/user/lang",
                 "/user/createUbsRecord",
                 "/ownSecurity/password-status")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
@@ -151,7 +152,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/ownSecurity/changePassword",
                 "/user/profile",
                 "/user/{id}/updateUserLastActivityTime/{date}",
-                "/user/{userId}/language/{languageId}",
+                "/user/language/{languageId}",
                 "/user/employee-email")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PUT,
