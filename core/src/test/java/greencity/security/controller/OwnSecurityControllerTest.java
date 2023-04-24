@@ -154,7 +154,6 @@ class OwnSecurityControllerTest {
 
         String content = "{\n" +
             "  \"confirmPassword\": \"String123=\",\n" +
-            "  \"currentPassword\": \"String123=\",\n" +
             "  \"password\": \"String124=\"\n" +
             "}";
 

@@ -1036,17 +1036,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUserLang() {
-        User user = ModelUtils.getUser();
-        user.setLanguage(Language.builder()
-            .id(1L)
-            .code("en")
-            .build());
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        assertEquals(user.getLanguage().getCode(), userService.getUserLang(1L));
-    }
-
-    @Test
     void getDeactivationReason() {
         List<String> test1 = List.of();
         User user = ModelUtils.getUser();
