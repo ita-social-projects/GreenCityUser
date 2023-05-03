@@ -158,11 +158,12 @@ class AuthorityServiceImplTest {
     @Test
     void updateEmployeesAuthoritiesThrowsBadRequestExceptionWhenEmployeeTryToEditSuperAdminTest() {
         User employee = createSuperAdmin();
+        var dto = getSuperAdminEmployeeAuthorityDto();
         when(userRepo.findByEmail("superadmin@gmail.com")).thenReturn(Optional.of(employee));
         when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Адмін"));
 
         assertThrows(BadRequestException.class,
-            () -> authorityService.updateEmployeesAuthorities(getSuperAdminEmployeeAuthorityDto()));
+            () -> authorityService.updateEmployeesAuthorities(dto));
         verify(userRepo).findByEmail("superadmin@gmail.com");
         verify(positionService).getEmployeeLoginPositionNames();
     }
