@@ -8,13 +8,35 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
+import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.position.PositionDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.*;
+import greencity.dto.user.EcoNewsAuthorDto;
+import greencity.dto.user.UserAdminRegistrationDto;
+import greencity.dto.user.UserAllFriendsDto;
+import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserProfilePictureDto;
+import greencity.dto.user.UserProfileStatisticsDto;
+import greencity.dto.user.UserVO;
+import greencity.dto.user.UsersFriendDto;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.entity.*;
+
+import greencity.entity.Achievement;
+import greencity.entity.AchievementCategory;
+import greencity.entity.Authority;
+import greencity.entity.Language;
+import greencity.entity.OwnSecurity;
+import greencity.entity.Position;
+import greencity.entity.RestorePasswordEmail;
+import greencity.entity.SocialNetwork;
+import greencity.entity.User;
+import greencity.entity.UserAchievement;
+import greencity.entity.VerifyEmail;
 import greencity.entity.localization.AchievementTranslation;
 import greencity.enums.AchievementStatus;
 import greencity.enums.EmailNotification;
@@ -43,6 +65,7 @@ public class ModelUtils {
     public static final UserProfileStatisticsDto USER_PROFILE_STATISTICS_DTO = createUserProfileStatisticsDto();
     public static final UserManagementDto CREATE_USER_MANAGER_DTO = createUserManagerDto();
     public static final List<UserAllFriendsDto> CREATE_USER_ALL_FRIENDS_DTO = createUserAllFriendsDto();
+    public static final String TEST_EMAIL = "taras@gmail.com";
 
     public static UsersFriendDto usersFriendDto = new UsersFriendDto() {
         @Override
@@ -132,7 +155,7 @@ public class ModelUtils {
         List<User> users = new ArrayList<>();
         users.add(User.builder()
             .id(1L)
-            .email("taras@mail.com")
+            .email("taras@gmail.com")
             .role(Role.ROLE_UBS_EMPLOYEE)
             .build());
         List<Authority> authorities = new ArrayList<>();
@@ -152,23 +175,40 @@ public class ModelUtils {
     public static UserEmployeeAuthorityDto getUserEmployeeAuthorityDto() {
         return UserEmployeeAuthorityDto.builder()
             .employeeEmail("taras@gmail.com")
-            .authorities(List.of("test"))
+            .authorities(List.of("test1"))
             .build();
     }
 
-    public static UserEmployeeAuthorityDto getUserEmployeeWithNoAuthorityDto() {
+    public static UserEmployeeAuthorityDto getSuperAdminEmployeeAuthorityDto() {
         return UserEmployeeAuthorityDto.builder()
-            .employeeEmail("taras@gmail.com")
-            .authorities(Collections.emptyList())
+            .employeeEmail("superadmin@gmail.com")
+            .authorities(List.of("test1"))
             .build();
+    }
+
+    public static List<Position> getPositions() {
+        return List.of(Position.builder()
+            .id(1L)
+            .name("Супер адмін")
+            .build());
     }
 
     public static Authority getAuthority() {
         List<User> list = new ArrayList<>();
         list.add(createUser());
         return Authority.builder()
-            .id(3L)
-            .name("test")
+            .id(1L)
+            .name("test1")
+            .employees(list)
+            .build();
+    }
+
+    public static Authority getNotValidAuthority() {
+        List<User> list = new ArrayList<>();
+        list.add(createUser());
+        return Authority.builder()
+            .id(1L)
+            .name("test2")
             .employees(list)
             .build();
     }
@@ -215,22 +255,6 @@ public class ModelUtils {
             .restorePasswordEmail(new RestorePasswordEmail())
             .dateOfRegistration(LocalDateTime.now())
             .build();
-    }
-
-    public static User getUserWithNewEmail() {
-        return User.builder()
-            .id(1L)
-            .email("test@mail.com")
-            .name(TestConst.NAME)
-            .role(Role.ROLE_USER)
-            .lastActivityTime(LocalDateTime.now())
-            .verifyEmail(new VerifyEmail())
-            .dateOfRegistration(LocalDateTime.now())
-            .build();
-    }
-
-    public static RecommendedFriendDto getRecommendedFriendDto() {
-        return new RecommendedFriendDto(1L, TestConst.NAME, "profile");
     }
 
     public static UserVO getUserVO() {
@@ -446,9 +470,39 @@ public class ModelUtils {
     public static User createEmployee() {
         return User.builder()
             .id(1L)
-            .email("taras@mail.com")
+            .email("taras@gmail.com")
             .authorities(authorities())
             .role(Role.ROLE_UBS_EMPLOYEE)
+            .positions(List.of(Position.builder()
+                .id(1L)
+                .name("Супер адмін")
+                .build()))
+            .build();
+    }
+
+    public static User createEmployeeDriver() {
+        return User.builder()
+            .id(1L)
+            .email("taras@gmail.com")
+            .authorities(authorities())
+            .role(Role.ROLE_UBS_EMPLOYEE)
+            .positions(List.of(Position.builder()
+                .id(1L)
+                .name("Водій")
+                .build()))
+            .build();
+    }
+
+    public static User createSuperAdmin() {
+        return User.builder()
+            .id(1L)
+            .email("superadmin@gmail.com")
+            .authorities(authorities())
+            .role(Role.ROLE_UBS_EMPLOYEE)
+            .positions(List.of(Position.builder()
+                .id(1L)
+                .name("Супер адмін")
+                .build()))
             .build();
     }
 
@@ -459,6 +513,19 @@ public class ModelUtils {
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_ADMIN)
             .authorities(authorities())
+            .build();
+    }
+
+    public static User createEmployeeAdmin() {
+        return User.builder()
+            .id(1L)
+            .email("taras@gmail.com")
+            .authorities(authorities())
+            .role(Role.ROLE_UBS_EMPLOYEE)
+            .positions(List.of(Position.builder()
+                .id(1L)
+                .name("Адмін")
+                .build()))
             .build();
     }
 
@@ -488,14 +555,6 @@ public class ModelUtils {
             .build();
     }
 
-    public static User createUbsAdmin() {
-        return User.builder()
-            .id(2L)
-            .email("email@mail.com")
-            .role(Role.ROLE_UBS_EMPLOYEE)
-            .build();
-    }
-
     public static EmployeeSignUpDto getEmployeeSignUpDto() {
         return EmployeeSignUpDto.builder()
             .name("Taras")
@@ -522,6 +581,25 @@ public class ModelUtils {
             .name("UbsProfile")
             .email("ubsuser@mail.com")
             .uuid("f81d4fae-7dec-11d0-a765-00a0c91e6bf6")
+            .build();
+    }
+
+    public static PositionAuthoritiesDto getPositionAuthoritiesDto() {
+        return PositionAuthoritiesDto.builder()
+            .positionId(List.of(1L))
+            .authorities(List.of("Auth"))
+            .build();
+    }
+
+    public static User getEmployeeWithPositionsAndRelatedAuthorities() {
+        return User.builder()
+            .positions(List.of(Position.builder()
+                .id(1L)
+                .name("Admin")
+                .build()))
+            .authorities(List.of(Authority.builder()
+                .name("Auth")
+                .build()))
             .build();
     }
 }

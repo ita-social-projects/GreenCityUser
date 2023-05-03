@@ -7,12 +7,32 @@ import greencity.dto.position.PositionDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.*;
+import greencity.entity.Achievement;
+import greencity.entity.AchievementCategory;
+import greencity.entity.Authority;
+import greencity.entity.Language;
+import greencity.entity.OwnSecurity;
+import greencity.entity.Position;
+import greencity.entity.RestorePasswordEmail;
+import greencity.entity.User;
+import greencity.entity.UserAchievement;
+import greencity.entity.UserAction;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserBlockedException;
+import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
+import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
@@ -32,7 +52,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +75,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final OwnSecurityRepo ownSecurityRepo;
+    private final PositionRepo positionRepo;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTool jwtTool;
@@ -70,6 +94,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Autowired
     public OwnSecurityServiceImpl(OwnSecurityRepo ownSecurityRepo,
+        PositionRepo positionRepo,
         UserService userService,
         PasswordEncoder passwordEncoder,
         JwtTool jwtTool,
@@ -79,6 +104,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         UserRepo userRepo,
         AchievementService achievementService, EmailService emailService, AuthorityRepo authorityRepo) {
         this.ownSecurityRepo = ownSecurityRepo;
+        this.positionRepo = positionRepo;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTool = jwtTool;
@@ -196,6 +222,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .map(PositionDto::getName).collect(Collectors.toList());
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);
+
+        List<Position> positions = positionRepo.findPositionsByNames(positionNames);
+        employee.setPositions(positions);
+
         try {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());
