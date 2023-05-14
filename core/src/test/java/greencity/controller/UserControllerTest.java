@@ -9,7 +9,7 @@ import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.constant.AppConstant;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
-import greencity.dto.UpdateEmployeeAuthoritiesDto;
+import greencity.dto.EmployeePositionsDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
@@ -29,10 +29,16 @@ import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.repository.UserRepo;
 import greencity.security.service.AuthorityService;
+import greencity.security.service.PositionService;
 import greencity.service.UserService;
 
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,9 +46,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -60,8 +68,14 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -76,6 +90,8 @@ class UserControllerTest {
     private UserRepo userRepo;
     @Mock
     private AuthorityService authorityService;
+    @Mock
+    private PositionService positionService;
     private ObjectMapper objectMapper;
 
     @BeforeEach
@@ -122,7 +138,7 @@ class UserControllerTest {
 
     @Test
     void updateRoleTest() throws Exception {
-        Principal principal = Mockito.mock(Principal.class);
+        Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
         String content = "{\n"
@@ -825,6 +841,34 @@ class UserControllerTest {
     }
 
     @Test
+    void getPositionsAndRelatedAuthoritiesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        mockMvc.perform(get(userLink + "/get-positions-authorities" + "?email=" + principal.getName())
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(principal.getName())))
+            .andExpect(status().isOk());
+
+        verify(positionService).getPositionsAndRelatedAuthorities(principal.getName());
+    }
+
+    @Test
+    void getEmployeeLoginPositionNamesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        mockMvc.perform(get(userLink + "/get-employee-login-positions" + "?email=" + principal.getName())
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(principal.getName())))
+            .andExpect(status().isOk());
+
+        verify(positionService).getEmployeeLoginPositionNames(principal.getName());
+    }
+
+    @Test
     void editAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
         List<String> list = new ArrayList<>();
@@ -850,9 +894,9 @@ class UserControllerTest {
     }
 
     @Test
-    void updateAuthoritiesTest() throws Exception {
+    void updatePositionsAndRelatedAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
-        var dto = new UpdateEmployeeAuthoritiesDto();
+        var dto = new EmployeePositionsDto();
         ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(dto);
         mockMvc.perform(put(userLink + "/authorities")
@@ -860,7 +904,7 @@ class UserControllerTest {
             .content(json)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
-        verify(authorityService).updateAuthorities(dto);
+        verify(authorityService).updateAuthoritiesToRelatedPositions(dto);
     }
 
     @Test
