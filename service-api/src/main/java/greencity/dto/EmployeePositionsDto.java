@@ -12,7 +12,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateEmployeeAuthoritiesDto {
+public class EmployeePositionsDto {
     private String email;
     private List<PositionDto> positions;
 }
