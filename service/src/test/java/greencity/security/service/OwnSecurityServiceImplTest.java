@@ -409,6 +409,19 @@ class OwnSecurityServiceImplTest {
     }
 
     @Test
+    void updateCurrentPasswordEmailNotVerifiedTest() {
+        updatePasswordDto.setPassword("123");
+
+        UserVO user = ModelUtils.getUserVO();
+        user.setUserStatus(UserStatus.CREATED);
+
+        when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+
+        assertThrows(EmailNotVerified.class,
+            () -> ownSecurityService.updateCurrentPassword(updatePasswordDto, "test@gmail.com"));
+    }
+
+    @Test
     void managementRegisterUserTest() {
         User user = ModelUtils.getUser();
         user.setUserStatus(UserStatus.BLOCKED);
