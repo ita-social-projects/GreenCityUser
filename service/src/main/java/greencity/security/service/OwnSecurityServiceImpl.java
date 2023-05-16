@@ -369,6 +369,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     @Transactional
     public void updateCurrentPassword(UpdatePasswordDto updatePasswordDto, String email) {
         UserVO user = userService.findByEmail(email);
+
+        if (user.getUserStatus() != UserStatus.ACTIVATED) {
+            throw new EmailNotVerified(ErrorMessage.USER_EMAIL_IS_NOT_VERIFIED);
+        }
+
         if (!updatePasswordDto.getPassword().equals(updatePasswordDto.getConfirmPassword())) {
             throw new PasswordsDoNotMatchesException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
