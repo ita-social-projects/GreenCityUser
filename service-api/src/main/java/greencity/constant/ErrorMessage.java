@@ -12,7 +12,6 @@ public final class ErrorMessage {
     public static final String USER_FRIENDS_LIST = "You don't have a friend with this id : ";
     public static final String FRIEND_EXISTS = "Friend with this id has already been added : ";
     public static final String NOT_FOUND_REQUEST = "Not found friend request from user with id: ";
-    public static final String NOT_FOUND_AUTHORITY = "Not found employee`s authority with name: ";
     public static final String NOT_FOUND_ANY_FRIENDS = "Not found any friends by id: ";
     public static final String USER_CANNOT_ADD_MORE_THAN_5_SOCIAL_NETWORK_LINKS =
         "User cannot add more than 5 social network links";
@@ -41,6 +40,9 @@ public final class ErrorMessage {
     public static final String LINK_IS_NO_ACTIVE = "This link is no longer active";
     public static final String USER_BLOCKED = "User is blocked";
     public static final String USER_CREATED = "User is not activated";
+    public static final String USER_CANNOT_HAVE_SUCH_AUTHORITIES = "Not valid authorities for this user";
+    public static final String USER_DOES_NOT_LOGIN = "User has not login in the system by this email: ";
+    public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
 
     private ErrorMessage() {
     }

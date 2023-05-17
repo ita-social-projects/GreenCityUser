@@ -28,7 +28,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static greencity.constant.AppConstant.*;
+import static greencity.constant.AppConstant.ADMIN;
+import static greencity.constant.AppConstant.EMPLOYEE;
+import static greencity.constant.AppConstant.MODERATOR;
+import static greencity.constant.AppConstant.UBS_EMPLOYEE;
+import static greencity.constant.AppConstant.USER;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
@@ -161,7 +165,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/deactivate-employee")
             .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
-                "/user/get-all-authorities")
+                "/user/get-all-authorities",
+                "/user/get-positions-authorities",
+                "/user/get-employee-login-positions")
             .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PATCH,
                 "/user/shopping-list-items/{userShoppingListItemId}",

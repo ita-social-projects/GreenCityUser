@@ -1,6 +1,6 @@
 package greencity.security.service;
 
-import greencity.dto.UpdateEmployeeAuthoritiesDto;
+import greencity.dto.EmployeePositionsDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.entity.User;
 import java.util.Set;
@@ -21,10 +21,10 @@ public interface AuthorityService {
     void updateEmployeesAuthorities(UserEmployeeAuthorityDto dto);
 
     /**
-     * Method that update authorities for employee.
+     * Method that update an employee`s authorities to related positions.
      *
      * @param dto contains email and list of positions.
      * @author Nikita Korzh.
      */
-    void updateAuthorities(UpdateEmployeeAuthoritiesDto dto);
+    void updateAuthoritiesToRelatedPositions(EmployeePositionsDto dto);
 }

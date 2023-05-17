@@ -1,10 +1,18 @@
 package greencity.security.service;
 
 import greencity.TestConst;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import greencity.ModelUtils;
@@ -15,11 +23,25 @@ import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
-import greencity.entity.*;
+import greencity.entity.Achievement;
+import greencity.entity.Language;
+import greencity.entity.User;
+import greencity.entity.UserAchievement;
+import greencity.entity.VerifyEmail;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserBlockedException;
+import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
+import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
@@ -59,6 +81,9 @@ class OwnSecurityServiceImplTest {
     OwnSecurityRepo ownSecurityRepo;
 
     @Mock
+    PositionRepo positionRepo;
+
+    @Mock
     UserService userService;
 
     @Mock
@@ -96,7 +121,7 @@ class OwnSecurityServiceImplTest {
     @BeforeEach
     public void init() {
         initMocks(this);
-        ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, userService, passwordEncoder,
+        ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, 1, restorePasswordEmailRepo, modelMapper,
             userRepo, achievementService, emailService, authorityRepo);
 
@@ -380,6 +405,19 @@ class OwnSecurityServiceImplTest {
         updatePasswordDto.setPassword("123");
         when(userService.findByEmail("test@gmail.com")).thenReturn(verifiedUser);
         assertThrows(PasswordsDoNotMatchesException.class,
+            () -> ownSecurityService.updateCurrentPassword(updatePasswordDto, "test@gmail.com"));
+    }
+
+    @Test
+    void updateCurrentPasswordEmailNotVerifiedTest() {
+        updatePasswordDto.setPassword("123");
+
+        UserVO user = ModelUtils.getUserVO();
+        user.setUserStatus(UserStatus.CREATED);
+
+        when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+
+        assertThrows(EmailNotVerified.class,
             () -> ownSecurityService.updateCurrentPassword(updatePasswordDto, "test@gmail.com"));
     }
 

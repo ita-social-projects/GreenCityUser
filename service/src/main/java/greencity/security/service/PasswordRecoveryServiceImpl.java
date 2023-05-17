@@ -112,6 +112,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
                 user.getName(), form.getIsUbs());
             applicationEventPublisher.publishEvent(
                 new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
+            user.setRestorePasswordEmail(null);
             restorePasswordEmailRepo.delete(restorePasswordEmail);
             log.info("User with email " + restorePasswordEmail.getUser().getEmail()
                 + " has successfully restored the password using token " + form.getToken());
