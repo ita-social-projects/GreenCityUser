@@ -1291,4 +1291,35 @@ class UserServiceImplTest {
             Arguments.of("444e66e8-8daa-4cb0-8269-a8d856e7dd15", Optional.of(getUser()), true),
             Arguments.of("uuid", Optional.empty(), false));
     }
+
+    @Test
+    void findAllUsersExceptMainUserAndUsersFriendTest() {
+        List<User> userList = Collections.singletonList(user);
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        Page<User> page = new PageImpl<>(userList, pageRequest, userList.size());
+        List<UserAllFriendsDto> dtoList =
+            Collections.singletonList(
+                new UserAllFriendsDto(
+                    1L, "test", "test", 20.0, 1L, "test", "aa",
+                    FriendsChatDto.builder()
+                        .chatId(1L)
+                        .chatExists(true)
+                        .build()));
+
+        when(userRepo.getAllUsersExceptMainUserAndFriends(pageRequest, userId)).thenReturn(page);
+        when(modelMapper.map(userList, new TypeToken<List<UserAllFriendsDto>>() {
+        }.getType())).thenReturn(dtoList);
+        when(restClient.chatBetweenTwo(anyLong(), anyLong())).thenReturn(any(FriendsChatDto.class));
+        when(userRepo.getAllUserFriends(1L)).thenReturn(userList);
+        when(userRepo.getAllUserFriends(1L)).thenReturn(userList);
+
+        userService.findAllUsersExceptMainUserAndUsersFriend(pageRequest, 1L);
+
+        verify(userRepo).getAllUsersExceptMainUserAndFriends(pageRequest, userId);
+        verify(modelMapper).map(userList, new TypeToken<List<UserAllFriendsDto>>() {
+        }.getType());
+        verify(restClient).chatBetweenTwo(anyLong(), anyLong());
+        verify(userRepo, times(2)).getAllUserFriends(1L);
+    }
+
 }
