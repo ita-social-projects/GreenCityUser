@@ -399,8 +399,9 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param userId   {@link Long} -current user's id.
      * @return {@link User}.
      */
-    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id <> :userId AND users.id NOT IN"
-        + "(SELECT friend_id FROM users_friends WHERE user_id = :userId)")
+    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id <> :userId AND users.id NOT IN "
+        + "((SELECT user_id FROM users_friends WHERE friend_id = :userId) "
+        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId))")
     Page<User> getAllUsersExceptMainUserAndFriends(Pageable pageable, @Param("userId") Long userId);
 
     /**
