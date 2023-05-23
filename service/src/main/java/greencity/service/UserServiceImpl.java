@@ -1090,17 +1090,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id) {
         Page<User> ourUsersList = userRepo.findUsersByName(name, page, id);
-        List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
-            new TypeToken<List<UserAllFriendsDto>>() {
-            }.getType());
-
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
-
-        return new PageableDto<>(
-            allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
-            ourUsersList.getTotalElements(),
-            ourUsersList.getPageable().getPageNumber(),
-            ourUsersList.getTotalPages());
+        return getUserAllFriendsDtoPageableDto(id, ourUsersList);
     }
 
     /**
@@ -1109,17 +1099,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public PageableDto<UserAllFriendsDto> findUserByName(String name, Pageable page, Long id) {
         Page<User> ourUsersList = userRepo.findAllUsersByName(name, page, id);
-        List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
-            new TypeToken<List<UserAllFriendsDto>>() {
-            }.getType());
-
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
-
-        return new PageableDto<>(
-            allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
-            ourUsersList.getTotalElements(),
-            ourUsersList.getPageable().getPageNumber(),
-            ourUsersList.getTotalPages());
+        return getUserAllFriendsDtoPageableDto(id, ourUsersList);
     }
 
     /**
@@ -1128,17 +1108,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id) {
         Page<User> ourUsersList = userRepo.findFriendsByName(name, page, id);
-        List<UserAllFriendsDto> friendDtos = modelMapper.map(ourUsersList.getContent(),
-            new TypeToken<List<UserAllFriendsDto>>() {
-            }.getType());
-
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), id)));
-
-        return new PageableDto<>(
-            allUsersMutualFriendsRecommendedOrRequest(id, friendDtos),
-            ourUsersList.getTotalElements(),
-            ourUsersList.getPageable().getPageNumber(),
-            ourUsersList.getTotalPages());
+        return getUserAllFriendsDtoPageableDto(id, ourUsersList);
     }
 
     /**
@@ -1219,11 +1189,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId) {
         Page<User> allUsers = userRepo.getAllUsersExceptMainUserAndFriends(pageable, userId);
+        return getUserAllFriendsDtoPageableDto(userId, allUsers);
+    }
+
+    private PageableDto<UserAllFriendsDto> getUserAllFriendsDtoPageableDto(Long userId, Page<User> allUsers) {
         List<UserAllFriendsDto> allFriends = modelMapper
             .map(allUsers.getContent(),
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
-        allFriends.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
+        allFriends.forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
             allUsers.getTotalElements(),
