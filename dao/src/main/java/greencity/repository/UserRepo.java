@@ -158,7 +158,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Modifying
     @Query(nativeQuery = true,
-        value = "DELETE FROM users_friends WHERE user_id = :userId AND friend_id = :friendId")
+        value = "DELETE FROM users_friends WHERE (user_id = :userId AND friend_id = :friendId)"
+            + " OR (user_id = :friendId AND friend_id = :userId)")
     void deleteUserFriendById(Long userId, Long friendId);
 
     /**
