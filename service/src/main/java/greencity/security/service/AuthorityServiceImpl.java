@@ -19,7 +19,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,8 +56,6 @@ public class AuthorityServiceImpl implements AuthorityService {
             .map(Position::getName)
             .collect(Collectors.toList()));
 
-        checkIfAuthoritiesValidForSuchEmployee(employee, dto.getAuthorities());
-
         List<Authority> authorities = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(dto.getAuthorities())) {
             authorities = authorityRepo.findAuthoritiesByNames(dto.getAuthorities());
@@ -86,21 +83,6 @@ public class AuthorityServiceImpl implements AuthorityService {
         employee.setPositions(positions);
         employee.setAuthorities(list);
         userRepo.save(employee);
-    }
-
-    private void checkIfAuthoritiesValidForSuchEmployee(User employee, List<String> authoritiesToUpdate) {
-        List<String> positionNames = employee.getPositions()
-            .stream()
-            .map(Position::getName).collect(Collectors.toList());
-
-        List<String> employeeAuthorities = authorityRepo.findAuthoritiesByPositions(positionNames)
-            .stream()
-            .map(Authority::getName)
-            .collect(Collectors.toList());
-
-        if (!new HashSet<>(employeeAuthorities).containsAll(authoritiesToUpdate)) {
-            throw new BadRequestException(ErrorMessage.USER_CANNOT_HAVE_SUCH_AUTHORITIES);
-        }
     }
 
     private void checkIfEmployeeLoginCanEditAuthorities(List<String> employeePositionNames) {
