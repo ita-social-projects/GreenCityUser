@@ -36,7 +36,6 @@ import static greencity.ModelUtils.createEmployee;
 import static greencity.ModelUtils.createEmployeeAdmin;
 import static greencity.ModelUtils.createEmployeeDriver;
 import static greencity.ModelUtils.createSuperAdmin;
-import static greencity.ModelUtils.getNotValidAuthority;
 import static greencity.ModelUtils.getPositions;
 import static greencity.ModelUtils.getAuthority;
 import static greencity.ModelUtils.getSuperAdminEmployeeAuthorityDto;
@@ -91,13 +90,11 @@ class AuthorityServiceImplTest {
     void updateEmployeesAuthoritiesTest() {
         User employee = createEmployee();
         List<Authority> authority = List.of(getAuthority());
-        List<String> positionNames = List.of("Супер адмін");
         List<String> authoritiesName = authority.stream().map(Authority::getName)
             .collect(Collectors.toList());
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         when(authorityRepo.findAuthoritiesByNames(authoritiesName)).thenReturn(authority);
-        when(authorityRepo.findAuthoritiesByPositions(positionNames)).thenReturn(List.of(getAuthority()));
         when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Супер адмін"));
 
         employee.setAuthorities(authority);
@@ -105,7 +102,6 @@ class AuthorityServiceImplTest {
 
         verify(userRepo).findByEmail(TEST_EMAIL);
         verify(authorityRepo).findAuthoritiesByNames(authoritiesName);
-        verify(authorityRepo).findAuthoritiesByPositions(positionNames);
         verify(positionService).getEmployeeLoginPositionNames();
         verify(userRepo).save(employee);
     }
@@ -133,26 +129,6 @@ class AuthorityServiceImplTest {
             () -> authorityService.updateEmployeesAuthorities(dto));
 
         verify(userRepo).findByEmail(TEST_EMAIL);
-    }
-
-    @Test
-    void updateEmployeesAuthoritiesThrowsBadRequestExceptionWithNotValidAuthoritiesTest() {
-        User employee = createEmployee();
-        List<Authority> authority = List.of(getNotValidAuthority());
-        List<String> positionNames = List.of("Супер адмін");
-        var dto = getUserEmployeeAuthorityDto();
-
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        when(authorityRepo.findAuthoritiesByPositions(positionNames)).thenReturn(List.of(getNotValidAuthority()));
-        when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Супер адмін"));
-
-        employee.setAuthorities(authority);
-        assertThrows(BadRequestException.class,
-            () -> authorityService.updateEmployeesAuthorities(dto));
-
-        verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(authorityRepo).findAuthoritiesByPositions(positionNames);
-        verify(positionService).getEmployeeLoginPositionNames();
     }
 
     @Test
