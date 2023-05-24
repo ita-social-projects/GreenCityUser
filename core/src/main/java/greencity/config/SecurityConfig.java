@@ -148,7 +148,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/shopping-list-items",
                 "/user/{userId}/habit",
                 "/user/{userId}/userFriend/{friendId}",
-                "/user/{userId}/declineFriend/{friendId}",
                 "/user/{userId}/acceptFriend/{friendId}",
                 "/ownSecurity/set-password")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
@@ -177,6 +176,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.DELETE,
                 "/user/shopping-list-items/user-shopping-list-items",
                 "/user/shopping-list-items",
+                "/user/{userId}/declineFriend/{friendId}",
                 "/user/{userId}/userFriend/{friendId}")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
