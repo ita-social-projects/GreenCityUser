@@ -297,15 +297,6 @@ public interface UserService {
     List<UserVO> getAllUserFriends(Long userId);
 
     /**
-     * Delete user friend by id {@link UserVO}.
-     *
-     * @param userId   {@link Long}
-     * @param friendId {@link Long}
-     * @author Marian Datsko
-     */
-    void deleteUserFriendById(Long userId, Long friendId);
-
-    /**
      * Add new user friend {@link UserVO}.
      *
      * @param userId   {@link Long}
