@@ -550,48 +550,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void deleteUserFriendByIdCheckRepeatingValueExceptionTest() {
-        when(userRepo.findById(anyLong())).thenReturn(Optional.of(user2));
-        assertThrows(CheckRepeatingValueException.class, () -> userService.deleteUserFriendById(1L, 1L));
-    }
-
-    @Test
-    void deleteUserFriendByIdTest() {
-        List<User> list = Collections.singletonList(user2);
-        List<UserVO> listVO = Collections.singletonList(userVO2);
-        when(userRepo.getAllUserFriends(anyLong())).thenReturn(list);
-        when(modelMapper.map(list,
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(listVO);
-        when(userRepo.findById(anyLong())).thenReturn(Optional.of(user2));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
-        userService.deleteUserFriendById(userId, user2.getId());
-        verify(userRepo).deleteUserFriendById(userId, user2.getId());
-    }
-
-    @Test
-    void deleteUserFriendByIdNotDeletedExceptionTest() {
-        when(userRepo.getAllUserFriends(1L)).thenReturn(Collections.emptyList());
-        when(modelMapper.map(Collections.emptyList(),
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(Collections.emptyList());
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
-        assertThrows(NotDeletedException.class, () -> userService.deleteUserFriendById(1L, 2L));
-    }
-
-    @Test
-    void deleteUserFriendByIdNotDeletedExceptionTest2() {
-        when(userRepo.getAllUserFriends(any())).thenReturn(Collections.singletonList(user));
-        when(modelMapper.map(Collections.singletonList(user),
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(Collections.singletonList(userVO));
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
-        assertThrows(NotDeletedException.class, () -> userService.deleteUserFriendById(3L, 2L));
-    }
-
-    @Test
     void addNewFriendCheckRepeatingValueExceptionWithSameIdTest() {
         when(userRepo.findById(anyLong())).thenReturn(Optional.of(user));
         assertThrows(CheckRepeatingValueException.class, () -> userService.addNewFriend(1L, 1L));

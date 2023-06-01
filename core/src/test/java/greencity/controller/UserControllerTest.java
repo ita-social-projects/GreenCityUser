@@ -356,14 +356,6 @@ class UserControllerTest {
     }
 
     @Test
-    void deleteUserFriendTest() throws Exception {
-        mockMvc.perform(delete(userLink + "/{userId}/userFriend/{friendId}", 1, 1))
-            .andExpect(status().isOk());
-
-        verify(userService).deleteUserFriendById(1L, 1L);
-    }
-
-    @Test
     void addNewFriendTest() throws Exception {
         mockMvc.perform(post(userLink + "/{userId}/userFriend/{friendId}", 1, 1))
             .andExpect(status().isOk());

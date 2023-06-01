@@ -154,15 +154,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<User> getAllUserFriendRequests(Long userId);
 
     /**
-     * Delete friend {@link User}.
-     */
-    @Modifying
-    @Query(nativeQuery = true,
-        value = "DELETE FROM users_friends WHERE (user_id = :userId AND friend_id = :friendId)"
-            + " OR (user_id = :friendId AND friend_id = :userId)")
-    void deleteUserFriendById(Long userId, Long friendId);
-
-    /**
      * Add new friend {@link User}.
      */
     @Modifying
