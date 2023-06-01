@@ -681,33 +681,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Delete user friend by id {@link UserVO}.
-     *
-     * @param userId   {@link Long}g
-     * @param friendId {@link Long}
-     * @author Marian Datsko
-     */
-    @Override
-    @Transactional
-    public void deleteUserFriendById(Long userId, Long friendId) {
-        List<UserVO> allUserFriends = getAllUserFriends(userId);
-        findById(friendId);
-        if (userId.equals(friendId)) {
-            throw new CheckRepeatingValueException(ErrorMessage.OWN_USER_ID + friendId);
-        }
-        if (!allUserFriends.isEmpty()) {
-            List<Long> listUserId = allUserFriends.stream().map(UserVO::getId).collect(Collectors.toList());
-            if (listUserId.contains(friendId)) {
-                userRepo.deleteUserFriendById(userId, friendId);
-            } else {
-                throw new NotDeletedException(ErrorMessage.USER_FRIENDS_LIST + friendId);
-            }
-        } else {
-            throw new NotDeletedException(ErrorMessage.USER_FRIENDS_LIST + friendId);
-        }
-    }
-
-    /**
      * Add new user friend {@link UserVO}.
      *
      * @param userId   {@link Long}

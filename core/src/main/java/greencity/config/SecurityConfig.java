@@ -176,8 +176,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.DELETE,
                 "/user/shopping-list-items/user-shopping-list-items",
                 "/user/shopping-list-items",
-                "/user/{userId}/declineFriend/{friendId}",
-                "/user/{userId}/userFriend/{friendId}")
+                "/user/{userId}/declineFriend/{friendId}")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
                 "/user/all",
