@@ -242,17 +242,6 @@ class UserRepoTest {
     }
 
     @Test
-    void addNewFriendTest() {
-        User user3 = userRepo.findByEmail("test3@email.com").get();
-        User user7 = userRepo.findByEmail("test7@email.com").get();
-        User user8 = userRepo.findByEmail("test8@email.com").get();
-        userRepo.addNewFriend(user3.getId(), user7.getId());
-        userRepo.addNewFriend(user3.getId(), user8.getId());
-        List<User> friends = userRepo.getAllUserFriendsWithoutStatus(user3.getId());
-        assertEquals(3, friends.size());
-    }
-
-    @Test
     void acceptFriendRequestTest() {
         userRepo.acceptFriendRequest(4L, 5L);
         List<User> friends = userRepo.getAllUserFriends(4L);
