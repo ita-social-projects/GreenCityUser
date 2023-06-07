@@ -451,14 +451,6 @@ public interface UserService {
     PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
 
     /**
-     * Accept friend request {@link UserVO}.
-     *
-     * @param userId   {@link Long}
-     * @param friendId {@link Long}
-     */
-    void acceptFriendRequest(Long userId, Long friendId);
-
-    /**
      * Decline friend request {@link UserVO}.
      *
      * @param userId   {@link Long}

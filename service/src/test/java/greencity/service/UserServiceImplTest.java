@@ -550,33 +550,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void acceptFriendRequestTest() {
-        List<User> users = Collections.singletonList(user2);
-        List<UserVO> usersVO = Collections.singletonList(userVO);
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
-        when(userRepo.getAllUserFriendRequests(1L))
-            .thenReturn(users);
-        when(modelMapper.map(users,
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(usersVO);
-
-        userService.acceptFriendRequest(1L, 2L);
-        verify(userRepo).acceptFriendRequest(1L, 2L);
-    }
-
-    @Test
-    void acceptFriendRequestUserHasNoRequestExceptionTest() {
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
-        when(userRepo.getAllUserFriendRequests(any())).thenReturn(Collections.emptyList());
-        when(modelMapper.map(Collections.emptyList(),
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(Collections.emptyList());
-        assertThrows(UserHasNoRequestException.class, () -> userService.acceptFriendRequest(1L, 2L));
-    }
-
-    @Test
     void declineFriendRequestTest() {
         List<User> users = Collections.singletonList(user2);
         List<UserVO> usersVO = Collections.singletonList(userVO);
@@ -683,11 +656,6 @@ class UserServiceImplTest {
             pages.getPageable().getPageNumber(),
             pages.getTotalPages());
         assertEquals(pageableDto, userService.findFriendByName("martin", pageable, 1L));
-    }
-
-    @Test
-    void acceptFriendRequestCheckRepeatingValueExceptionWithSameIdTest() {
-        assertThrows(CheckRepeatingValueException.class, () -> userService.acceptFriendRequest(1L, 1L));
     }
 
     @Test

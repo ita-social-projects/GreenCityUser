@@ -361,26 +361,6 @@ public class UserController {
     }
 
     /**
-     * Method for accepting request from user.
-     *
-     * @param friendId id user friend.
-     * @param userId   id current user.
-     */
-    @ApiOperation(value = "Accept friend request")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-    })
-    @PostMapping("/{userId}/acceptFriend/{friendId}")
-    public ResponseEntity<Object> acceptFriendRequest(
-        @ApiParam("Friend's id. Cannot be empty.") @PathVariable Long friendId,
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        userService.acceptFriendRequest(userId, friendId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
      * Method for declining request from user.
      *
      * @param friendId id user friend.

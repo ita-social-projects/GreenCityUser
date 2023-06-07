@@ -242,13 +242,6 @@ class UserRepoTest {
     }
 
     @Test
-    void acceptFriendRequestTest() {
-        userRepo.acceptFriendRequest(4L, 5L);
-        List<User> friends = userRepo.getAllUserFriends(4L);
-        assertEquals(2, friends.size());
-    }
-
-    @Test
     void declineFriendRequestTest() {
         userRepo.declineFriendRequest(4L, 1L);
         List<User> friends = userRepo.getAllUserFriends(4L);

@@ -259,16 +259,6 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
-    @Override
-    @Transactional
-    public void acceptFriendRequest(Long userId, Long friendId) {
-        checkFriendRequest(userId, friendId);
-        userRepo.acceptFriendRequest(userId, friendId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     private void checkFriendRequest(Long userId, Long friendId) {
         if (userId.equals(friendId)) {
             throw new CheckRepeatingValueException(ErrorMessage.OWN_USER_ID + friendId);
