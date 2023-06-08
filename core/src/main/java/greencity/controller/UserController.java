@@ -361,27 +361,6 @@ public class UserController {
     }
 
     /**
-     * Method for add new user friend.
-     *
-     * @param friendId id user friend.
-     * @param userId   id current user.
-     * @author Marian Datsko
-     */
-    @ApiOperation(value = "Add new user friend")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-    })
-    @PostMapping("/{userId}/userFriend/{friendId}")
-    public ResponseEntity<Object> addNewFriend(
-        @ApiParam("Id friend of current user. Cannot be empty.") @PathVariable Long friendId,
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        userService.addNewFriend(userId, friendId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
      * Method for accepting request from user.
      *
      * @param friendId id user friend.

@@ -550,33 +550,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void addNewFriendCheckRepeatingValueExceptionWithSameIdTest() {
-        when(userRepo.findById(anyLong())).thenReturn(Optional.of(user));
-        assertThrows(CheckRepeatingValueException.class, () -> userService.addNewFriend(1L, 1L));
-    }
-
-    @Test
-    void addNewFriendCheckRepeatingValueExceptionWithSameIdTest2() {
-        when(userRepo.getAllUserFriends(any())).thenReturn(Collections.singletonList(user2));
-        when(modelMapper.map(Collections.singletonList(user2),
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(Collections.singletonList(userVO2));
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user));
-        assertThrows(CheckRepeatingValueException.class, () -> userService.addNewFriend(1L, 2L));
-    }
-
-    @Test
-    void addNewFriendTest() {
-        when(userRepo.getAllUserFriends(any())).thenReturn(Collections.emptyList());
-        when(modelMapper.map(Collections.emptyList(),
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(Collections.emptyList());
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
-        userService.addNewFriend(1L, 2L);
-        verify(userRepo).addNewFriend(1L, 2L);
-    }
-
-    @Test
     void acceptFriendRequestTest() {
         List<User> users = Collections.singletonList(user2);
         List<UserVO> usersVO = Collections.singletonList(userVO);

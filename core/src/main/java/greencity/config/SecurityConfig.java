@@ -147,7 +147,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 USER_LINK,
                 "/user/shopping-list-items",
                 "/user/{userId}/habit",
-                "/user/{userId}/userFriend/{friendId}",
                 "/user/{userId}/acceptFriend/{friendId}",
                 "/ownSecurity/set-password")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
