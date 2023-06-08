@@ -356,14 +356,6 @@ class UserControllerTest {
     }
 
     @Test
-    void declineFriendRequestTest() throws Exception {
-        mockMvc.perform(delete(userLink + "/{userId}/declineFriend/{friendId}", 1, 2))
-            .andExpect(status().isOk());
-
-        verify(userService).declineFriendRequest(1L, 2L);
-    }
-
-    @Test
     void getSixFriendsWithTheHighestRatingTest() throws Exception {
         mockMvc.perform(get(userLink + "/{userId}/sixUserFriends/", 1))
             .andExpect(status().isOk());

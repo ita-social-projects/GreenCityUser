@@ -242,13 +242,6 @@ class UserRepoTest {
     }
 
     @Test
-    void declineFriendRequestTest() {
-        userRepo.declineFriendRequest(4L, 1L);
-        List<User> friends = userRepo.getAllUserFriends(4L);
-        assertEquals(0, friends.size());
-    }
-
-    @Test
     void updateUserLastActivityTimeTest() {
         LocalDateTime expected = LocalDateTime.of(2021, 5, 31, 22, 0, 0);
         userRepo.updateUserLastActivityTime(3L, expected);

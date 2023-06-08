@@ -259,30 +259,6 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
-    private void checkFriendRequest(Long userId, Long friendId) {
-        if (userId.equals(friendId)) {
-            throw new CheckRepeatingValueException(ErrorMessage.OWN_USER_ID + friendId);
-        }
-        UserVO friend = findById(friendId);
-        List<UserVO> users = getAllUserFriendRequests(userId);
-        if (!users.contains(friend)) {
-            throw new UserHasNoRequestException(ErrorMessage.NOT_FOUND_REQUEST + friendId);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public void declineFriendRequest(Long userId, Long friendId) {
-        checkFriendRequest(userId, friendId);
-        userRepo.declineFriendRequest(userId, friendId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Transactional
     public PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable) {

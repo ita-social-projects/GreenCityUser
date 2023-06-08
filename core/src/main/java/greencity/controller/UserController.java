@@ -361,26 +361,6 @@ public class UserController {
     }
 
     /**
-     * Method for declining request from user.
-     *
-     * @param friendId id user friend.
-     * @param userId   id current user.
-     */
-    @ApiOperation(value = "Decline friend request")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-    })
-    @DeleteMapping("/{userId}/declineFriend/{friendId}")
-    public ResponseEntity<Object> declineFriendRequest(
-        @ApiParam("Friend's id. Cannot be empty.") @PathVariable Long friendId,
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        userService.declineFriendRequest(userId, friendId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
      * Method returns list profile picture with the highest rating.
      *
      * @return {@link ResponseEntity}.

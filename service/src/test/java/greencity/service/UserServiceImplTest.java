@@ -550,22 +550,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void declineFriendRequestTest() {
-        List<User> users = Collections.singletonList(user2);
-        List<UserVO> usersVO = Collections.singletonList(userVO);
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
-        when(userRepo.getAllUserFriendRequests(1L))
-            .thenReturn(users);
-        when(modelMapper.map(users,
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(usersVO);
-
-        userService.declineFriendRequest(1L, 2L);
-        verify(userRepo).declineFriendRequest(1L, 2L);
-    }
-
-    @Test
     void geTUserProfileStatistics() {
         when(restClient.findAmountOfPublishedNews(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
