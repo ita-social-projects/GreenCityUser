@@ -288,24 +288,6 @@ public interface UserService {
     void deleteUserProfilePicture(String email);
 
     /**
-     * Get list user friends by user id {@link UserVO}.
-     *
-     * @param userId {@link Long}
-     * @return {@link UserVO}.
-     * @author Marian Datsko
-     */
-    List<UserVO> getAllUserFriends(Long userId);
-
-    /**
-     * Add new user friend {@link UserVO}.
-     *
-     * @param userId   {@link Long}
-     * @param friendId {@link Long}
-     * @author Marian Datsko
-     */
-    void addNewFriend(Long userId, Long friendId);
-
-    /**
      * Get six friends with the highest rating {@link UserVO}.
      *
      * @param userId {@link Long}

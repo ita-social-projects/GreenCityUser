@@ -667,45 +667,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Get list user friends by user id {@link UserVO}.
-     *
-     * @param userId {@link Long}
-     * @return {@link UserVO}.
-     * @author Marian Datsko
-     */
-    @Override
-    public List<UserVO> getAllUserFriends(Long userId) {
-        List<User> allUserFriends = userRepo.getAllUserFriends(userId);
-        return modelMapper.map(allUserFriends, new TypeToken<List<UserVO>>() {
-        }.getType());
-    }
-
-    /**
-     * Add new user friend {@link UserVO}.
-     *
-     * @param userId   {@link Long}
-     * @param friendId {@link Long}
-     * @author Marian Datsko
-     */
-    @Override
-    @Transactional
-    public void addNewFriend(Long userId, Long friendId) {
-        List<UserVO> allUserFriends = getAllUserFriends(userId);
-        findById(friendId);
-        if (userId.equals(friendId)) {
-            throw new CheckRepeatingValueException(ErrorMessage.OWN_USER_ID + friendId);
-        }
-        if (!allUserFriends.isEmpty()) {
-            allUserFriends.forEach(user -> {
-                if (user.getId().equals(friendId)) {
-                    throw new CheckRepeatingValueException(ErrorMessage.FRIEND_EXISTS + friendId);
-                }
-            });
-        }
-        userRepo.addNewFriend(userId, friendId);
-    }
-
-    /**
      * Get six friends with the highest rating {@link UserVO}.
      *
      * @param userId {@link Long}

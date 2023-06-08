@@ -154,15 +154,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<User> getAllUserFriendRequests(Long userId);
 
     /**
-     * Add new friend {@link User}.
-     */
-    @Modifying
-    @Query(nativeQuery = true,
-        value = "INSERT INTO users_friends(user_id, friend_id, status, created_date) "
-            + "VALUES (:userId, :friendId, 'REQUEST', CURRENT_TIMESTAMP)")
-    void addNewFriend(Long userId, Long friendId);
-
-    /**
      * Accept friend request {@link User}.
      */
     @Modifying
