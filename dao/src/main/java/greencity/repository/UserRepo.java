@@ -154,6 +154,26 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<User> getAllUserFriendRequests(Long userId);
 
     /**
+<<<<<<< HEAD
+=======
+     * Accept friend request {@link User}.
+     */
+    @Modifying
+    @Query(nativeQuery = true,
+        value = "UPDATE users_friends SET status = 'FRIEND' "
+            + "WHERE user_id = :friendId AND friend_id = :userId")
+    void acceptFriendRequest(Long userId, Long friendId);
+
+    /**
+     * Decline friend request {@link User}.
+     */
+    @Modifying
+    @Query(nativeQuery = true,
+        value = "DELETE FROM users_friends WHERE user_id = :friendId AND friend_id = :userId")
+    void declineFriendRequest(Long userId, Long friendId);
+
+    /**
+>>>>>>> dev
      * Get six friends with the highest rating {@link User}.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
