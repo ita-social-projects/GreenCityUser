@@ -700,24 +700,6 @@ public class UserController {
     }
 
     /**
-     * Method that allow you to find all user friends.
-     *
-     * @return {@link UserManagementDto list}.
-     * @author Orest Mamchuk
-     */
-    @ApiOperation(value = "Get all User friends")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/{id}/friends")
-    public ResponseEntity<List<UserManagementDto>> findUserFriendsByUserId(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findUserFriendsByUserId(id));
-    }
-
-    /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
      *
      * @param email - {@link UserVO}'s email

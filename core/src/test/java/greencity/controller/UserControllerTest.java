@@ -552,18 +552,6 @@ class UserControllerTest {
     }
 
     @Test
-    void findUserFriendByUserIdTest() throws Exception {
-        when(userService.findUserFriendsByUserId(1L)).thenReturn(List.of(ModelUtils.getUserManagementDto()));
-        mockMvc.perform(get(userLink + "/1/friends"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].name").value(TestConst.NAME))
-            .andExpect(jsonPath("$[0].id").value(1L))
-            .andExpect(jsonPath("$[0].email").value(TestConst.EMAIL))
-            .andExpect(jsonPath("$[0].userCredo").value(TestConst.CREDO));
-    }
-
-    @Test
     void findNotDeactivatedByEmailTest() throws Exception {
         when(userService.findNotDeactivatedByEmail(TestConst.EMAIL)).thenReturn(Optional.of(ModelUtils.getUserVO()));
         mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")

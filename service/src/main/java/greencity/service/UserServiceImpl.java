@@ -198,16 +198,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserManagementDto> findUserFriendsByUserId(Long id) {
-        return modelMapper.map(userRepo.getAllUserFriends(id),
-            new TypeToken<List<UserManagementDto>>() {
-            }.getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
         Page<UsersFriendDto> recommendedFriends = userRepo.findUsersRecommendedFriends(pageable, userId);
 

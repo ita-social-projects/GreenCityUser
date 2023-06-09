@@ -180,8 +180,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/roles",
                 "/user/findUserForManagement",
                 "/user/searchBy",
-                "/user/findAll",
-                "/user/{id}/friends")
+                "/user/findAll")
             .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/sign-up-employee")

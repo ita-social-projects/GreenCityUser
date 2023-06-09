@@ -403,13 +403,6 @@ public interface UserService {
     List<UserVO> findAll();
 
     /**
-     * Method that finds user's friends by id.
-     *
-     * @return {@link List} of {@link UserManagementDto} instances.
-     */
-    List<UserManagementDto> findUserFriendsByUserId(Long id);
-
-    /**
      * Method that finds new friends by name.
      *
      * @return {@link List} of {@link UserAllFriendsDto} instances.
