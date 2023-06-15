@@ -154,7 +154,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<User> getAllUserFriendRequests(Long userId);
 
     /**
-     * Accept friend request {@link User}.
+     * <<<<<<< HEAD ======= Accept friend request {@link User}.
      */
     @Modifying
     @Query(nativeQuery = true,
@@ -171,7 +171,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     void declineFriendRequest(Long userId, Long friendId);
 
     /**
-     * Get six friends with the highest rating {@link User}.
+     * >>>>>>> dev Get six friends with the highest rating {@link User}.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
         + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 'FRIEND') "

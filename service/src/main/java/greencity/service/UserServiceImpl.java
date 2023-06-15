@@ -198,16 +198,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserManagementDto> findUserFriendsByUserId(Long id) {
-        return modelMapper.map(userRepo.getAllUserFriends(id),
-            new TypeToken<List<UserManagementDto>>() {
-            }.getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
         Page<UsersFriendDto> recommendedFriends = userRepo.findUsersRecommendedFriends(pageable, userId);
 
@@ -254,40 +244,6 @@ public class UserServiceImpl implements UserService {
             friends.getTotalElements(),
             friends.getPageable().getPageNumber(),
             friends.getTotalPages());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public void acceptFriendRequest(Long userId, Long friendId) {
-        checkFriendRequest(userId, friendId);
-        userRepo.acceptFriendRequest(userId, friendId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    private void checkFriendRequest(Long userId, Long friendId) {
-        if (userId.equals(friendId)) {
-            throw new CheckRepeatingValueException(ErrorMessage.OWN_USER_ID + friendId);
-        }
-        UserVO friend = findById(friendId);
-        List<UserVO> users = getAllUserFriendRequests(userId);
-        if (!users.contains(friend)) {
-            throw new UserHasNoRequestException(ErrorMessage.NOT_FOUND_REQUEST + friendId);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public void declineFriendRequest(Long userId, Long friendId) {
-        checkFriendRequest(userId, friendId);
-        userRepo.declineFriendRequest(userId, friendId);
     }
 
     /**

@@ -403,13 +403,6 @@ public interface UserService {
     List<UserVO> findAll();
 
     /**
-     * Method that finds user's friends by id.
-     *
-     * @return {@link List} of {@link UserManagementDto} instances.
-     */
-    List<UserManagementDto> findUserFriendsByUserId(Long id);
-
-    /**
      * Method that finds new friends by name.
      *
      * @return {@link List} of {@link UserAllFriendsDto} instances.
@@ -449,22 +442,6 @@ public interface UserService {
      */
 
     PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
-
-    /**
-     * Accept friend request {@link UserVO}.
-     *
-     * @param userId   {@link Long}
-     * @param friendId {@link Long}
-     */
-    void acceptFriendRequest(Long userId, Long friendId);
-
-    /**
-     * Decline friend request {@link UserVO}.
-     *
-     * @param userId   {@link Long}
-     * @param friendId {@link Long}
-     */
-    void declineFriendRequest(Long userId, Long friendId);
 
     /**
      * Method that finds all friends that send you request.

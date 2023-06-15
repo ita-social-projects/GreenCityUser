@@ -147,7 +147,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 USER_LINK,
                 "/user/shopping-list-items",
                 "/user/{userId}/habit",
-                "/user/{userId}/acceptFriend/{friendId}",
                 "/ownSecurity/set-password")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PUT,
@@ -174,16 +173,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.DELETE,
                 "/user/shopping-list-items/user-shopping-list-items",
-                "/user/shopping-list-items",
-                "/user/{userId}/declineFriend/{friendId}")
+                "/user/shopping-list-items")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
                 "/user/all",
                 "/user/roles",
                 "/user/findUserForManagement",
                 "/user/searchBy",
-                "/user/findAll",
-                "/user/{id}/friends")
+                "/user/findAll")
             .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/sign-up-employee")
