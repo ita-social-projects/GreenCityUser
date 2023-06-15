@@ -361,46 +361,6 @@ public class UserController {
     }
 
     /**
-     * Method for accepting request from user.
-     *
-     * @param friendId id user friend.
-     * @param userId   id current user.
-     */
-    @ApiOperation(value = "Accept friend request")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-    })
-    @PostMapping("/{userId}/acceptFriend/{friendId}")
-    public ResponseEntity<Object> acceptFriendRequest(
-        @ApiParam("Friend's id. Cannot be empty.") @PathVariable Long friendId,
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        userService.acceptFriendRequest(userId, friendId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
-     * Method for declining request from user.
-     *
-     * @param friendId id user friend.
-     * @param userId   id current user.
-     */
-    @ApiOperation(value = "Decline friend request")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-    })
-    @DeleteMapping("/{userId}/declineFriend/{friendId}")
-    public ResponseEntity<Object> declineFriendRequest(
-        @ApiParam("Friend's id. Cannot be empty.") @PathVariable Long friendId,
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        userService.declineFriendRequest(userId, friendId);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
      * Method returns list profile picture with the highest rating.
      *
      * @return {@link ResponseEntity}.
@@ -737,24 +697,6 @@ public class UserController {
     @GetMapping("/findAll")
     public ResponseEntity<List<UserVO>> findAll() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
-    }
-
-    /**
-     * Method that allow you to find all user friends.
-     *
-     * @return {@link UserManagementDto list}.
-     * @author Orest Mamchuk
-     */
-    @ApiOperation(value = "Get all User friends")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/{id}/friends")
-    public ResponseEntity<List<UserManagementDto>> findUserFriendsByUserId(@PathVariable Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findUserFriendsByUserId(id));
     }
 
     /**

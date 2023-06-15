@@ -550,49 +550,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void acceptFriendRequestTest() {
-        List<User> users = Collections.singletonList(user2);
-        List<UserVO> usersVO = Collections.singletonList(userVO);
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
-        when(userRepo.getAllUserFriendRequests(1L))
-            .thenReturn(users);
-        when(modelMapper.map(users,
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(usersVO);
-
-        userService.acceptFriendRequest(1L, 2L);
-        verify(userRepo).acceptFriendRequest(1L, 2L);
-    }
-
-    @Test
-    void acceptFriendRequestUserHasNoRequestExceptionTest() {
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
-        when(userRepo.getAllUserFriendRequests(any())).thenReturn(Collections.emptyList());
-        when(modelMapper.map(Collections.emptyList(),
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(Collections.emptyList());
-        assertThrows(UserHasNoRequestException.class, () -> userService.acceptFriendRequest(1L, 2L));
-    }
-
-    @Test
-    void declineFriendRequestTest() {
-        List<User> users = Collections.singletonList(user2);
-        List<UserVO> usersVO = Collections.singletonList(userVO);
-        when(userRepo.findById(2L)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO);
-        when(userRepo.getAllUserFriendRequests(1L))
-            .thenReturn(users);
-        when(modelMapper.map(users,
-            new TypeToken<List<UserVO>>() {
-            }.getType())).thenReturn(usersVO);
-
-        userService.declineFriendRequest(1L, 2L);
-        verify(userRepo).declineFriendRequest(1L, 2L);
-    }
-
-    @Test
     void geTUserProfileStatistics() {
         when(restClient.findAmountOfPublishedNews(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
@@ -683,11 +640,6 @@ class UserServiceImplTest {
             pages.getPageable().getPageNumber(),
             pages.getTotalPages());
         assertEquals(pageableDto, userService.findFriendByName("martin", pageable, 1L));
-    }
-
-    @Test
-    void acceptFriendRequestCheckRepeatingValueExceptionWithSameIdTest() {
-        assertThrows(CheckRepeatingValueException.class, () -> userService.acceptFriendRequest(1L, 1L));
     }
 
     @Test
@@ -1148,15 +1100,6 @@ class UserServiceImplTest {
         when(modelMapper.map(user, UserVOAchievement.class)).thenReturn(userVOAchievement);
         assertEquals(userVOAchievement, userService.findUserForAchievement(id));
         verify(userRepo, times(1)).findUserForAchievement(id);
-    }
-
-    @Test
-    void findUserFriendsByUserIdTest() {
-        UserManagementDto user = UserManagementDto.builder().id(1L).build();
-        List<UserManagementDto> friends = new ArrayList<>();
-        friends.add(user);
-        when(userService.findUserFriendsByUserId(anyLong())).thenReturn(friends);
-        assertEquals(1, userService.findUserFriendsByUserId(anyLong()).size());
     }
 
     @Test

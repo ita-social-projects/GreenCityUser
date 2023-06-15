@@ -356,22 +356,6 @@ class UserControllerTest {
     }
 
     @Test
-    void acceptFriendRequestTest() throws Exception {
-        mockMvc.perform(post(userLink + "/{userId}/acceptFriend/{friendId}", 1, 2))
-            .andExpect(status().isOk());
-
-        verify(userService).acceptFriendRequest(1L, 2L);
-    }
-
-    @Test
-    void declineFriendRequestTest() throws Exception {
-        mockMvc.perform(delete(userLink + "/{userId}/declineFriend/{friendId}", 1, 2))
-            .andExpect(status().isOk());
-
-        verify(userService).declineFriendRequest(1L, 2L);
-    }
-
-    @Test
     void getSixFriendsWithTheHighestRatingTest() throws Exception {
         mockMvc.perform(get(userLink + "/{userId}/sixUserFriends/", 1))
             .andExpect(status().isOk());
@@ -565,18 +549,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$[0].name").value(TestConst.NAME))
             .andExpect(jsonPath("$[0].id").value(1L))
             .andExpect(jsonPath("$[0].email").value(TestConst.EMAIL));
-    }
-
-    @Test
-    void findUserFriendByUserIdTest() throws Exception {
-        when(userService.findUserFriendsByUserId(1L)).thenReturn(List.of(ModelUtils.getUserManagementDto()));
-        mockMvc.perform(get(userLink + "/1/friends"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].name").value(TestConst.NAME))
-            .andExpect(jsonPath("$[0].id").value(1L))
-            .andExpect(jsonPath("$[0].email").value(TestConst.EMAIL))
-            .andExpect(jsonPath("$[0].userCredo").value(TestConst.CREDO));
     }
 
     @Test
