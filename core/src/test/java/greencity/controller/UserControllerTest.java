@@ -743,17 +743,6 @@ class UserControllerTest {
     }
 
     @Test
-    void findAllUsersExceptMainUserAndUsersFriend() throws Exception {
-        int pageNumber = 0;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/findAll/friendsWithoutExist/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).findAllUsersExceptMainUserAndUsersFriend(pageable, 1L);
-    }
-
-    @Test
     void deactivateUser() throws Exception {
         String uuid = "87df9ad5-6393-441f-8423-8b2e770b01a8";
         List<String> uuids = List.of("uuid5", "uuid3");

@@ -1062,17 +1062,6 @@ public class UserServiceImpl implements UserService {
         throw new LowRoleLevelException("You do not have authorities");
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
-    @Override
-    public PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId) {
-        Page<User> allUsers = userRepo.getAllUsersExceptMainUserAndFriends(pageable, userId);
-        return getUserAllFriendsDtoPageableDto(userId, allUsers);
-    }
-
     private PageableDto<UserAllFriendsDto> getUserAllFriendsDtoPageableDto(Long userId, Page<User> allUsers) {
         List<UserAllFriendsDto> allFriends = modelMapper
             .map(allUsers.getContent(),

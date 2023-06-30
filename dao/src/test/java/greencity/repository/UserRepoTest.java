@@ -253,20 +253,4 @@ class UserRepoTest {
         List<UsersFriendDto> friendDtos = userRepo.findAnyRecommendedFriends(1L);
         assertEquals(1, friendDtos.size());
     }
-
-    @Test
-    void getAllUsersExceptMainUserAndFriendsTest() {
-        Pageable pageable = PageRequest.of(0, 2);
-        User user = userRepo.findByEmail("test9@email.com").get();
-        List<User> users = List.of(user);
-        Page<User> actual = new PageImpl<>(users, pageable, users.size());
-        Page<User> expected = userRepo.getAllUsersExceptMainUserAndFriends(pageable, 1L);
-        List<Long> actualIds = actual.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-        List<Long> expectedIds = expected.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-
-        assertEquals(1, expected.getContent().size());
-        assertEquals(expectedIds, actualIds);
-    }
 }

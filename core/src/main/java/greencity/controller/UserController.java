@@ -402,28 +402,6 @@ public class UserController {
     }
 
     /**
-     * The method finds {@link UserAllFriendsDto} for the current userId.
-     *
-     * @return {@link ResponseEntity}.
-     */
-    @ApiOperation(value = "Find all friends without exist")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/{userId}/findAll/friendsWithoutExist/")
-    @ApiPageable
-    public ResponseEntity<PageableDto<UserAllFriendsDto>> findAllUsersExceptMainUserAndUsersFriend(
-        @ApiIgnore Pageable page,
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(userService.findAllUsersExceptMainUserAndUsersFriend(page, userId));
-    }
-
-    /**
      * The method finds for the current userId.
      *
      * @return {@link ResponseEntity}.
