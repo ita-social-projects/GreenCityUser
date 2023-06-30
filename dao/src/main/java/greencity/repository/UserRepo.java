@@ -338,15 +338,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> findAllUsersByName(String name, Pageable page, Long userId);
 
     /**
-     * Method that finds user by name BUT except friends.
-     */
-    @Query(nativeQuery = true, value = "select * from users u where u.id <> :userId and \n"
-        + "                            LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%')) AND \n"
-        + "                            u.id not in \n"
-        + "                            (select uf.friend_id from users_friends uf where uf.user_id = :userId)")
-    Page<User> findUsersByName(String name, Pageable page, Long userId);
-
-    /**
      * Method that finds friends by name.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users U\n"

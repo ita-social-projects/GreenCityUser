@@ -227,14 +227,6 @@ class UserRepoTest {
     }
 
     @Test
-    void findUsersByNameTest() {
-        Pageable pageable = PageRequest.of(0, 3);
-        User user = userRepo.findByEmail("test2@email.com").get();
-        Page<User> expected = userRepo.findUsersByName("SuperTest2", pageable, 3L);
-        assertEquals(user, expected.getContent().get(0));
-    }
-
-    @Test
     void countOfMutualFriendsTest() {
         Integer expected = 2;
         Integer friends = userRepo.countOfMutualFriends(1L);

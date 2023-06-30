@@ -134,7 +134,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findIdByEmail",
                 "/user/findById",
                 "/user/{userId}/findAll/friendsWithoutExist/",
-                "/user/findNewFriendsByName/**",
                 "/user/findUserByName/**",
                 "/user/findFriendByName/**",
                 "/user/findByUuId",

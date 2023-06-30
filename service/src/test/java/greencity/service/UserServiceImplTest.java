@@ -589,24 +589,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testFindNewFriendByName() {
-        Pageable pageable = PageRequest.of(1, 3);
-        user.setUserCredo("credo");
-        Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
-        when(userRepo.findUsersByName("martin", pageable, 1L))
-            .thenReturn(pages);
-        when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType()))
-            .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
-        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
-            CREATE_USER_ALL_FRIENDS_DTO,
-            pages.getTotalElements(),
-            pages.getPageable().getPageNumber(),
-            pages.getTotalPages());
-        assertEquals(pageableDto, userService.findNewFriendByName("martin", pageable, 1L));
-    }
-
-    @Test
     void findUserByName() {
         Pageable pageable = PageRequest.of(1, 3);
         user.setUserCredo("credo");

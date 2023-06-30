@@ -1042,24 +1042,6 @@ public class UserController {
     /**
      * Method that find new Friends by name.
      */
-    @ApiOperation(value = "Search new Friends by name")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-    })
-    @GetMapping("/findNewFriendsByName")
-    @ApiPageable
-    public ResponseEntity<PageableDto<UserAllFriendsDto>> findNewFriendsByName(
-        @ApiIgnore Pageable page,
-        @RequestParam String name,
-        @ApiIgnore @CurrentUser UserVO userVO) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findNewFriendByName(name, page, userVO.getId()));
-    }
-
-    /**
-     * Method that find new Friends by name.
-     */
     @ApiOperation(value = "Search Friends by name")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),

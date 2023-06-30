@@ -978,15 +978,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id) {
-        Page<User> ourUsersList = userRepo.findUsersByName(name, page, id);
-        return getUserAllFriendsDtoPageableDto(id, ourUsersList);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public PageableDto<UserAllFriendsDto> findUserByName(String name, Pageable page, Long id) {
         Page<User> ourUsersList = userRepo.findAllUsersByName(name, page, id);
         return getUserAllFriendsDtoPageableDto(id, ourUsersList);

@@ -403,13 +403,6 @@ public interface UserService {
     List<UserVO> findAll();
 
     /**
-     * Method that finds new friends by name.
-     *
-     * @return {@link List} of {@link UserAllFriendsDto} instances.
-     */
-    PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id);
-
-    /**
      * Method that finds users by name.
      *
      * @return {@link List} of {@link UserAllFriendsDto} instances.
