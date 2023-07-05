@@ -30,7 +30,11 @@ public class SocialNetworkLinksValidator implements ConstraintValidator<ValidSoc
             throw new BadSocialNetworkLinksException(ErrorMessage.USER_CANNOT_ADD_SAME_SOCIAL_NETWORK_LINKS);
         }
 
-        links.forEach(UrlValidator::isUrlValid);
+        for (String link : links) {
+            if (!UrlValidator.isUrlValid(link)) {
+                return false;
+            }
+        }
 
         return true;
     }
