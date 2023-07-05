@@ -377,6 +377,15 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findByEmail() {
+        String email = "test";
+        Optional<User> optionalUser = Optional.of(new User());
+
+        UserVO userVO = optionalUser.isPresent() ? modelMapper.map(optionalUser.get(), UserVO.class) : null;
+        assertEquals(userVO, userService.findByEmail(email));
+    }
+
+    @Test
     void findIdByEmail() {
         String email = "email";
         when(userRepo.findIdByEmail(email)).thenReturn(Optional.of(2L));
