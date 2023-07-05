@@ -31,7 +31,7 @@ public class SocialNetworkLinksValidator implements ConstraintValidator<ValidSoc
         return links.stream().allMatch(UrlValidator::isUrlValid);
     }
 
-    private boolean areDistinct(List<String> list) {
+    public boolean areDistinct(List<String> list) {
         Set<String> hashSet = new HashSet<>(list);
         return (hashSet.size() == list.size());
     }

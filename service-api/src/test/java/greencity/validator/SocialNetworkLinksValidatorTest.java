@@ -9,7 +9,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.validation.ConstraintValidatorContext;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,5 +27,31 @@ class SocialNetworkLinksValidatorTest {
         List<String> links = List.of("1", "2", "3", "4", "5", "6");
         assertThrows(BadSocialNetworkLinksException.class,
             () -> socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
+    }
+
+    @Test
+    void isValidWithLinksNull() {
+        List<String> links = null;
+        assertTrue(socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
+    }
+
+    @Test
+    void isValidWithTwoSameSocialNetworkLinks() {
+        List<String> links = List.of("1", "1");
+        assertThrows(BadSocialNetworkLinksException.class,
+            () -> socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
+    }
+
+    @Test
+    void isValidAllValidUrlsCorrect() {
+        List<String> links = List.of("https://example1.com", "https://example2.com", "https://example3.com");
+        assertTrue(socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
+    }
+
+    @Test
+    void areDistinctTest() {
+        List<String> list = List.of("1", "2", "3");
+        boolean result = socialNetworkLinksValidator.areDistinct(list);
+        assertTrue(result);
     }
 }
