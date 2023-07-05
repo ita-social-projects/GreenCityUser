@@ -28,7 +28,7 @@ public class SocialNetworkLinksValidator implements ConstraintValidator<ValidSoc
         if (!areDistinct(links)) {
             throw new BadSocialNetworkLinksException(ErrorMessage.USER_CANNOT_ADD_SAME_SOCIAL_NETWORK_LINKS);
         }
-         return links.stream().allMatch(UrlValidator::isUrlValid);
+        return links.stream().allMatch(UrlValidator::isUrlValid);
     }
 
     private boolean areDistinct(List<String> list) {
