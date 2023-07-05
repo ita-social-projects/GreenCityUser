@@ -674,6 +674,29 @@ class UserServiceImplTest {
     }
 
     @Test
+    void testGetAllUserFriendRequests() {
+        Long userId = 1L;
+        List<User> mockUserFriends = new ArrayList<>();
+        User user1 = new User();
+        user1.setId(2L);
+        user1.setName("Test");
+        mockUserFriends.add(user1);
+        when(userRepo.getAllUserFriendRequests(userId)).thenReturn(mockUserFriends);
+        List<UserVO> expectedUserVOs = new ArrayList<>();
+        UserVO userVO1 = new UserVO();
+        userVO1.setId(2L);
+        userVO1.setName("Test");
+        expectedUserVOs.add(userVO1);
+        when(modelMapper.map(mockUserFriends, new TypeToken<List<UserVO>>() {
+        }.getType())).thenReturn(expectedUserVOs);
+        List<UserVO> actualUserVOs = userService.getAllUserFriendRequests(userId);
+        assertEquals(expectedUserVOs, actualUserVOs);
+        verify(userRepo, times(1)).getAllUserFriendRequests(userId);
+        verify(modelMapper, times(1)).map(mockUserFriends, new TypeToken<List<UserVO>>() {
+        }.getType());
+    }
+
+    @Test
     void getSixFriendsWithTheHighestRatingPagedTest() {
         Pageable pageable = PageRequest.of(0, 6);
         List<User> users = Collections.singletonList(ModelUtils.getUser());
