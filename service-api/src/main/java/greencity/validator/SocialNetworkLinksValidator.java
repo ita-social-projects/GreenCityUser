@@ -22,21 +22,13 @@ public class SocialNetworkLinksValidator implements ConstraintValidator<ValidSoc
         if (links == null) {
             return true;
         }
-
         if (links.size() > ValidationConstants.MAX_AMOUNT_OF_SOCIAL_NETWORK_LINKS) {
             throw new BadSocialNetworkLinksException(ErrorMessage.USER_CANNOT_ADD_MORE_THAN_5_SOCIAL_NETWORK_LINKS);
         }
         if (!areDistinct(links)) {
             throw new BadSocialNetworkLinksException(ErrorMessage.USER_CANNOT_ADD_SAME_SOCIAL_NETWORK_LINKS);
         }
-
-        for (String link : links) {
-            if (!UrlValidator.isUrlValid(link)) {
-                return false;
-            }
-        }
-
-        return true;
+         return links.stream().allMatch(UrlValidator::isUrlValid);
     }
 
     private boolean areDistinct(List<String> list) {
