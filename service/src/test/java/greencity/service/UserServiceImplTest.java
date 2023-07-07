@@ -211,8 +211,8 @@ class UserServiceImplTest {
         UserAllFriendsDto friendsDto1 = new UserAllFriendsDto();
         friendsDto1.setId(1L);
 
-        Long amountOfAcquiredHabitsByUserId = 10L;
-        Long amountOfHabitsInProgressByUserId = 5L;
+        Long amountOfAcquiredHabitsByUserId = 0L;
+        Long amountOfHabitsInProgressByUserId = 0L;
 
         UserRepo userRepoMock = mock(UserRepo.class);
         RestClient restClientMock = mock(RestClient.class);
