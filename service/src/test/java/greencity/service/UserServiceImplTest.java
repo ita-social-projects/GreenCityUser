@@ -217,10 +217,10 @@ class UserServiceImplTest {
         UserRepo userRepoMock = mock(UserRepo.class);
         RestClient restClientMock = mock(RestClient.class);
 
-        when(userRepoMock.findUsersRecommendedFriends(pageable, userId)).thenReturn(new PageImpl<>(recommendedFriendsList, pageable, recommendedFriendsList.size()));
+        when(userRepoMock.findUsersRecommendedFriends(pageable, userId))
+            .thenReturn(new PageImpl<>(recommendedFriendsList, pageable, recommendedFriendsList.size()));
         when(restClientMock.findAmountOfAcquiredHabits(userId)).thenReturn(amountOfAcquiredHabitsByUserId);
         when(restClientMock.findAmountOfHabitsInProgress(userId)).thenReturn(amountOfHabitsInProgressByUserId);
-
 
         int start = Math.min((int) pageable.getOffset(), 0);
         int end = Math.min((start + pageable.getPageSize()), 0);
