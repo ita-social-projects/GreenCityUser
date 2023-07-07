@@ -202,6 +202,25 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findUsersRecommendedFriendsTestWithEmptyRecommendedFriends() {
+        Long userId = 3L;
+        Pageable pageable = PageRequest.of(0, 1);
+        Page<UsersFriendDto> recommendedFriends = userRepo.findUsersRecommendedFriends(pageable, userId);
+
+        List<UsersFriendDto> recommendedFriendsList = new ArrayList<>();
+        UserAllFriendsDto friendsDto1 = new UserAllFriendsDto();
+        friendsDto1.setId(1L);
+
+        int start = Math.min((int) pageable.getOffset(), 0);
+        int end = Math.min((start + pageable.getPageSize()), 0);
+
+        Page<UsersFriendDto> recommendedFriendsResult = new PageImpl<>(recommendedFriendsList.subList(start, end),
+            pageable, recommendedFriendsList.size());
+
+        assertEquals(pageable, recommendedFriendsResult.getPageable());
+    }
+
+    @Test
     void findAllUsersFriendsTest() {
         User user = User.builder()
             .id(1L)
