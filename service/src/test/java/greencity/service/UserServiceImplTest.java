@@ -211,6 +211,17 @@ class UserServiceImplTest {
         UserAllFriendsDto friendsDto1 = new UserAllFriendsDto();
         friendsDto1.setId(1L);
 
+        Long amountOfAcquiredHabitsByUserId = 10L;
+        Long amountOfHabitsInProgressByUserId = 5L;
+
+        UserRepo userRepoMock = mock(UserRepo.class);
+        RestClient restClientMock = mock(RestClient.class);
+
+        when(userRepoMock.findUsersRecommendedFriends(pageable, userId)).thenReturn(new PageImpl<>(recommendedFriendsList, pageable, recommendedFriendsList.size()));
+        when(restClientMock.findAmountOfAcquiredHabits(userId)).thenReturn(amountOfAcquiredHabitsByUserId);
+        when(restClientMock.findAmountOfHabitsInProgress(userId)).thenReturn(amountOfHabitsInProgressByUserId);
+
+
         int start = Math.min((int) pageable.getOffset(), 0);
         int end = Math.min((start + pageable.getPageSize()), 0);
 
