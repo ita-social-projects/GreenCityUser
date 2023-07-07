@@ -228,6 +228,10 @@ class UserServiceImplTest {
         Page<UsersFriendDto> recommendedFriendsResult = new PageImpl<>(recommendedFriendsList.subList(start, end),
             pageable, recommendedFriendsList.size());
 
+        assertTrue(recommendedFriendsList.isEmpty());
+        assertEquals(0, amountOfAcquiredHabitsByUserId);
+        assertEquals(0, amountOfHabitsInProgressByUserId);
+
         assertEquals(pageable, recommendedFriendsResult.getPageable());
     }
 
