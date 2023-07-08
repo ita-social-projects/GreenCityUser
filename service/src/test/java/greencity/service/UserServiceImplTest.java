@@ -206,6 +206,39 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findUsersEnptyRecommendedFriendsTest() {
+        User user = User.builder()
+            .id(1L)
+            .name("test")
+            .city("test")
+            .rating(20.0)
+            .profilePicturePath("test")
+            .build();
+        List<User> singletonListUsers = Collections.singletonList(user);
+        UsersFriendDto usersFriendDto = ModelUtils.usersFriendDto;
+        List<UsersFriendDto> singletonList = Collections.singletonList(usersFriendDto);
+        List<UsersFriendDto> list = new ArrayList();
+        PageRequest pageRequest = PageRequest.of(0, 1);
+        Page<UsersFriendDto> page = new PageImpl<>(list, pageRequest, singletonList.size());
+        List<UserAllFriendsDto> dtoList =
+            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
+                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
+        PageableDto<UserAllFriendsDto> pageableDto =
+            new PageableDto<>(dtoList, dtoList.size(), 0, 1);
+        when(userRepo.findUsersRecommendedFriends(pageRequest, userId)).thenReturn(page);
+        when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
+        }.getType())).thenReturn(dtoList);
+        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
+        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
+        when(userRepo.findAnyRecommendedFriends(userId)).thenReturn(singletonList);
+        when(userRepo.findUsersRecommendedFriends(any(Pageable.class), any(Long.class))).thenReturn(Page.empty());
+        when(restClient.findAmountOfAcquiredHabits(userId)).thenReturn(0L);
+        when(restClient.findAmountOfHabitsInProgress(userId)).thenReturn(0L);
+        PageableDto<UserAllFriendsDto> actual = userService.findUsersRecommendedFriends(pageRequest, 1L);
+        assertEquals(pageableDto, actual);
+    }
+
+    @Test
     void findAllUsersFriendsTest() {
         User user = User.builder()
             .id(1L)
