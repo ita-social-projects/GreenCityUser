@@ -197,42 +197,11 @@ class UserServiceImplTest {
         when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
         when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
         when(userRepo.findAnyRecommendedFriends(userId)).thenReturn(singletonList);
+        when(userRepo.findUsersRecommendedFriends(pageRequest, userId)).thenReturn(Page.empty());
+        when(restClient.findAmountOfAcquiredHabits(userId)).thenReturn(0L);
+        when(restClient.findAmountOfHabitsInProgress(userId)).thenReturn(0L);
         PageableDto<UserAllFriendsDto> actual = userService.findUsersRecommendedFriends(pageRequest, 1L);
         assertEquals(pageableDto, actual);
-    }
-
-    @Test
-    void findUsersRecommendedFriendsTestWithEmptyRecommendedFriends() {
-        Long userId = 3L;
-        Pageable pageable = PageRequest.of(0, 1);
-        Page<UsersFriendDto> recommendedFriends = userRepo.findUsersRecommendedFriends(pageable, userId);
-
-        List<UsersFriendDto> recommendedFriendsList = new ArrayList<>();
-        UserAllFriendsDto friendsDto1 = new UserAllFriendsDto();
-        friendsDto1.setId(1L);
-
-        Long amountOfAcquiredHabitsByUserId = 0L;
-        Long amountOfHabitsInProgressByUserId = 0L;
-
-        UserRepo userRepoMock = mock(UserRepo.class);
-        RestClient restClientMock = mock(RestClient.class);
-
-        when(userRepoMock.findUsersRecommendedFriends(pageable, userId))
-            .thenReturn(new PageImpl<>(recommendedFriendsList, pageable, recommendedFriendsList.size()));
-        when(restClientMock.findAmountOfAcquiredHabits(userId)).thenReturn(amountOfAcquiredHabitsByUserId);
-        when(restClientMock.findAmountOfHabitsInProgress(userId)).thenReturn(amountOfHabitsInProgressByUserId);
-
-        int start = Math.min((int) pageable.getOffset(), 0);
-        int end = Math.min((start + pageable.getPageSize()), 0);
-
-        Page<UsersFriendDto> recommendedFriendsResult = new PageImpl<>(recommendedFriendsList.subList(start, end),
-            pageable, recommendedFriendsList.size());
-
-        assertTrue(recommendedFriendsList.isEmpty());
-        assertEquals(0, amountOfAcquiredHabitsByUserId);
-        assertEquals(0, amountOfHabitsInProgressByUserId);
-
-        assertEquals(pageable, recommendedFriendsResult.getPageable());
     }
 
     @Test
