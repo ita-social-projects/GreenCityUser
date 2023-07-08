@@ -184,6 +184,7 @@ class UserServiceImplTest {
         UsersFriendDto usersFriendDto = ModelUtils.usersFriendDto;
         List<UsersFriendDto> singletonList = Collections.singletonList(usersFriendDto);
         List<UsersFriendDto> list = new ArrayList();
+        list.add(usersFriendDto);
         PageRequest pageRequest = PageRequest.of(0, 1);
         Page<UsersFriendDto> page = new PageImpl<>(list, pageRequest, singletonList.size());
         List<UserAllFriendsDto> dtoList =
