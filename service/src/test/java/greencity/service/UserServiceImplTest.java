@@ -198,7 +198,7 @@ class UserServiceImplTest {
         when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
         when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
         when(userRepo.findAnyRecommendedFriends(userId)).thenReturn(singletonList);
-        when(userRepo.findUsersRecommendedFriends(pageRequest, userId)).thenReturn(Page.empty());
+        when(userRepo.findUsersRecommendedFriends(any(Pageable.class), any(Long.class))).thenReturn(Page.empty());
         when(restClient.findAmountOfAcquiredHabits(userId)).thenReturn(0L);
         when(restClient.findAmountOfHabitsInProgress(userId)).thenReturn(0L);
         PageableDto<UserAllFriendsDto> actual = userService.findUsersRecommendedFriends(pageRequest, 1L);
