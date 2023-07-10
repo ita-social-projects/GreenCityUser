@@ -598,8 +598,8 @@ class UserServiceImplTest {
         userProfilePictureDto.setProfilePicturePath(null);
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         assertThrows(BadRequestException.class,
-                () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
-                        "test"));
+            () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
+                "test"));
     }
 
     @Test
