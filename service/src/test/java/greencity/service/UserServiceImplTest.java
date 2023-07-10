@@ -30,6 +30,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -42,6 +43,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -597,10 +599,12 @@ class UserServiceImplTest {
         UserProfilePictureDto userProfilePictureDto = ModelUtils.getUserProfilePictureDto();
         userProfilePictureDto.setProfilePicturePath(null);
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(restClient.uploadImage(any(MultipartFile.class))).thenReturn(null);
         assertThrows(BadRequestException.class,
-            () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
-                "test"));
+                () -> userService.updateUserProfilePicture(Mockito.any(MultipartFile.class), "testmail@gmail.com",
+                        "test"));
     }
+
 
     @Test
     void geTUserProfileStatistics() {
