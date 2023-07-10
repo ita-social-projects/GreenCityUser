@@ -200,6 +200,8 @@ class UserServiceImplTest {
         PageableDto<UserAllFriendsDto> actual = userService.findUsersRecommendedFriends(pageRequest, 1L);
         assertEquals(pageableDto, actual);
         when(userRepo.findAnyRecommendedFriends(userId)).thenReturn(Collections.emptyList());
+        when(restClient.findAmountOfAcquiredHabits(userId)).thenReturn(0L);
+        when(restClient.findAmountOfHabitsInProgress(userId)).thenReturn(0L);
         assertEquals(pageableDto, actual);
     }
 
