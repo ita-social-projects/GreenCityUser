@@ -601,10 +601,9 @@ class UserServiceImplTest {
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         when(restClient.uploadImage(any(MultipartFile.class))).thenReturn(null);
         assertThrows(BadRequestException.class,
-                () -> userService.updateUserProfilePicture(Mockito.any(MultipartFile.class), "testmail@gmail.com",
-                        "test"));
+            () -> userService.updateUserProfilePicture(Mockito.any(MultipartFile.class), "testmail@gmail.com",
+                "test"));
     }
-
 
     @Test
     void geTUserProfileStatistics() {
