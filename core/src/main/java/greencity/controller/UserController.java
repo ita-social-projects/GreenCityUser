@@ -402,27 +402,6 @@ public class UserController {
     }
 
     /**
-     * The method finds for the current userId.
-     *
-     * @return {@link ResponseEntity}.
-     */
-    @ApiOperation(value = "Find user's requests")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-    })
-    @GetMapping("/{userId}/friendRequests/")
-    @ApiPageable
-    public ResponseEntity<PageableDto<UserAllFriendsDto>> getAllUserFriendsRequests(
-        @ApiIgnore Pageable page,
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(userService.getAllUserFriendRequests(userId, page));
-    }
-
-    /**
      * The method finds {@link UserAllFriendsDto} for the current userId.
      *
      * @return {@link ResponseEntity}.

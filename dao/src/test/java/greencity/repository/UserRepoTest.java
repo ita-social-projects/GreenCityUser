@@ -132,21 +132,6 @@ class UserRepoTest {
     }
 
     @Test
-    void getAllUserFriendRequestsPageTest() {
-        Pageable pageable = PageRequest.of(0, 2);
-        User user = userRepo.findByEmail("test5@email.com").get();
-        List<User> users = Arrays.asList(user);
-        Page<User> actual = new PageImpl<>(users, pageable, users.size());
-        Page<User> expected = userRepo.getAllUserFriendRequests(4L, pageable);
-        List<Long> actualIds = actual.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-        List<Long> expectedIds = expected.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-        assertEquals(1, expected.getContent().size());
-        assertEquals(expectedIds, actualIds);
-    }
-
-    @Test
     void getAllUserFriendRequestsTest() {
         List<User> users = userRepo.getAllUserFriendRequests(4L);
         assertEquals(1, users.size());

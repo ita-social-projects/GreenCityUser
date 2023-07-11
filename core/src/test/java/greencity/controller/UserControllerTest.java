@@ -206,17 +206,6 @@ class UserControllerTest {
     }
 
     @Test
-    void findAllUsersFriendRequestTest() throws Exception {
-        int pageNumber = 0;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/friendRequests/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).getAllUserFriendRequests(1L, pageable);
-    }
-
-    @Test
     void getRolesTest() throws Exception {
         mockMvc.perform(get(userLink + "/roles"))
             .andExpect(status().isOk());

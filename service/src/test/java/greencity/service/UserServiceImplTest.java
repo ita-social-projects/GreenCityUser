@@ -630,32 +630,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getAllUserFriendRequestsTest() {
-        User user = User.builder()
-            .id(1L)
-            .name("test")
-            .city("test")
-            .rating(20.0)
-            .profilePicturePath("test")
-            .build();
-        List<User> singletonList = Collections.singletonList(user);
-        PageRequest pageRequest = PageRequest.of(0, 1);
-        Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
-        List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
-                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
-        PageableDto<UserAllFriendsDto> pageableDto =
-            new PageableDto<>(dtoList, dtoList.size(), 0, 1);
-        when(userRepo.getAllUserFriendRequests(userId, pageRequest)).thenReturn(page);
-        when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType())).thenReturn(dtoList);
-        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonList);
-        PageableDto<UserAllFriendsDto> actual = userService.getAllUserFriendRequests(1L, pageRequest);
-
-        assertEquals(pageableDto, actual);
-    }
-
-    @Test
     void getSixFriendsWithTheHighestRatingPagedTest() {
         Pageable pageable = PageRequest.of(0, 6);
         List<User> users = Collections.singletonList(ModelUtils.getUser());

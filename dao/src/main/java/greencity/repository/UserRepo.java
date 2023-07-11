@@ -135,16 +135,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> getAllUserFriends(Long userId, Pageable pageable);
 
     /**
-     * Get all user friend requests{@link User}. by page.
-     *
-     * @param pageable pageable configuration.
-     * @return {@link Page}
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'REQUEST')")
-    Page<User> getAllUserFriendRequests(Long userId, Pageable pageable);
-
-    /**
      * Get all user friend requests{@link User}.
      *
      * @return list of {@link User}.
