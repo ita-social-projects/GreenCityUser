@@ -195,17 +195,6 @@ class UserControllerTest {
     }
 
     @Test
-    void findAllUsersFriendsTest() throws Exception {
-        int pageNumber = 0;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/findAll/friends/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).findAllUsersFriends(pageable, 1L);
-    }
-
-    @Test
     void getRolesTest() throws Exception {
         mockMvc.perform(get(userLink + "/roles"))
             .andExpect(status().isOk());
@@ -715,20 +704,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.length()").value(2))
             .andExpect(jsonPath("$.1").value(10))
             .andExpect(jsonPath("$.12").value(20));
-    }
-
-    @Test
-    void findFriendsByName() throws Exception {
-        int pageNumber = 1;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn(TestConst.EMAIL);
-        when(userService.findByEmail(principal.getName())).thenReturn(ModelUtils.getUserVO());
-        mockMvc.perform(get(userLink + "/findFriendByName?page=" + pageNumber + "&name=test")
-            .principal(principal)).andExpect(status().isOk());
-
-        verify(userService).findFriendByName("test", pageable, 1L);
     }
 
     @Test

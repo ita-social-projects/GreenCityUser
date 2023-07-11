@@ -1,30 +1,54 @@
 package greencity.service;
 
-import greencity.constant.UpdateConstants;
-import greencity.dto.UbsCustomerDto;
-import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
-import greencity.entity.Language;
-import greencity.entity.UserDeactivationReason;
-import greencity.enums.UserStatusRequest;
-import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
+import greencity.constant.UpdateConstants;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.RoleDto;
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserAllFriendsDto;
+import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserProfileDtoResponse;
+import greencity.dto.user.UserProfilePictureDto;
+import greencity.dto.user.UserProfileStatisticsDto;
+import greencity.dto.user.UserRoleDto;
+import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserUpdateDto;
+import greencity.dto.user.UserVO;
+import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.dto.user.UsersFriendDto;
+import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
+import greencity.entity.UserDeactivationReason;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.LowRoleLevelException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongIdException;
+import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
@@ -49,7 +73,11 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -224,26 +252,6 @@ public class UserServiceImpl implements UserService {
             recommendedFriends.getTotalElements(),
             recommendedFriends.getPageable().getPageNumber(),
             recommendedFriends.getTotalPages());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId) {
-        Page<User> friends = userRepo.getAllUserFriends(userId, pageable);
-        List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
-            new TypeToken<List<UserAllFriendsDto>>() {
-            }.getType());
-        for (UserAllFriendsDto friendDto : friendDtos) {
-            friendDto.setFriendStatus(UserStatusRequest.FRIEND.toString());
-        }
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
-        return new PageableDto<>(
-            allUsersMutualFriendsMethod(friendDtos),
-            friends.getTotalElements(),
-            friends.getPageable().getPageNumber(),
-            friends.getTotalPages());
     }
 
     /**
@@ -957,33 +965,8 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id) {
-        Page<User> ourUsersList = userRepo.findFriendsByName(name, page, id);
-        return getUserAllFriendsDtoPageableDto(id, ourUsersList);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Map<Integer, Long> findAllRegistrationMonthsMap() {
         return userRepo.findAllRegistrationMonthsMap();
-    }
-
-    private List<UserAllFriendsDto> allUsersMutualFriendsMethod(List<UserAllFriendsDto> userAllFriends) {
-        for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
-            long mutualFriends = 0;
-            List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
-            for (User friendUser : allFriendsCurrentUser) {
-                for (UserAllFriendsDto user : userAllFriends) {
-                    if (friendUser.getId().equals(user.getId())) {
-                        mutualFriends++;
-                    }
-                }
-            }
-            friendCurrentUser.setMutualFriends(mutualFriends);
-        }
-        return userAllFriends;
     }
 
     private List<UserAllFriendsDto> allUsersMutualFriendsRecommendedOrRequest(Long id,

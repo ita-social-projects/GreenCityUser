@@ -410,13 +410,6 @@ public interface UserService {
     PageableDto<UserAllFriendsDto> findUserByName(String name, Pageable page, Long id);
 
     /**
-     * Method that finds friends by name.
-     *
-     * @return {@link List} of {@link UserAllFriendsDto} instances.
-     */
-    PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id);
-
-    /**
      * Method that finds user's recommended friends.
      *
      * @param pageable {@link Pageable}.
@@ -425,16 +418,6 @@ public interface UserService {
      */
 
     PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
-
-    /**
-     * Method that finds all user's friends.
-     *
-     * @param pageable {@link Pageable}.
-     * @param userId   {@link Long} -current user's id.
-     * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
-     */
-
-    PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
 
     /**
      * {@inheritDoc}

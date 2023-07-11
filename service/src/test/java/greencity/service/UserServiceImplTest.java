@@ -202,33 +202,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findAllUsersFriendsTest() {
-        User user = User.builder()
-            .id(1L)
-            .name("test")
-            .city("test")
-            .rating(20.0)
-            .profilePicturePath("test")
-            .build();
-        List<User> singletonList = Collections.singletonList(user);
-        PageRequest pageRequest = PageRequest.of(0, 1);
-        Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
-        List<User> list = Collections.singletonList(user);
-        List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
-                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
-        PageableDto<UserAllFriendsDto> pageableDto =
-            new PageableDto<>(dtoList, dtoList.size(), 0, 1);
-        when(userRepo.getAllUserFriends(userId, pageRequest)).thenReturn(page);
-        when(userRepo.getAllUserFriends(1L)).thenReturn(list);
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(ModelUtils.getUser()));
-        when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType())).thenReturn(dtoList);
-        PageableDto<UserAllFriendsDto> actual = userService.findAllUsersFriends(pageRequest, 1L);
-        assertEquals(pageableDto, actual);
-    }
-
-    @Test
     void saveTest() {
         when(userRepo.findByEmail(userEmail)).thenReturn(Optional.ofNullable(user));
         when(userService.findByEmail(userEmail)).thenReturn(userVO);
@@ -604,24 +577,6 @@ class UserServiceImplTest {
             pages.getPageable().getPageNumber(),
             pages.getTotalPages());
         assertEquals(pageableDto, userService.findUserByName("martin", pageable, 1L));
-    }
-
-    @Test
-    void findFriendByName() {
-        Pageable pageable = PageRequest.of(1, 3);
-        user.setUserCredo("credo");
-        Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
-        when(userRepo.findFriendsByName("martin", pageable, 1L))
-            .thenReturn(pages);
-        when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType()))
-            .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
-        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
-            CREATE_USER_ALL_FRIENDS_DTO,
-            pages.getTotalElements(),
-            pages.getPageable().getPageNumber(),
-            pages.getTotalPages());
-        assertEquals(pageableDto, userService.findFriendByName("martin", pageable, 1L));
     }
 
     @Test
