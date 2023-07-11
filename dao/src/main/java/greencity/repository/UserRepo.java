@@ -135,33 +135,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> getAllUserFriends(Long userId, Pageable pageable);
 
     /**
-     * Get all user friend requests{@link User}.
-     *
-     * @return list of {@link User}.
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'REQUEST')")
-    List<User> getAllUserFriendRequests(Long userId);
-
-    /**
-     * <<<<<<< HEAD ======= Accept friend request {@link User}.
-     */
-    @Modifying
-    @Query(nativeQuery = true,
-        value = "UPDATE users_friends SET status = 'FRIEND' "
-            + "WHERE user_id = :friendId AND friend_id = :userId")
-    void acceptFriendRequest(Long userId, Long friendId);
-
-    /**
-     * Decline friend request {@link User}.
-     */
-    @Modifying
-    @Query(nativeQuery = true,
-        value = "DELETE FROM users_friends WHERE user_id = :friendId AND friend_id = :userId")
-    void declineFriendRequest(Long userId, Long friendId);
-
-    /**
-     * >>>>>>> dev Get six friends with the highest rating {@link User}.
+     * Get six friends with the highest rating {@link User}.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
         + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 'FRIEND') "
@@ -346,15 +320,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         + "WHERE U1.user_id =:id GROUP BY U2.user_id Having u2.user_id not in (:id)\n"
         + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n")
     int countOfMutualFriends(Long id);
-
-    /**
-     * This method was created only for testing some functions. We don't need this
-     * method in our application.
-     */
-    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId)"
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId));")
-    List<User> getAllUserFriendsWithoutStatus(Long userId);
 
     /**
      * Method, that return status from table user_friends.

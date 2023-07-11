@@ -250,16 +250,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVO> getAllUserFriendRequests(Long userId) {
-        List<User> allUserFriends = userRepo.getAllUserFriendRequests(userId);
-        return modelMapper.map(allUserFriends, new TypeToken<List<UserVO>>() {
-        }.getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public PageableAdvancedDto<UserManagementVO> search(Pageable pageable,
         UserManagementViewDto userManagementViewDto) {
         Page<User> found = userRepo.findAll(buildSpecification(userManagementViewDto), pageable);

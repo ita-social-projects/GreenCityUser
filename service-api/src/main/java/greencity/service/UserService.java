@@ -437,14 +437,6 @@ public interface UserService {
     PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
 
     /**
-     * Method that finds all friends that send you request.
-     *
-     * @param userId {@link Long} -current user's id.
-     * @return {@link List} of {@link UserVO} instances.
-     */
-    List<UserVO> getAllUserFriendRequests(Long userId);
-
-    /**
      * {@inheritDoc}
      */
     PageableAdvancedDto<UserManagementVO> search(Pageable pageable, UserManagementViewDto userManagementViewDto);

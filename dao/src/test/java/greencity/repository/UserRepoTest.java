@@ -132,13 +132,6 @@ class UserRepoTest {
     }
 
     @Test
-    void getAllUserFriendRequestsTest() {
-        List<User> users = userRepo.getAllUserFriendRequests(4L);
-        assertEquals(1, users.size());
-        assertEquals(5, users.get(0).getId());
-    }
-
-    @Test
     void getSixFriendsWithTheHighestRatingTest() {
         List<User> friends = userRepo.getSixFriendsWithTheHighestRating(1L);
         User user2 = userRepo.findByEmail("test2@email.com").get();
