@@ -684,13 +684,13 @@ class UserServiceImplTest {
 
         when(userRepo.getAllUserFriendRequests(userId)).thenReturn(friendRequests);
 
-        List<UserVO> expectedUserVOs = modelMapper.map(friendRequests, new TypeToken<List<UserVO>>() {}.getType());
+        List<UserVO> expectedUserVOs = modelMapper.map(friendRequests, new TypeToken<List<UserVO>>() {
+        }.getType());
 
         List<UserVO> actualUserVOs = userService.getAllUserFriendRequests(userId);
 
         assertEquals(expectedUserVOs, actualUserVOs);
     }
-
 
     @Test
     void getSixFriendsWithTheHighestRatingPagedTest() {
@@ -734,6 +734,20 @@ class UserServiceImplTest {
             () -> userService.saveUserProfile(request, "test@gmail.com"));
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "test@gmail.com", thrown.getMessage());
         verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
+    void saveUserProfileUpdatesNameWhenNameNotNull() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("John Doe");
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        String result = userService.saveUserProfile(request, "test@gmail.com");
+        assertEquals(UpdateConstants.SUCCESS_EN, result);
+        assertEquals("John Doe", user.getName());
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
     }
 
     @Test
