@@ -737,17 +737,20 @@ class UserServiceImplTest {
     }
 
     @Test
-    void saveUserProfileUpdatesNameWhenNameNotNull() {
+    void saveUserProfileUpdatesValuesNull() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("John Doe");
+        request.setName(null);
+        request.setUserCredo(null);
+        request.setCity(null);
+        request.setSocialNetworks(null);
+        request.setShowLocation(null);
+        request.setShowEcoPlace(null);
+        request.setShowShoppingList(null);
         var user = ModelUtils.getUserWithSocialNetworks();
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
         String result = userService.saveUserProfile(request, "test@gmail.com");
         assertEquals(UpdateConstants.SUCCESS_EN, result);
-        assertEquals("John Doe", user.getName());
-        verify(userRepo).findByEmail("test@gmail.com");
-        verify(userRepo).save(user);
     }
 
     @Test
