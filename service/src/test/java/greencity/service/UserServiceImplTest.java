@@ -935,6 +935,7 @@ class UserServiceImplTest {
         when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
         assertEquals(test1, userService.getDeactivationReason(1L, "en"));
         assertEquals(test1, userService.getDeactivationReason(1L, "ua"));
+        assertEquals(test1, userService.getDeactivationReason(1L, "uk"));
     }
 
     @Test
