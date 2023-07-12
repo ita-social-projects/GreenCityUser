@@ -26,4 +26,23 @@ class SocialNetworkLinksValidatorTest {
         assertThrows(BadSocialNetworkLinksException.class,
             () -> socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
     }
+
+    @Test
+    void isValidWithLinksNull() {
+        List<String> links = null;
+        assertTrue(socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
+    }
+
+    @Test
+    void isValidWithTwoSameSocialNetworkLinks() {
+        List<String> links = List.of("1", "1");
+        assertThrows(BadSocialNetworkLinksException.class,
+                () -> socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
+    }
+
+    @Test
+    void isValidAllValidUrlsCorrect() {
+        List<String> links = List.of("https://example1.com", "https://example2.com", "https://example3.com");
+        assertTrue(socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
+    }
 }
