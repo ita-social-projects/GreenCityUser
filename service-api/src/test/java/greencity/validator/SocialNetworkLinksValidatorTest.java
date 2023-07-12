@@ -37,7 +37,7 @@ class SocialNetworkLinksValidatorTest {
     void isValidWithTwoSameSocialNetworkLinks() {
         List<String> links = List.of("1", "1");
         assertThrows(BadSocialNetworkLinksException.class,
-                () -> socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
+            () -> socialNetworkLinksValidator.isValid(links, constraintValidatorContext));
     }
 
     @Test

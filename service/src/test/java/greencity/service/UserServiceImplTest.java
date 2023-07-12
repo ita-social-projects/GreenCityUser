@@ -706,6 +706,7 @@ class UserServiceImplTest {
         verify(userRepo).findByEmail("test@gmail.com");
         verify(userRepo).save(user);
     }
+
     @Test
     void saveUserProfileUpdatesValuesNull() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
