@@ -674,6 +674,25 @@ class UserServiceImplTest {
     }
 
     @Test
+    void getAllUserFriendRequests() {
+        Long userId = 1L;
+
+        List<User> friendRequests = new ArrayList<>();
+        friendRequests.add(new User());
+        friendRequests.add(new User());
+        friendRequests.add(new User());
+
+        when(userRepo.getAllUserFriendRequests(userId)).thenReturn(friendRequests);
+
+        List<UserVO> expectedUserVOs = modelMapper.map(friendRequests, new TypeToken<List<UserVO>>() {}.getType());
+
+        List<UserVO> actualUserVOs = userService.getAllUserFriendRequests(userId);
+
+        assertEquals(expectedUserVOs, actualUserVOs);
+    }
+
+
+    @Test
     void getSixFriendsWithTheHighestRatingPagedTest() {
         Pageable pageable = PageRequest.of(0, 6);
         List<User> users = Collections.singletonList(ModelUtils.getUser());
