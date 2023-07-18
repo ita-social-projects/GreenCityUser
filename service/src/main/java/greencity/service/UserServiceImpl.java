@@ -9,7 +9,6 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.RoleDto;
@@ -25,7 +24,6 @@ import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserManagementViewDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfilePictureDto;
 import greencity.dto.user.UserProfileStatisticsDto;
 import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
@@ -61,7 +59,6 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -598,57 +595,6 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         user.setProfilePicturePath(null);
         userRepo.save(user);
-    }
-
-    /**
-     * Get six friends with the highest rating {@link UserVO}.
-     *
-     * @param userId {@link Long}
-     * @author Marian Datsko
-     */
-    @Override
-    public List<UserProfilePictureDto> getSixFriendsWithTheHighestRating(Long userId) {
-        List<UserProfilePictureDto> userProfilePictureDtoList = userRepo.getSixFriendsWithTheHighestRating(userId)
-            .stream()
-            .map(user -> modelMapper.map(user, UserProfilePictureDto.class))
-            .collect(Collectors.toList());
-        if (userProfilePictureDtoList.isEmpty()) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND_ANY_FRIENDS + userId.toString());
-        }
-        return userProfilePictureDtoList;
-    }
-
-    /**
-     * Get six friends with the highest rating {@link UserVO}. by page.
-     *
-     * @param userId {@link Long}
-     * @return {@link SixFriendsPageResponceDto}.
-     * @author Oleh Bilonizhka
-     */
-    @Override
-    public SixFriendsPageResponceDto getSixFriendsWithTheHighestRatingPaged(Long userId) {
-        Pageable pageable = PageRequest.of(0, 6);
-        List<User> users = userRepo.getSixFriendsWithTheHighestRating(userId);
-        Page<User> pageUsers = new PageImpl<>(users, pageable, users.size());
-
-        List<UserProfilePictureDto> userProfilePictureDtoList = users
-            .stream()
-            .map(user -> modelMapper.map(user, UserProfilePictureDto.class))
-            .collect(Collectors.toList());
-
-        return SixFriendsPageResponceDto.builder()
-            .pagedFriends(getPageableDto(userProfilePictureDtoList,
-                pageUsers))
-            .amountOfFriends(userRepo.getAllUserFriendsCount(userId)).build();
-    }
-
-    private PageableDto<UserProfilePictureDto> getPageableDto(
-        List<UserProfilePictureDto> userProfilePictureDtoList, Page<User> pageUsers) {
-        return new PageableDto<>(
-            userProfilePictureDtoList,
-            pageUsers.getTotalElements(),
-            pageUsers.getPageable().getPageNumber(),
-            pageUsers.getTotalPages());
     }
 
     /**

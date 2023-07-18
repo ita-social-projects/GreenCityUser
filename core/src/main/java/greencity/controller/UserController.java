@@ -361,26 +361,6 @@ public class UserController {
     }
 
     /**
-     * Method returns list profile picture with the highest rating.
-     *
-     * @return {@link ResponseEntity}.
-     * @author Datsko Marian + Oleh Bilonizhka
-     */
-    @ApiOperation(value = "Get six friends profile picture with the highest rating")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-    })
-    @GetMapping("/{userId}/sixUserFriends/")
-    public ResponseEntity<SixFriendsPageResponceDto> getSixFriendsWithTheHighestRating(
-        @ApiParam("Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
-            .body(userService.getSixFriendsWithTheHighestRatingPaged(userId));
-    }
-
-    /**
      * The method finds {@link UserAllFriendsDto} for the current userId.
      *
      * @return {@link ResponseEntity}.

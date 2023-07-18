@@ -144,12 +144,6 @@ class UserRepoTest {
     }
 
     @Test
-    void getAllUserFriendsCountTest() {
-        Integer friends = userRepo.getAllUserFriendsCount(1L);
-        assertEquals(7, friends);
-    }
-
-    @Test
     void deactivateSelectedUsersTest() {
         List<Long> ids = Arrays.asList(1L, 2L, 3L);
         userRepo.deactivateSelectedUsers(ids);

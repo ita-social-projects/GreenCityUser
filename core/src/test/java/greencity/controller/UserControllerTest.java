@@ -334,14 +334,6 @@ class UserControllerTest {
     }
 
     @Test
-    void getSixFriendsWithTheHighestRatingTest() throws Exception {
-        mockMvc.perform(get(userLink + "/{userId}/sixUserFriends/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).getSixFriendsWithTheHighestRatingPaged(1L);
-    }
-
-    @Test
     void getUserProfileInformationTest() throws Exception {
         mockMvc.perform(get(userLink + "/{userId}/profile/", 1))
             .andExpect(status().isOk());

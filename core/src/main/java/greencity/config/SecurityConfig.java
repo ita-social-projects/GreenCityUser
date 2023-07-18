@@ -119,7 +119,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 USER_LINK,
                 "/user/shopping-list-items/habits/{habitId}/shopping-list",
                 "/user/{userId}/{habitId}/custom-shopping-list-items/available",
-                "/user/{userId}/sixUserFriends/",
                 "/user/{userId}/profile/",
                 "/user/isOnline/{userId}/",
                 "/user/{userId}/profileStatistics/",

@@ -580,34 +580,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getSixFriendsWithTheHighestRatingExceptionTest() {
-        assertThrows(NotFoundException.class, () -> userService.getSixFriendsWithTheHighestRating(1L));
-    }
-
-    @Test
-    void getSixFriendsWithTheHighestRatingPagedTest() {
-        Pageable pageable = PageRequest.of(0, 6);
-        List<User> users = Collections.singletonList(ModelUtils.getUser());
-        Page<User> pageUsers = new PageImpl<>(users, pageable, users.size());
-        List<UserProfilePictureDto> userProfilePictureDtoList =
-            Collections.singletonList(ModelUtils.getUserProfilePictureDto());
-
-        when(userRepo.getSixFriendsWithTheHighestRating(anyLong())).thenReturn(users);
-        when(modelMapper.map(users.get(0), UserProfilePictureDto.class)).thenReturn(userProfilePictureDtoList.get(0));
-        when(userRepo.getAllUserFriendsCount(anyLong())).thenReturn(5);
-
-        SixFriendsPageResponceDto expected = SixFriendsPageResponceDto.builder()
-            .pagedFriends(new PageableDto<>(
-                userProfilePictureDtoList,
-                pageUsers.getTotalElements(),
-                pageUsers.getPageable().getPageNumber(),
-                pageUsers.getTotalPages()))
-            .amountOfFriends(5).build();
-
-        assertEquals(expected, userService.getSixFriendsWithTheHighestRatingPaged(10L));
-    }
-
-    @Test
     void saveUserProfileTest() {
         var request = ModelUtils.getUserProfileDtoRequest();
         var user = ModelUtils.getUserWithSocialNetworks();
@@ -626,15 +598,6 @@ class UserServiceImplTest {
             () -> userService.saveUserProfile(request, "test@gmail.com"));
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "test@gmail.com", thrown.getMessage());
         verify(userRepo).findByEmail(anyString());
-    }
-
-    @Test
-    void getSixFriendsWithTheHighestRatingTest() {
-        UserProfilePictureDto e = new UserProfilePictureDto();
-        List<UserProfilePictureDto> list = Collections.singletonList(e);
-        when(userRepo.getSixFriendsWithTheHighestRating(1L)).thenReturn(Collections.singletonList(user));
-        when(modelMapper.map(user, UserProfilePictureDto.class)).thenReturn(e);
-        assertEquals(list, userService.getSixFriendsWithTheHighestRating(1L));
     }
 
     @Test

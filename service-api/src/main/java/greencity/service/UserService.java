@@ -288,23 +288,6 @@ public interface UserService {
     void deleteUserProfilePicture(String email);
 
     /**
-     * Get six friends with the highest rating {@link UserVO}.
-     *
-     * @param userId {@link Long}
-     * @author Marian Datsko
-     */
-    List<UserProfilePictureDto> getSixFriendsWithTheHighestRating(Long userId);
-
-    /**
-     * Get six friends with the highest rating {@link UserVO}. by page.
-     *
-     * @param userId {@link Long}
-     * @return {@link SixFriendsPageResponceDto}.
-     * @author Oleh Bilonizhka
-     */
-    SixFriendsPageResponceDto getSixFriendsWithTheHighestRatingPaged(Long userId);
-
-    /**
      * Save user profile information {@link UserVO}.
      *
      * @author Marian Datsko

@@ -144,17 +144,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<User> getSixFriendsWithTheHighestRating(Long userId);
 
     /**
-     * Get all user friends count.
-     *
-     * @param userId - {@link User}'s id
-     * @return - {@link Integer} count of user friends
-     */
-    @Query(nativeQuery = true, value = "SELECT count(id) FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 'FRIEND')"
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 'FRIEND'))")
-    Integer getAllUserFriendsCount(Long userId);
-
-    /**
      * Updates last activity time for a given user.
      *
      * @param userId               - {@link User}'s id
