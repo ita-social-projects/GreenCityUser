@@ -30,7 +30,6 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.dto.user.UsersFriendDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
@@ -58,7 +57,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -575,24 +573,38 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        user.setName(userProfileDtoRequest.getName());
-        user.setCity(userProfileDtoRequest.getCity());
-        user.setUserCredo(userProfileDtoRequest.getUserCredo());
+        if (userProfileDtoRequest.getName() != null) {
+            user.setName(userProfileDtoRequest.getName());
+        }
+        if (userProfileDtoRequest.getCity() != null) {
+            user.setCity(userProfileDtoRequest.getCity());
+        }
+        if (userProfileDtoRequest.getUserCredo() != null) {
+            user.setUserCredo(userProfileDtoRequest.getUserCredo());
+        }
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
-        socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
-        user.getSocialNetworks().clear();
-        user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
-            .stream()
-            .map(url -> SocialNetwork.builder()
-                .url(url)
-                .user(user)
-                .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
-                    SocialNetworkImage.class))
-                .build())
-            .collect(Collectors.toList()));
-        user.setShowLocation(userProfileDtoRequest.getShowLocation());
-        user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
-        user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
+        if (userProfileDtoRequest.getSocialNetworks() != null) {
+            socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
+            user.getSocialNetworks().clear();
+            user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
+                .stream()
+                .map(url -> SocialNetwork.builder()
+                    .url(url)
+                    .user(user)
+                    .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
+                        SocialNetworkImage.class))
+                    .build())
+                .collect(Collectors.toList()));
+        }
+        if (userProfileDtoRequest.getShowLocation() != null) {
+            user.setShowLocation(userProfileDtoRequest.getShowLocation());
+        }
+        if (userProfileDtoRequest.getShowEcoPlace() != null) {
+            user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
+        }
+        if (userProfileDtoRequest.getShowShoppingList() != null) {
+            user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
+        }
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
