@@ -223,38 +223,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
-        Page<UsersFriendDto> recommendedFriends = userRepo.findUsersRecommendedFriends(pageable, userId);
-
-        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
-        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
-
-        if (recommendedFriends.isEmpty()
-            && amountOfAcquiredHabitsByUserId == 0
-            && amountOfHabitsInProgressByUserId == 0) {
-            List<UsersFriendDto> recommendedFriendsList = userRepo.findAnyRecommendedFriends(userId);
-            int start = Math.min((int) pageable.getOffset(), recommendedFriendsList.size());
-            int end = Math.min((start + pageable.getPageSize()), recommendedFriendsList.size());
-            recommendedFriends = new PageImpl<>(recommendedFriendsList.subList(start, end),
-                pageable, recommendedFriendsList.size());
-        }
-
-        List<UserAllFriendsDto> recommendedFriendsDtos = modelMapper
-            .map(recommendedFriends.getContent(),
-                new TypeToken<List<UserAllFriendsDto>>() {
-                }.getType());
-
-        return new PageableDto<>(
-            allUsersMutualFriendsRecommendedOrRequest(userId, recommendedFriendsDtos),
-            recommendedFriends.getTotalElements(),
-            recommendedFriends.getPageable().getPageNumber(),
-            recommendedFriends.getTotalPages());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public PageableAdvancedDto<UserManagementVO> search(Pageable pageable,
         UserManagementViewDto userManagementViewDto) {
         Page<User> found = userRepo.findAll(buildSpecification(userManagementViewDto), pageable);

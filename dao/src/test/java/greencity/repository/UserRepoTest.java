@@ -219,10 +219,4 @@ class UserRepoTest {
         Timestamp actual = userRepo.findLastActivityTimeById(8L).get();
         assertEquals(expected, actual);
     }
-
-    @Test
-    void findAnyRecommendedFriendsTest() {
-        List<UsersFriendDto> friendDtos = userRepo.findAnyRecommendedFriends(1L);
-        assertEquals(1, friendDtos.size());
-    }
 }
