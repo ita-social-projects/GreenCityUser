@@ -1,5 +1,6 @@
 package greencity.service;
 
+import androidx.annotation.Nullable;
 import greencity.constant.UpdateConstants;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.ubs.UbsTableCreationDto;
@@ -683,24 +684,38 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        user.setName(userProfileDtoRequest.getName());
-        user.setCity(userProfileDtoRequest.getCity());
-        user.setUserCredo(userProfileDtoRequest.getUserCredo());
+        if (userProfileDtoRequest.getName() != null) {
+            user.setName(userProfileDtoRequest.getName());
+        }
+        if (userProfileDtoRequest.getCity() != null) {
+            user.setCity(userProfileDtoRequest.getCity());
+        }
+        if (userProfileDtoRequest.getUserCredo() != null) {
+            user.setUserCredo(userProfileDtoRequest.getUserCredo());
+        }
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
-        socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
-        user.getSocialNetworks().clear();
-        user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
-            .stream()
-            .map(url -> SocialNetwork.builder()
-                .url(url)
-                .user(user)
-                .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
-                    SocialNetworkImage.class))
-                .build())
-            .collect(Collectors.toList()));
-        user.setShowLocation(userProfileDtoRequest.getShowLocation());
-        user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
-        user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
+        if (userProfileDtoRequest.getSocialNetworks() != null) {
+            socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
+            user.getSocialNetworks().clear();
+            user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
+                .stream()
+                .map(url -> SocialNetwork.builder()
+                    .url(url)
+                    .user(user)
+                    .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
+                        SocialNetworkImage.class))
+                    .build())
+                .collect(Collectors.toList()));
+        }
+        if (userProfileDtoRequest.getShowLocation() != null) {
+            user.setShowLocation(userProfileDtoRequest.getShowLocation());
+        }
+        if (userProfileDtoRequest.getShowEcoPlace() != null) {
+            user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
+        }
+        if (userProfileDtoRequest.getShowShoppingList() != null) {
+            user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
+        }
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
