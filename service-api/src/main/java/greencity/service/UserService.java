@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
@@ -77,13 +76,6 @@ public interface UserService {
      */
     UserVO findById(Long id);
 
-    /**
-     * Method that allow you to find {@link UserVO} by ID.
-     *
-     * @param id a value of {@link Long}
-     * @return {@link UserVO}
-     */
-    UserVOAchievement findUserForAchievement(Long id);
 
     /**
      * Method that allow you to delete {@link UserVO} by ID.

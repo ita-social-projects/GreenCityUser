@@ -1,10 +1,8 @@
 package greencity.dto.user;
 
-import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
-import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -53,8 +51,6 @@ public class UserVO {
 
     private List<UserVO> userFriends = new ArrayList<>();
 
-    private List<UserAchievementVO> userAchievements = new ArrayList<>();
-
     private String refreshTokenKey;
 
     private OwnSecurityVO ownSecurity;
@@ -70,8 +66,6 @@ public class UserVO {
     private Boolean showShoppingList;
 
     private LocalDateTime lastActivityTime;
-
-    private List<UserActionVO> userActions = new ArrayList<>();
 
     private LanguageVO languageVO;
 }

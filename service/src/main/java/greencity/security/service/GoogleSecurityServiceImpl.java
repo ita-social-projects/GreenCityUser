@@ -8,8 +8,6 @@ import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -17,7 +15,6 @@ import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
-import greencity.service.AchievementService;
 import greencity.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +31,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static greencity.constant.AppConstant.*;
-import static greencity.security.service.OwnSecurityServiceImpl.getUserAchievements;
-import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 
 /**
  * {@inheritDoc}
@@ -47,7 +42,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final GoogleIdTokenVerifier googleIdTokenVerifier;
     private final JwtTool jwtTool;
     private final ModelMapper modelMapper;
-    private final AchievementService achievementService;
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final PlatformTransactionManager transactionManager;
@@ -69,7 +63,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         JwtTool jwtTool,
         GoogleIdTokenVerifier googleIdTokenVerifier,
         ModelMapper modelMapper,
-        AchievementService achievementService,
         UserRepo userRepo,
         RestClient restClient,
         PlatformTransactionManager transactionManager) {
@@ -77,7 +70,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         this.jwtTool = jwtTool;
         this.googleIdTokenVerifier = googleIdTokenVerifier;
         this.modelMapper = modelMapper;
-        this.achievementService = achievementService;
         this.userRepo = userRepo;
         this.restClient = restClient;
         this.transactionManager = transactionManager;
@@ -101,8 +93,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                     TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
                     User user = transactionTemplate.execute(status -> {
                         User savedUser = createNewUser(email, userName, profilePicture, language);
-                        savedUser.setUserAchievements(createUserAchievements(savedUser));
-                        savedUser.setUserActions(createUserActions(savedUser));
                         savedUser.setUuid(UUID.randomUUID().toString());
                         savedUser.setFirstName(userName);
                         Long id = userRepo.save(savedUser).getId();
@@ -145,14 +135,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
                 .id(modelMapper.map(language, Long.class))
                 .build())
             .build();
-    }
-
-    private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, achievementService);
-    }
-
-    private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, achievementService);
     }
 
     private SuccessSignInDto getSuccessSignInDto(UserVO user) {

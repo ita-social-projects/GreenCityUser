@@ -4,8 +4,6 @@ import greencity.constant.RestTemplateLinks;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.enums.AchievementCategoryType;
-import greencity.enums.AchievementType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -45,22 +43,6 @@ class RestClientTest {
     @InjectMocks
     private RestClient restClient;
 
-    @Test
-    void calculateAchievement() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + 1L
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + AchievementType.INCREMENT
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + AchievementCategoryType.ECO_NEWS
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + 1,
-            HttpMethod.POST, entity, Object.class)).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
-        assertEquals(ResponseEntity.status(HttpStatus.OK).build(),
-            restClient.calculateAchievement(1L, AchievementType.INCREMENT, AchievementCategoryType.ECO_NEWS, 1));
-    }
 
     @Test
     void getAllAvailableCustomShoppingListItems() {

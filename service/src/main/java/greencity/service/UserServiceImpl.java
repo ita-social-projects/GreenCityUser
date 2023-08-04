@@ -13,7 +13,6 @@ import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
@@ -91,16 +90,6 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findById(id)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
         return modelMapper.map(user, UserVO.class);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public UserVOAchievement findUserForAchievement(Long id) {
-        User user = userRepo.findUserForAchievement(id)
-            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
-        return modelMapper.map(user, UserVOAchievement.class);
     }
 
     /**

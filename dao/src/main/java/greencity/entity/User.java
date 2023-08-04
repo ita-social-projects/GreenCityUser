@@ -107,8 +107,6 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
     private List<User> userFriends = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<UserAchievement> userAchievements = new ArrayList<>();
 
     @Column(name = "rating")
     private Double rating;
@@ -137,9 +135,6 @@ public class User {
 
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserAction> userActions = new ArrayList<>();
 
     @Column(columnDefinition = "varchar(60)")
     private String uuid;

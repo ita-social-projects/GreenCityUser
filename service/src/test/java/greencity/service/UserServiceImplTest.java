@@ -8,7 +8,6 @@ import greencity.constant.UpdateConstants;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
@@ -1089,17 +1088,6 @@ class UserServiceImplTest {
         String uuid = "uuid";
         assertThrows(NotFoundException.class,
             () -> userService.markUserAsDeactivated(uuid));
-    }
-
-    @Test
-    void findUserForAchievementTest() {
-        Long id = 1L;
-        UserVOAchievement userVOAchievement = UserVOAchievement.builder().id(id).build();
-        User user = User.builder().id(id).build();
-        when(userRepo.findUserForAchievement(id)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVOAchievement.class)).thenReturn(userVOAchievement);
-        assertEquals(userVOAchievement, userService.findUserForAchievement(id));
-        verify(userRepo, times(1)).findUserForAchievement(id);
     }
 
     @Test

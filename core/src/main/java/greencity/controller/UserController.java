@@ -9,7 +9,6 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.EmployeePositionsDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.position.PositionAuthoritiesDto;
@@ -605,23 +604,6 @@ public class UserController {
     @GetMapping("/findById")
     public ResponseEntity<UserVO> findById(@RequestParam Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findById(id));
-    }
-
-    /**
-     * Method that allow you to find {@link UserVO} by Id.
-     *
-     * @return {@link UserUpdateDto}.
-     * @author Orest Mamchuk
-     */
-    @ApiOperation(value = "Get User by id")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-    })
-    @GetMapping("/findByIdForAchievement")
-    public ResponseEntity<UserVOAchievement> findUserForAchievement(@RequestParam Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findUserForAchievement(id));
     }
 
     /**

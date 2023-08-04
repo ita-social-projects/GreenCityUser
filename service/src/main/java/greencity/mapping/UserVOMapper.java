@@ -1,12 +1,8 @@
 package greencity.mapping;
 
-import greencity.dto.achievement.AchievementVO;
-import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserVO;
-import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
 import org.modelmapper.AbstractConverter;
@@ -60,30 +56,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .showEcoPlace(user.getShowEcoPlace())
             .showLocation(user.getShowLocation())
             .lastActivityTime(user.getLastActivityTime())
-            .userAchievements(user.getUserAchievements() != null ? user.getUserAchievements()
-                .stream().map(userAchievement -> UserAchievementVO.builder()
-                    .id(userAchievement.getId())
-                    .achievementStatus(userAchievement.getAchievementStatus())
-                    .user(UserVO.builder()
-                        .id(userAchievement.getUser().getId())
-                        .build())
-                    .achievement(AchievementVO.builder()
-                        .id(userAchievement.getAchievement().getId())
-                        .build())
-                    .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
-            .userActions(user.getUserActions() != null ? user.getUserActions()
-                .stream().map(userAction -> UserActionVO.builder()
-                    .id(userAction.getId())
-                    .achievementCategory(AchievementCategoryVO.builder()
-                        .id(userAction.getAchievementCategory().getId())
-                        .build())
-                    .count(userAction.getCount())
-                    .user(UserVO.builder()
-                        .id(userAction.getUser().getId())
-                        .build())
-                    .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
             .languageVO(LanguageVO.builder()
                 .id(user.getLanguage().getId())
                 .code(user.getLanguage().getCode())

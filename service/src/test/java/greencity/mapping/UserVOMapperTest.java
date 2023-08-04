@@ -8,7 +8,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -62,30 +61,6 @@ class UserVOMapperTest {
                     .build())
                 .build() : null)
             .lastActivityTime(expected.getLastActivityTime())
-            .userAchievements(expected.getUserAchievements() != null ? expected.getUserAchievements()
-                .stream().map(userAchievement -> UserAchievement.builder()
-                    .id(userAchievement.getId())
-                    .achievementStatus(userAchievement.getAchievementStatus())
-                    .user(User.builder()
-                        .id(userAchievement.getUser().getId())
-                        .build())
-                    .achievement(Achievement.builder()
-                        .id(userAchievement.getAchievement().getId())
-                        .build())
-                    .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
-            .userActions(expected.getUserActions() != null ? expected.getUserActions()
-                .stream().map(userAction -> UserAction.builder()
-                    .id(userAction.getId())
-                    .achievementCategory(AchievementCategory.builder()
-                        .id(userAction.getAchievementCategory().getId())
-                        .build())
-                    .count(userAction.getCount())
-                    .user(User.builder()
-                        .id(userAction.getUser().getId())
-                        .build())
-                    .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
             .language(Language.builder()
                 .id(1L)
                 .code("ua")
