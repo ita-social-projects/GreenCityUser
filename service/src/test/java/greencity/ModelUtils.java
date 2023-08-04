@@ -19,7 +19,6 @@ import greencity.dto.user.UserProfilePictureDto;
 import greencity.dto.user.UserProfileStatisticsDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersFriendDto;
-import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
 

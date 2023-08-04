@@ -27,7 +27,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 import static greencity.constant.AppConstant.*;
