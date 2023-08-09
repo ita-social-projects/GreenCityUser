@@ -5,20 +5,36 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
+import greencity.dto.user.RegistrationStatisticsDtoResponse;
+import greencity.dto.user.RoleDto;
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserAllFriendsDto;
+import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserProfileDtoResponse;
+import greencity.dto.user.UserProfileStatisticsDto;
+import greencity.dto.user.UserRoleDto;
+import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserUpdateDto;
+import greencity.dto.user.UserVO;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import java.time.LocalDateTime;
-import java.util.Map;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -288,23 +304,6 @@ public interface UserService {
     void deleteUserProfilePicture(String email);
 
     /**
-     * Get six friends with the highest rating {@link UserVO}.
-     *
-     * @param userId {@link Long}
-     * @author Marian Datsko
-     */
-    List<UserProfilePictureDto> getSixFriendsWithTheHighestRating(Long userId);
-
-    /**
-     * Get six friends with the highest rating {@link UserVO}. by page.
-     *
-     * @param userId {@link Long}
-     * @return {@link SixFriendsPageResponceDto}.
-     * @author Oleh Bilonizhka
-     */
-    SixFriendsPageResponceDto getSixFriendsWithTheHighestRatingPaged(Long userId);
-
-    /**
      * Save user profile information {@link UserVO}.
      *
      * @author Marian Datsko
@@ -403,62 +402,11 @@ public interface UserService {
     List<UserVO> findAll();
 
     /**
-     * Method that finds new friends by name.
-     *
-     * @return {@link List} of {@link UserAllFriendsDto} instances.
-     */
-    PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id);
-
-    /**
      * Method that finds users by name.
      *
      * @return {@link List} of {@link UserAllFriendsDto} instances.
      */
     PageableDto<UserAllFriendsDto> findUserByName(String name, Pageable page, Long id);
-
-    /**
-     * Method that finds friends by name.
-     *
-     * @return {@link List} of {@link UserAllFriendsDto} instances.
-     */
-    PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id);
-
-    /**
-     * Method that finds user's recommended friends.
-     *
-     * @param pageable {@link Pageable}.
-     * @param userId   {@link Long} -current user's id.
-     * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
-     */
-
-    PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId);
-
-    /**
-     * Method that finds all user's friends.
-     *
-     * @param pageable {@link Pageable}.
-     * @param userId   {@link Long} -current user's id.
-     * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
-     */
-
-    PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId);
-
-    /**
-     * Method that finds all friends that send you request.
-     *
-     * @param pageable {@link Pageable}.
-     * @param userId   {@link Long} -current user's id.
-     * @return {@link PageableDto} of {@link RecommendedFriendDto} instances.
-     */
-    PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable);
-
-    /**
-     * Method that finds all friends that send you request.
-     *
-     * @param userId {@link Long} -current user's id.
-     * @return {@link List} of {@link UserVO} instances.
-     */
-    List<UserVO> getAllUserFriendRequests(Long userId);
 
     /**
      * {@inheritDoc}
@@ -522,13 +470,6 @@ public interface UserService {
      * @author Ihor Volianskyi
      */
     UserVO findAdminById(Long id);
-
-    /**
-     * Method find all users except current user and his friends.
-     *
-     * @author Stepan Omeliukh
-     */
-    PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId);
 
     /**
      * Method checks the existence of the user by uuid.

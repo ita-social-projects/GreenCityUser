@@ -132,28 +132,6 @@ class UserRepoTest {
     }
 
     @Test
-    void getAllUserFriendRequestsPageTest() {
-        Pageable pageable = PageRequest.of(0, 2);
-        User user = userRepo.findByEmail("test5@email.com").get();
-        List<User> users = Arrays.asList(user);
-        Page<User> actual = new PageImpl<>(users, pageable, users.size());
-        Page<User> expected = userRepo.getAllUserFriendRequests(4L, pageable);
-        List<Long> actualIds = actual.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-        List<Long> expectedIds = expected.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-        assertEquals(1, expected.getContent().size());
-        assertEquals(expectedIds, actualIds);
-    }
-
-    @Test
-    void getAllUserFriendRequestsTest() {
-        List<User> users = userRepo.getAllUserFriendRequests(4L);
-        assertEquals(1, users.size());
-        assertEquals(5, users.get(0).getId());
-    }
-
-    @Test
     void getSixFriendsWithTheHighestRatingTest() {
         List<User> friends = userRepo.getSixFriendsWithTheHighestRating(1L);
         User user2 = userRepo.findByEmail("test2@email.com").get();
@@ -163,12 +141,6 @@ class UserRepoTest {
         assertTrue(friends.contains(user2));
         assertTrue(friends.contains(user4));
         assertFalse(friends.contains(user6));
-    }
-
-    @Test
-    void getAllUserFriendsCountTest() {
-        Integer friends = userRepo.getAllUserFriendsCount(1L);
-        assertEquals(7, friends);
     }
 
     @Test
@@ -227,14 +199,6 @@ class UserRepoTest {
     }
 
     @Test
-    void findUsersByNameTest() {
-        Pageable pageable = PageRequest.of(0, 3);
-        User user = userRepo.findByEmail("test2@email.com").get();
-        Page<User> expected = userRepo.findUsersByName("SuperTest2", pageable, 3L);
-        assertEquals(user, expected.getContent().get(0));
-    }
-
-    @Test
     void countOfMutualFriendsTest() {
         Integer expected = 2;
         Integer friends = userRepo.countOfMutualFriends(1L);
@@ -254,27 +218,5 @@ class UserRepoTest {
         Timestamp expected = Timestamp.valueOf(LocalDateTime.of(2020, 9, 29, 0, 0, 0));
         Timestamp actual = userRepo.findLastActivityTimeById(8L).get();
         assertEquals(expected, actual);
-    }
-
-    @Test
-    void findAnyRecommendedFriendsTest() {
-        List<UsersFriendDto> friendDtos = userRepo.findAnyRecommendedFriends(1L);
-        assertEquals(1, friendDtos.size());
-    }
-
-    @Test
-    void getAllUsersExceptMainUserAndFriendsTest() {
-        Pageable pageable = PageRequest.of(0, 2);
-        User user = userRepo.findByEmail("test9@email.com").get();
-        List<User> users = List.of(user);
-        Page<User> actual = new PageImpl<>(users, pageable, users.size());
-        Page<User> expected = userRepo.getAllUsersExceptMainUserAndFriends(pageable, 1L);
-        List<Long> actualIds = actual.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-        List<Long> expectedIds = expected.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-
-        assertEquals(1, expected.getContent().size());
-        assertEquals(expectedIds, actualIds);
     }
 }
