@@ -172,63 +172,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findUsersRecommendedFriendsTest() {
-        User user = User.builder()
-            .id(1L)
-            .name("test")
-            .city("test")
-            .rating(20.0)
-            .profilePicturePath("test")
-            .build();
-        List<User> singletonListUsers = Collections.singletonList(user);
-        UsersFriendDto usersFriendDto = ModelUtils.usersFriendDto;
-        List<UsersFriendDto> singletonList = Collections.singletonList(usersFriendDto);
-        List<UsersFriendDto> list = new ArrayList();
-        PageRequest pageRequest = PageRequest.of(0, 1);
-        Page<UsersFriendDto> page = new PageImpl<>(list, pageRequest, singletonList.size());
-        List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
-                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
-        PageableDto<UserAllFriendsDto> pageableDto =
-            new PageableDto<>(dtoList, dtoList.size(), 0, 1);
-        when(userRepo.findUsersRecommendedFriends(pageRequest, userId)).thenReturn(page);
-        when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType())).thenReturn(dtoList);
-        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
-        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonListUsers);
-        when(userRepo.findAnyRecommendedFriends(userId)).thenReturn(singletonList);
-        PageableDto<UserAllFriendsDto> actual = userService.findUsersRecommendedFriends(pageRequest, 1L);
-        assertEquals(pageableDto, actual);
-    }
-
-    @Test
-    void findAllUsersFriendsTest() {
-        User user = User.builder()
-            .id(1L)
-            .name("test")
-            .city("test")
-            .rating(20.0)
-            .profilePicturePath("test")
-            .build();
-        List<User> singletonList = Collections.singletonList(user);
-        PageRequest pageRequest = PageRequest.of(0, 1);
-        Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
-        List<User> list = Collections.singletonList(user);
-        List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
-                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
-        PageableDto<UserAllFriendsDto> pageableDto =
-            new PageableDto<>(dtoList, dtoList.size(), 0, 1);
-        when(userRepo.getAllUserFriends(userId, pageRequest)).thenReturn(page);
-        when(userRepo.getAllUserFriends(1L)).thenReturn(list);
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(ModelUtils.getUser()));
-        when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType())).thenReturn(dtoList);
-        PageableDto<UserAllFriendsDto> actual = userService.findAllUsersFriends(pageRequest, 1L);
-        assertEquals(pageableDto, actual);
-    }
-
-    @Test
     void saveTest() {
         when(userRepo.findByEmail(userEmail)).thenReturn(Optional.ofNullable(user));
         when(userService.findByEmail(userEmail)).thenReturn(userVO);
@@ -589,24 +532,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testFindNewFriendByName() {
-        Pageable pageable = PageRequest.of(1, 3);
-        user.setUserCredo("credo");
-        Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
-        when(userRepo.findUsersByName("martin", pageable, 1L))
-            .thenReturn(pages);
-        when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType()))
-            .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
-        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
-            CREATE_USER_ALL_FRIENDS_DTO,
-            pages.getTotalElements(),
-            pages.getPageable().getPageNumber(),
-            pages.getTotalPages());
-        assertEquals(pageableDto, userService.findNewFriendByName("martin", pageable, 1L));
-    }
-
-    @Test
     void findUserByName() {
         Pageable pageable = PageRequest.of(1, 3);
         user.setUserCredo("credo");
@@ -622,78 +547,6 @@ class UserServiceImplTest {
             pages.getPageable().getPageNumber(),
             pages.getTotalPages());
         assertEquals(pageableDto, userService.findUserByName("martin", pageable, 1L));
-    }
-
-    @Test
-    void findFriendByName() {
-        Pageable pageable = PageRequest.of(1, 3);
-        user.setUserCredo("credo");
-        Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
-        when(userRepo.findFriendsByName("martin", pageable, 1L))
-            .thenReturn(pages);
-        when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType()))
-            .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
-        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
-            CREATE_USER_ALL_FRIENDS_DTO,
-            pages.getTotalElements(),
-            pages.getPageable().getPageNumber(),
-            pages.getTotalPages());
-        assertEquals(pageableDto, userService.findFriendByName("martin", pageable, 1L));
-    }
-
-    @Test
-    void getSixFriendsWithTheHighestRatingExceptionTest() {
-        assertThrows(NotFoundException.class, () -> userService.getSixFriendsWithTheHighestRating(1L));
-    }
-
-    @Test
-    void getAllUserFriendRequestsTest() {
-        User user = User.builder()
-            .id(1L)
-            .name("test")
-            .city("test")
-            .rating(20.0)
-            .profilePicturePath("test")
-            .build();
-        List<User> singletonList = Collections.singletonList(user);
-        PageRequest pageRequest = PageRequest.of(0, 1);
-        Page<User> page = new PageImpl<>(singletonList, pageRequest, singletonList.size());
-        List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(new UserAllFriendsDto(1L, "test", "test", 20.0, 1L, "test", "aa",
-                FriendsChatDto.builder().chatId(1L).chatExists(true).build()));
-        PageableDto<UserAllFriendsDto> pageableDto =
-            new PageableDto<>(dtoList, dtoList.size(), 0, 1);
-        when(userRepo.getAllUserFriendRequests(userId, pageRequest)).thenReturn(page);
-        when(modelMapper.map(singletonList, new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType())).thenReturn(dtoList);
-        when(userRepo.getAllUserFriends(1L)).thenReturn(singletonList);
-        PageableDto<UserAllFriendsDto> actual = userService.getAllUserFriendRequests(1L, pageRequest);
-
-        assertEquals(pageableDto, actual);
-    }
-
-    @Test
-    void getSixFriendsWithTheHighestRatingPagedTest() {
-        Pageable pageable = PageRequest.of(0, 6);
-        List<User> users = Collections.singletonList(ModelUtils.getUser());
-        Page<User> pageUsers = new PageImpl<>(users, pageable, users.size());
-        List<UserProfilePictureDto> userProfilePictureDtoList =
-            Collections.singletonList(ModelUtils.getUserProfilePictureDto());
-
-        when(userRepo.getSixFriendsWithTheHighestRating(anyLong())).thenReturn(users);
-        when(modelMapper.map(users.get(0), UserProfilePictureDto.class)).thenReturn(userProfilePictureDtoList.get(0));
-        when(userRepo.getAllUserFriendsCount(anyLong())).thenReturn(5);
-
-        SixFriendsPageResponceDto expected = SixFriendsPageResponceDto.builder()
-            .pagedFriends(new PageableDto<>(
-                userProfilePictureDtoList,
-                pageUsers.getTotalElements(),
-                pageUsers.getPageable().getPageNumber(),
-                pageUsers.getTotalPages()))
-            .amountOfFriends(5).build();
-
-        assertEquals(expected, userService.getSixFriendsWithTheHighestRatingPaged(10L));
     }
 
     @Test
@@ -732,15 +585,6 @@ class UserServiceImplTest {
             () -> userService.saveUserProfile(request, "test@gmail.com"));
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "test@gmail.com", thrown.getMessage());
         verify(userRepo).findByEmail(anyString());
-    }
-
-    @Test
-    void getSixFriendsWithTheHighestRatingTest() {
-        UserProfilePictureDto e = new UserProfilePictureDto();
-        List<UserProfilePictureDto> list = Collections.singletonList(e);
-        when(userRepo.getSixFriendsWithTheHighestRating(1L)).thenReturn(Collections.singletonList(user));
-        when(modelMapper.map(user, UserProfilePictureDto.class)).thenReturn(e);
-        assertEquals(list, userService.getSixFriendsWithTheHighestRating(1L));
     }
 
     @Test
@@ -1182,35 +1026,4 @@ class UserServiceImplTest {
             Arguments.of("444e66e8-8daa-4cb0-8269-a8d856e7dd15", Optional.of(getUser()), true),
             Arguments.of("uuid", Optional.empty(), false));
     }
-
-    @Test
-    void findAllUsersExceptMainUserAndUsersFriendTest() {
-        List<User> userList = Collections.singletonList(user);
-        PageRequest pageRequest = PageRequest.of(0, 1);
-        Page<User> page = new PageImpl<>(userList, pageRequest, userList.size());
-        List<UserAllFriendsDto> dtoList =
-            Collections.singletonList(
-                new UserAllFriendsDto(
-                    1L, "test", "test", 20.0, 1L, "test", "aa",
-                    FriendsChatDto.builder()
-                        .chatId(1L)
-                        .chatExists(true)
-                        .build()));
-
-        when(userRepo.getAllUsersExceptMainUserAndFriends(pageRequest, userId)).thenReturn(page);
-        when(modelMapper.map(userList, new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType())).thenReturn(dtoList);
-        when(restClient.chatBetweenTwo(anyLong(), anyLong())).thenReturn(any(FriendsChatDto.class));
-        when(userRepo.getAllUserFriends(1L)).thenReturn(userList);
-        when(userRepo.getAllUserFriends(1L)).thenReturn(userList);
-
-        userService.findAllUsersExceptMainUserAndUsersFriend(pageRequest, 1L);
-
-        verify(userRepo).getAllUsersExceptMainUserAndFriends(pageRequest, userId);
-        verify(modelMapper).map(userList, new TypeToken<List<UserAllFriendsDto>>() {
-        }.getType());
-        verify(restClient).chatBetweenTwo(anyLong(), anyLong());
-        verify(userRepo, times(2)).getAllUserFriends(1L);
-    }
-
 }

@@ -184,39 +184,6 @@ class UserControllerTest {
     }
 
     @Test
-    void findUsersRecommendedFriendsTest() throws Exception {
-        int pageNumber = 0;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/recommendedFriends/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).findUsersRecommendedFriends(pageable, 1L);
-    }
-
-    @Test
-    void findAllUsersFriendsTest() throws Exception {
-        int pageNumber = 0;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/findAll/friends/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).findAllUsersFriends(pageable, 1L);
-    }
-
-    @Test
-    void findAllUsersFriendRequestTest() throws Exception {
-        int pageNumber = 0;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/friendRequests/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).getAllUserFriendRequests(1L, pageable);
-    }
-
-    @Test
     void getRolesTest() throws Exception {
         mockMvc.perform(get(userLink + "/roles"))
             .andExpect(status().isOk());
@@ -353,14 +320,6 @@ class UserControllerTest {
             .andExpect(status().isOk());
 
         verify(userService, times(1)).deleteUserProfilePicture("test@email.com");
-    }
-
-    @Test
-    void getSixFriendsWithTheHighestRatingTest() throws Exception {
-        mockMvc.perform(get(userLink + "/{userId}/sixUserFriends/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).getSixFriendsWithTheHighestRatingPaged(1L);
     }
 
     @Test
@@ -726,45 +685,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.length()").value(2))
             .andExpect(jsonPath("$.1").value(10))
             .andExpect(jsonPath("$.12").value(20));
-    }
-
-    @Test
-    void findNewFriendsByNameTest() throws Exception {
-        int pageNumber = 1;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn(TestConst.EMAIL);
-        when(userService.findByEmail(principal.getName())).thenReturn(ModelUtils.getUserVO());
-        mockMvc.perform(get(userLink + "/findNewFriendsByName?page=" + pageNumber + "&name=test")
-            .principal(principal)).andExpect(status().isOk());
-
-        verify(userService).findNewFriendByName("test", pageable, 1L);
-    }
-
-    @Test
-    void findFriendsByName() throws Exception {
-        int pageNumber = 1;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn(TestConst.EMAIL);
-        when(userService.findByEmail(principal.getName())).thenReturn(ModelUtils.getUserVO());
-        mockMvc.perform(get(userLink + "/findFriendByName?page=" + pageNumber + "&name=test")
-            .principal(principal)).andExpect(status().isOk());
-
-        verify(userService).findFriendByName("test", pageable, 1L);
-    }
-
-    @Test
-    void findAllUsersExceptMainUserAndUsersFriend() throws Exception {
-        int pageNumber = 0;
-        int pageSize = 20;
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        mockMvc.perform(get(userLink + "/{userId}/findAll/friendsWithoutExist/", 1))
-            .andExpect(status().isOk());
-
-        verify(userService).findAllUsersExceptMainUserAndUsersFriend(pageable, 1L);
     }
 
     @Test

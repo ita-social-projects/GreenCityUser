@@ -1,31 +1,51 @@
 package greencity.service;
 
-import androidx.annotation.Nullable;
-import greencity.constant.UpdateConstants;
-import greencity.dto.UbsCustomerDto;
-import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
-import greencity.entity.Language;
-import greencity.entity.UserDeactivationReason;
-import greencity.enums.UserStatusRequest;
-import greencity.filters.SearchCriteria;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
+import greencity.constant.UpdateConstants;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.RoleDto;
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserAllFriendsDto;
+import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserProfileDtoResponse;
+import greencity.dto.user.UserProfileStatisticsDto;
+import greencity.dto.user.UserRoleDto;
+import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserUpdateDto;
+import greencity.dto.user.UserVO;
+import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
+import greencity.entity.UserDeactivationReason;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.LowRoleLevelException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongIdException;
+import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
@@ -37,8 +57,6 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -50,7 +68,11 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -192,88 +214,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserVO> findAll() {
         return modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVO>>() {
-        }.getType());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PageableDto<UserAllFriendsDto> findUsersRecommendedFriends(Pageable pageable, Long userId) {
-        Page<UsersFriendDto> recommendedFriends = userRepo.findUsersRecommendedFriends(pageable, userId);
-
-        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
-        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
-
-        if (recommendedFriends.isEmpty()
-            && amountOfAcquiredHabitsByUserId == 0
-            && amountOfHabitsInProgressByUserId == 0) {
-            List<UsersFriendDto> recommendedFriendsList = userRepo.findAnyRecommendedFriends(userId);
-            int start = Math.min((int) pageable.getOffset(), recommendedFriendsList.size());
-            int end = Math.min((start + pageable.getPageSize()), recommendedFriendsList.size());
-            recommendedFriends = new PageImpl<>(recommendedFriendsList.subList(start, end),
-                pageable, recommendedFriendsList.size());
-        }
-
-        List<UserAllFriendsDto> recommendedFriendsDtos = modelMapper
-            .map(recommendedFriends.getContent(),
-                new TypeToken<List<UserAllFriendsDto>>() {
-                }.getType());
-
-        return new PageableDto<>(
-            allUsersMutualFriendsRecommendedOrRequest(userId, recommendedFriendsDtos),
-            recommendedFriends.getTotalElements(),
-            recommendedFriends.getPageable().getPageNumber(),
-            recommendedFriends.getTotalPages());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PageableDto<UserAllFriendsDto> findAllUsersFriends(Pageable pageable, Long userId) {
-        Page<User> friends = userRepo.getAllUserFriends(userId, pageable);
-        List<UserAllFriendsDto> friendDtos = modelMapper.map(friends.getContent(),
-            new TypeToken<List<UserAllFriendsDto>>() {
-            }.getType());
-        for (UserAllFriendsDto friendDto : friendDtos) {
-            friendDto.setFriendStatus(UserStatusRequest.FRIEND.toString());
-        }
-        friendDtos.stream().forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
-        return new PageableDto<>(
-            allUsersMutualFriendsMethod(friendDtos),
-            friends.getTotalElements(),
-            friends.getPageable().getPageNumber(),
-            friends.getTotalPages());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public PageableDto<UserAllFriendsDto> getAllUserFriendRequests(Long userId, Pageable pageable) {
-        Page<User> friendsRequests = userRepo.getAllUserFriendRequests(userId, pageable);
-        List<UserAllFriendsDto> friendDtos = modelMapper.map(friendsRequests.getContent(),
-            new TypeToken<List<UserAllFriendsDto>>() {
-            }.getType());
-        for (UserAllFriendsDto friendDto : friendDtos) {
-            friendDto.setFriendStatus(UserStatusRequest.REQUEST.toString());
-        }
-        return new PageableDto<>(
-            allUsersMutualFriendsRecommendedOrRequest(userId, friendDtos),
-            friendsRequests.getTotalElements(),
-            friendsRequests.getPageable().getPageNumber(),
-            friendsRequests.getTotalPages());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserVO> getAllUserFriendRequests(Long userId) {
-        List<User> allUserFriends = userRepo.getAllUserFriendRequests(userId);
-        return modelMapper.map(allUserFriends, new TypeToken<List<UserVO>>() {
         }.getType());
     }
 
@@ -624,57 +564,6 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Get six friends with the highest rating {@link UserVO}.
-     *
-     * @param userId {@link Long}
-     * @author Marian Datsko
-     */
-    @Override
-    public List<UserProfilePictureDto> getSixFriendsWithTheHighestRating(Long userId) {
-        List<UserProfilePictureDto> userProfilePictureDtoList = userRepo.getSixFriendsWithTheHighestRating(userId)
-            .stream()
-            .map(user -> modelMapper.map(user, UserProfilePictureDto.class))
-            .collect(Collectors.toList());
-        if (userProfilePictureDtoList.isEmpty()) {
-            throw new NotFoundException(ErrorMessage.NOT_FOUND_ANY_FRIENDS + userId.toString());
-        }
-        return userProfilePictureDtoList;
-    }
-
-    /**
-     * Get six friends with the highest rating {@link UserVO}. by page.
-     *
-     * @param userId {@link Long}
-     * @return {@link SixFriendsPageResponceDto}.
-     * @author Oleh Bilonizhka
-     */
-    @Override
-    public SixFriendsPageResponceDto getSixFriendsWithTheHighestRatingPaged(Long userId) {
-        Pageable pageable = PageRequest.of(0, 6);
-        List<User> users = userRepo.getSixFriendsWithTheHighestRating(userId);
-        Page<User> pageUsers = new PageImpl<>(users, pageable, users.size());
-
-        List<UserProfilePictureDto> userProfilePictureDtoList = users
-            .stream()
-            .map(user -> modelMapper.map(user, UserProfilePictureDto.class))
-            .collect(Collectors.toList());
-
-        return SixFriendsPageResponceDto.builder()
-            .pagedFriends(getPageableDto(userProfilePictureDtoList,
-                pageUsers))
-            .amountOfFriends(userRepo.getAllUserFriendsCount(userId)).build();
-    }
-
-    private PageableDto<UserProfilePictureDto> getPageableDto(
-        List<UserProfilePictureDto> userProfilePictureDtoList, Page<User> pageUsers) {
-        return new PageableDto<>(
-            userProfilePictureDtoList,
-            pageUsers.getTotalElements(),
-            pageUsers.getPageable().getPageNumber(),
-            pageUsers.getTotalPages());
-    }
-
-    /**
      * Save user profile information {@link UserVO}.
      *
      * @author Marian Datsko
@@ -993,15 +882,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public PageableDto<UserAllFriendsDto> findNewFriendByName(String name, Pageable page, Long id) {
-        Page<User> ourUsersList = userRepo.findUsersByName(name, page, id);
-        return getUserAllFriendsDtoPageableDto(id, ourUsersList);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public PageableDto<UserAllFriendsDto> findUserByName(String name, Pageable page, Long id) {
         Page<User> ourUsersList = userRepo.findAllUsersByName(name, page, id);
         return getUserAllFriendsDtoPageableDto(id, ourUsersList);
@@ -1011,33 +891,8 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public PageableDto<UserAllFriendsDto> findFriendByName(String name, Pageable page, Long id) {
-        Page<User> ourUsersList = userRepo.findFriendsByName(name, page, id);
-        return getUserAllFriendsDtoPageableDto(id, ourUsersList);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Map<Integer, Long> findAllRegistrationMonthsMap() {
         return userRepo.findAllRegistrationMonthsMap();
-    }
-
-    private List<UserAllFriendsDto> allUsersMutualFriendsMethod(List<UserAllFriendsDto> userAllFriends) {
-        for (UserAllFriendsDto friendCurrentUser : userAllFriends) {
-            long mutualFriends = 0;
-            List<User> allFriendsCurrentUser = userRepo.getAllUserFriends(friendCurrentUser.getId());
-            for (User friendUser : allFriendsCurrentUser) {
-                for (UserAllFriendsDto user : userAllFriends) {
-                    if (friendUser.getId().equals(user.getId())) {
-                        mutualFriends++;
-                    }
-                }
-            }
-            friendCurrentUser.setMutualFriends(mutualFriends);
-        }
-        return userAllFriends;
     }
 
     private List<UserAllFriendsDto> allUsersMutualFriendsRecommendedOrRequest(Long id,
@@ -1084,17 +939,6 @@ public class UserServiceImpl implements UserService {
         }
 
         throw new LowRoleLevelException("You do not have authorities");
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
-    @Override
-    public PageableDto<UserAllFriendsDto> findAllUsersExceptMainUserAndUsersFriend(Pageable pageable, Long userId) {
-        Page<User> allUsers = userRepo.getAllUsersExceptMainUserAndFriends(pageable, userId);
-        return getUserAllFriendsDtoPageableDto(userId, allUsers);
     }
 
     private PageableDto<UserAllFriendsDto> getUserAllFriendsDtoPageableDto(Long userId, Page<User> allUsers) {
