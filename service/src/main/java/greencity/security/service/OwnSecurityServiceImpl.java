@@ -220,6 +220,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setShowShoppingList(true);
         List<String> positionNames = employeeSignUpDto.getPositions().stream()
             .map(PositionDto::getName).collect(Collectors.toList());
+        if (positionNames.isEmpty()) {
+            positionNames = employeeSignUpDto.getPositions().stream()
+                .map(PositionDto::getNameEn).collect(Collectors.toList());
+        }
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);
 
