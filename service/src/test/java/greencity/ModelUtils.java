@@ -190,6 +190,7 @@ public class ModelUtils {
         return List.of(Position.builder()
             .id(1L)
             .name("Супер адмін")
+            .nameEn("Super admin")
             .build());
     }
 
@@ -466,6 +467,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Супер адмін")
+                .nameEn("Super admin")
                 .build()))
             .build();
     }
@@ -479,6 +481,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Водій")
+                .nameEn("Driver")
                 .build()))
             .build();
     }
@@ -492,6 +495,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Супер адмін")
+                .nameEn("Super admin")
                 .build()))
             .build();
     }
@@ -515,6 +519,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Адмін")
+                .nameEn("Admin")
                 .build()))
             .build();
     }
@@ -586,6 +591,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Admin")
+                .nameEn("Admin")
                 .build()))
             .authorities(List.of(Authority.builder()
                 .name("Auth")
