@@ -218,12 +218,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setShowLocation(true);
         employee.setShowEcoPlace(true);
         employee.setShowShoppingList(true);
-        List<String> positionNames = employeeSignUpDto.getPositions().stream()
-            .map(PositionDto::getName).collect(Collectors.toList());
-        if (positionNames.isEmpty()) {
-            positionNames = employeeSignUpDto.getPositions().stream()
-                .map(PositionDto::getNameEn).collect(Collectors.toList());
-        }
+        List<String> positionNames = employeeSignUpDto.getPositions().isEmpty()
+            ? employeeSignUpDto.getPositions().stream()
+                .map(PositionDto::getNameEn)
+                .collect(Collectors.toList())
+            : employeeSignUpDto.getPositions().stream()
+                .map(PositionDto::getName)
+                .collect(Collectors.toList());
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);
 
