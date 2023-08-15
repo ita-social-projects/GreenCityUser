@@ -3,7 +3,6 @@ package greencity.security.service;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
-import greencity.dto.position.PositionDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -57,6 +56,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -218,13 +218,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setShowLocation(true);
         employee.setShowEcoPlace(true);
         employee.setShowShoppingList(true);
-        List<String> positionNames = employeeSignUpDto.getPositions().isEmpty()
-            ? employeeSignUpDto.getPositions().stream()
-                .map(PositionDto::getNameEn)
-                .collect(Collectors.toList())
-            : employeeSignUpDto.getPositions().stream()
-                .map(PositionDto::getName)
-                .collect(Collectors.toList());
+        List<String> positionNames = employeeSignUpDto.getPositions().stream()
+            .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
+            .collect(Collectors.toList());
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);
 
