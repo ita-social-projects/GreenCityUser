@@ -124,8 +124,7 @@ class UserRepoTest {
     @Test
     void getProfilePicturePathByUserIdTest() {
         String expected = "pathToPicture";
-        when(userRepo.getProfilePicturePathByUserId(anyLong())).thenReturn(Optional.of(expected)); // Mock the
-
+        when(userRepo.getProfilePicturePathByUserId(anyLong())).thenReturn(Optional.of(expected));
         String actual = userRepo.getProfilePicturePathByUserId(5L).get();
         assertEquals(expected, actual);
     }
@@ -154,10 +153,10 @@ class UserRepoTest {
     @Test
     void getAllUserFriendsPageTest() {
         Pageable pageable = PageRequest.of(0, 2);
-        List<User> users = Arrays.asList(new User(), new User()); // Create mock User instances
+        List<User> users = Arrays.asList(new User(), new User());
         Page<User> expectedPage = new PageImpl<>(users, pageable, users.size());
-        when(userRepo.getAllUserFriends(anyLong(), any())).thenReturn(expectedPage); // Mock the getAllUserFriends
-                                                                                     // method
+        when(userRepo.getAllUserFriends(anyLong(), any())).thenReturn(expectedPage);
+
         Page<User> actual = userRepo.getAllUserFriends(1L, pageable);
         assertEquals(2, actual.getContent().size());
         assertEquals(expectedPage.getContent(), actual.getContent());
