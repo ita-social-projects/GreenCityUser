@@ -94,6 +94,20 @@ public class ModelUtils {
         }
     };
 
+    public static User getUser() {
+        return User.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.DEACTIVATED)
+            .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .uuid("444e66e8-8daa-4cb0-8269-a8d856e7dd15")
+            .build();
+    }
+
     private static UserManagementDto createUserManagerDto() {
         return UserManagementDto.builder()
             .id(1L)
@@ -190,6 +204,7 @@ public class ModelUtils {
         return List.of(Position.builder()
             .id(1L)
             .name("Супер адмін")
+            .nameEn("Super admin")
             .build());
     }
 
@@ -200,18 +215,6 @@ public class ModelUtils {
             .id(1L)
             .name("test1")
             .employees(list)
-            .build();
-    }
-
-    public static User getUser() {
-        return User.builder()
-            .id(1L)
-            .email(TestConst.EMAIL)
-            .name(TestConst.NAME)
-            .role(Role.ROLE_USER)
-            .lastActivityTime(LocalDateTime.now())
-            .verifyEmail(new VerifyEmail())
-            .dateOfRegistration(LocalDateTime.now())
             .build();
     }
 
@@ -466,6 +469,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Супер адмін")
+                .nameEn("Super admin")
                 .build()))
             .build();
     }
@@ -479,6 +483,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Водій")
+                .nameEn("Driver")
                 .build()))
             .build();
     }
@@ -492,6 +497,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Супер адмін")
+                .nameEn("Super admin")
                 .build()))
             .build();
     }
@@ -515,6 +521,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Адмін")
+                .nameEn("Admin")
                 .build()))
             .build();
     }
@@ -545,13 +552,38 @@ public class ModelUtils {
             .build();
     }
 
+    public static EmployeeSignUpDto getEmployeeSignUpDto_UA() {
+        return EmployeeSignUpDto.builder()
+            .name("Taras")
+            .email("test@mail.com")
+            .positions(List.of(PositionDto.builder()
+                .id(1L)
+                .name("тест")
+                .build()))
+            .isUbs(true)
+            .build();
+    }
+
     public static EmployeeSignUpDto getEmployeeSignUpDto() {
         return EmployeeSignUpDto.builder()
             .name("Taras")
             .email("test@mail.com")
             .positions(List.of(PositionDto.builder()
                 .id(1L)
-                .name("test")
+                .name("тест")
+                .nameEn("test")
+                .build()))
+            .isUbs(true)
+            .build();
+    }
+
+    public static EmployeeSignUpDto getEmployeeSignUpDto_EN() {
+        return EmployeeSignUpDto.builder()
+            .name("Taras")
+            .email("test@mail.com")
+            .positions(List.of(PositionDto.builder()
+                .id(1L)
+                .nameEn("test")
                 .build()))
             .isUbs(true)
             .build();
@@ -586,6 +618,7 @@ public class ModelUtils {
             .positions(List.of(Position.builder()
                 .id(1L)
                 .name("Admin")
+                .nameEn("Admin")
                 .build()))
             .authorities(List.of(Authority.builder()
                 .name("Auth")
