@@ -552,13 +552,38 @@ public class ModelUtils {
             .build();
     }
 
+    public static EmployeeSignUpDto getEmployeeSignUpDto_UA() {
+        return EmployeeSignUpDto.builder()
+            .name("Taras")
+            .email("test@mail.com")
+            .positions(List.of(PositionDto.builder()
+                .id(1L)
+                .name("тест")
+                .build()))
+            .isUbs(true)
+            .build();
+    }
+
     public static EmployeeSignUpDto getEmployeeSignUpDto() {
         return EmployeeSignUpDto.builder()
             .name("Taras")
             .email("test@mail.com")
             .positions(List.of(PositionDto.builder()
                 .id(1L)
-                .name("test")
+                .name("тест")
+                .nameEn("test")
+                .build()))
+            .isUbs(true)
+            .build();
+    }
+
+    public static EmployeeSignUpDto getEmployeeSignUpDto_EN() {
+        return EmployeeSignUpDto.builder()
+            .name("Taras")
+            .email("test@mail.com")
+            .positions(List.of(PositionDto.builder()
+                .id(1L)
+                .nameEn("test")
                 .build()))
             .isUbs(true)
             .build();
