@@ -31,6 +31,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class UserRepoTest {
@@ -43,6 +44,7 @@ class UserRepoTest {
         when(userRepo.findByEmail("test@email.com")).thenReturn(Optional.of(ModelUtils.getUser()));
         User actual = userRepo.findByEmail("test@email.com").get();
         assertEquals(expected, actual.getId());
+        verify(userRepo, times(1)).findByEmail("test@email.com");
     }
 
     @Test
@@ -63,6 +65,7 @@ class UserRepoTest {
 
         assertEquals(3, expectedPage.getContent().size());
         assertEquals(expectedIds, actualIds);
+        verify(userRepo, times(1)).findAll(any(Pageable.class));
     }
 
     @Test
@@ -71,6 +74,7 @@ class UserRepoTest {
         when(userRepo.findIdByEmail("test@email.com")).thenReturn(Optional.of(ModelUtils.getUser().getId()));
         Long actual = userRepo.findIdByEmail("test@email.com").get();
         assertEquals(expected, actual);
+        verify(userRepo, times(1)).findIdByEmail("test@email.com");
     }
 
     @Test
@@ -79,6 +83,7 @@ class UserRepoTest {
         when(userRepo.findUuidByEmail("test@email.com")).thenReturn(Optional.of(ModelUtils.getUser().getUuid()));
         String actual = userRepo.findUuidByEmail("test@email.com").get();
         assertEquals(expected, actual);
+        verify(userRepo, times(1)).findUuidByEmail("test@email.com");
     }
 
     @Test
@@ -86,6 +91,7 @@ class UserRepoTest {
         when(userRepo.findNotDeactivatedByEmail("test@email.com")).thenReturn(Optional.of(ModelUtils.getUser()));
         User actual = userRepo.findNotDeactivatedByEmail("test@email.com").get();
         assertEquals(1L, actual.getId());
+        verify(userRepo).findNotDeactivatedByEmail("test@email.com");
     }
 
     @Test
@@ -111,6 +117,8 @@ class UserRepoTest {
         assertEquals(1L, immediately.get(1).getId());
         assertEquals(2, immediately.size());
         assertEquals("test2@email.com", disabled.get(0).getEmail());
+        verify(userRepo).findAllByEmailNotification(EmailNotification.DISABLED);
+        verify(userRepo, times(1)).findAllByEmailNotification(EmailNotification.IMMEDIATELY);
     }
 
     @Test
@@ -119,6 +127,7 @@ class UserRepoTest {
         when(userRepo.countAllByUserStatus(any())).thenReturn(expected);
         Long actual = userRepo.countAllByUserStatus(UserStatus.ACTIVATED);
         assertEquals(expected, actual);
+        verify(userRepo).countAllByUserStatus(UserStatus.ACTIVATED);
     }
 
     @Test
@@ -127,6 +136,7 @@ class UserRepoTest {
         when(userRepo.getProfilePicturePathByUserId(anyLong())).thenReturn(Optional.of(expected));
         String actual = userRepo.getProfilePicturePathByUserId(5L).get();
         assertEquals(expected, actual);
+        verify(userRepo).getProfilePicturePathByUserId(5L);
     }
 
     @Test
@@ -148,6 +158,7 @@ class UserRepoTest {
         List<User> actual = userRepo.getAllUserFriends(1L);
         assertEquals(5, actual.size());
         assertEquals(1, actual.get(1).getId());
+        verify(userRepo).getAllUserFriends(1L);
     }
 
     @Test
@@ -160,6 +171,7 @@ class UserRepoTest {
         Page<User> actual = userRepo.getAllUserFriends(1L, pageable);
         assertEquals(2, actual.getContent().size());
         assertEquals(expectedPage.getContent(), actual.getContent());
+        verify(userRepo).getAllUserFriends(1L, pageable);
     }
 
     @Test
@@ -180,6 +192,7 @@ class UserRepoTest {
         assertTrue(highestRatedFriends.contains(user1));
         assertTrue(highestRatedFriends.contains(user2));
         assertTrue(highestRatedFriends.contains(user3));
+        verify(userRepo).getSixFriendsWithTheHighestRating(1L);
     }
 
     @Test
@@ -211,6 +224,8 @@ class UserRepoTest {
             userRepo.findByEmail("test2@email.com").get().getUserStatus().toString());
         assertEquals(UserStatus.ACTIVATED.toString(),
             userRepo.findByEmail("test3@email.com").get().getUserStatus().toString());
+        verify(userRepo).deactivateSelectedUsers(ids);
+        verify(userRepo, times(3)).findByEmail(anyString());
     }
 
     @Test
@@ -232,6 +247,7 @@ class UserRepoTest {
 
         assertEquals(1, expectedPage.getContent().size());
         assertEquals(expectedIds, actualIds);
+        verify(userRepo).searchBy(pageable, "test3@email.com");
     }
 
     @Test
@@ -244,6 +260,7 @@ class UserRepoTest {
         List<String> actualCities = userRepo.findAllUsersCities();
         assertEquals(expectedCities, actualCities);
         assertEquals(9, actualCities.size());
+        verify(userRepo).findAllUsersCities();
     }
 
     @Test
@@ -256,6 +273,7 @@ class UserRepoTest {
         User actualUser = userRepo.findUserForAchievement(1L).orElse(null);
 
         assertEquals(expectedUser, actualUser);
+        verify(userRepo).findUserForAchievement(1L);
     }
 
     @Test
@@ -269,6 +287,7 @@ class UserRepoTest {
         User actualUser = userRepo.findUserByUuid(uuid).get();
 
         assertEquals(expectedUser, actualUser);
+        verify(userRepo).findUserByUuid(uuid);
     }
 
     @Test
@@ -280,6 +299,7 @@ class UserRepoTest {
         Integer actualFriends = userRepo.countOfMutualFriends(1L);
 
         assertEquals(expected, actualFriends);
+        verify(userRepo).countOfMutualFriends(1L);
     }
 
     @Test
@@ -294,6 +314,7 @@ class UserRepoTest {
         User user = userRepo.findByEmail("test3@email.com").get();
 
         assertEquals(expectedTime, user.getLastActivityTime());
+        verify(userRepo).findByEmail("test3@email.com");
     }
 
     @Test
@@ -305,6 +326,7 @@ class UserRepoTest {
         Timestamp actualTimestamp = userRepo.findLastActivityTimeById(8L).get();
 
         assertEquals(expectedTimestamp, actualTimestamp);
+        verify(userRepo).findLastActivityTimeById(8L);
     }
 
 }
