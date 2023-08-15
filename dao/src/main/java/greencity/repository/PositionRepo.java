@@ -20,6 +20,6 @@ public interface PositionRepo extends JpaRepository<Position, Long>, JpaSpecific
      * @return list of {@link Position}
      * @author Anton Bondar
      */
-    @Query("SELECT p FROM Position p WHERE p.name IN(:positionNames)")
+    @Query("SELECT p FROM Position p WHERE p.name  IN(:positionNames) or p.nameEn  IN(:positionNames)")
     List<Position> findPositionsByNames(List<String> positionNames);
 }
