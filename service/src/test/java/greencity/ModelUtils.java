@@ -94,6 +94,20 @@ public class ModelUtils {
         }
     };
 
+    public static User getUser() {
+        return User.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.DEACTIVATED)
+            .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .uuid("444e66e8-8daa-4cb0-8269-a8d856e7dd15")
+            .build();
+    }
+
     private static UserManagementDto createUserManagerDto() {
         return UserManagementDto.builder()
             .id(1L)
@@ -201,18 +215,6 @@ public class ModelUtils {
             .id(1L)
             .name("test1")
             .employees(list)
-            .build();
-    }
-
-    public static User getUser() {
-        return User.builder()
-            .id(1L)
-            .email(TestConst.EMAIL)
-            .name(TestConst.NAME)
-            .role(Role.ROLE_USER)
-            .lastActivityTime(LocalDateTime.now())
-            .verifyEmail(new VerifyEmail())
-            .dateOfRegistration(LocalDateTime.now())
             .build();
     }
 
