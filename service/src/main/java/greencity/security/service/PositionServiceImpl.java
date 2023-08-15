@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @AllArgsConstructor
@@ -31,9 +32,8 @@ public class PositionServiceImpl implements PositionService {
         List<Authority> authorities = authorityRepo
             .findAuthoritiesByPositions(user.getPositions()
                 .stream()
-                .map(Position::getName)
+                .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
                 .collect(Collectors.toList()));
-
         return PositionAuthoritiesDto.builder()
             .positionId(user.getPositions().stream().map(Position::getId).collect(Collectors.toList()))
             .authorities(authorities.stream().map(Authority::getName).collect(Collectors.toList()))
