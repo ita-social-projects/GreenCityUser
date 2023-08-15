@@ -616,9 +616,43 @@ public class ModelUtils {
     public static User getEmployeeWithPositionsAndRelatedAuthorities() {
         return User.builder()
             .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Admin")
+                .id(1L).name("Адмін")
                 .nameEn("Admin")
+                .build()))
+            .authorities(List.of(Authority.builder()
+                .name("Auth")
+                .build()))
+            .build();
+    }
+
+    public static User getEmployeeWithPositionsAndRelatedAuthorities_UA() {
+        return User.builder()
+            .positions(List.of(Position.builder()
+                .id(1L)
+                .name("Адмін")
+                .build()))
+            .authorities(List.of(Authority.builder()
+                .name("Auth")
+                .build()))
+            .build();
+    }
+
+    public static User getEmployeeWithPositionsAndRelatedAuthorities_EN() {
+        return User.builder()
+            .positions(List.of(Position.builder()
+                .id(1L)
+                .nameEn("Admin")
+                .build()))
+            .authorities(List.of(Authority.builder()
+                .name("Auth")
+                .build()))
+            .build();
+    }
+
+    public static User getEmployeeWithPositionsAndRelatedAuthorities_Empty() {
+        return User.builder()
+            .positions(List.of(Position.builder()
+                .id(1L)
                 .build()))
             .authorities(List.of(Authority.builder()
                 .name("Auth")
