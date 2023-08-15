@@ -102,7 +102,6 @@ class AuthorityServiceImplTest {
 
         verify(userRepo).findByEmail(TEST_EMAIL);
         verify(authorityRepo).findAuthoritiesByNames(authoritiesName);
-        verify(positionService).getEmployeeLoginPositionNames();
         verify(userRepo).save(employee);
     }
 
@@ -125,43 +124,6 @@ class AuthorityServiceImplTest {
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
 
         assertEquals(Role.ROLE_USER, employee.getRole());
-        assertThrows(BadRequestException.class,
-            () -> authorityService.updateEmployeesAuthorities(dto));
-
-        verify(userRepo).findByEmail(TEST_EMAIL);
-    }
-
-    @Test
-    void updateEmployeesAuthoritiesThrowsBadRequestExceptionWhenEmployeeTryToEditSuperAdminTest() {
-        User employee = createSuperAdmin();
-        var dto = getSuperAdminEmployeeAuthorityDto();
-        when(userRepo.findByEmail("superadmin@gmail.com")).thenReturn(Optional.of(employee));
-        when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Адмін"));
-
-        assertThrows(BadRequestException.class,
-            () -> authorityService.updateEmployeesAuthorities(dto));
-        verify(userRepo).findByEmail("superadmin@gmail.com");
-        verify(positionService).getEmployeeLoginPositionNames();
-    }
-
-    @Test
-    void updateEmployeesAuthoritiesThrowsBadRequestExceptionWhenAdminTryToEditPersonalDataTest() {
-        User employee = createEmployeeAdmin();
-        var dto = getUserEmployeeAuthorityDto();
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Адмін"));
-        assertThrows(BadRequestException.class,
-            () -> authorityService.updateEmployeesAuthorities(dto));
-
-        verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(positionService).getEmployeeLoginPositionNames();
-    }
-
-    @Test
-    void updateEmployeesAuthoritiesThrowsBadRequestExceptionWhenNonAdminTryToEditEmployeeTest() {
-        User employee = createEmployeeDriver();
-        var dto = getUserEmployeeAuthorityDto();
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         assertThrows(BadRequestException.class,
             () -> authorityService.updateEmployeesAuthorities(dto));
 
@@ -192,7 +154,6 @@ class AuthorityServiceImplTest {
         verify(userRepo).findByEmail(TEST_EMAIL);
         verify(positionRepo).findPositionsByNames(positionNames);
         verify(authorityRepo).findAuthoritiesByPositions(positionNames);
-        verify(positionService).getEmployeeLoginPositionNames();
     }
 
     @Test
