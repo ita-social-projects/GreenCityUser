@@ -1,6 +1,5 @@
 package greencity.security.service;
 
-import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.position.PositionDto;
@@ -46,11 +45,9 @@ public class AuthorityServiceImpl implements AuthorityService {
         User employee = userRepo.findByEmail(dto.getEmployeeEmail())
             .orElseThrow(
                 () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmployeeEmail()));
-
         if (!employee.getRole().equals(Role.ROLE_UBS_EMPLOYEE)) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
-
         List<Authority> authorities = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(dto.getAuthorities())) {
             authorities = authorityRepo.findAuthoritiesByNames(dto.getAuthorities());
