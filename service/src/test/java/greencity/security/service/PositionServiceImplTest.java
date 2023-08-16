@@ -57,49 +57,16 @@ class PositionServiceImplTest {
         var expected = getPositionAuthoritiesDto();
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        when(authorityRepo.findAuthoritiesByPositions(List.of("Адмін", "Admin")))
-            .thenReturn(List.of(Authority.builder().name("Auth").build()));
 
         assertEquals(expected, positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
 
         verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(authorityRepo).findAuthoritiesByPositions(List.of("Адмін", "Admin"));
     }
 
     @Test
-    void getPositionsAndRelatedAuthoritiesTest_UA() {
-        User employee = getEmployeeWithPositionsAndRelatedAuthorities_UA();
-        var expected = getPositionAuthoritiesDto();
-
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        when(authorityRepo.findAuthoritiesByPositions(List.of("Адмін")))
-            .thenReturn(List.of(Authority.builder().name("Auth").build()));
-
-        assertEquals(expected, positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
-
-        verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(authorityRepo).findAuthoritiesByPositions(List.of("Адмін"));
-    }
-
-    @Test
-    void getPositionsAndRelatedAuthoritiesTest_EN() {
-        User employee = getEmployeeWithPositionsAndRelatedAuthorities_EN();
-        var expected = getPositionAuthoritiesDto();
-
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        when(authorityRepo.findAuthoritiesByPositions(List.of("Admin")))
-            .thenReturn(List.of(Authority.builder().name("Auth").build()));
-
-        assertEquals(expected, positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
-
-        verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(authorityRepo).findAuthoritiesByPositions(List.of("Admin"));
-    }
-
-    @Test
-    void getPositionsAndRelatedAuthoritiesTest_BothNull() {
+    void getPositionsAndRelatedAuthoritiesTest_AuthorotiesListEmpty() {
         User employee = getEmployeeWithPositionsAndRelatedAuthorities_Empty();
-
+        employee.setAuthorities(Collections.emptyList());
         var expected = getPositionAuthoritiesDto();
         expected.setAuthorities(Collections.emptyList());
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
@@ -109,7 +76,6 @@ class PositionServiceImplTest {
         assertEquals(expected, positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
 
         verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(authorityRepo).findAuthoritiesByPositions(Collections.emptyList());
     }
 
     @Test

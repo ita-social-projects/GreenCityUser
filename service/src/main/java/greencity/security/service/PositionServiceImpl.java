@@ -30,15 +30,9 @@ public class PositionServiceImpl implements PositionService {
     public PositionAuthoritiesDto getPositionsAndRelatedAuthorities(String email) {
         var user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        List<Authority> authorities = authorityRepo
-            .findAuthoritiesByPositions(user.getPositions()
-                .stream()
-                .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList()));
         return PositionAuthoritiesDto.builder()
             .positionId(user.getPositions().stream().map(Position::getId).collect(Collectors.toList()))
-            .authorities(authorities.stream()
+            .authorities(user.getAuthorities().stream()
                 .map(Authority::getName)
                 .collect(Collectors.toList()))
             .build();
