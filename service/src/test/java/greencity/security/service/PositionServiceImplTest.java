@@ -1,6 +1,5 @@
 package greencity.security.service;
 
-import greencity.entity.Authority;
 import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
