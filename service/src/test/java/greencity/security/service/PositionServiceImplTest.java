@@ -18,13 +18,11 @@ import org.mockito.quality.Strictness;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static greencity.ModelUtils.TEST_EMAIL;
-import static greencity.ModelUtils.createEmployee;
-import static greencity.ModelUtils.getEmployeeWithPositionsAndRelatedAuthorities;
-import static greencity.ModelUtils.getPositionAuthoritiesDto;
+import static greencity.ModelUtils.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -59,6 +57,36 @@ class PositionServiceImplTest {
         var expected = getPositionAuthoritiesDto();
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+        when(authorityRepo.findAuthoritiesByPositions(List.of("Адмін", "Admin")))
+            .thenReturn(List.of(Authority.builder().name("Auth").build()));
+
+        assertEquals(expected, positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(authorityRepo).findAuthoritiesByPositions(List.of("Адмін", "Admin"));
+    }
+
+    @Test
+    void getPositionsAndRelatedAuthoritiesTest_UA() {
+        User employee = getEmployeeWithPositionsAndRelatedAuthorities_UA();
+        var expected = getPositionAuthoritiesDto();
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+        when(authorityRepo.findAuthoritiesByPositions(List.of("Адмін")))
+            .thenReturn(List.of(Authority.builder().name("Auth").build()));
+
+        assertEquals(expected, positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(authorityRepo).findAuthoritiesByPositions(List.of("Адмін"));
+    }
+
+    @Test
+    void getPositionsAndRelatedAuthoritiesTest_EN() {
+        User employee = getEmployeeWithPositionsAndRelatedAuthorities_EN();
+        var expected = getPositionAuthoritiesDto();
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         when(authorityRepo.findAuthoritiesByPositions(List.of("Admin")))
             .thenReturn(List.of(Authority.builder().name("Auth").build()));
 
@@ -66,6 +94,22 @@ class PositionServiceImplTest {
 
         verify(userRepo).findByEmail(TEST_EMAIL);
         verify(authorityRepo).findAuthoritiesByPositions(List.of("Admin"));
+    }
+
+    @Test
+    void getPositionsAndRelatedAuthoritiesTest_BothNull() {
+        User employee = getEmployeeWithPositionsAndRelatedAuthorities_Empty();
+
+        var expected = getPositionAuthoritiesDto();
+        expected.setAuthorities(Collections.emptyList());
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+        when(authorityRepo.findAuthoritiesByPositions(Collections.emptyList()))
+            .thenReturn(Collections.emptyList());
+
+        assertEquals(expected, positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(authorityRepo).findAuthoritiesByPositions(Collections.emptyList());
     }
 
     @Test
