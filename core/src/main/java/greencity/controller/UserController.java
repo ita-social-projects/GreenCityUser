@@ -719,12 +719,14 @@ public class UserController {
     }
 
     /**
-     * Method for setting {@link UserVO}'s status to ACTIVE.
+     * Method for setting {@link UserVO}'s status to ACTIVATED, so the user will not
+     * be able to log in into the system.
      *
-     * @param id of the searched {@link UserVO}
-     * @author Oksana Spodaryk
+     * @param id          of the searched {@link UserVO}.
+     * @param userReasons {@link List} of {@link String}.
+     * @author Orest Mamchuk
      */
-    @ApiOperation(value = "Activate user")
+    @ApiOperation(value = "Activate user indicating the list of reasons for activation")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
@@ -732,9 +734,10 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PutMapping("/activate")
-    public ResponseEntity<Object> activateUser(@RequestParam Long id) {
-        UserActivationDto userActivationDto = userService.setActivatedStatus(id);
-        emailService.sendMessageOfActivation(userActivationDto);
+    public ResponseEntity<ResponseEntity.BodyBuilder> activateUser(@RequestParam Long id,
+        @RequestBody List<String> userReasons) {
+        UserDeactivationReasonDto userDeactivationDto = userService.activateUser(id, userReasons);
+        emailService.sendReasonOfDeactivation(userDeactivationDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
