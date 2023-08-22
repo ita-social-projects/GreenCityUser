@@ -703,6 +703,21 @@ class UserControllerTest {
     }
 
     @Test
+    void activateUser() throws Exception {
+        String uuid = "87df9ad5-6393-441f-8423-8b2e770b01a8";
+        List<String> uuids = List.of("uuid5", "uuid3");
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("test@email.com");
+
+        mockMvc.perform(put(userLink + "/markUserAsActivated" + "?uuid=" + uuid)
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(uuids)))
+            .andExpect(status().isOk());
+        verify(userService).markUserAsActivated(uuid);
+    }
+
+    @Test
     void getAllAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
@@ -789,6 +804,14 @@ class UserControllerTest {
         mockMvc.perform(put(userLink + "/deactivate-employee").param("uuid", uuid))
             .andExpect(status().isOk());
         verify(userService).markUserAsDeactivated(uuid);
+    }
+
+    @Test
+    void activateEmployeeByUUID() throws Exception {
+        String uuid = "87df9ad5-6393-441f-8423-8b2e770b01a8";
+        mockMvc.perform(put(userLink + "/activate-employee").param("uuid", uuid))
+            .andExpect(status().isOk());
+        verify(userService).markUserAsActivated(uuid);
     }
 
     @Test
