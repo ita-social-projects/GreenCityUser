@@ -999,6 +999,29 @@ public class UserController {
     }
 
     /**
+     * Method for mark user like ACTIVATED .
+     *
+     * @param uuid - for found user.
+     *
+     * @author Oksana Spodaryk.
+     */
+    @ApiOperation(value = "mark user as ACTIVATED")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
+    })
+    @PutMapping("/markUserAsActivated")
+    public ResponseEntity<Object> markUserAsActivated(
+        @RequestParam @ApiIgnore String uuid) {
+        userService.markUserAsActivated(uuid);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
      * Controller to get information about all employee's authorities.
      *
      * @return @return Set of {@link String}

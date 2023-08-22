@@ -953,6 +953,25 @@ class UserServiceImplTest {
     }
 
     @Test
+    void markUserActivated() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        User user = ModelUtils.getUser();
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        user.setUserStatus(ACTIVATED);
+        when(userRepo.save(user)).thenReturn(user);
+        userService.markUserAsActivated(uuid);
+        verify(userRepo).save(user);
+
+    }
+
+    @Test
+    void markUserActivatedException() {
+        String uuid = "uuid";
+        assertThrows(NotFoundException.class,
+            () -> userService.markUserAsActivated(uuid));
+    }
+
+    @Test
     void findUserForAchievementTest() {
         Long id = 1L;
         UserVOAchievement userVOAchievement = UserVOAchievement.builder().id(id).build();
