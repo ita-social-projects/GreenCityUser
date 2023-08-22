@@ -719,14 +719,12 @@ public class UserController {
     }
 
     /**
-     * Method for setting {@link UserVO}'s status to ACTIVATED, so the user will not
-     * be able to log in into the system.
+     * Method for setting {@link UserVO}'s status to ACTIVE.
      *
-     * @param id          of the searched {@link UserVO}.
-     * @param userReasons {@link List} of {@link String}.
-     * @author Orest Mamchuk
+     * @param id of the searched {@link UserVO}
+     * @author Oksana Spodaryk
      */
-    @ApiOperation(value = "Activate user indicating the list of reasons for activation")
+    @ApiOperation(value = "Activate user")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
@@ -734,10 +732,9 @@ public class UserController {
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PutMapping("/activate")
-    public ResponseEntity<ResponseEntity.BodyBuilder> activateUser(@RequestParam Long id,
-        @RequestBody List<String> userReasons) {
-        UserDeactivationReasonDto userDeactivationDto = userService.activateUser(id, userReasons);
-        emailService.sendReasonOfDeactivation(userDeactivationDto);
+    public ResponseEntity<Object> activateUser(@RequestParam Long id) {
+        UserActivationDto userActivationDto = userService.setActivatedStatus(id);
+        emailService.sendMessageOfActivation(userActivationDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -801,26 +798,6 @@ public class UserController {
         @PathVariable Long languageId) {
         userService.updateUserLanguage(userVO.getId(), languageId);
         return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Method for setting {@link UserVO}'s status to ACTIVE.
-     *
-     * @param id of the searched {@link UserVO}
-     * @author Oksana Spodaryk
-     */
-    @ApiOperation(value = "Activate User")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
-    })
-    @PutMapping("/activate")
-    public ResponseEntity<Object> activateUser(@RequestParam Long id) {
-        UserActivationDto userActivationDto = userService.setActivatedStatus(id);
-        emailService.sendMessageOfActivation(userActivationDto);
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
