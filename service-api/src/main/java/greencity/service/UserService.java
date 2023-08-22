@@ -465,6 +465,13 @@ public interface UserService {
     void markUserAsDeactivated(String uuid);
 
     /**
+     * Method that mark User Activated.
+     *
+     * @author Oksana Spodaryk
+     */
+    void markUserAsActivated(String uuid);
+
+    /**
      * Method find user with admin authority.
      *
      * @author Ihor Volianskyi
