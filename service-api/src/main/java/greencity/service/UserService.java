@@ -431,15 +431,6 @@ public interface UserService {
     UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons);
 
     /**
-     * change {@link UserVO}'s status to ACTIVATED.
-     *
-     * @param id          {@link UserVO}'s id
-     * @param userReasons {@link List} of {@link String}.
-     * @author Oksana Spodaryk
-     */
-    UserDeactivationReasonDto activateUser(Long id, List<String> userReasons);
-
-    /**
      * Method for getting a {@link List} of {@link String} - reasons for
      * deactivation of the current user.
      *
