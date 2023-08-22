@@ -1011,6 +1011,7 @@ public class UserController {
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
         @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
     })
     @PutMapping("/markUserAsActivated")
@@ -1145,26 +1146,6 @@ public class UserController {
     @PutMapping("/deactivate-employee")
     public ResponseEntity<HttpStatus> deactivateEmployee(@RequestParam String uuid) {
         userService.markUserAsDeactivated(uuid);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
-     * Controller that activate employee by uuid.
-     *
-     * @param uuid - uuid of Employee.
-     * @author Oksana Spodaryk.
-     */
-    @ApiOperation(value = "Activate employee by uuid")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
-        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
-    })
-    @PutMapping("/activate-employee")
-    public ResponseEntity<HttpStatus> activateEmployee(@RequestParam String uuid) {
-        userService.markUserAsActivated(uuid);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
