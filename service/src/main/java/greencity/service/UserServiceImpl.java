@@ -751,6 +751,26 @@ public class UserServiceImpl implements UserService {
             .build();
     }
 
+    @Override
+    public UserDeactivationReasonDto activateUser(Long id, List<String> userReasons) {
+        User foundUser =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        foundUser.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(foundUser);
+        String reasons = userReasons.stream().map(Object::toString).collect(Collectors.joining("/"));
+        userDeactivationRepo.save(UserDeactivationReason.builder()
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .reason(reasons)
+            .user(foundUser)
+            .build());
+        return UserDeactivationReasonDto.builder()
+            .email(foundUser.getEmail())
+            .name(foundUser.getName())
+            .deactivationReasons(filterReasons(foundUser.getLanguage().getCode(), reasons))
+            .lang(foundUser.getLanguage().getCode())
+            .build();
+    }
+
     /**
      * {@inheritDoc}
      */

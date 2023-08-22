@@ -155,6 +155,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/authorities",
                 "/user/deactivate-employee")
             .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.PUT,
+                "/user/edit-authorities",
+                "/user/authorities",
+                "/user/activate-employee")
+            .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
                 "/user/get-all-authorities",
                 "/user/get-positions-authorities",
