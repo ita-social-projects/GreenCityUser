@@ -928,6 +928,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void markUserAsActivated(String uuid) {
+        User user = userRepo.findUserByUuid(uuid).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
+        user.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(user);
+    }
+
+    @Override
     public UserVO findAdminById(Long id) {
         User user = userRepo.findById(id)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID));
