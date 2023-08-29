@@ -184,7 +184,6 @@ class EmailServiceImplTest {
 
     @Test
     void sendMessageOfActivation() {
-        List<String> test = List.of("test", "test");
         UserActivationDto test1 = UserActivationDto.builder()
             .lang("en")
             .email("test@ukr.net")
