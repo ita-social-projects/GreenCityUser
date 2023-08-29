@@ -4,6 +4,8 @@ import greencity.ModelUtils;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.eventcomment.EventAuthorDto;
+import greencity.dto.eventcomment.EventCommentAuthorDto;
 import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.notification.NotificationDto;
@@ -25,6 +27,7 @@ import org.thymeleaf.ITemplateEngine;
 
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -103,9 +106,24 @@ class EmailServiceImplTest {
 
     @Test
     void sendNewCommentForEventOrganizer() {
-        EventCommentForSendEmailDto dto = new EventCommentForSendEmailDto();
-        dto.setEmail("inna@gmail.com");
+        var dto = EventCommentForSendEmailDto.builder()
+            .id(1L)
+            .email("inna@gmail.com")
+            .createdDate(LocalDateTime.MIN)
+            .text("new comment")
+            .eventId(2L)
+            .author(EventCommentAuthorDto.builder()
+                .id(3L)
+                .name("Author")
+                .build())
+            .organizer(EventAuthorDto.builder()
+                .id(4L)
+                .name("Organizer")
+                .build())
+            .build();
+
         service.sendNewCommentForEventOrganizer(dto);
+
         verify(javaMailSender).createMimeMessage();
     }
 

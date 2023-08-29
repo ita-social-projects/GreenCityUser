@@ -70,11 +70,12 @@ class EmailControllerTest {
     @Test
     void addEventComment() throws Exception {
         String content =
-            "{\"id\":\"1\"}," +
+            "{\"id\":\"1\"," +
                 "\"createdDate\":\"2021-02-05T15:10:22.434Z\"," +
                 "\"text\":\"string\"," +
                 "\"organizer\":{\"id\":0,\"name\":\"string\",\"userProfilePicturePath\":\"string\" }," +
                 "\"author\":{\"id\":0,\"name\":\"string\",\"organizerRating\":\"1.0\" }," +
+                "\"eventId\":\"2\"," +
                 "\"email\":\"inna@gmail.com\"}";
 
         mockPerform(content, "/addEventComment");
