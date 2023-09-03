@@ -3,6 +3,7 @@ package greencity.security.filters;
 import greencity.service.UserService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,8 +37,8 @@ class UserOnlineStatusUpdateFilterTest {
     @InjectMocks
     private UserOnlineStatusUpdateFilter userOnlineStatusUpdateFilter;
 
-    @AfterEach
-    void restoreSecurityContext() {
+    @BeforeEach
+    void setUp() {
         SecurityContextHolder.getContext().setAuthentication(null);
     }
 
