@@ -635,6 +635,14 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime) {
+        userRepo.updateUserLastActivityTimeByEmail(email, userLastActivityTime);
+    }
+
+    /**
      * The method checks by id if a {@link UserVO} is online.
      *
      * @param userId {@link Long}

@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import greencity.security.filters.AccessTokenAuthenticationFilter;
+import greencity.security.filters.UserOnlineStatusUpdateFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
 import greencity.service.UserService;
@@ -83,6 +84,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(
                 new AccessTokenAuthenticationFilter(jwtTool, authenticationManager(), userService),
                 UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new UserOnlineStatusUpdateFilter(userService),
+                AccessTokenAuthenticationFilter.class)
             .exceptionHandling()
             .authenticationEntryPoint((req, resp, exc) -> resp.sendError(SC_UNAUTHORIZED, "Authorize first."))
             .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities."))

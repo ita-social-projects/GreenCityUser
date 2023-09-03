@@ -320,6 +320,14 @@ public interface UserService {
     void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime);
 
     /**
+     * Updates last activity time for a given user by email.
+     *
+     * @param email                - {@link UserVO}'s email
+     * @param userLastActivityTime - new {@link UserVO}'s last activity time
+     */
+    void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
+
+    /**
      * The method checks by id if a {@link UserVO} is online.
      *
      * @param userId - {@link UserVO}'s id

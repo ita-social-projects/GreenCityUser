@@ -152,6 +152,18 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime);
 
     /**
+     * Updates last activity time for a given user by email.
+     *
+     * @param email                - {@link User}'s email
+     * @param userLastActivityTime - new {@link User}'s last activity time
+     * @author Yurii Zhurakovskyi
+     */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE User SET last_activity_time=:userLastActivityTime WHERE email=:email")
+    void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
+
+    /**
      * Find the last activity time by {@link User}'s id.
      *
      * @param userId - {@link User}'s id
