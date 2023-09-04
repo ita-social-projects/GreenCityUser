@@ -608,6 +608,13 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateUserLastActivityTimeByEmailTest() {
+        LocalDateTime currentTime = LocalDateTime.now();
+        userService.updateUserLastActivityTimeByEmail(userEmail, currentTime);
+        verify(userRepo).updateUserLastActivityTimeByEmail(userEmail, currentTime);
+    }
+
+    @Test
     void checkIfTheUserIsOnlineExceptionTest() {
         assertThrows(WrongIdException.class, () -> userService.checkIfTheUserIsOnline(null));
     }
