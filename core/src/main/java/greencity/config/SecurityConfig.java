@@ -109,9 +109,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
                 "/ownSecurity/signIn",
-                "/ownSecurity/updatePassword",
-                "/email/sendReport",
-                "/email/sendHabitNotification")
+                "/ownSecurity/updatePassword")
             .permitAll()
             .antMatchers(HttpMethod.GET,
                 USER_LINK,
@@ -140,6 +138,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/shopping-list-items",
                 "/user/{userId}/habit",
                 "/ownSecurity/set-password",
+                "/email/sendReport",
+                "/email/sendHabitNotification",
                 "/email/addEcoNews",
                 "/email/changePlaceStatus",
                 "/email/addEventComment")
