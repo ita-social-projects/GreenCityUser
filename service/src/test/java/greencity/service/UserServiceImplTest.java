@@ -1048,16 +1048,16 @@ class UserServiceImplTest {
 
     @Test
     void getUserRatingTest() {
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.ofNullable(TEST_USER));
-        UserRatingDto userRatingDto = userService.getUserRating("test@gmail.com");
+        when(userRepo.findById(anyLong())).thenReturn(Optional.ofNullable(TEST_USER));
+        UserRatingDto userRatingDto = userService.getUserRating(1L);
         assertEquals(100D, userRatingDto.getRating());
     }
 
     @Test
     void editUserRatingTest() {
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.ofNullable(TEST_USER));
+        when(userRepo.findById(anyLong())).thenReturn(Optional.ofNullable(TEST_USER));
         UserRatingDto userRatingDto = UserRatingDto.builder()
-            .email("test@gmail.com")
+            .id(1L)
             .rating(200D)
             .build();
 

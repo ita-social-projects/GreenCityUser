@@ -111,11 +111,11 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserRatingDto getUserRating(String email) {
-        var user = userRepo.findByEmail(email)
+    public UserRatingDto getUserRating(Long id) {
+        var user = userRepo.findById(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return UserRatingDto.builder()
-            .email(user.getEmail())
+            .id(user.getId())
             .rating(user.getRating())
             .build();
     }
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserRating(UserRatingDto userRatingDto) {
-        var user = userRepo.findByEmail(userRatingDto.getEmail())
+        var user = userRepo.findById(userRatingDto.getId())
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         user.setRating(userRatingDto.getRating());
         userRepo.save(user);

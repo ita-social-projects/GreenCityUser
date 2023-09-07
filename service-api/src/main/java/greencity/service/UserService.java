@@ -48,11 +48,11 @@ public interface UserService {
     /**
      * Retrieves an employee's rating information based on their email.
      *
-     * @param email The email address of the employee for whom the rating
-     *              information is requested.
+     * @param id The id of the employee for whom the rating information is
+     *           requested.
      * @return A UserRatingDto containing the rating information of the employee.
      */
-    UserRatingDto getUserRating(String email);
+    UserRatingDto getUserRating(Long id);
 
     /**
      * Updates an employee's rating information using the provided UserRatingDto.

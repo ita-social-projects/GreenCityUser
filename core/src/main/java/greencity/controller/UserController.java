@@ -1153,14 +1153,14 @@ public class UserController {
     /**
      * Retrieves an employee's rating information by their email.
      *
-     * @param email The email address of the employee for whom the rating
-     *              information is requested.
+     * @param id The id of the employee for whom the rating information is
+     *           requested.
      * @return A ResponseEntity containing the UserRatingDto with the employee's
      *         rating information.
      *
      * @author Oksana Spodaryk.
      */
-    @ApiOperation(value = "Get an employee's rating information by their email.")
+    @ApiOperation(value = "Get an employee's rating information by their id.")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
@@ -1169,8 +1169,8 @@ public class UserController {
         @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("/get-user-rating")
-    public ResponseEntity<UserRatingDto> getUserRating(@RequestParam String email) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserRating(email));
+    public ResponseEntity<UserRatingDto> getUserRating(@RequestParam Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserRating(id));
     }
 
     /**

@@ -48,6 +48,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -820,13 +822,13 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        mockMvc.perform(get(userLink + "/get-user-rating" + "?email=" + principal.getName())
+        mockMvc.perform(get(userLink + "/get-user-rating?id=1")
             .principal(principal)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(principal.getName())))
             .andExpect(status().isOk());
 
-        verify(userService).getUserRating(principal.getName());
+        verify(userService).getUserRating(anyLong());
     }
 
     @Test
@@ -835,7 +837,7 @@ class UserControllerTest {
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
         UserRatingDto dto = UserRatingDto.builder()
-            .email("testmail@gmail.com")
+            .id(1L)
             .rating(10.0)
             .build();
 
