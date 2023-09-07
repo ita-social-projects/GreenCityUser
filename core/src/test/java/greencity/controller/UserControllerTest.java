@@ -17,14 +17,7 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
+import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.repository.UserRepo;
@@ -47,6 +40,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -814,4 +808,42 @@ class UserControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").value(true));
     }
+
+    @Test
+    void getUserRatingTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        mockMvc.perform(get(userLink + "/get-user-rating" + "?email=" + principal.getName())
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(principal.getName())))
+            .andExpect(status().isOk());
+
+        verify(userService).getUserRating(principal.getName());
+    }
+
+    @Test
+    void editUserRatingTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        UserRatingDto dto = UserRatingDto.builder()
+            .id(1L)
+            .email("testmail@gmail.com")
+            .rating(10.0)
+            .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(put(userLink + "/user-rating")
+            .principal(principal)
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        verify(userService).updateUserRating(eq(dto));
+    }
+
 }
