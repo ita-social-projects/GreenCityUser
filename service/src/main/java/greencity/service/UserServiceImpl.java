@@ -115,7 +115,6 @@ public class UserServiceImpl implements UserService {
         var user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return UserRatingDto.builder()
-            .id(user.getId())
             .email(user.getEmail())
             .rating(user.getRating())
             .build();

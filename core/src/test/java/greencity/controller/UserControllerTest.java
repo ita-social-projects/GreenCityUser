@@ -827,7 +827,6 @@ class UserControllerTest {
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
         UserRatingDto dto = UserRatingDto.builder()
-            .id(1L)
             .email("testmail@gmail.com")
             .rating(10.0)
             .build();

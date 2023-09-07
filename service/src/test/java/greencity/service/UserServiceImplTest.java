@@ -1057,7 +1057,6 @@ class UserServiceImplTest {
     void editUserRatingTest() {
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.ofNullable(TEST_USER));
         UserRatingDto userRatingDto = UserRatingDto.builder()
-            .id(1L)
             .email("test@gmail.com")
             .rating(200D)
             .build();
