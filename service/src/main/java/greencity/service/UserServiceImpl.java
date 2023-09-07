@@ -11,25 +11,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserActivationDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.dto.user.*;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
@@ -104,6 +86,28 @@ public class UserServiceImpl implements UserService {
     public UserVO save(UserVO userVO) {
         User user = modelMapper.map(userVO, User.class);
         return modelMapper.map(userRepo.save(user), UserVO.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserRatingDto getUserRating(String email) {
+        var user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        return UserRatingDto.builder()
+            .id(user.getId())
+            .email(user.getEmail())
+            .rating(user.getRating())
+            .build();
+    }
+
+    @Override
+    public void updateUserRating(UserRatingDto userRatingDto) {
+        var user = userRepo.findByEmail(userRatingDto.getEmail())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        user.setRating(userRatingDto.getRating());
+        userRepo.save(user);
     }
 
     /**
