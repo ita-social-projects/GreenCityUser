@@ -104,7 +104,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/token",
                 "/socket/**",
                 "/user/findAllByEmailNotification",
-                "/user/checkByUuid")
+                "/user/checkByUuid",
+                "/user/get-user-rating")
             .permitAll()
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
@@ -199,7 +200,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/css/**",
                 "/img/**")
             .permitAll()
-            .anyRequest().hasAnyRole(ADMIN);
+            .antMatchers(HttpMethod.PUT,
+                "/user/user-rating")
+            .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
+            .anyRequest().hasAnyRole(ADMIN)
+
+        ;
     }
 
     /**
