@@ -212,7 +212,6 @@ class RestClientTest {
         String[] allLanguageCodes = new String[3];
         allLanguageCodes[0] = "en";
         allLanguageCodes[1] = "uk";
-        allLanguageCodes[2] = "ru";
         when(restTemplate.getForObject(greenCityServerAddress
             + RestTemplateLinks.LANGUAGE, String[].class)).thenReturn(allLanguageCodes);
 
