@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class UserRatingDto {
-
     private String email;
 
     private Double rating;
