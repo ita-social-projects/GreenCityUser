@@ -15,6 +15,7 @@ import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.RoleDto;
+import greencity.dto.user.UserRatingDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
@@ -1146,6 +1147,53 @@ public class UserController {
     @PutMapping("/deactivate-employee")
     public ResponseEntity<HttpStatus> deactivateEmployee(@RequestParam String uuid) {
         userService.markUserAsDeactivated(uuid);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Retrieves an employee's rating information by their email.
+     *
+     * @param id The id of the employee for whom the rating information is
+     *           requested.
+     * @return A ResponseEntity containing the UserRatingDto with the employee's
+     *         rating information.
+     *
+     * @author Oksana Spodaryk.
+     */
+    @ApiOperation(value = "Get an employee's rating information by their id.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
+    })
+    @GetMapping("/get-user-rating")
+    public ResponseEntity<UserRatingDto> getUserRating(@RequestParam Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserRating(id));
+    }
+
+    /**
+     * Updates an employee's rating information.
+     *
+     * @param userRatingDto The UserRatingDto containing the updated rating
+     *                      information.
+     * @return A ResponseEntity with HTTP status indicating the success of the
+     *         update operation.
+     *
+     * @author Oksana Spodaryk.
+     */
+    @ApiOperation(value = "Update an employee's rating information.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
+    })
+    @PutMapping("/user-rating")
+    public ResponseEntity<HttpStatus> updateUserRating(@Valid @RequestBody UserRatingDto userRatingDto) {
+        userService.updateUserRating(userRatingDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

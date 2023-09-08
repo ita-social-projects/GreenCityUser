@@ -25,6 +25,7 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UserRatingDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.repository.UserRepo;
@@ -47,6 +48,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -68,7 +71,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -814,4 +816,41 @@ class UserControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").value(true));
     }
+
+    @Test
+    void getUserRatingTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        mockMvc.perform(get(userLink + "/get-user-rating?id=1")
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(principal.getName())))
+            .andExpect(status().isOk());
+
+        verify(userService).getUserRating(anyLong());
+    }
+
+    @Test
+    void editUserRatingTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        UserRatingDto dto = UserRatingDto.builder()
+            .id(1L)
+            .rating(10.0)
+            .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String json = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(put(userLink + "/user-rating")
+            .principal(principal)
+            .content(json)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+
+        verify(userService).updateUserRating(dto);
+    }
+
 }
