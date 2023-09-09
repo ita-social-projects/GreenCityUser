@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Builder
-public class UserRatingDto {
+public class UserAddRatingDto {
     private Long id;
 
     private Double rating;
