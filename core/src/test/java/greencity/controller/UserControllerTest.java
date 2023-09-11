@@ -25,7 +25,7 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UserRatingDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.repository.UserRepo;
@@ -818,25 +818,11 @@ class UserControllerTest {
     }
 
     @Test
-    void getUserRatingTest() throws Exception {
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("testmail@gmail.com");
-
-        mockMvc.perform(get(userLink + "/get-user-rating?id=1")
-            .principal(principal)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(principal.getName())))
-            .andExpect(status().isOk());
-
-        verify(userService).getUserRating(anyLong());
-    }
-
-    @Test
     void editUserRatingTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        UserRatingDto dto = UserRatingDto.builder()
+        UserAddRatingDto dto = UserAddRatingDto.builder()
             .id(1L)
             .rating(10.0)
             .build();

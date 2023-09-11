@@ -1047,22 +1047,14 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUserRatingTest() {
-        when(userRepo.findById(anyLong())).thenReturn(Optional.ofNullable(TEST_USER));
-        UserRatingDto userRatingDto = userService.getUserRating(1L);
-        assertEquals(100D, userRatingDto.getRating());
-    }
-
-    @Test
     void editUserRatingTest() {
         when(userRepo.findById(anyLong())).thenReturn(Optional.ofNullable(TEST_USER));
-        UserRatingDto userRatingDto = UserRatingDto.builder()
+        UserAddRatingDto userRatingDto = UserAddRatingDto.builder()
             .id(1L)
             .rating(200D)
             .build();
 
         userService.updateUserRating(userRatingDto);
-
         verify(userRepo).save(TEST_USER);
     }
 }

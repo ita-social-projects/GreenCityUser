@@ -7,7 +7,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.UserRatingDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
@@ -46,21 +46,12 @@ import java.util.Optional;
  */
 public interface UserService {
     /**
-     * Retrieves an employee's rating information based on their email.
-     *
-     * @param id The id of the employee for whom the rating information is
-     *           requested.
-     * @return A UserRatingDto containing the rating information of the employee.
-     */
-    UserRatingDto getUserRating(Long id);
-
-    /**
      * Updates an employee's rating information using the provided UserRatingDto.
      *
      * @param userRatingDto The UserRatingDto containing the updated rating
      *                      information.
      */
-    void updateUserRating(UserRatingDto userRatingDto);
+    void updateUserRating(UserAddRatingDto userRatingDto);
 
     /**
      * Find all {@link User}'s with {@link EmailNotification} type.
