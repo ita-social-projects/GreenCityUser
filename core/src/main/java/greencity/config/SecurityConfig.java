@@ -202,7 +202,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .permitAll()
             .antMatchers(HttpMethod.PUT,
                 "/user/user-rating")
-            .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE, UBS_EMPLOYEE)
+            .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE, UBS_EMPLOYEE, USER)
             .anyRequest().hasAnyRole(ADMIN);
     }
 
