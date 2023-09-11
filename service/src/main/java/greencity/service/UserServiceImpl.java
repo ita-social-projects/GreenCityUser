@@ -12,7 +12,7 @@ import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserRatingDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
@@ -111,23 +111,10 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserRatingDto getUserRating(Long id) {
-        var user = userRepo.findById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        return UserRatingDto.builder()
-            .id(user.getId())
-            .rating(user.getRating())
-            .build();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void updateUserRating(UserRatingDto userRatingDto) {
+    public void updateUserRating(UserAddRatingDto userRatingDto) {
         var user = userRepo.findById(userRatingDto.getId())
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        user.setRating(userRatingDto.getRating());
+        user.setRating(user.getRating() + userRatingDto.getRating());
         userRepo.save(user);
     }
 
