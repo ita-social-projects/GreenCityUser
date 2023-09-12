@@ -149,4 +149,14 @@ public interface EmailService {
      * @author Pavlo Hural.
      */
     void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
+
+    /**
+     * Method for email notification on email about event creation status.
+     *
+     * @param email       notification is sent to this email.
+     * @param messageBody contains message which will be send on user's email.
+     *
+     * @author Olena Sotnik.
+     */
+    void sendEventCreationNotification(String email, String messageBody);
 }

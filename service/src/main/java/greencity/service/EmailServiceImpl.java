@@ -305,4 +305,14 @@ public class EmailServiceImpl implements EmailService {
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
         sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
     }
+
+    @Override
+    public void sendEventCreationNotification(String email, String messageBody) {
+        if (userRepo.findByEmail(email).isPresent()) {
+            String subject = "Notification about event creation status";
+            sendEmail(email, subject, messageBody);
+        } else {
+            throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
+        }
+    }
 }
