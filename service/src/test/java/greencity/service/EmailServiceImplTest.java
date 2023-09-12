@@ -207,4 +207,19 @@ class EmailServiceImplTest {
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
     }
+
+    @Test
+    void sendEventCreatedNotificationTest() {
+        User user = User.builder().build();
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        service.sendEventCreationNotification("test@gmail.com", "message");
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendEventCreatedNotificationNotFoundExceptionTest() {
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
+        assertThrows(NotFoundException.class,
+            () -> service.sendEventCreationNotification("test@gmail.com", "message"));
+    }
 }
