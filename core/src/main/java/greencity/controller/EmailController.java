@@ -134,12 +134,10 @@ public class EmailController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
     })
     @PostMapping("/sendEventNotification")
-    public ResponseEntity<Object> sendEventNotification(@RequestBody SendEventCreationNotification notification) {
+    @ResponseStatus(HttpStatus.OK)
+    public void sendEventNotification(@RequestBody SendEventCreationNotification notification) {
         emailService.sendEventCreationNotification(notification.getEmail(), notification.getMessageBody());
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
