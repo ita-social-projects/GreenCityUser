@@ -308,8 +308,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendEventCreationNotification(String email, String messageBody) {
-        userRepo.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         String subject = "Notification about event creation status";
         sendEmail(email, subject, messageBody);
     }
