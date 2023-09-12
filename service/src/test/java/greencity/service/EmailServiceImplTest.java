@@ -207,4 +207,10 @@ class EmailServiceImplTest {
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
     }
+
+    @Test
+    void sendEventCreatedNotificationTest() {
+        service.sendEventCreationNotification("test@gmail.com", "message");
+        verify(javaMailSender).createMimeMessage();
+    }
 }
