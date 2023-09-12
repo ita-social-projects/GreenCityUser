@@ -305,4 +305,10 @@ public class EmailServiceImpl implements EmailService {
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
         sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
     }
+
+    @Override
+    public void sendEventCreationNotification(String email, String messageBody) {
+        String subject = "Notification about event creation status";
+        sendEmail(email, subject, messageBody);
+    }
 }
