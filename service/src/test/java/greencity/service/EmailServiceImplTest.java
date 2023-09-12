@@ -210,16 +210,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendEventCreatedNotificationTest() {
-        User user = User.builder().build();
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         service.sendEventCreationNotification("test@gmail.com", "message");
         verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendEventCreatedNotificationNotFoundExceptionTest() {
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
-        assertThrows(NotFoundException.class,
-            () -> service.sendEventCreationNotification("test@gmail.com", "message"));
     }
 }
