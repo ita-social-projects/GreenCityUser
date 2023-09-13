@@ -136,7 +136,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/lang",
                 "/user/createUbsRecord",
                 "/user/{userId}/sixUserFriends/",
-                "/ownSecurity/password-status")
+                "/ownSecurity/password-status",
+                "/user/emailNotifications")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,

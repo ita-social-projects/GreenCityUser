@@ -195,10 +195,14 @@ class UserControllerTest {
 
     @Test
     void getEmailNotificationsTest() throws Exception {
-        mockMvc.perform(get(userLink + "/emailNotifications"))
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        mockMvc.perform(get(userLink + "/emailNotifications")
+            .principal(principal))
             .andExpect(status().isOk());
 
-        verify(userService).getEmailNotificationsStatuses();
+        verify(userService).getEmailNotificationsStatuses("testmail@gmail.com");
     }
 
     @Test

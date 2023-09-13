@@ -211,7 +211,7 @@ public interface UserService {
      *
      * @return available {@link EmailNotification} statuses.
      */
-    List<EmailNotification> getEmailNotificationsStatuses();
+    List<EmailNotification> getEmailNotificationsStatuses(String email);
 
     /**
      * Update last visit of user.

@@ -388,8 +388,13 @@ public class UserServiceImpl implements UserService {
      * @author Nazar Vladyka
      */
     @Override
-    public List<EmailNotification> getEmailNotificationsStatuses() {
-        return Arrays.asList(EmailNotification.class.getEnumConstants());
+    public List<EmailNotification> getEmailNotificationsStatuses(String email) {
+        Long userId = findIdByEmail(email);
+        User user = findUserById(userId);
+        EmailNotification emailNotification = user.getEmailNotification();
+        List<EmailNotification> emailNotificationList = new ArrayList<>();
+        emailNotificationList.add(emailNotification);
+        return emailNotificationList;
     }
 
     /**
