@@ -189,7 +189,7 @@ public class UserController {
      * user{@link EmailNotification}.
      *
      * @return {@link EmailNotification} array
-     * @author Nazar Bokalo
+     * @author Nazar Vladyka
      */
     @ApiOperation(value = "Get email notifications status by authorization user")
     @ApiResponses(value = {
