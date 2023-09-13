@@ -48,6 +48,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -402,6 +404,31 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         verify(userService).search(pageable, userViewDto);
+    }
+
+    @Test
+    void findByEmailTest() throws Exception {
+        UserVO userVO = ModelUtils.getUserVO();
+        when(userService.findByEmail(TestConst.EMAIL)).thenReturn(userVO);
+        mockMvc.perform(get(userLink + "/findByEmail")
+            .param("email", TestConst.EMAIL))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findByIdTest() throws Exception {
+        UserVO userVO = ModelUtils.getUserVO();
+        when(userService.findById(1L)).thenReturn(userVO);
+        mockMvc.perform(get(userLink + "/findById")
+            .param("id", "1"))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType("application/json;charset=UTF-8"))
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
     }
 
     @Test
