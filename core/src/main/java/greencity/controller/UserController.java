@@ -73,9 +73,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/user")
@@ -202,7 +200,7 @@ public class UserController {
     public ResponseEntity<List<EmailNotification>> getEmailNotifications(
         @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getEmailNotificationsStatuses(email));
+        return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
     }
 
     /**

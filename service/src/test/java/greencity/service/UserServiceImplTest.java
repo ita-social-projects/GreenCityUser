@@ -390,18 +390,15 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getEmailNotificationsStatusesWithValidValuesTest() {
+    void getEmailNotificationsStatusesTest() {
         User user = new User();
-        user.setEmailNotification(EmailNotification.IMMEDIATELY);
         String email = "test@gmail.com";
+        user.setEmailNotification(EmailNotification.IMMEDIATELY);
 
-        when(userRepo.findIdByEmail(email)).thenReturn(Optional.of(4L));
-        when(userRepo.findById(4L)).thenReturn(Optional.of(user));
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+        EmailNotification result = userService.getEmailNotificationsStatuses(email);
 
-        List<EmailNotification> emailNotifications = userService.getEmailNotificationsStatuses(email);
-
-        assertEquals(1, emailNotifications.size());
-        assertEquals(EmailNotification.IMMEDIATELY, emailNotifications.get(0));
+        assertEquals(EmailNotification.IMMEDIATELY, result);
     }
 
     @Test

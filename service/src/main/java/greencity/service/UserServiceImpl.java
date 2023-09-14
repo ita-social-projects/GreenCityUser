@@ -69,11 +69,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -388,13 +384,10 @@ public class UserServiceImpl implements UserService {
      * @author Nazar Vladyka
      */
     @Override
-    public List<EmailNotification> getEmailNotificationsStatuses(String email) {
-        Long userId = findIdByEmail(email);
-        User user = findUserById(userId);
-        EmailNotification emailNotification = user.getEmailNotification();
-        List<EmailNotification> emailNotificationList = new ArrayList<>();
-        emailNotificationList.add(emailNotification);
-        return emailNotificationList;
+    public EmailNotification getEmailNotificationsStatuses(String email) {
+        User user = userRepo.findByEmail(email).
+                orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+        return user.getEmailNotification();
     }
 
     /**
