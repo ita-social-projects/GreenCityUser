@@ -200,7 +200,8 @@ public class UserController {
     public ResponseEntity<List<EmailNotification>> getEmailNotifications(
         @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
-        return ResponseEntity.status(HttpStatus.OK).body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
     }
 
     /**
