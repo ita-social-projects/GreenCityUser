@@ -378,8 +378,15 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public RoleDto getRoles() {
-        return new RoleDto(Role.class.getEnumConstants());
+    public RoleDto getRoles(Long id) {
+        User user = userRepo.findById(id).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+
+        Role role = user.getRole();
+
+        return RoleDto.builder()
+            .roles(new Role[] {role})
+            .build();
     }
 
     /**
