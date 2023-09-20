@@ -168,21 +168,21 @@ public class UserController {
     }
 
     /**
-     * The method which return array of existing roles.
+     * The method which return array of user role by user id.
      *
      * @return {@link RoleDto}
      * @author Rostyslav Khasanov
      */
-    @ApiOperation(value = "Get all available roles")
+    @ApiOperation(value = "Get user role by user id")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = RoleDto.class),
-        @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("roles")
-    public ResponseEntity<RoleDto> getRoles() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getRoles());
+    public ResponseEntity<RoleDto> getRoles(@RequestParam Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getRoles(id));
     }
 
     /**
