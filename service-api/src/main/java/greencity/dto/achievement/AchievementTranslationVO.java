@@ -16,12 +16,9 @@ import lombok.Setter;
 @Builder
 public class AchievementTranslationVO {
     private Long id;
+    private Long achievement_id;
 
-    private LanguageVO language;
+    private String name;
 
-    private String title;
-
-    private String description;
-
-    private String message;
+    private String nameEng;
 }

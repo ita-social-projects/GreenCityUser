@@ -380,7 +380,7 @@ public class ModelUtils {
     }
 
     public static AchievementTranslation getAchievementTranslation() {
-        return new AchievementTranslation(1L, getLanguage(), "Title", "Description", "Message", null);
+        return new AchievementTranslation(1L, "Title", "Description", getAchievement());
     }
 
     public static UserAchievement getUserAchievement() {

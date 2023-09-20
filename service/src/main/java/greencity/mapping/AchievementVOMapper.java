@@ -10,30 +10,24 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Component
 public class AchievementVOMapper extends AbstractConverter<Achievement, AchievementVO> {
     @Override
     protected AchievementVO convert(Achievement achievement) {
         List<AchievementTranslationVO> list = new ArrayList<>();
-        achievement.getTranslations().forEach(achievementTranslation -> list.add(AchievementTranslationVO.builder()
-            .id(achievementTranslation.getId())
-            .title(achievementTranslation.getTitle())
-            .description(achievementTranslation.getDescription())
-            .message(achievementTranslation.getMessage())
-            .language(LanguageVO.builder()
-                .id(achievementTranslation.getLanguage().getId())
-                .code(achievementTranslation.getLanguage().getCode())
-                .build())
-            .build()));
+        achievement.getTranslations()
+                .forEach(achievementTranslation -> list.add(AchievementTranslationVO.builder()
+                        .id(achievementTranslation.getId())
+                        .name(achievementTranslation.getName())
+                        .nameEng(achievementTranslation.getNameEng())
+                        .build()));
         return AchievementVO.builder()
-            .id(achievement.getId())
-            .translations(list)
-            .achievementCategory(AchievementCategoryVO.builder()
-                .id(achievement.getAchievementCategory().getId())
-                .name(achievement.getAchievementCategory().getName())
-                .build())
-            .condition(achievement.getCondition())
-            .build();
+                .id(achievement.getId())
+                .translations(list)
+                .achievementCategory(AchievementCategoryVO.builder()
+                        .id(achievement.getAchievementCategory().getId())
+                        .name(achievement.getAchievementCategory().getName())
+                        .build())
+                .build();
     }
 }
