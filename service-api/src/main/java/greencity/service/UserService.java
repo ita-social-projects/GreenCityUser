@@ -199,12 +199,12 @@ public interface UserService {
     void updateUser(Long userId, UserManagementUpdateDto dto);
 
     /**
-     * Get all exists roles.
+     * The method which return array of user role by user id.
      *
      * @return {@link RoleDto}.
      * @author Rostyslav Khasanov
      */
-    RoleDto getRoles();
+    RoleDto getRoles(Long id);
 
     /**
      * Get {@link EmailNotification} status for {@link UserVO}.

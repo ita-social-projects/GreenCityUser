@@ -187,10 +187,12 @@ class UserControllerTest {
 
     @Test
     void getRolesTest() throws Exception {
-        mockMvc.perform(get(userLink + "/roles"))
+        Long id = 1L;
+        mockMvc.perform(get(userLink + "/roles")
+            .param("id", String.valueOf(id)))
             .andExpect(status().isOk());
 
-        verify(userService).getRoles();
+        verify(userService).getRoles(id);
     }
 
     @Test

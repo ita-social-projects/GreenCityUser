@@ -385,8 +385,15 @@ class UserServiceImplTest {
 
     @Test
     void getRoles() {
-        RoleDto roleDto = new RoleDto(Role.class.getEnumConstants());
-        assertEquals(roleDto, userService.getRoles());
+        User user = new User();
+        user.setRole(ROLE_USER);
+
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+
+        RoleDto result = userService.getRoles(1L);
+
+        assertEquals(ROLE_USER, result.getRoles()[0]);
+        assertThrows(NotFoundException.class, () -> userService.getRoles(0L));
     }
 
     @Test
