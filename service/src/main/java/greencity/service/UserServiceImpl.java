@@ -383,7 +383,6 @@ public class UserServiceImpl implements UserService {
             () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
 
         Role role = user.getRole();
-
         return RoleDto.builder()
             .roles(new Role[] {role})
             .build();
