@@ -207,11 +207,11 @@ public interface UserService {
     RoleDto getRoles();
 
     /**
-     * Get list of available {@link EmailNotification} statuses for {@link UserVO}.
+     * Get {@link EmailNotification} status for {@link UserVO}.
      *
-     * @return available {@link EmailNotification} statuses.
+     * @return user {@link EmailNotification} status.
      */
-    List<EmailNotification> getEmailNotificationsStatuses();
+    EmailNotification getEmailNotificationsStatuses(String email);
 
     /**
      * Update last visit of user.

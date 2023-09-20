@@ -73,6 +73,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -185,20 +186,25 @@ public class UserController {
     }
 
     /**
-     * The method which return array of existing {@link EmailNotification}.
+     * The method which return email status authorization
+     * user{@link EmailNotification}.
      *
      * @return {@link EmailNotification} array
      * @author Nazar Vladyka
      */
-    @ApiOperation(value = "Get all available email notifications statuses")
+    @ApiOperation(value = "Get email notifications status by authorization user")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = EmailNotification[].class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST)
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED)
     })
     @GetMapping("emailNotifications")
-    public ResponseEntity<List<EmailNotification>> getEmailNotifications() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getEmailNotificationsStatuses());
+    public ResponseEntity<List<EmailNotification>> getEmailNotifications(
+        @ApiIgnore @AuthenticationPrincipal Principal principal) {
+        String email = principal.getName();
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
     }
 
     /**

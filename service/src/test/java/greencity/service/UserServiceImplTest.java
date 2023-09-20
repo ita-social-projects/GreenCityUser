@@ -390,11 +390,15 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getEmailStatusesTest() {
-        List<EmailNotification> placeStatuses =
-            Arrays.asList(EmailNotification.class.getEnumConstants());
+    void getEmailNotificationsStatusesTest() {
+        User user = new User();
+        String email = "test@gmail.com";
+        user.setEmailNotification(EmailNotification.IMMEDIATELY);
 
-        assertEquals(placeStatuses, userService.getEmailNotificationsStatuses());
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+        EmailNotification result = userService.getEmailNotificationsStatuses(email);
+
+        assertEquals(EmailNotification.IMMEDIATELY, result);
     }
 
     @Test
