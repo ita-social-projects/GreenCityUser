@@ -1,7 +1,7 @@
 package greencity.dto.achievement;
 
 import greencity.dto.user.UserVO;
-import greencity.enums.AchievementStatus;
+
 import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
@@ -20,9 +20,6 @@ public class UserAchievementVO {
 
     @NotEmpty
     private AchievementVO achievement;
-
-    @NotEmpty
-    private AchievementStatus achievementStatus;
 
     @NotEmpty
     private boolean notified;

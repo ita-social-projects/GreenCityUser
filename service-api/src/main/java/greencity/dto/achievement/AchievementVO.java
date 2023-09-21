@@ -15,11 +15,10 @@ import java.util.List;
 @Builder
 public class AchievementVO {
     private Long id;
+    private String title;
 
-    private List<AchievementTranslationVO> translations;
-
-    private List<UserAchievementVO> userAchievements;
-
+    private String name;
+    private String nameEng;
     @NotEmpty
     private AchievementCategoryVO achievementCategory;
 

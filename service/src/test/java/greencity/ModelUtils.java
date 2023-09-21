@@ -37,8 +37,7 @@ import greencity.entity.SocialNetwork;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
 import greencity.entity.VerifyEmail;
-import greencity.entity.localization.AchievementTranslation;
-import greencity.enums.AchievementStatus;
+
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -310,7 +309,6 @@ public class ModelUtils {
             .userAchievements(List.of(
                 UserAchievementVO.builder()
                     .id(47L)
-                    .achievementStatus(AchievementStatus.ACTIVE)
                     .user(UserVO.builder()
                         .id(13L)
                         .build())
@@ -320,7 +318,6 @@ public class ModelUtils {
                     .build(),
                 UserAchievementVO.builder()
                     .id(39L)
-                    .achievementStatus(AchievementStatus.INACTIVE)
                     .user(UserVO.builder()
                         .id(13L)
                         .build())
@@ -371,20 +368,16 @@ public class ModelUtils {
     }
 
     public static Achievement getAchievement() {
-        return new Achievement(1L, Collections.singletonList(getAchievementTranslation()), Collections.emptyList(),
+        return new Achievement(1L, "name", "name", "name", Collections.emptyList(),
             new AchievementCategory(), 1);
     }
 
     public static AchievementVO getAchievementVO() {
-        return new AchievementVO(1L, Collections.emptyList(), Collections.emptyList(), new AchievementCategoryVO(), 1);
-    }
-
-    public static AchievementTranslation getAchievementTranslation() {
-        return new AchievementTranslation(1L, "Title", "Description", getAchievement());
+        return new AchievementVO(1L, "name", "name", "name", new AchievementCategoryVO(), 1);
     }
 
     public static UserAchievement getUserAchievement() {
-        return new UserAchievement(1L, getUser(), getAchievement(), AchievementStatus.ACTIVE, false);
+        return new UserAchievement(1L, getUser(), getAchievement(), false);
     }
 
     public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
