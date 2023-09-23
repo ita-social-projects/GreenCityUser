@@ -104,7 +104,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/token",
                 "/socket/**",
                 "/user/findAllByEmailNotification",
-                "/user/checkByUuid")
+                "/user/checkByUuid",
+                "/user/get-user-rating")
             .permitAll()
             .antMatchers(HttpMethod.POST,
                 "/ownSecurity/signUp",
@@ -131,7 +132,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/lang",
                 "/user/createUbsRecord",
                 "/user/{userId}/sixUserFriends/",
-                "/ownSecurity/password-status")
+                "/ownSecurity/password-status",
+                "/user/emailNotifications")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.POST,
                 USER_LINK,
@@ -200,6 +202,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/css/**",
                 "/img/**")
             .permitAll()
+            .antMatchers(HttpMethod.PUT,
+                "/user/user-rating")
+            .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE, UBS_EMPLOYEE, USER)
             .anyRequest().hasAnyRole(ADMIN);
     }
 

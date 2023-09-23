@@ -215,14 +215,10 @@ public class EmailServiceImpl implements EmailService {
      * @param language language which will be used for sending recovery letter.
      */
     private void changeLocale(String language) {
-        Locale rus = new Locale("ru", "RU");
         Locale ua = new Locale("uk", "UA");
         switch (language) {
             case "ua":
                 Locale.setDefault(ua);
-                break;
-            case "ru":
-                Locale.setDefault(rus);
                 break;
             case "en":
                 Locale.setDefault(Locale.ENGLISH);
@@ -313,5 +309,11 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
         sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
+    }
+
+    @Override
+    public void sendEventCreationNotification(String email, String messageBody) {
+        String subject = "Notification about event creation status";
+        sendEmail(email, subject, messageBody);
     }
 }

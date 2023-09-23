@@ -128,8 +128,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ru",
-        "1, Test, test@gmail.com, token, ua",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua",
         "1, Test, test@gmail.com, token, en"})
     void sendVerificationEmail(Long id, String name, String email, String token, String language) {
         service.sendVerificationEmail(id, name, email, token, language, false);
@@ -149,8 +148,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ru, true",
-        "1, Test, test@gmail.com, token, ua, false",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
         "1, Test, test@gmail.com, token, en, false"})
     void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
         service.sendRestoreEmail(id, name, email, token, language, isUbs);
@@ -225,5 +223,11 @@ class EmailServiceImplTest {
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
+    }
+
+    @Test
+    void sendEventCreatedNotificationTest() {
+        service.sendEventCreationNotification("test@gmail.com", "message");
+        verify(javaMailSender).createMimeMessage();
     }
 }

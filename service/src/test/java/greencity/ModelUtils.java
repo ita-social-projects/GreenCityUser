@@ -457,6 +457,7 @@ public class ModelUtils {
             .email("test@mail.com")
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_USER)
+            .rating(100D)
             .build();
     }
 

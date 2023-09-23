@@ -7,6 +7,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
@@ -44,6 +45,14 @@ import java.util.Optional;
  * @version 1.0
  */
 public interface UserService {
+    /**
+     * Updates an employee's rating information using the provided UserRatingDto.
+     *
+     * @param userRatingDto The UserRatingDto containing the updated rating
+     *                      information.
+     */
+    void updateUserRating(UserAddRatingDto userRatingDto);
+
     /**
      * Find all {@link User}'s with {@link EmailNotification} type.
      *
@@ -190,19 +199,19 @@ public interface UserService {
     void updateUser(Long userId, UserManagementUpdateDto dto);
 
     /**
-     * Get all exists roles.
+     * The method which return array of user role by user id.
      *
      * @return {@link RoleDto}.
      * @author Rostyslav Khasanov
      */
-    RoleDto getRoles();
+    RoleDto getRoles(Long id);
 
     /**
-     * Get list of available {@link EmailNotification} statuses for {@link UserVO}.
+     * Get {@link EmailNotification} status for {@link UserVO}.
      *
-     * @return available {@link EmailNotification} statuses.
+     * @return user {@link EmailNotification} status.
      */
-    List<EmailNotification> getEmailNotificationsStatuses();
+    EmailNotification getEmailNotificationsStatuses(String email);
 
     /**
      * Update last visit of user.

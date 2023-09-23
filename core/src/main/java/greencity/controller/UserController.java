@@ -15,6 +15,7 @@ import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.RoleDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
@@ -72,6 +73,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -166,38 +168,43 @@ public class UserController {
     }
 
     /**
-     * The method which return array of existing roles.
+     * The method which return array of user role by user id.
      *
      * @return {@link RoleDto}
      * @author Rostyslav Khasanov
      */
-    @ApiOperation(value = "Get all available roles")
+    @ApiOperation(value = "Get user role by user id")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = RoleDto.class),
-        @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("roles")
-    public ResponseEntity<RoleDto> getRoles() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getRoles());
+    public ResponseEntity<RoleDto> getRoles(@RequestParam Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.getRoles(id));
     }
 
     /**
-     * The method which return array of existing {@link EmailNotification}.
+     * The method which return email status authorization
+     * user{@link EmailNotification}.
      *
      * @return {@link EmailNotification} array
      * @author Nazar Vladyka
      */
-    @ApiOperation(value = "Get all available email notifications statuses")
+    @ApiOperation(value = "Get email notifications status by authorization user")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK, response = EmailNotification[].class),
         @ApiResponse(code = 303, message = HttpStatuses.SEE_OTHER),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST)
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED)
     })
     @GetMapping("emailNotifications")
-    public ResponseEntity<List<EmailNotification>> getEmailNotifications() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getEmailNotificationsStatuses());
+    public ResponseEntity<List<EmailNotification>> getEmailNotifications(
+        @ApiIgnore @AuthenticationPrincipal Principal principal) {
+        String email = principal.getName();
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
     }
 
     /**
@@ -1146,6 +1153,30 @@ public class UserController {
     @PutMapping("/deactivate-employee")
     public ResponseEntity<HttpStatus> deactivateEmployee(@RequestParam String uuid) {
         userService.markUserAsDeactivated(uuid);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Updates an employee's rating information.
+     *
+     * @param userAddRatingDto The UserRatingDto containing the updated rating
+     *                         information.
+     * @return A ResponseEntity with HTTP status indicating the success of the
+     *         update operation.
+     *
+     * @author Oksana Spodaryk.
+     */
+    @ApiOperation(value = "Update an employee's rating information.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+        @ApiResponse(code = 404, message = HttpStatuses.NOT_FOUND)
+    })
+    @PutMapping("/user-rating")
+    public ResponseEntity<HttpStatus> updateUserRating(@Valid @RequestBody UserAddRatingDto userAddRatingDto) {
+        userService.updateUserRating(userAddRatingDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

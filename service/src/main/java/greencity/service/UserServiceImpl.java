@@ -12,6 +12,7 @@ import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.RoleDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
@@ -69,7 +70,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -104,6 +104,17 @@ public class UserServiceImpl implements UserService {
     public UserVO save(UserVO userVO) {
         User user = modelMapper.map(userVO, User.class);
         return modelMapper.map(userRepo.save(user), UserVO.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUserRating(UserAddRatingDto userRatingDto) {
+        var user = userRepo.findById(userRatingDto.getId())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        user.setRating(user.getRating() + userRatingDto.getRating());
+        userRepo.save(user);
     }
 
     /**
@@ -366,8 +377,14 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public RoleDto getRoles() {
-        return new RoleDto(Role.class.getEnumConstants());
+    public RoleDto getRoles(Long id) {
+        User user = userRepo.findById(id).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+
+        Role role = user.getRole();
+        return RoleDto.builder()
+            .roles(new Role[] {role})
+            .build();
     }
 
     /**
@@ -376,8 +393,10 @@ public class UserServiceImpl implements UserService {
      * @author Nazar Vladyka
      */
     @Override
-    public List<EmailNotification> getEmailNotificationsStatuses() {
-        return Arrays.asList(EmailNotification.class.getEnumConstants());
+    public EmailNotification getEmailNotificationsStatuses(String email) {
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+        return user.getEmailNotification();
     }
 
     /**

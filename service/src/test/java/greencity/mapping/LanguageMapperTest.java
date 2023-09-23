@@ -18,6 +18,5 @@ class LanguageMapperTest {
         assertThrows(IllegalStateException.class, () -> languageMapper.convert("e"));
         assertEquals(1L, languageMapper.convert("ua"));
         assertEquals(2L, languageMapper.convert("en"));
-        assertEquals(3L, languageMapper.convert("ru"));
     }
 }

@@ -8,6 +8,7 @@ import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.notification.NotificationDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.SendChangePlaceStatusEmailMessage;
+import greencity.message.SendEventCreationNotification;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
@@ -185,5 +186,24 @@ class EmailControllerTest {
 
         NotificationDto notification = new ObjectMapper().readValue(content, NotificationDto.class);
         verify(emailService).sendNotificationByEmail(notification, email);
+    }
+
+    @Test
+    @SneakyThrows
+    void sendEventCreatedNotificationTest() {
+        String content = "{" +
+            "\"email\":\"email@mail.com\"," +
+            "\"messageBody\":\"messageBody\"" +
+            "}";
+        String email = "email@mail.com";
+
+        mockMvc.perform(post(LINK + "/sendEventNotification")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+
+        SendEventCreationNotification notification = new ObjectMapper()
+            .readValue(content, SendEventCreationNotification.class);
+        verify(emailService).sendEventCreationNotification(email, notification.getMessageBody());
     }
 }

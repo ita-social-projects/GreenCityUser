@@ -385,16 +385,27 @@ class UserServiceImplTest {
 
     @Test
     void getRoles() {
-        RoleDto roleDto = new RoleDto(Role.class.getEnumConstants());
-        assertEquals(roleDto, userService.getRoles());
+        User user = new User();
+        user.setRole(ROLE_USER);
+
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+
+        RoleDto result = userService.getRoles(1L);
+
+        assertEquals(ROLE_USER, result.getRoles()[0]);
+        assertThrows(NotFoundException.class, () -> userService.getRoles(0L));
     }
 
     @Test
-    void getEmailStatusesTest() {
-        List<EmailNotification> placeStatuses =
-            Arrays.asList(EmailNotification.class.getEnumConstants());
+    void getEmailNotificationsStatusesTest() {
+        User user = new User();
+        String email = "test@gmail.com";
+        user.setEmailNotification(EmailNotification.IMMEDIATELY);
 
-        assertEquals(placeStatuses, userService.getEmailNotificationsStatuses());
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+        EmailNotification result = userService.getEmailNotificationsStatuses(email);
+
+        assertEquals(EmailNotification.IMMEDIATELY, result);
     }
 
     @Test
@@ -1044,5 +1055,17 @@ class UserServiceImplTest {
         return Stream.of(
             Arguments.of("444e66e8-8daa-4cb0-8269-a8d856e7dd15", Optional.of(getUser()), true),
             Arguments.of("uuid", Optional.empty(), false));
+    }
+
+    @Test
+    void editUserRatingTest() {
+        when(userRepo.findById(anyLong())).thenReturn(Optional.ofNullable(TEST_USER));
+        UserAddRatingDto userRatingDto = UserAddRatingDto.builder()
+            .id(1L)
+            .rating(200D)
+            .build();
+
+        userService.updateUserRating(userRatingDto);
+        verify(userRepo).save(TEST_USER);
     }
 }
