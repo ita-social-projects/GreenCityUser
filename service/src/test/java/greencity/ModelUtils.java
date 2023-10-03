@@ -368,12 +368,14 @@ public class ModelUtils {
     }
 
     public static Achievement getAchievement() {
-        return new Achievement(1L, "name", "name", "name", Collections.emptyList(),
+        return new Achievement(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
+            "Acquired habit 14 days", Collections.emptyList(),
             new AchievementCategory(), 1);
     }
 
     public static AchievementVO getAchievementVO() {
-        return new AchievementVO(1L, "name", "name", "name", new AchievementCategoryVO(), 1);
+        return new AchievementVO(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
+            "Acquired habit 14 days", new AchievementCategoryVO(), 1);
     }
 
     public static UserAchievement getUserAchievement() {

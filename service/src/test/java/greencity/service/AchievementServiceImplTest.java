@@ -5,7 +5,6 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.entity.Achievement;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
-
 import greencity.repository.AchievementRepo;
 import greencity.repository.UserAchievementRepo;
 import org.junit.jupiter.api.Test;
@@ -57,10 +56,8 @@ class AchievementServiceImplTest {
         List<Achievement> achievementVOS = new ArrayList<>();
         achievementVOS.add(ModelUtils.getAchievement());
         when(achievementRepo.findAll()).thenReturn(achievementVOS);
-
         List<AchievementVO> allAchievements = achievementService.findAll();
         assertFalse(allAchievements.isEmpty());
-
     }
 
 }

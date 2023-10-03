@@ -1,9 +1,7 @@
 package greencity.dto.achievement;
 
 import greencity.dto.user.UserVO;
-
 import lombok.*;
-
 import javax.validation.constraints.NotEmpty;
 
 @Data

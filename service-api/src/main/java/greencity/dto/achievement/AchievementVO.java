@@ -15,12 +15,10 @@ import javax.validation.constraints.NotEmpty;
 public class AchievementVO {
     private Long id;
     private String title;
-
     private String name;
     private String nameEng;
     @NotEmpty
     private AchievementCategoryVO achievementCategory;
-
     @NotEmpty
     private Integer condition;
 }
