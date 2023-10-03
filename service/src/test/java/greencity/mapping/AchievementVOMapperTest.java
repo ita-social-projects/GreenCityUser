@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class AchievementVOMapperTest {
 
     @InjectMocks
-    AchievementVOMapper achievementVOMapper;
+    private AchievementVOMapper achievementVOMapper;
 
     @Test
     void convert() {

@@ -37,14 +37,12 @@ import greencity.entity.SocialNetwork;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
 import greencity.entity.VerifyEmail;
-
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
-
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
