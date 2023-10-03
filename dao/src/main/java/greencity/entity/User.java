@@ -119,6 +119,10 @@ public class User {
     @Column(name = "city")
     private String city;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id")
+    private UserLocation userLocation;
+
     @Column(name = "user_credo")
     private String userCredo;
 

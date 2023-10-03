@@ -1,5 +1,7 @@
 package greencity.service;
 
+import com.google.maps.model.AddressComponentType;
+import com.google.maps.model.GeocodingResult;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -31,12 +33,7 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.entity.Language;
-import greencity.entity.SocialNetwork;
-import greencity.entity.SocialNetworkImage;
-import greencity.entity.User;
-import greencity.entity.UserDeactivationReason;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -69,10 +66,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -89,6 +84,7 @@ public class UserServiceImpl implements UserService {
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
     private final UserDeactivationRepo userDeactivationRepo;
+    private final GoogleApiService googleApiService;
     /**
      * Autowired mapper.
      */
@@ -595,9 +591,21 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        if (userProfileDtoRequest.getCity() != null) {
-            user.setCity(userProfileDtoRequest.getCity());
-        }
+
+        GeocodingResult resultsUa = googleApiService
+            .getLocationByCoordinates(userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude(), 0);
+
+        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
+            userProfileDtoRequest.getLongitude(), 0);
+
+        UserLocation userLocation = new UserLocation();
+        userLocation.setUsers(Collections.singletonList(user));
+
+        initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUa);
+        initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
+
+        user.setUserLocation(new UserLocation());
+
         if (userProfileDtoRequest.getUserCredo() != null) {
             user.setUserCredo(userProfileDtoRequest.getUserCredo());
         }
@@ -626,6 +634,31 @@ public class UserServiceImpl implements UserService {
         }
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
+    }
+
+    private void initializeGeoCodingResults(Map<AddressComponentType, Consumer<String>> initializedMap,
+        GeocodingResult geocodingResult) {
+        initializedMap
+            .forEach((key, value) -> Arrays.stream(geocodingResult.addressComponents)
+                .forEach(addressComponent -> Arrays.stream(addressComponent.types)
+                    .filter(componentType -> componentType.equals(key))
+                    .forEach(componentType -> value.accept(addressComponent.longName))));
+    }
+
+    private Map<AddressComponentType, Consumer<String>> initializeEnglishGeoCodingResult(
+        UserLocation userLocation) {
+        return Map.of(
+            AddressComponentType.LOCALITY, userLocation::setCityEn,
+            AddressComponentType.COUNTRY, userLocation::setCountryEn,
+            AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionEn);
+    }
+
+    private Map<AddressComponentType, Consumer<String>> initializeUkrainianGeoCodingResult(
+        UserLocation userLocation) {
+        return Map.of(
+            AddressComponentType.LOCALITY, userLocation::setCityUa,
+            AddressComponentType.COUNTRY, userLocation::setCountryUa,
+            AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionUa);
     }
 
     /**
