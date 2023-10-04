@@ -5,7 +5,6 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.entity.Achievement;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
-import greencity.enums.AchievementStatus;
 import greencity.repository.AchievementRepo;
 import greencity.repository.UserAchievementRepo;
 import org.junit.jupiter.api.Test;
@@ -44,11 +43,9 @@ class AchievementServiceImplTest {
             .user(new User())
             .achievement(new Achievement())
             .notified(false)
-            .achievementStatus(AchievementStatus.INACTIVE)
             .build();
         when(userAchievementRepo.getUserAchievementByIdAndAchievementId(1L, 1L))
             .thenReturn(userAchievement);
-        userAchievement.setAchievementStatus(AchievementStatus.ACTIVE);
         achievementService.findUserAchievement(1L, 1L);
         verify(userAchievementRepo).save(userAchievement);
 
@@ -59,10 +56,8 @@ class AchievementServiceImplTest {
         List<Achievement> achievementVOS = new ArrayList<>();
         achievementVOS.add(ModelUtils.getAchievement());
         when(achievementRepo.findAll()).thenReturn(achievementVOS);
-
         List<AchievementVO> allAchievements = achievementService.findAll();
         assertFalse(allAchievements.isEmpty());
-
     }
 
 }

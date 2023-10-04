@@ -37,15 +37,12 @@ import greencity.entity.SocialNetwork;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
 import greencity.entity.VerifyEmail;
-import greencity.entity.localization.AchievementTranslation;
-import greencity.enums.AchievementStatus;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
-
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -310,7 +307,6 @@ public class ModelUtils {
             .userAchievements(List.of(
                 UserAchievementVO.builder()
                     .id(47L)
-                    .achievementStatus(AchievementStatus.ACTIVE)
                     .user(UserVO.builder()
                         .id(13L)
                         .build())
@@ -320,7 +316,6 @@ public class ModelUtils {
                     .build(),
                 UserAchievementVO.builder()
                     .id(39L)
-                    .achievementStatus(AchievementStatus.INACTIVE)
                     .user(UserVO.builder()
                         .id(13L)
                         .build())
@@ -371,20 +366,18 @@ public class ModelUtils {
     }
 
     public static Achievement getAchievement() {
-        return new Achievement(1L, Collections.singletonList(getAchievementTranslation()), Collections.emptyList(),
+        return new Achievement(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
+            "Acquired habit 14 days", Collections.emptyList(),
             new AchievementCategory(), 1);
     }
 
     public static AchievementVO getAchievementVO() {
-        return new AchievementVO(1L, Collections.emptyList(), Collections.emptyList(), new AchievementCategoryVO(), 1);
-    }
-
-    public static AchievementTranslation getAchievementTranslation() {
-        return new AchievementTranslation(1L, getLanguage(), "Title", "Description", "Message", null);
+        return new AchievementVO(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
+            "Acquired habit 14 days", new AchievementCategoryVO(), 1);
     }
 
     public static UserAchievement getUserAchievement() {
-        return new UserAchievement(1L, getUser(), getAchievement(), AchievementStatus.ACTIVE, false);
+        return new UserAchievement(1L, getUser(), getAchievement(), false);
     }
 
     public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
