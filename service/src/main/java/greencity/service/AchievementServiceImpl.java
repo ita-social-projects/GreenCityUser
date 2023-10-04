@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.constant.CacheConstants;
 import greencity.dto.achievement.AchievementVO;
 import greencity.entity.UserAchievement;
-import greencity.enums.AchievementStatus;
 import greencity.repository.AchievementRepo;
 import greencity.repository.UserAchievementRepo;
 import lombok.AllArgsConstructor;
@@ -44,7 +43,6 @@ public class AchievementServiceImpl implements AchievementService {
     public void findUserAchievement(Long userId, Long achievementId) {
         UserAchievement userAchievement = userAchievementRepo
             .getUserAchievementByIdAndAchievementId(userId, achievementId);
-        userAchievement.setAchievementStatus(AchievementStatus.ACTIVE);
         userAchievementRepo.save(userAchievement);
     }
 }

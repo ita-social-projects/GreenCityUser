@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -15,14 +14,11 @@ import java.util.List;
 @Builder
 public class AchievementVO {
     private Long id;
-
-    private List<AchievementTranslationVO> translations;
-
-    private List<UserAchievementVO> userAchievements;
-
+    private String title;
+    private String name;
+    private String nameEng;
     @NotEmpty
     private AchievementCategoryVO achievementCategory;
-
     @NotEmpty
     private Integer condition;
 }
