@@ -47,6 +47,7 @@ import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
+import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -83,6 +84,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
+    private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
     private final GoogleApiService googleApiService;
     /**
@@ -599,12 +601,13 @@ public class UserServiceImpl implements UserService {
             userProfileDtoRequest.getLongitude(), 0);
 
         UserLocation userLocation = new UserLocation();
-        userLocation.setUsers(Collections.singletonList(user));
+        //userLocation.setUsers(Collections.singletonList(user));
 
         initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUa);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
 
-        user.setUserLocation(new UserLocation());
+        userLocation = userLocationRepo.save(userLocation);
+        user.setUserLocation(userLocation);
 
         if (userProfileDtoRequest.getUserCredo() != null) {
             user.setUserCredo(userProfileDtoRequest.getUserCredo());

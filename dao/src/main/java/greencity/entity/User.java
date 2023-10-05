@@ -120,7 +120,7 @@ public class User {
     private String city;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
+    @JoinColumn(name = "user_location")
     private UserLocation userLocation;
 
     @Column(name = "user_credo")
