@@ -191,14 +191,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .build();
     }
 
-    private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, achievementService);
-    }
-
-    private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, achievementService);
-    }
-
     /**
      * {@inheritDoc}
      *
