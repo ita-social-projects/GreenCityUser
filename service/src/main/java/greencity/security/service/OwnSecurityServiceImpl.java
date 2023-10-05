@@ -100,8 +100,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         @Value("${verifyEmailTimeHour}") Integer expirationTime,
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         ModelMapper modelMapper,
-        UserRepo userRepo,
-        AchievementService achievementService, EmailService emailService, AuthorityRepo authorityRepo) {
+        UserRepo userRepo, EmailService emailService, AuthorityRepo authorityRepo) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.positionRepo = positionRepo;
         this.userService = userService;
@@ -111,7 +110,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         this.restorePasswordEmailRepo = restorePasswordEmailRepo;
         this.modelMapper = modelMapper;
         this.userRepo = userRepo;
-        this.achievementService = achievementService;
         this.emailService = emailService;
         this.authorityRepo = authorityRepo;
     }
