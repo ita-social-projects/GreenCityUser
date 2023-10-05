@@ -123,7 +123,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     @Override
     public SuccessSignUpDto signUp(OwnSignUpDto dto, String language) {
         User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
-        setUsersFields(dto, user);
+        user.setOwnSecurity(createOwnSecurity(dto, user));
         user.setVerifyEmail(createVerifyEmail(user, jwtTool.generateTokenKey()));
         user.setUuid(UUID.randomUUID().toString());
         try {
@@ -156,11 +156,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 .id(modelMapper.map(language, Long.class))
                 .build())
             .build();
-    }
-
-    private void setUsersFields(OwnSignUpDto dto, User user) {
-        OwnSecurity ownSecurity = createOwnSecurity(dto, user);
-        user.setOwnSecurity(ownSecurity);
     }
 
     private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
@@ -196,7 +191,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employeeSignUpDto.setPassword(password);
         OwnSignUpDto dto = modelMapper.map(employeeSignUpDto, OwnSignUpDto.class);
         User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
-        setUsersFields(dto, employee);
+        employee.setOwnSecurity(createOwnSecurity(dto, employee));
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
         employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate()));
         employee.setUuid(employeeSignUpDto.getUuid());
