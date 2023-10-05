@@ -85,7 +85,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final UserRepo userRepo;
     private static final String VALID_PW_CHARS =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
-    private final AchievementService achievementService;
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
 
