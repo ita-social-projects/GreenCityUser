@@ -123,7 +123,7 @@ class OwnSecurityServiceImplTest {
         initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, 1, restorePasswordEmailRepo, modelMapper,
-            userRepo, achievementService, emailService, authorityRepo);
+            userRepo, emailService, authorityRepo);
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")
