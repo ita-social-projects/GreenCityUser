@@ -201,7 +201,6 @@ class OwnSecurityServiceImplTest {
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(achievementService, times(2)).findAll();
         verify(modelMapper, times(2)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
@@ -231,7 +230,6 @@ class OwnSecurityServiceImplTest {
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(achievementService, times(2)).findAll();
         verify(modelMapper, times(2)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
@@ -261,7 +259,6 @@ class OwnSecurityServiceImplTest {
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(achievementService, times(2)).findAll();
         verify(modelMapper, times(2)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();

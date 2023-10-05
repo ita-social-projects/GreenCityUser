@@ -163,11 +163,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     private void setUsersFields(OwnSignUpDto dto, User user) {
         OwnSecurity ownSecurity = createOwnSecurity(dto, user);
-        List<UserAchievement> userAchievementList = createUserAchievements(user);
-        List<UserAction> userActionsList = createUserActions(user);
         user.setOwnSecurity(ownSecurity);
-        user.setUserAchievements(userAchievementList);
-        user.setUserActions(userActionsList);
+        user.setUserAchievements(new ArrayList<>());
+        user.setUserActions(new ArrayList<>());
     }
 
     private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
