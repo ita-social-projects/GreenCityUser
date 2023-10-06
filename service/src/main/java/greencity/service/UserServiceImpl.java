@@ -674,7 +674,10 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findById(userId)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
-        return modelMapper.map(user, UserProfileDtoResponse.class);
+
+        UserProfileDtoResponse userProfileDtoResponse = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
+        modelMapper.map(user, userProfileDtoResponse);
+        return userProfileDtoResponse;
     }
 
     /**
