@@ -23,4 +23,12 @@ public class UserProfileDtoResponse {
     private Boolean showShoppingList;
     private Float rating;
     private Role role;
+    private String cityEn;
+    private String cityUa;
+    private String regionEn;
+    private String regionUa;
+    private String countryEn;
+    private String countryUa;
+    private Double latitude;
+    private Double longitude;
 }

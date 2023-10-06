@@ -598,15 +598,15 @@ public class UserServiceImpl implements UserService {
             .getLocationByCoordinates(userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude(), 0);
 
         GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
-            userProfileDtoRequest.getLongitude(), 0);
+            userProfileDtoRequest.getLongitude(), 1);
 
         UserLocation userLocation = new UserLocation();
-        //userLocation.setUsers(Collections.singletonList(user));
-
         initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUa);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
 
         userLocation = userLocationRepo.save(userLocation);
+        userLocation.setLatitude(userProfileDtoRequest.getLatitude());
+        userLocation.setLongitude(userProfileDtoRequest.getLongitude());
         user.setUserLocation(userLocation);
 
         if (userProfileDtoRequest.getUserCredo() != null) {

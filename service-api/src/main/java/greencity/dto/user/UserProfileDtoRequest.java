@@ -24,9 +24,6 @@ public class UserProfileDtoRequest {
     @Pattern(regexp = "^(?!\\.)(?!.*\\.$)(?!.*?\\.\\.)(?!.*?\\-\\-)(?!.*?\\'\\')[-'ʼ ґҐіІєЄїЇА-Яа-я+\\w.]{1,30}$",
         message = "name must contain only \"ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'0-9 .\", dot can only be in the center of the name")
     private String name;
-    @Size(min = 1, max = 85)
-    @Pattern(regexp = "[ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'\\s)(!,]{1,85}")
-    private String city;
     @Size(max = 170)
     private String userCredo;
     @ValidSocialNetworkLinks
