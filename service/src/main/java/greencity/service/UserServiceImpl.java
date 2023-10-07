@@ -593,22 +593,24 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
+        GeocodingResult resultsUa = googleApiService.getLocationByCoordinates
+                (userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude(), 0);
+        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates
+                (userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude(), 1);
 
-        GeocodingResult resultsUa = googleApiService
-            .getLocationByCoordinates(userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude(), 0);
-
-        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
-            userProfileDtoRequest.getLongitude(), 1);
-
-        UserLocation userLocation = userLocationRepo.findById(user.getUserLocation().getId()).orElse(new UserLocation());
+        UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndAndLongitude(
+                userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
+        if(userLocation.getUsers() != null){
+            if(userLocation.getUsers().size()>1){
+                userLocation = new UserLocation();
+            }
+        }
         initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUa);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
-
-        userLocation = userLocationRepo.save(userLocation);
         userLocation.setLatitude(userProfileDtoRequest.getLatitude());
         userLocation.setLongitude(userProfileDtoRequest.getLongitude());
+        userLocation = userLocationRepo.save(userLocation);
         user.setUserLocation(userLocation);
-
         if (userProfileDtoRequest.getUserCredo() != null) {
             user.setUserCredo(userProfileDtoRequest.getUserCredo());
         }
@@ -675,7 +677,10 @@ public class UserServiceImpl implements UserService {
             .findById(userId)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
 
-        UserProfileDtoResponse userProfileDtoResponse = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
+        UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
+        if(user.getUserLocation()!=null){
+            userProfileDtoResponse = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
+        }
         modelMapper.map(user, userProfileDtoResponse);
         return userProfileDtoResponse;
     }
