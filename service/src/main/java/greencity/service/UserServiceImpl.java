@@ -593,15 +593,15 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        GeocodingResult resultsUa = googleApiService.getLocationByCoordinates
-                (userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude(), 0);
-        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates
-                (userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude(), 1);
+        GeocodingResult resultsUa = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
+            userProfileDtoRequest.getLongitude(), 0);
+        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
+            userProfileDtoRequest.getLongitude(), 1);
 
-        UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndAndLongitude(
-                userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
-        if(userLocation.getUsers() != null){
-            if(userLocation.getUsers().size()>1){
+        UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
+        if (userLocation.getUsers() != null) {
+            if (userLocation.getUsers().size() > 1) {
                 userLocation = new UserLocation();
             }
         }
@@ -678,7 +678,7 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
 
         UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
-        if(user.getUserLocation()!=null){
+        if (user.getUserLocation() != null) {
             userProfileDtoResponse = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
         }
         modelMapper.map(user, userProfileDtoResponse);
