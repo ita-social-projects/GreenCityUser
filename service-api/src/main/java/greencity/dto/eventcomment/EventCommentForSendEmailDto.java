@@ -23,4 +23,6 @@ public class EventCommentForSendEmailDto {
     private EventAuthorDto organizer;
 
     private String email;
+
+    private Long eventId;
 }

@@ -125,7 +125,12 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendNewCommentForEventOrganizer(EventCommentForSendEmailDto dto) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.EVENT_COMMENT_LINK, serverLink + "/events/comments/" + dto.getId());
+        model.put(EmailConstants.USER_NAME, dto.getOrganizer().getName());
+        model.put(EmailConstants.AUTHOR_NAME, dto.getAuthor().getName());
+        model.put(EmailConstants.COMMENT_BODY, dto.getText());
+        model.put(EmailConstants.COMMENT_TIME, dto.getCreatedDate());
+        String eventLink = clientLink + "#/events/" + dto.getEventId();
+        model.put(EmailConstants.CLIENT_LINK, eventLink);
         String template = createEmailTemplate(model, EmailConstants.NEW_EVENT_COMMENT_EMAIL_PAGE);
         sendEmail(dto.getEmail(), EmailConstants.EVENT_COMMENT, template);
     }
