@@ -902,17 +902,17 @@ public class UserController {
      *
      * @return {@link List} of cities
      */
-    @ApiOperation(value = "Find all users cities")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
-    })
-    @GetMapping("/findAllUsersCities")
-    public ResponseEntity<List<String>> findAllUsersCities() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities());
-    }
+//    @ApiOperation(value = "Find all users cities")
+//    @ApiResponses(value = {
+//        @ApiResponse(code = 200, message = HttpStatuses.OK),
+//        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+//        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+//        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
+//    })
+//    @GetMapping("/findAllUsersCities")
+//    public ResponseEntity<List<String>> findAllUsersCities() {
+//        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities());
+//    }
 
     /**
      * Method that find all registration months.

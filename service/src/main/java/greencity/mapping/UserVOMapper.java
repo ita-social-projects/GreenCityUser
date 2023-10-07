@@ -55,7 +55,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                 .build() : null)
             .dateOfRegistration(user.getDateOfRegistration())
             .profilePicturePath(user.getProfilePicturePath())
-            .city(user.getCity())
             .showShoppingList(user.getShowShoppingList())
             .showEcoPlace(user.getShowEcoPlace())
             .showLocation(user.getShowLocation())

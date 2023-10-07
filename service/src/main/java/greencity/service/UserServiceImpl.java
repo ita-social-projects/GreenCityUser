@@ -600,7 +600,7 @@ public class UserServiceImpl implements UserService {
         GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
             userProfileDtoRequest.getLongitude(), 1);
 
-        UserLocation userLocation = new UserLocation();
+        UserLocation userLocation = userLocationRepo.findById(user.getUserLocation().getId()).orElse(new UserLocation());
         initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUa);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
 
@@ -928,13 +928,13 @@ public class UserServiceImpl implements UserService {
         return userRepo.scheduleDeleteDeactivatedUsers();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> findAllUsersCities() {
-        return userRepo.findAllUsersCities();
-    }
+//    /**
+//     * {@inheritDoc}
+//     */
+//    @Override
+//    public List<String> findAllUsersCities() {
+//        return userRepo.findAllUsersCities();
+//    }
 
     /**
      * {@inheritDoc}
