@@ -11,7 +11,6 @@ import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.NotFoundException;
 import lombok.Data;
 import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
@@ -37,7 +36,8 @@ public class GoogleApiService {
         } catch (IOException | InterruptedException | ApiException e) {
             Thread.currentThread().interrupt();
             if (e instanceof InvalidRequestException) {
-                throw new NotFoundException(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + latitude + " " + longitude);
+                String formattedCoords = String.format("%.8f,%.8f", latitude, longitude);
+                throw new NotFoundException(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + formattedCoords);
             }
             throw new GoogleApiException(e.getMessage());
         }

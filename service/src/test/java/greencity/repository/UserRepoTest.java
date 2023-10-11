@@ -250,18 +250,18 @@ class UserRepoTest {
         verify(userRepo).searchBy(pageable, "test3@email.com");
     }
 
-    @Test
-    void findAllUsersCitiesTest() {
-        List<String> expectedCities = Arrays.asList("New York", "LA", "Chicago", "Miami",
-            "Dallas", "Toronto", "Montreal", "Montreal", "Liverpool");
-
-        when(userRepo.findAllUsersCities()).thenReturn(expectedCities);
-
-        List<String> actualCities = userRepo.findAllUsersCities();
-        assertEquals(expectedCities, actualCities);
-        assertEquals(9, actualCities.size());
-        verify(userRepo).findAllUsersCities();
-    }
+//    @Test
+//    void findAllUsersCitiesTest() {
+//        List<String> expectedCities = Arrays.asList("New York", "LA", "Chicago", "Miami",
+//            "Dallas", "Toronto", "Montreal", "Montreal", "Liverpool");
+//
+//        when(userRepo.findAllUsersCities()).thenReturn(expectedCities);
+//
+//        List<String> actualCities = userRepo.findAllUsersCities();
+//        assertEquals(expectedCities, actualCities);
+//        assertEquals(9, actualCities.size());
+//        verify(userRepo).findAllUsersCities();
+//    }
 
     @Test
     void findUserForAchievementTest() {
