@@ -69,12 +69,12 @@ public interface UserService {
      */
     int scheduleDeleteDeactivatedUsers();
 
-//    /**
-//     * Find and return all cities for all users.
-//     *
-//     * @return {@link List} of {@link String} of cities
-//     **/
-//    List<String> findAllUsersCities();
+    /**
+     * Find and return all cities for all users.
+     *
+     * @return {@link List} of {@link String} of cities
+     **/
+    // List<String> findAllUsersCities();
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described

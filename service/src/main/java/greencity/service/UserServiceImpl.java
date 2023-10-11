@@ -933,13 +933,13 @@ public class UserServiceImpl implements UserService {
         return userRepo.scheduleDeleteDeactivatedUsers();
     }
 
-//    /**
-//     * {@inheritDoc}
-//     */
-//    @Override
-//    public List<String> findAllUsersCities() {
-//        return userRepo.findAllUsersCities();
-//    }
+    /**
+     * {@inheritDoc}
+     */
+    // @Override
+    // public List<String> findAllUsersCities() {
+    // return userRepo.findAllUsersCities();
+    // }
 
     /**
      * {@inheritDoc}
