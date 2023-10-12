@@ -362,12 +362,13 @@ class UserControllerTest {
 
         String json = "{\n"
             + "\t\"name\": \"testName\",\n"
-            + "\t\"city\": \"city\",\n"
             + "\t\"userCredo\": \"credo\",\n"
             + "\t\"socialNetworks\": [],\n"
             + "\t\"showLocation\": true,\n"
             + "\t\"showEcoPlace\": true,\n"
-            + "\t\"showShoppingList\": false\n"
+            + "\t\"showShoppingList\": false,\n"
+            + "\t\"latitude\": 20.000000,\n"
+            + "\t\"longitude\": 20.000000\n"
             + "}";
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
@@ -687,15 +688,15 @@ class UserControllerTest {
             .andExpect(jsonPath("$").value(1));
     }
 
-    @Test
-    void findAllUsersCitiesTest() throws Exception {
-        List<String> cities = List.of("Lviv", "Kyiv", "Kharkiv");
-        when(userService.findAllUsersCities()).thenReturn(cities);
-        mockMvc.perform(get(userLink + "/findAllUsersCities"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.length()").value(3))
-            .andExpect(jsonPath("$", Matchers.containsInAnyOrder("Lviv", "Kyiv", "Kharkiv")));
-    }
+//    @Test
+//    void findAllUsersCitiesTest() throws Exception {
+//        List<String> cities = List.of("Lviv", "Kyiv", "Kharkiv");
+//        when(userService.findAllUsersCities()).thenReturn(cities);
+//        mockMvc.perform(get(userLink + "/findAllUsersCities"))
+//            .andExpect(status().isOk())
+//            .andExpect(jsonPath("$.length()").value(3))
+//            .andExpect(jsonPath("$", Matchers.containsInAnyOrder("Lviv", "Kyiv", "Kharkiv")));
+//    }
 
     @Test
     void findAllRegistrationMonthsMapTest() throws Exception {

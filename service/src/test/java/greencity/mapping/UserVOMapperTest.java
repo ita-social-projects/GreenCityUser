@@ -7,10 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,7 +47,7 @@ class UserVOMapperTest {
             .refreshTokenKey(expected.getRefreshTokenKey())
             .dateOfRegistration(expected.getDateOfRegistration())
             .profilePicturePath(expected.getProfilePicturePath())
-            // .city(expected.getCity())
+            .userLocation(expected.getUserLocation())
             .showShoppingList(expected.getShowShoppingList())
             .showEcoPlace(expected.getShowEcoPlace())
             .showLocation(expected.getShowLocation())

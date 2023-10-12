@@ -284,7 +284,8 @@ public class ModelUtils {
             .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-            .city("Lviv")
+            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
+                20.000000, null))
             .showShoppingList(true)
             .showEcoPlace(true)
             .showLocation(true)
