@@ -676,7 +676,7 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         UserCityDto userCityDto = new UserCityDto(1L, "Lviv", "Львів", 49.842957, 24.031111);
         when(userService.findByEmail(principal.getName())).thenReturn(ModelUtils.getUserVO());
-        when(userService.findAllUsersCities(eq(1L))).thenReturn(userCityDto);
+        when(userService.findAllUsersCities(1L)).thenReturn(userCityDto);
         mockMvc.perform(get(userLink + "/findAllUsersCities")
             .principal(principal))
             .andExpect(status().isOk())

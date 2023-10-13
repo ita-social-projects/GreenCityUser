@@ -164,18 +164,18 @@ class UserServiceImplTest {
         UserLocation userLocation = ModelUtils.getUserLocation();
         UserCityDto userCityDto = modelMapper.map(userLocation, UserCityDto.class);
 
-        when(userRepo.findAllUsersCities(eq(1L))).thenReturn(Optional.of(userLocation));
+        when(userRepo.findAllUsersCities(1L)).thenReturn(Optional.of(userLocation));
         assertEquals(userCityDto, userService.findAllUsersCities(1L));
-        verify(userRepo).findAllUsersCities(eq(1L));
+        verify(userRepo).findAllUsersCities(1L);
     }
 
     @Test
     void findAllUsersCitiesExceptionTest() {
-        when(userRepo.findAllUsersCities(eq(1L)))
+        when(userRepo.findAllUsersCities(1L))
             .thenThrow(new NotFoundException(ErrorMessage.USER_DID_NOT_SET_ANY_CITY));
         Exception exception = assertThrows(NotFoundException.class, () -> userService.findAllUsersCities(1L));
         assertEquals(ErrorMessage.USER_DID_NOT_SET_ANY_CITY, exception.getMessage());
-        verify(userRepo).findAllUsersCities(eq(1L));
+        verify(userRepo).findAllUsersCities(1L);
     }
 
     @Test
