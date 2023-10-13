@@ -53,9 +53,9 @@ public interface UserService {
     /**
      * Find and return city and coordinates .
      *
-     * @return {@link List} of {@link String} of cities
+     * @return {@link UserCityDto}
      **/
-    UserCityDto findAllUsersCities();
+    UserCityDto findAllUsersCities(Long userId);
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described

@@ -890,8 +890,8 @@ public class UserController {
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),})
     @GetMapping("/findAllUsersCities")
-    public ResponseEntity<UserCityDto> findAllUsersCities() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities());
+    public ResponseEntity<UserCityDto> findAllUsersCities(@ApiIgnore @CurrentUser UserVO userVO) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities(userVO.getId()));
     }
 
     /**

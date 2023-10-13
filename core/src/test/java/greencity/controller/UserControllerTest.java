@@ -3,9 +3,7 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
-
 import static greencity.constant.AppConstant.AUTHORIZATION;
-
 import greencity.constant.AppConstant;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.PageableAdvancedDto;
@@ -17,22 +15,13 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.repository.UserRepo;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
 import greencity.service.UserService;
-
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,21 +29,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -70,7 +54,6 @@ import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequ
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -688,15 +671,24 @@ class UserControllerTest {
             .andExpect(jsonPath("$").value(1));
     }
 
-//    @Test
-//    void findAllUsersCitiesTest() throws Exception {
-//        List<String> cities = List.of("Lviv", "Kyiv", "Kharkiv");
-//        when(userService.findAllUsersCities()).thenReturn(cities);
-//        mockMvc.perform(get(userLink + "/findAllUsersCities"))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.length()").value(3))
-//            .andExpect(jsonPath("$", Matchers.containsInAnyOrder("Lviv", "Kyiv", "Kharkiv")));
-//    }
+    @Test
+    void findAllUsersCitiesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        UserCityDto userCityDto = new UserCityDto(1L, "Lviv", "Львів", 49.842957, 24.031111);
+        when(userService.findByEmail(principal.getName())).thenReturn(ModelUtils.getUserVO());
+        when(userService.findAllUsersCities(eq(1L))).thenReturn(userCityDto);
+        mockMvc.perform(get(userLink + "/findAllUsersCities")
+            .principal(principal))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(5))
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.cityEn").value("Lviv"))
+            .andExpect(jsonPath("$.cityUa").value("Львів"))
+            .andExpect(jsonPath("$.latitude").value(49.842957))
+            .andExpect(jsonPath("$.longitude").value(24.031111));
+        verify(userService).findAllUsersCities(1L);
+        verify(userService).findByEmail(principal.getName());
+    }
 
     @Test
     void findAllRegistrationMonthsMapTest() throws Exception {

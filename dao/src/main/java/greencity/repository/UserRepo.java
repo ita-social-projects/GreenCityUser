@@ -215,8 +215,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @return {@link List} of {@link String} of cities
      **/
-    @Query(value = "SELECT u.userLocation FROM User u")
-    Optional<UserLocation> findAllUsersCities();
+    @Query(value = "SELECT u.userLocation FROM User u WHERE u.id =:userId")
+    Optional<UserLocation> findAllUsersCities(Long userId);
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described
