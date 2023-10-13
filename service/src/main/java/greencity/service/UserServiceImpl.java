@@ -13,26 +13,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserAddRatingDto;
-import greencity.dto.user.UserActivationDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.dto.user.*;
 import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -600,10 +581,8 @@ public class UserServiceImpl implements UserService {
 
         UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
             userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
-        if (userLocation.getUsers() != null) {
-            if (userLocation.getUsers().size() > 1) {
-                userLocation = new UserLocation();
-            }
+        if (userLocation.getUsers() != null && userLocation.getUsers().size() > 1) {
+            userLocation = new UserLocation();
         }
         initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUa);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
@@ -936,10 +915,12 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
-    // @Override
-    // public List<String> findAllUsersCities() {
-    // return userRepo.findAllUsersCities();
-    // }
+    @Override
+    public UserCityDto findAllUsersCities() {
+        UserLocation userLocation = userRepo.findAllUsersCities()
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DID_NOT_SET_ANY_CITY));
+        return modelMapper.map(userLocation, UserCityDto.class);
+    }
 
     /**
      * {@inheritDoc}

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class GoogleApiServiceTest {
+class GoogleApiServiceTest {
     @InjectMocks
     GoogleApiService googleApiService;
     @Mock

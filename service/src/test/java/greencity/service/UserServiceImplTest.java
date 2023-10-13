@@ -625,7 +625,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    public void testUpdateUserProfileLocationWithTwoAssignedUsers() {
+    void testUpdateUserProfileLocationWithTwoAssignedUsers() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName("Dmutro");
         request.setLatitude(20.0000);

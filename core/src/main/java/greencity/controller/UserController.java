@@ -14,26 +14,7 @@ import greencity.dto.filter.FilterUserDto;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserAddRatingDto;
-import greencity.dto.user.UserActivationDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
+import greencity.dto.user.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -902,24 +883,16 @@ public class UserController {
      *
      * @return {@link List} of cities
      */
-    /*
-     * @ApiOperation(value = "Find all users cities")
-     * 
-     * @ApiResponses(value = {
-     * 
-     * @ApiResponse(code = 200, message = HttpStatuses.OK),
-     * 
-     * @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-     * 
-     * @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-     * 
-     * @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN), })
-     * 
-     * @GetMapping("/findAllUsersCities") public ResponseEntity<List<String>>
-     * findAllUsersCities() { return
-     * ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities());
-     * }
-     */
+    @ApiOperation(value = "Find all users cities")
+    @ApiResponses(value = {
+        @ApiResponse(code = 200, message = HttpStatuses.OK),
+        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),})
+    @GetMapping("/findAllUsersCities")
+    public ResponseEntity<UserCityDto> findAllUsersCities() {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities());
+    }
 
     /**
      * Method that find all registration months.
