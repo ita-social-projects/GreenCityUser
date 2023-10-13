@@ -26,8 +26,18 @@ import greencity.dto.user.UsersFriendDto;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
-
-import greencity.entity.*;
+import greencity.entity.Achievement;
+import greencity.entity.AchievementCategory;
+import greencity.entity.Authority;
+import greencity.entity.Language;
+import greencity.entity.OwnSecurity;
+import greencity.entity.Position;
+import greencity.entity.RestorePasswordEmail;
+import greencity.entity.SocialNetwork;
+import greencity.entity.User;
+import greencity.entity.UserAchievement;
+import greencity.entity.UserLocation;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -37,7 +47,6 @@ import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 

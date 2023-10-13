@@ -15,10 +15,18 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
+import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserUpdateDto;
+import greencity.dto.user.UserVO;
+import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserCityDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
-import greencity.repository.UserRepo;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
 import greencity.service.UserService;
@@ -34,7 +42,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -71,8 +78,6 @@ class UserControllerTest {
     private UserController userController;
     @Mock
     private UserService userService;
-    @Mock
-    private UserRepo userRepo;
     @Mock
     private AuthorityService authorityService;
     @Mock
