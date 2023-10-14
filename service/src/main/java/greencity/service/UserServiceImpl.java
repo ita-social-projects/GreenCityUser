@@ -606,8 +606,8 @@ public class UserServiceImpl implements UserService {
 
         UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
             userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
-        if (userLocation.getUsers() != null && userLocation.getUsers().size() > 1) {
-            userLocation = new UserLocation();
+        if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
+            userLocation = user.getUserLocation();
         }
         initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUa);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
