@@ -33,12 +33,11 @@ public class GoogleApiService {
             GeocodingResult[] results = GeocodingApi.newRequest(context).latlng(new LatLng(latitude, longitude))
                 .language(locales.get(langCode).getLanguage()).await();
             return results[0];
+        } catch (InvalidRequestException e) {
+            String formattedCoords = String.format("%.8f,%.8f", latitude, longitude);
+            throw new NotFoundException(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + formattedCoords);
         } catch (IOException | InterruptedException | ApiException e) {
             Thread.currentThread().interrupt();
-            if (e instanceof InvalidRequestException) {
-                String formattedCoords = String.format("%.8f,%.8f", latitude, longitude);
-                throw new NotFoundException(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + formattedCoords);
-            }
             throw new GoogleApiException(e.getMessage());
         }
     }
