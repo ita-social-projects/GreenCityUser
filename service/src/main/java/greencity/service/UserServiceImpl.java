@@ -603,17 +603,17 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        GeocodingResult resultsUa = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
-            userProfileDtoRequest.getLongitude(), 0);
+        GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
+            userProfileDtoRequest.getLongitude(), "uk");
         GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
-            userProfileDtoRequest.getLongitude(), 1);
+            userProfileDtoRequest.getLongitude(), "en");
 
         UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
             userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
         if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
             userLocation = user.getUserLocation();
         }
-        initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUa);
+        initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUk);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
         userLocation.setLatitude(userProfileDtoRequest.getLatitude());
         userLocation.setLongitude(userProfileDtoRequest.getLongitude());

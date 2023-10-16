@@ -103,7 +103,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UserServiceImplTest {
@@ -631,17 +630,17 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getLatitude(),
             request.getLongitude(),
-            0))
+            "uk"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         when(googleApiService.getLocationByCoordinates(
             request.getLatitude(),
             request.getLongitude(),
-            1))
+            "en"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
-        verify(googleApiService, times(2)).getLocationByCoordinates(eq(null), eq(null), anyInt());
+        verify(googleApiService, times(2)).getLocationByCoordinates(eq(null), eq(null), anyString());
         verify(userRepo).save(user);
     }
 
@@ -663,19 +662,19 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getLatitude(),
             request.getLongitude(),
-            0))
+            "uk"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         when(googleApiService.getLocationByCoordinates(
             request.getLatitude(),
             request.getLongitude(),
-            1))
+            "en"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         String result = userService.saveUserProfile(request, "test@gmail.com");
         verify(userRepo).findByEmail("test@gmail.com");
         verify(userRepo).save(user);
-        verify(googleApiService, times(2)).getLocationByCoordinates(eq(null), eq(null), anyInt());
+        verify(googleApiService, times(2)).getLocationByCoordinates(eq(null), eq(null), anyString());
         assertEquals(UpdateConstants.SUCCESS_EN, result);
     }
 
@@ -696,19 +695,19 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getLatitude(),
             request.getLongitude(),
-            0))
+            "uk"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         when(googleApiService.getLocationByCoordinates(
             request.getLatitude(),
             request.getLongitude(),
-            1))
+            "en"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
         verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(request.getLatitude(), request.getLongitude());
         verify(googleApiService, times(2)).getLocationByCoordinates(eq(request.getLatitude()),
-            eq(request.getLongitude()), anyInt());
+            eq(request.getLongitude()), anyString());
         verify(userRepo).save(user);
 
     }

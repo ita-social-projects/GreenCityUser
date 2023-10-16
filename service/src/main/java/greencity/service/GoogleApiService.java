@@ -12,14 +12,11 @@ import greencity.exception.exceptions.NotFoundException;
 import lombok.Data;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
 
 @Service
 @Data
 public class GoogleApiService {
     private final GeoApiContext context;
-    private static final List<Locale> locales = List.of(new Locale("uk"), new Locale("en"));
 
     /**
      * Method gets user location by coordinates.
@@ -28,10 +25,10 @@ public class GoogleApiService {
      * @param longitude user's longitude
      * @return {@link greencity.entity.UserLocation}
      */
-    public GeocodingResult getLocationByCoordinates(Double latitude, Double longitude, Integer langCode) {
+    public GeocodingResult getLocationByCoordinates(Double latitude, Double longitude, String lang) {
         try {
             GeocodingResult[] results = GeocodingApi.newRequest(context).latlng(new LatLng(latitude, longitude))
-                .language(locales.get(langCode).getLanguage()).await();
+                .language(lang).await();
             return results[0];
         } catch (InvalidRequestException e) {
             String formattedCoords = String.format("%.8f,%.8f", latitude, longitude);

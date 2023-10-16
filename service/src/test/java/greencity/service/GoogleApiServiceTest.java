@@ -47,7 +47,7 @@ class GoogleApiServiceTest {
             when(request.await()).thenReturn(new GeocodingResult[1]);
 
             assertDoesNotThrow(
-                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, langCode));
+                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));
             verify(request).latlng(coordinates);
             verify(request).language(language);
             verify(request).await();
@@ -71,7 +71,7 @@ class GoogleApiServiceTest {
             String formattedCoordinates = String.format("%.8f,%.8f", coordinates.lat, coordinates.lng);
             NotFoundException exception =
                 assertThrows(NotFoundException.class,
-                    () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, langCode));
+                    () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));
 
             assertEquals(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + formattedCoordinates, exception.getMessage());
             verify(request).language(language);
@@ -96,7 +96,7 @@ class GoogleApiServiceTest {
             when(request.latlng(coordinates)).thenReturn(request);
 
             assertThrows(GoogleApiException.class,
-                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, langCode));
+                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));
             verify(request).language(language);
             verify(request).latlng(coordinates);
             verify(request).await();
