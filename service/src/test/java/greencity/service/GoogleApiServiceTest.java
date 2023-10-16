@@ -6,6 +6,7 @@ import com.google.maps.GeocodingApiRequest;
 import com.google.maps.errors.InvalidRequestException;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.LatLng;
+import greencity.ModelUtils;
 import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.NotFoundException;
@@ -35,7 +36,6 @@ class GoogleApiServiceTest {
     @Test
     @SneakyThrows
     void testGetLocationByCoordinates() {
-        Integer langCode = 0;
         String language = "uk";
         LatLng coordinates = new LatLng(20.000000, 20.000000);
         try (MockedStatic<GeocodingApi> utilities = Mockito.mockStatic(GeocodingApi.class)) {
@@ -44,7 +44,7 @@ class GoogleApiServiceTest {
 
             when(request.latlng(coordinates)).thenReturn(request);
             when(request.language(language)).thenReturn(request);
-            when(request.await()).thenReturn(new GeocodingResult[1]);
+            when(request.await()).thenReturn(new GeocodingResult[] {ModelUtils.getGeocodingResult().get(1)});
 
             assertDoesNotThrow(
                 () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));
@@ -57,7 +57,6 @@ class GoogleApiServiceTest {
     @Test
     @SneakyThrows
     void testGtLocationByCoordinatesThrowsNotFoundException() {
-        Integer langCode = 0;
         String language = "uk";
         LatLng coordinates = new LatLng(20.000000, 20.000000);
 
@@ -83,7 +82,6 @@ class GoogleApiServiceTest {
     @Test
     @SneakyThrows
     void testGetLocationByCoordinatesThrowsGoogleApiException() {
-        Integer langCode = 0;
         String language = "uk";
         LatLng coordinates = new LatLng(20.000000, 20.000000);
 

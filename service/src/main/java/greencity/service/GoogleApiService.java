@@ -9,12 +9,13 @@ import com.google.maps.model.LatLng;
 import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.NotFoundException;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Service
-@Data
+@AllArgsConstructor
 public class GoogleApiService {
     private final GeoApiContext context;
 
@@ -27,9 +28,10 @@ public class GoogleApiService {
      */
     public GeocodingResult getLocationByCoordinates(Double latitude, Double longitude, String lang) {
         try {
-            GeocodingResult[] results = GeocodingApi.newRequest(context).latlng(new LatLng(latitude, longitude))
-                .language(lang).await();
-            return results[0];
+            return Arrays.stream(GeocodingApi.newRequest(context).latlng(new LatLng(latitude, longitude))
+                .language(lang).await())
+                .findFirst()
+                .orElseThrow(() -> new GoogleApiException("Geocoding result was not found"));
         } catch (InvalidRequestException e) {
             String formattedCoords = String.format("%.8f,%.8f", latitude, longitude);
             throw new NotFoundException(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + formattedCoords);

@@ -166,6 +166,7 @@
             <artifactId>json-path</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--kotlin-stdlib fix issue with google maps std lib-->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
