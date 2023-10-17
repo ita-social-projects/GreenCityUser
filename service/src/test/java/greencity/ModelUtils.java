@@ -110,6 +110,22 @@ public class ModelUtils {
             .build();
     }
 
+    public static User getUserWithUserLocation() {
+        return User.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.DEACTIVATED)
+            .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
+                20.000000, null))
+            .language(new Language(1L, "en", null))
+            .build();
+    }
+
     private static UserManagementDto createUserManagerDto() {
         return UserManagementDto.builder()
             .id(1L)
@@ -669,6 +685,21 @@ public class ModelUtils {
             .countryUa("Україна")
             .regionUa("Львівська")
             .regionEn("Lvivska")
+            .latitude(49.842957)
+            .longitude(24.031111)
+            .users(Collections.singletonList(getUser()))
+            .build();
+    }
+
+    public static UserLocation getUserLocation2() {
+        return UserLocation.builder()
+            .id(2L)
+            .cityEn("Ternopil")
+            .cityUa("Тернопіль")
+            .countryEn("Ukraine")
+            .countryUa("Україна")
+            .regionUa("Тернопільська")
+            .regionEn("Ternopilska")
             .latitude(49.842957)
             .longitude(24.031111)
             .users(Collections.singletonList(getUser()))

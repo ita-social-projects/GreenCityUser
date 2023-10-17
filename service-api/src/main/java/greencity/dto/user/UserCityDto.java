@@ -2,18 +2,14 @@ package greencity.dto.user;
 
 import lombok.Builder;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.EqualsAndHashCode;
 import javax.validation.constraints.NotNull;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Builder
-@EqualsAndHashCode
 public class UserCityDto {
     @NotNull
     private Long id;

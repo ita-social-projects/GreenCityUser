@@ -211,14 +211,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     int scheduleDeleteCreatedUsers();
 
     /**
-     * Find and return all cities for all users.
-     *
-     * @return {@link List} of {@link String} of cities
-     **/
-    @Query(value = "SELECT u.userLocation FROM User u WHERE u.id =:userId")
-    Optional<UserLocation> findAllUsersCities(Long userId);
-
-    /**
      * Find and return all registration months. Runs an SQL Query which is described
      * in {@link User} under {@link NamedNativeQuery} annotation. Spring Data JPA
      * can run a named native query that follows the naming convention

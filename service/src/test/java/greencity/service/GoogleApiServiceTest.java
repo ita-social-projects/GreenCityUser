@@ -90,7 +90,7 @@ class GoogleApiServiceTest {
                 .thenReturn(request);
 
             when(request.language(language)).thenReturn(request);
-            when(request.await()).thenThrow(new InterruptedException());
+            when(request.await()).thenThrow(new GoogleApiException("something went wrong"));
             when(request.latlng(coordinates)).thenReturn(request);
 
             assertThrows(GoogleApiException.class,

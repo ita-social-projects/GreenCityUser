@@ -2,10 +2,8 @@ package greencity.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -17,13 +15,11 @@ import javax.persistence.Table;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@AllArgsConstructor
+@Data
 @Table(name = "user_location")
 @Builder
-@EqualsAndHashCode
 public class UserLocation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
