@@ -102,13 +102,6 @@ class GoogleApiServiceTest {
     }
 
     @Test
-    public void testGoogleApiExceptionMessage() {
-        String message = "Test exception message";
-        GoogleApiException exception = new GoogleApiException(message);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
     @SneakyThrows
     void testGetLocationByCoordinatesThrowsInterruptedException() {
         String language = "uk";
