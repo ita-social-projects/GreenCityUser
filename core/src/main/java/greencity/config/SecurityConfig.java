@@ -125,6 +125,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/findNotDeactivatedByEmail",
                 "/user/findByEmail",
                 "/user/findIdByEmail",
+                "/user/findAllUsersCities",
                 "/user/findById",
                 "/user/findUserByName/**",
                 "/user/findByUuId",

@@ -14,6 +14,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserManagementDto;
@@ -70,11 +71,11 @@ public interface UserService {
     int scheduleDeleteDeactivatedUsers();
 
     /**
-     * Find and return all cities for all users.
+     * Find and return city and coordinates .
      *
-     * @return {@link List} of {@link String} of cities
+     * @return {@link UserCityDto}
      **/
-    List<String> findAllUsersCities();
+    UserCityDto findAllUsersCities(Long userId);
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described

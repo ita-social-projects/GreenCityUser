@@ -1,5 +1,7 @@
 package greencity.service;
 
+import com.google.maps.model.AddressComponentType;
+import com.google.maps.model.GeocodingResult;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -11,8 +13,8 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
@@ -30,12 +32,14 @@ import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
+import greencity.entity.UserLocation;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -50,6 +54,7 @@ import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
+import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -64,15 +69,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -88,7 +94,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
+    private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
+    private final GoogleApiService googleApiService;
     /**
      * Autowired mapper.
      */
@@ -595,9 +603,29 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        if (userProfileDtoRequest.getCity() != null) {
-            user.setCity(userProfileDtoRequest.getCity());
+        GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
+            userProfileDtoRequest.getLongitude(), "uk");
+        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
+            userProfileDtoRequest.getLongitude(), "en");
+
+        UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
+
+        if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
+            if (userLocation.getId() != null) {
+                UserLocation deleteLocation = user.getUserLocation();
+                user.setUserLocation(userLocation);
+                userLocationRepo.delete(deleteLocation);
+            } else {
+                userLocation = user.getUserLocation();
+            }
         }
+        initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUk);
+        initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
+        userLocation.setLatitude(userProfileDtoRequest.getLatitude());
+        userLocation.setLongitude(userProfileDtoRequest.getLongitude());
+        userLocation = userLocationRepo.save(userLocation);
+        user.setUserLocation(userLocation);
         if (userProfileDtoRequest.getUserCredo() != null) {
             user.setUserCredo(userProfileDtoRequest.getUserCredo());
         }
@@ -628,6 +656,31 @@ public class UserServiceImpl implements UserService {
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
 
+    private void initializeGeoCodingResults(Map<AddressComponentType, Consumer<String>> initializedMap,
+        GeocodingResult geocodingResult) {
+        initializedMap
+            .forEach((key, value) -> Arrays.stream(geocodingResult.addressComponents)
+                .forEach(addressComponent -> Arrays.stream(addressComponent.types)
+                    .filter(componentType -> componentType.equals(key))
+                    .forEach(componentType -> value.accept(addressComponent.longName))));
+    }
+
+    private Map<AddressComponentType, Consumer<String>> initializeEnglishGeoCodingResult(
+        UserLocation userLocation) {
+        return Map.of(
+            AddressComponentType.LOCALITY, userLocation::setCityEn,
+            AddressComponentType.COUNTRY, userLocation::setCountryEn,
+            AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionEn);
+    }
+
+    private Map<AddressComponentType, Consumer<String>> initializeUkrainianGeoCodingResult(
+        UserLocation userLocation) {
+        return Map.of(
+            AddressComponentType.LOCALITY, userLocation::setCityUa,
+            AddressComponentType.COUNTRY, userLocation::setCountryUa,
+            AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionUa);
+    }
+
     /**
      * Method return user profile information {@link UserVO}.
      *
@@ -638,7 +691,13 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findById(userId)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
-        return modelMapper.map(user, UserProfileDtoResponse.class);
+
+        UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
+        if (user.getUserLocation() != null) {
+            userProfileDtoResponse = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
+        }
+        modelMapper.map(user, userProfileDtoResponse);
+        return userProfileDtoResponse;
     }
 
     /**
@@ -893,8 +952,10 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> findAllUsersCities() {
-        return userRepo.findAllUsersCities();
+    public UserCityDto findAllUsersCities(Long userId) {
+        UserLocation userLocation = userLocationRepo.findAllUsersCities(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DID_NOT_SET_ANY_CITY));
+        return modelMapper.map(userLocation, UserCityDto.class);
     }
 
     /**

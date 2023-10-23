@@ -116,8 +116,9 @@ public class User {
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "city")
-    private String city;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_location")
+    private UserLocation userLocation;
 
     @Column(name = "user_credo")
     private String userCredo;
