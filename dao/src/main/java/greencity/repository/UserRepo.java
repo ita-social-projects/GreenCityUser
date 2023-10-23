@@ -2,6 +2,7 @@ package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.entity.User;
+import greencity.entity.UserLocation;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
 import org.springframework.data.domain.Page;
@@ -208,14 +209,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true, value = "DELETE FROM users u WHERE u.user_status = 3 "
         + "AND u.date_of_registration + interval '1 day' <= CURRENT_TIMESTAMP")
     int scheduleDeleteCreatedUsers();
-
-    /**
-     * Find and return all cities for all users.
-     *
-     * @return {@link List} of {@link String} of cities
-     **/
-    @Query("SELECT city FROM User")
-    List<String> findAllUsersCities();
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described

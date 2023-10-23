@@ -34,6 +34,7 @@ import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UserCityDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -906,12 +907,10 @@ public class UserController {
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN),
-    })
+        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED)})
     @GetMapping("/findAllUsersCities")
-    public ResponseEntity<List<String>> findAllUsersCities() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities());
+    public ResponseEntity<UserCityDto> findAllUsersCities(@ApiIgnore @CurrentUser UserVO userVO) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities(userVO.getId()));
     }
 
     /**
