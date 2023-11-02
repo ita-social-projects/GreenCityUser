@@ -31,7 +31,6 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -203,13 +202,7 @@ class EmailServiceImplTest {
     void sendUserViolationEmailWithEmptyLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("");
-        Exception exception = null;
-        try {
-            service.sendUserViolationEmail(dto);
-        } catch (IllegalArgumentException t) {
-            exception = t;
-        }
-        assertNotNull(exception);
+        assertThrows(IllegalArgumentException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test
@@ -229,12 +222,12 @@ class EmailServiceImplTest {
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         service.sendNotificationByEmail(dto, "test@gmail.com");
+        verify(userRepo).findByEmail(anyString());
         verify(javaMailSender).createMimeMessage();
     }
 
     @Test
     void sendNotificationByEmailNotFoundException() {
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
     }

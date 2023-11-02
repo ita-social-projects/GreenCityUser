@@ -23,7 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -217,5 +218,6 @@ class CustomExceptionHandlerTest {
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleIllegalArgumentException(illegalArgumentException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+        verify(errorAttributes).getErrorAttributes(webRequest, true);
     }
 }
