@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -196,6 +197,18 @@ class EmailServiceImplTest {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         service.sendUserViolationEmail(dto);
         verify(javaMailSender).createMimeMessage();
+    }
+    @Test
+    void sendUserViolationEmailWithEmptyLanguageTest() {
+        UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
+        dto.setLanguage("");
+        Exception exception = null;
+        try {
+            service.sendUserViolationEmail(dto);
+        } catch (IllegalArgumentException t) {
+            exception = t;
+        }
+        assertNotNull(exception);
     }
 
     @Test
