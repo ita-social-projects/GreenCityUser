@@ -209,4 +209,13 @@ class CustomExceptionHandlerTest {
         ResponseEntity<Object> body = status.body(multipartException.getMessage());
         assertEquals(customExceptionHandler.handleBadRequestWhenProfilePictureExceeded(multipartException), body);
     }
+
+    @Test
+    void handleIllegalArgumentException() {
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleIllegalArgumentException(illegalArgumentException, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
 }
