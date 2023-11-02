@@ -198,6 +198,7 @@ class EmailServiceImplTest {
         service.sendUserViolationEmail(dto);
         verify(javaMailSender).createMimeMessage();
     }
+
     @Test
     void sendUserViolationEmailWithEmptyLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
