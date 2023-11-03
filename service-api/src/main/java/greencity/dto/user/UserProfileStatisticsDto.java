@@ -10,8 +10,7 @@ import lombok.*;
 @EqualsAndHashCode
 public class UserProfileStatisticsDto {
     private Long amountHabitsInProgress;
-
     private Long amountHabitsAcquired;
-
     private Long amountPublishedNews;
+    private Long amountPublishedEvents;
 }

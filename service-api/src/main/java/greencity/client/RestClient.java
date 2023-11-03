@@ -252,4 +252,19 @@ public class RestClient {
             }
         };
     }
+
+    /**
+     * Method for getting amount of published events by {@link UserVO} id.
+     *
+     * @param userId of {@link UserVO}
+     * @return {@link Long} count of published by user events.
+     *
+     * @author Olena Sotnik
+     */
+    public Long findAmountOfEventsPublishedByUser(Long userId) {
+        HttpEntity<String> entity = new HttpEntity<>(setHeader());
+        return restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_PUBLISHED_BY_USER_COUNT + RestTemplateLinks.USER_ID + userId,
+            HttpMethod.GET, entity, Long.class).getBody();
+    }
 }
