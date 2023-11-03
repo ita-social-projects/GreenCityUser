@@ -747,13 +747,14 @@ public class UserServiceImpl implements UserService {
         Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
         Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
         Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
-        Long amountOfPublishedEventsByUserId = restClient.findAmountOfEventsPublishedByUser(userId);
+        Long amountOfOrganizedAndAttendedEventsByUserId = restClient
+            .findAmountOfEventsOrganizedAndAttendedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)
             .amountHabitsAcquired(amountOfAcquiredHabitsByUserId)
             .amountHabitsInProgress(amountOfHabitsInProgressByUserId)
-            .amountPublishedEvents(amountOfPublishedEventsByUserId)
+            .amountOrganizedAndAttendedEvents(amountOfOrganizedAndAttendedEventsByUserId)
             .build();
     }
 
