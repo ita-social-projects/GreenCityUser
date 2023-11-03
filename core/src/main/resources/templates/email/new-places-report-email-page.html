@@ -181,7 +181,7 @@
                         style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
                         <div th:each="categoryWithPlaces : ${result}">
                             <span>New </span>
-                            <b> <span th:text="${categoryWithPlaces.key.getName()}"></span> </b>
+                            <b> <span th:text="${categoryWithPlaces.value.get(0).getCategory().getName()}"></span> </b>
                             <span th:if="${categoryWithPlaces.value.size() == 1}">place </span>
                             <span th:unless="${categoryWithPlaces.value.size() == 1}">places </span>
 
