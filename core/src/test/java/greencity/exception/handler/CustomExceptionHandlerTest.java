@@ -23,8 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -209,15 +208,5 @@ class CustomExceptionHandlerTest {
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
         ResponseEntity<Object> body = status.body(multipartException.getMessage());
         assertEquals(customExceptionHandler.handleBadRequestWhenProfilePictureExceeded(multipartException), body);
-    }
-
-    @Test
-    void handleIllegalArgumentException() {
-        IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
-        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
-        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleIllegalArgumentException(illegalArgumentException, webRequest),
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
-        verify(errorAttributes).getErrorAttributes(webRequest, true);
     }
 }

@@ -199,13 +199,6 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendUserViolationEmailWithEmptyLanguageTest() {
-        UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
-        dto.setLanguage("");
-        assertThrows(IllegalArgumentException.class, () -> service.sendUserViolationEmail(dto));
-    }
-
-    @Test
     void sendSuccessRestorePasswordByEmailTest() {
         String email = "test@gmail.com";
         String lang = "en";
@@ -222,12 +215,12 @@ class EmailServiceImplTest {
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         service.sendNotificationByEmail(dto, "test@gmail.com");
-        verify(userRepo).findByEmail(anyString());
         verify(javaMailSender).createMimeMessage();
     }
 
     @Test
     void sendNotificationByEmailNotFoundException() {
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
     }

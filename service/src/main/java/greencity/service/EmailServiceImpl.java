@@ -280,9 +280,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendUserViolationEmail(UserViolationMailDto dto) {
-        if (dto.getLanguage().isEmpty()) {
-            throw new IllegalArgumentException("Field language is empty");
-        }
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getName());

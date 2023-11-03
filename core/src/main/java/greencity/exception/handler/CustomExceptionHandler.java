@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  *
  * @author Marian Milian
  */
+
 @AllArgsConstructor
 @RestControllerAdvice
 @Slf4j
@@ -99,6 +100,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      * @author Marian Milian
      */
+
     @ExceptionHandler(NotFoundException.class)
     public final ResponseEntity<Object> handleNotFoundException(NotFoundException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
@@ -115,6 +117,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      * @author Julia Seti
      */
+
     @ExceptionHandler(WrongIdException.class)
     public final ResponseEntity<Object> handleWrongIdException(WrongIdException ex, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
@@ -342,21 +345,5 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(MultipartException me) {
         log.error("Error when profile picture was being uploaded {}", me);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(me.getMessage());
-    }
-
-    /**
-     * Method intercept exception {@link IllegalArgumentException}.
-     *
-     * @param ex      Exception witch should be intercepted.
-     * @param request contain detail about occur exception
-     * @return ResponseEntity witch contain http status and body with message of
-     *         exception.
-     * @author Volodymyr Mladonov
-     */
-    @ExceptionHandler({IllegalArgumentException.class})
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
-        log.info(ex.getMessage());
-        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 }
