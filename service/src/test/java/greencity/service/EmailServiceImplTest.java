@@ -137,7 +137,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendVerificationEmailIllegalStateException() {
-        assertThrows(IllegalStateException.class,
+        assertThrows(IllegalArgumentException.class,
             () -> service.sendVerificationEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
@@ -157,7 +157,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendRestoreEmailIllegalStateException() {
-        assertThrows(IllegalStateException.class,
+        assertThrows(IllegalArgumentException.class,
             () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
