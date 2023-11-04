@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -49,6 +51,7 @@ public class UserLocation {
     @Column(name = "longitude")
     private Double longitude;
 
+    @ToString.Exclude
     @OneToMany(mappedBy = "userLocation", fetch = FetchType.LAZY)
     private List<User> users;
 }

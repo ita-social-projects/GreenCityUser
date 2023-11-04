@@ -603,13 +603,17 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
-            userProfileDtoRequest.getLongitude(), "uk");
-        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
-            userProfileDtoRequest.getLongitude(), "en");
-
+        GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(
+            userProfileDtoRequest.getCoordinates().getLatitude(),
+            userProfileDtoRequest.getCoordinates().getLongitude(),
+            "uk");
+        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(
+            userProfileDtoRequest.getCoordinates().getLatitude(),
+            userProfileDtoRequest.getCoordinates().getLongitude(),
+            "en");
         UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
-            userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
+            userProfileDtoRequest.getCoordinates().getLatitude(),
+            userProfileDtoRequest.getCoordinates().getLongitude()).orElse(new UserLocation());
 
         if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
             if (userLocation.getId() != null) {
@@ -622,8 +626,8 @@ public class UserServiceImpl implements UserService {
         }
         initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUk);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
-        userLocation.setLatitude(userProfileDtoRequest.getLatitude());
-        userLocation.setLongitude(userProfileDtoRequest.getLongitude());
+        userLocation.setLatitude(userProfileDtoRequest.getCoordinates().getLatitude());
+        userLocation.setLongitude(userProfileDtoRequest.getCoordinates().getLongitude());
         userLocation = userLocationRepo.save(userLocation);
         user.setUserLocation(userLocation);
         if (userProfileDtoRequest.getUserCredo() != null) {

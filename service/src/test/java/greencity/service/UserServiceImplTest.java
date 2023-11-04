@@ -5,6 +5,7 @@ import greencity.TestConst;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
+import greencity.dto.CoordinatesDto;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
@@ -627,14 +628,14 @@ class UserServiceImplTest {
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "uk"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "en"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
@@ -646,27 +647,27 @@ class UserServiceImplTest {
     @Test
     void saveUserProfileUpdatesValuesNull() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
+        CoordinatesDto coordinates = new CoordinatesDto();
         request.setName(null);
         request.setUserCredo(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
         request.setShowShoppingList(null);
-        request.setLatitude(null);
-        request.setLongitude(null);
+        request.setCoordinates(coordinates);
 
         var user = ModelUtils.getUserWithSocialNetworks();
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "uk"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "en"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
@@ -680,33 +681,35 @@ class UserServiceImplTest {
     @Test
     void testUpdateUserProfileLocationWithTwoAssignedUsers() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
         request.setName("Dmutro");
-        request.setLatitude(20.0000);
-        request.setLongitude(20.0000);
         var user = ModelUtils.getUserWithSocialNetworks();
         var user2 = ModelUtils.getUser();
         UserLocation userLocation = new UserLocation();
         userLocation.setUsers(new ArrayList<>(Arrays.asList(user, user2)));
         when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
-            request.getLatitude(), request.getLongitude())).thenReturn(Optional.of(userLocation));
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(userLocation));
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "uk"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "en"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
-        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(request.getLatitude(), request.getLongitude());
-        verify(googleApiService, times(2)).getLocationByCoordinates(eq(request.getLatitude()),
-            eq(request.getLongitude()), anyString());
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
         verify(userRepo).save(user);
     }
 
@@ -714,33 +717,35 @@ class UserServiceImplTest {
     void testUpdateUserProfileLocationWhenUserHasAUserLocation() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName("Dmutro");
-        request.setLatitude(20.0000);
-        request.setLongitude(20.0000);
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
         var user = ModelUtils.getUserWithUserLocation();
         UserLocation userLocation2 = ModelUtils.getUserLocation2();
         user.getUserLocation().setUsers(Collections.singletonList(user));
 
         when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
-            request.getLatitude(), request.getLongitude())).thenReturn(Optional.of(userLocation2));
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(userLocation2));
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
         when(userLocationRepo.save(userLocation2)).thenReturn(userLocation2);
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "uk"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "en"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
-        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(request.getLatitude(), request.getLongitude());
-        verify(googleApiService, times(2)).getLocationByCoordinates(eq(request.getLatitude()),
-            eq(request.getLongitude()), anyString());
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
         verify(userLocationRepo).save(userLocation2);
         verify(userRepo).save(user);
         verify(userLocationRepo).delete(any());
@@ -750,32 +755,34 @@ class UserServiceImplTest {
     void testUpdateUserProfileLocationWhenUserModifyUserLocation() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName("Dmutro");
-        request.setLatitude(20.0000);
-        request.setLongitude(20.0000);
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
         var user = ModelUtils.getUserWithUserLocation();
         user.getUserLocation().setUsers(Collections.singletonList(user));
         when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
-            request.getLatitude(), request.getLongitude())).thenReturn(Optional.of(new UserLocation()));
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(new UserLocation()));
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
 
         when(userLocationRepo.save(user.getUserLocation())).thenReturn(user.getUserLocation());
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "uk"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         when(googleApiService.getLocationByCoordinates(
-            request.getLatitude(),
-            request.getLongitude(),
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
             "en"))
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
-        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(request.getLatitude(), request.getLongitude());
-        verify(googleApiService, times(2)).getLocationByCoordinates(eq(request.getLatitude()),
-            eq(request.getLongitude()), anyString());
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
         verify(userLocationRepo).save(any());
         verify(userRepo).save(user);
         verify(userLocationRepo, never()).delete(any());

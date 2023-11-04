@@ -19,6 +19,7 @@ public interface UserLocationRepo extends JpaRepository<UserLocation, Long> {
      *
      * @return {@link List} of {@link String} of cities
      **/
-    @Query(value = "SELECT u.userLocation FROM User u WHERE u.id =:userId")
+    // @Query(value = "SELECT u.userLocation FROM User u WHERE u.id =:userId")
+    @Query("SELECT ul FROM UserLocation ul JOIN ul.users u WHERE u.id = :userId")
     Optional<UserLocation> findAllUsersCities(Long userId);
 }
