@@ -218,11 +218,11 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleIllegalArgumentException() {
+    void handleLanguageNotFoundException() {
         LanguageNotFoundException languageNotFoundException = new LanguageNotFoundException();
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleIllegalArgumentException(languageNotFoundException, webRequest),
+        assertEquals(customExceptionHandler.handleLanguageNotFoundException(languageNotFoundException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
         verify(errorAttributes).getErrorAttributes(webRequest, true);
     }
