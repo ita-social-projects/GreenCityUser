@@ -15,6 +15,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
+import greencity.exception.exceptions.LanguageNotFoundException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -136,8 +137,8 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendVerificationEmailIllegalStateException() {
-        assertThrows(IllegalStateException.class,
+    void sendVerificationEmailLanguageNotFoundException() {
+        assertThrows(LanguageNotFoundException.class,
             () -> service.sendVerificationEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
@@ -156,8 +157,8 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendRestoreEmailIllegalStateException() {
-        assertThrows(IllegalStateException.class,
+    void sendRestoreEmailLanguageNotFoundException() {
+        assertThrows(LanguageNotFoundException.class,
             () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
@@ -202,7 +203,7 @@ class EmailServiceImplTest {
     void sendUserViolationEmailWithEmptyLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("");
-        assertThrows(IllegalArgumentException.class, () -> service.sendUserViolationEmail(dto));
+        assertThrows(LanguageNotFoundException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test
