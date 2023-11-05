@@ -14,6 +14,7 @@ import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.exception.exceptions.LanguageNotFoundException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,10 @@ import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Executor;
 
 /**
@@ -224,7 +228,7 @@ public class EmailServiceImpl implements EmailService {
                 Locale.setDefault(Locale.ENGLISH);
                 break;
             default:
-                throw new IllegalStateException("Unexpected value: " + language);
+                throw new LanguageNotFoundException("Unexpected language: " + language);
         }
     }
 
@@ -280,9 +284,6 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendUserViolationEmail(UserViolationMailDto dto) {
-        if (dto.getLanguage().isEmpty()) {
-            throw new IllegalArgumentException("Field language is empty");
-        }
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getName());

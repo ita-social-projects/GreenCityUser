@@ -345,7 +345,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Method intercept exception {@link IllegalArgumentException}.
+     * Method intercept exception {@link LanguageNotFoundException}.
      *
      * @param ex      Exception witch should be intercepted.
      * @param request contain detail about occur exception
@@ -353,8 +353,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      * @author Volodymyr Mladonov
      */
-    @ExceptionHandler({IllegalArgumentException.class})
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex, WebRequest request) {
+    @ExceptionHandler({LanguageNotFoundException.class})
+    public ResponseEntity<Object> handleIllegalArgumentException(LanguageNotFoundException ex, WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
