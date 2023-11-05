@@ -265,7 +265,7 @@ public class RestClient {
     public Long findAmountOfEventsOrganizedAndAttendedByUser(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_PUBLISHED_BY_USER_COUNT + RestTemplateLinks.USER_ID + userId,
+            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT + RestTemplateLinks.USER_ID + userId,
             HttpMethod.GET, entity, Long.class).getBody();
     }
 }

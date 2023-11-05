@@ -21,7 +21,7 @@ public class RestTemplateLinks {
     public static final Object CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK = "&socialNetwork=";
     public static final String CALCULATE_ACHIEVEMENT_SIZE = "&size=";
     public static final String UBS_USER_PROFILE = "/ubs/userProfile";
-    public static final String EVENTS_PUBLISHED_BY_USER_COUNT = "/events/userEvents/count";
+    public static final String EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT = "/events/userEvents/count";
 
     private RestTemplateLinks() {
     }
