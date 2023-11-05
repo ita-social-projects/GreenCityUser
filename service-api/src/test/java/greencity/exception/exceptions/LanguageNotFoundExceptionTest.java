@@ -9,10 +9,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-public class LanguageNotFoundExceptionTest {
-
+class LanguageNotFoundExceptionTest {
     @Test
-    public void testDefaultConstructor() {
+    void testDefaultConstructor() {
         // Arrange
         LanguageNotFoundException exception = new LanguageNotFoundException();
 
@@ -21,7 +20,7 @@ public class LanguageNotFoundExceptionTest {
     }
 
     @Test
-    public void testMessageConstructor() {
+    void testMessageConstructor() {
         // Arrange
         String message = "Custom exception message";
         LanguageNotFoundException exception = new LanguageNotFoundException(message);
@@ -31,7 +30,7 @@ public class LanguageNotFoundExceptionTest {
     }
 
     @Test
-    public void testMessageConstructorWithMockito() {
+    void testMessageConstructorWithMockito() {
         // Arrange
         String message = "Custom exception message";
         LanguageNotFoundException exception = Mockito.spy(new LanguageNotFoundException(message));
