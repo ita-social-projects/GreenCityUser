@@ -345,7 +345,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Method intercept exception {@link LanguageNotFoundException}.
+     * Method intercept exception {@link LanguageNotSupportedException}.
      *
      * @param ex      Exception witch should be intercepted.
      * @param request contain detail about occur exception
@@ -353,8 +353,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      * @author Volodymyr Mladonov
      */
-    @ExceptionHandler({LanguageNotFoundException.class})
-    public ResponseEntity<Object> handleLanguageNotFoundException(LanguageNotFoundException ex, WebRequest request) {
+    @ExceptionHandler({LanguageNotSupportedException.class})
+    public ResponseEntity<Object> handleLanguageNotFoundException(LanguageNotSupportedException ex, WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);

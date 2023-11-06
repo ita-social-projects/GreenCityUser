@@ -14,7 +14,7 @@ import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.exception.exceptions.LanguageNotFoundException;
+import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import lombok.extern.slf4j.Slf4j;
@@ -228,7 +228,7 @@ public class EmailServiceImpl implements EmailService {
                 Locale.setDefault(Locale.ENGLISH);
                 break;
             default:
-                throw new LanguageNotFoundException("Unexpected language: " + language);
+                throw new LanguageNotSupportedException("Unexpected language: " + language);
         }
     }
 

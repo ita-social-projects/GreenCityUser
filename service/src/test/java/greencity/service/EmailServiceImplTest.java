@@ -15,7 +15,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
-import greencity.exception.exceptions.LanguageNotFoundException;
+import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
@@ -138,7 +138,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendVerificationEmailLanguageNotFoundException() {
-        assertThrows(LanguageNotFoundException.class,
+        assertThrows(LanguageNotSupportedException.class,
             () -> service.sendVerificationEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
@@ -158,7 +158,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendRestoreEmailLanguageNotFoundException() {
-        assertThrows(LanguageNotFoundException.class,
+        assertThrows(LanguageNotSupportedException.class,
             () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
@@ -203,7 +203,7 @@ class EmailServiceImplTest {
     void sendUserViolationEmailWithEmptyLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("");
-        assertThrows(LanguageNotFoundException.class, () -> service.sendUserViolationEmail(dto));
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test

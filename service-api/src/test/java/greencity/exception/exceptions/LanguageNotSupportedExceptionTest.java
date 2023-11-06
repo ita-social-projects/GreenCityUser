@@ -9,24 +9,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class LanguageNotFoundExceptionTest {
+class LanguageNotSupportedExceptionTest {
     @Test
     void testDefaultConstructor() {
-        LanguageNotFoundException exception = new LanguageNotFoundException();
+        LanguageNotSupportedException exception = new LanguageNotSupportedException();
         assertEquals(null, exception.getMessage());
     }
 
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        LanguageNotFoundException exception = new LanguageNotFoundException(message);
+        LanguageNotSupportedException exception = new LanguageNotSupportedException(message);
         assertEquals(message, exception.getMessage());
     }
 
     @Test
     void testMessageConstructorWithMockito() {
         String message = "Custom exception message";
-        LanguageNotFoundException exception = Mockito.spy(new LanguageNotFoundException(message));
+        LanguageNotSupportedException exception = Mockito.spy(new LanguageNotSupportedException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);
         verify(exception).getMessage(); // Verify that getMessage() was called

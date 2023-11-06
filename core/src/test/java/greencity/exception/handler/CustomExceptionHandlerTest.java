@@ -5,7 +5,7 @@ import greencity.exception.exceptions.BadSocialNetworkLinksException;
 import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.EmailNotVerified;
 import greencity.exception.exceptions.InvalidURLException;
-import greencity.exception.exceptions.LanguageNotFoundException;
+import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.WrongEmailException;
@@ -219,10 +219,10 @@ class CustomExceptionHandlerTest {
 
     @Test
     void handleLanguageNotFoundException() {
-        LanguageNotFoundException languageNotFoundException = new LanguageNotFoundException();
+        LanguageNotSupportedException languageNotSupportedException = new LanguageNotSupportedException();
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleLanguageNotFoundException(languageNotFoundException, webRequest),
+        assertEquals(customExceptionHandler.handleLanguageNotFoundException(languageNotSupportedException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
         verify(errorAttributes).getErrorAttributes(webRequest, true);
     }
