@@ -52,6 +52,7 @@ public class EmailServiceImpl implements EmailService {
     private final String ecoNewsLink;
     private final String serverLink;
     private final String senderEmailAddress;
+    private static final Locale LOCALE_UA = new Locale("uk", "UA");
     private static final String PARAM_USER_ID = "&user_id=";
 
     /**
@@ -219,10 +220,9 @@ public class EmailServiceImpl implements EmailService {
      * @param language language which will be used for sending recovery letter.
      */
     private void changeLocale(String language) {
-        Locale ua = new Locale("uk", "UA");
         switch (language) {
             case "ua":
-                Locale.setDefault(ua);
+                Locale.setDefault(LOCALE_UA);
                 break;
             case "en":
                 Locale.setDefault(Locale.ENGLISH);
