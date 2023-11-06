@@ -1,6 +1,7 @@
 package greencity.dto.user;
 
 import greencity.annotations.ValidSocialNetworkLinks;
+import greencity.dto.CoordinatesDto;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,5 @@ public class UserProfileDtoRequest {
     private Boolean showLocation;
     private Boolean showEcoPlace;
     private Boolean showShoppingList;
-    private Double latitude;
-    private Double longitude;
+    private CoordinatesDto coordinates;
 }
