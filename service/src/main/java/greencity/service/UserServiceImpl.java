@@ -740,17 +740,21 @@ public class UserServiceImpl implements UserService {
      *
      * @param userId - {@link UserVO}'s id
      * @author Marian Datsko
+     * @author Olena Sotnik
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
         Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
         Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
         Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
+        Long amountOfOrganizedAndAttendedEventsByUserId = restClient
+            .findAmountOfEventsOrganizedAndAttendedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)
             .amountHabitsAcquired(amountOfAcquiredHabitsByUserId)
             .amountHabitsInProgress(amountOfHabitsInProgressByUserId)
+            .amountOrganizedAndAttendedEvents(amountOfOrganizedAndAttendedEventsByUserId)
             .build();
     }
 
