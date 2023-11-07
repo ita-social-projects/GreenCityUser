@@ -280,6 +280,12 @@ spec:
             secretKeyRef:
               name: {{ .Values.externalSecret.secretName }}
               key: GOOGLE-CLIENT-ID
+              
+        - name: GOOGLE_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.externalSecret.secretName }}
+              key: GOOGLE-API-KEY
 
         ports:
         - containerPort: 8060
