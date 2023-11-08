@@ -2,9 +2,14 @@ package greencity.dto.user;
 
 import greencity.dto.socialnetwork.SocialNetworkResponseDTO;
 import java.util.List;
-
 import greencity.enums.Role;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,12 +27,5 @@ public class UserProfileDtoResponse {
     private Boolean showShoppingList;
     private Float rating;
     private Role role;
-    private String cityEn;
-    private String cityUa;
-    private String regionEn;
-    private String regionUa;
-    private String countryEn;
-    private String countryUa;
-    private Double latitude;
-    private Double longitude;
+    private UserLocationDto userLocation;
 }
