@@ -615,8 +615,18 @@ public class UserServiceImpl implements UserService {
             userProfileDtoRequest.getCoordinates().getLatitude(),
             userProfileDtoRequest.getCoordinates().getLongitude()).orElse(new UserLocation());
 
+        /*
+         * check if user already has a location and if he is the only one assigned to
+         * this location. If user do not have a location check if such location is in
+         * database, if true then assign it to user, if not - add new location to
+         * database and assign it to user. If user has a location and this location
+         * belongs only to him, modify this location. If user has a location but there
+         * are more users assigned to this location, then create a new location for this
+         * user. If user inserted same location get his location and do not change
+         * anything.
+         */
         if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
-            if (userLocation.getId() != null) {
+            if (userLocation.getId() != null && user.getUserLocation() != userLocation) {
                 UserLocation deleteLocation = user.getUserLocation();
                 user.setUserLocation(userLocation);
                 userLocationRepo.delete(deleteLocation);
