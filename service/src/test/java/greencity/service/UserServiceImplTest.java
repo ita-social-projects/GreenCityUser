@@ -806,6 +806,43 @@ class UserServiceImplTest {
     }
 
     @Test
+    void saveUserProfileWhenLocationIsNotUpdated() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmutro");
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
+        var user = ModelUtils.getUserWithUserLocation();
+        user.getUserLocation().setUsers(Collections.singletonList(user));
+        when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(user.getUserLocation()));
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        when(userLocationRepo.save(user.getUserLocation())).thenReturn(user.getUserLocation());
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
+        verify(userLocationRepo).save(any());
+        verify(userRepo).save(user);
+        verify(userLocationRepo, never()).delete(any());
+    }
+
+    @Test
     void getUserProfileInformationTest() {
         UserProfileDtoResponse response = new UserProfileDtoResponse();
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
