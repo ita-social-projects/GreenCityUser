@@ -604,6 +604,38 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
+        if (userProfileDtoRequest.getUserCredo() != null) {
+            user.setUserCredo(userProfileDtoRequest.getUserCredo());
+        }
+        setLocationForUser(user, userProfileDtoRequest);
+        List<SocialNetwork> socialNetworks = user.getSocialNetworks();
+        if (userProfileDtoRequest.getSocialNetworks() != null) {
+            socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
+            user.getSocialNetworks().clear();
+            user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
+                .stream()
+                .map(url -> SocialNetwork.builder()
+                    .url(url)
+                    .user(user)
+                    .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
+                        SocialNetworkImage.class))
+                    .build())
+                .collect(Collectors.toList()));
+        }
+        if (userProfileDtoRequest.getShowLocation() != null) {
+            user.setShowLocation(userProfileDtoRequest.getShowLocation());
+        }
+        if (userProfileDtoRequest.getShowEcoPlace() != null) {
+            user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
+        }
+        if (userProfileDtoRequest.getShowShoppingList() != null) {
+            user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
+        }
+        userRepo.save(user);
+        return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
+    }
+
+    private void setLocationForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
         if (user.getUserLocation() != null && (userProfileDtoRequest.getCoordinates().getLatitude() == null
             || userProfileDtoRequest.getCoordinates().getLongitude() == null)) {
             UserLocation old = user.getUserLocation();
@@ -651,34 +683,6 @@ public class UserServiceImpl implements UserService {
             userLocation = userLocationRepo.save(userLocation);
             user.setUserLocation(userLocation);
         }
-        if (userProfileDtoRequest.getUserCredo() != null) {
-            user.setUserCredo(userProfileDtoRequest.getUserCredo());
-        }
-        List<SocialNetwork> socialNetworks = user.getSocialNetworks();
-        if (userProfileDtoRequest.getSocialNetworks() != null) {
-            socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
-            user.getSocialNetworks().clear();
-            user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
-                .stream()
-                .map(url -> SocialNetwork.builder()
-                    .url(url)
-                    .user(user)
-                    .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
-                        SocialNetworkImage.class))
-                    .build())
-                .collect(Collectors.toList()));
-        }
-        if (userProfileDtoRequest.getShowLocation() != null) {
-            user.setShowLocation(userProfileDtoRequest.getShowLocation());
-        }
-        if (userProfileDtoRequest.getShowEcoPlace() != null) {
-            user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
-        }
-        if (userProfileDtoRequest.getShowShoppingList() != null) {
-            user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-        }
-        userRepo.save(user);
-        return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
 
     private void initializeGeoCodingResults(Map<AddressComponentType, Consumer<String>> initializedMap,

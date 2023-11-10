@@ -762,6 +762,20 @@ class UserServiceImplTest {
     void testUpdateUserProfileDeleteLocation() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName("Dmutro");
+        CoordinatesDto coordinates = new CoordinatesDto(null, null);
+        request.setCoordinates(coordinates);
+        var user = ModelUtils.getUserWithUserLocation();
+        user.getUserLocation().getUsers().add(user);
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).save(user);
+        assertNull(user.getUserLocation());
+    }
+
+    @Test
+    void testUpdateUserProfileRemoveUserFromUserLocationList() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmutro");
         CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
         request.setCoordinates(coordinates);
         var user = ModelUtils.getUserWithUserLocation();
@@ -796,18 +810,6 @@ class UserServiceImplTest {
             eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
         verify(userLocationRepo).save(userLocation2);
         verify(userRepo).save(user);
-    }
-
-    @Test
-    void testUpdateUserProfileRemoveUserFromUserLocationList() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        var user = ModelUtils.getUserWithUserLocation();
-        user.getUserLocation().getUsers().add(user);
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
-
     }
 
     @Test
