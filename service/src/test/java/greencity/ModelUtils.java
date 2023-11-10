@@ -122,7 +122,7 @@ public class ModelUtils {
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
             .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
-                20.000000, null))
+                20.000000, new ArrayList<User>()))
             .language(new Language(1L, "en", null))
             .build();
     }
