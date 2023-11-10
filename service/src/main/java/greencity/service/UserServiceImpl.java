@@ -604,8 +604,8 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        if (userProfileDtoRequest.getCoordinates().getLatitude() == null
-            || userProfileDtoRequest.getCoordinates().getLongitude() == null) {
+        if (user.getUserLocation() != null && (userProfileDtoRequest.getCoordinates().getLatitude() == null
+            || userProfileDtoRequest.getCoordinates().getLongitude() == null)) {
             UserLocation old = user.getUserLocation();
             old.getUsers().remove(user);
             user.setUserLocation(null);
