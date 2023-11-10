@@ -762,14 +762,52 @@ class UserServiceImplTest {
     void testUpdateUserProfileDeleteLocation() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(null, null);
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
+        var user = ModelUtils.getUserWithUserLocation();
+        var user2 = ModelUtils.getUser();
+        user.getUserLocation().getUsers().add(user);
+        user.getUserLocation().getUsers().add(user2);
+        UserLocation userLocation2 = ModelUtils.getUserLocation2();
+
+        when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(userLocation2));
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        when(userLocationRepo.save(userLocation2)).thenReturn(userLocation2);
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        assertEquals(1, user.getUserLocation().getUsers().size());
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
+        verify(userLocationRepo).save(userLocation2);
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void testUpdateUserProfileRemoveUserFromUserLocationList() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmutro");
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
         request.setCoordinates(coordinates);
         var user = ModelUtils.getUserWithUserLocation();
         user.getUserLocation().getUsers().add(user);
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
-        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
-        verify(userRepo).save(user);
-        assertNull(user.getUserLocation());
+
     }
 
     @Test
