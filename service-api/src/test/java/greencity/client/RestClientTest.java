@@ -262,7 +262,7 @@ class RestClientTest {
             any(HttpEntity.class),
             eq(FriendsChatDto.class));
     }
-    
+
     @Test
     void findAmountOfEventsOrganizedAndAttendedByUserTest() {
         String accessToken = "accessToken";
