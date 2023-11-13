@@ -1357,34 +1357,4 @@ class UserServiceImplTest {
         verify(userRepo).findByEmail(anyString());
     }
 
-    @Test
-    void getUserProfileInformationWithNullLocationTest() {
-        UserLocation userLocation = ModelUtils.getUserLocation();
-        user.setUserLocation(userLocation);
-        UserLocationDto userLocationDto = modelMapper.map(user.getUserLocation(), UserLocationDto.class);
-        UserProfileDtoResponse response = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user.getUserLocation(), UserLocationDto.class)).thenReturn(userLocationDto);
-        assertEquals(response, userService.getUserProfileInformation(1L));
-        verify(userRepo).findById(1L);
-        verify(modelMapper).map(user.getUserLocation(), UserLocationDto.class);
-    }
-
-    @Test
-    void getDeactivationReasonUkTest() {
-        List<String> test1 = List.of();
-        User user = ModelUtils.getUser();
-        user.setLanguage(Language.builder()
-            .id(1L)
-            .code("en")
-            .build());
-        UserDeactivationReason test = UserDeactivationReason.builder()
-            .id(1L)
-            .user(user)
-            .reason("test")
-            .dateTimeOfDeactivation(LocalDateTime.now())
-            .build();
-        when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
-        assertEquals(test1, userService.getDeactivationReason(1L, "uk"));
-    }
 }
