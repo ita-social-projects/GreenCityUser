@@ -1,6 +1,16 @@
 package greencity.exception.handler;
 
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadSocialNetworkLinksException;
+import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.InvalidURLException;
+import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongIdException;
+import greencity.exception.exceptions.WrongPasswordException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -139,7 +149,6 @@ class CustomExceptionHandlerTest {
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleNotFoundException(notFoundException, webRequest),
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
-
     }
 
     @Test
@@ -149,7 +158,6 @@ class CustomExceptionHandlerTest {
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleWrongIdException(wrongIdException, webRequest),
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
-
     }
 
     @Test
@@ -169,7 +177,6 @@ class CustomExceptionHandlerTest {
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleConversionFailedException(mismatchException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
-
     }
 
     @Test
@@ -182,7 +189,6 @@ class CustomExceptionHandlerTest {
         assertEquals(
             customExceptionHandler.handleMethodArgumentNotValid(notValidException, headers, httpStatus, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonList(validationExceptionDto)));
-
     }
 
     @Test
@@ -212,11 +218,11 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleIllegalArgumentException() {
-        IllegalArgumentException illegalArgumentException = new IllegalArgumentException();
+    void handleLanguageNotFoundException() {
+        LanguageNotSupportedException languageNotSupportedException = new LanguageNotSupportedException();
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleIllegalArgumentException(illegalArgumentException, webRequest),
+        assertEquals(customExceptionHandler.handleLanguageNotFoundException(languageNotSupportedException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
         verify(errorAttributes).getErrorAttributes(webRequest, true);
     }
