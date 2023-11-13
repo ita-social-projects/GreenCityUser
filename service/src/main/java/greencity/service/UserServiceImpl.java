@@ -21,6 +21,7 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -603,46 +604,10 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(
-            userProfileDtoRequest.getCoordinates().getLatitude(),
-            userProfileDtoRequest.getCoordinates().getLongitude(),
-            "uk");
-        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(
-            userProfileDtoRequest.getCoordinates().getLatitude(),
-            userProfileDtoRequest.getCoordinates().getLongitude(),
-            "en");
-        UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
-            userProfileDtoRequest.getCoordinates().getLatitude(),
-            userProfileDtoRequest.getCoordinates().getLongitude()).orElse(new UserLocation());
-
-        /*
-         * check if user already has a location and if he is the only one assigned to
-         * this location. If user do not have a location check if such location is in
-         * database, if true then assign it to user, if not - add new location to
-         * database and assign it to user. If user has a location and this location
-         * belongs only to him, modify this location. If user has a location but there
-         * are more users assigned to this location, then create a new location for this
-         * user. If user inserted same location get his location and do not change
-         * anything.
-         */
-        if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
-            if (userLocation.getId() != null && user.getUserLocation() != userLocation) {
-                UserLocation deleteLocation = user.getUserLocation();
-                user.setUserLocation(userLocation);
-                userLocationRepo.delete(deleteLocation);
-            } else {
-                userLocation = user.getUserLocation();
-            }
-        }
-        initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUk);
-        initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
-        userLocation.setLatitude(userProfileDtoRequest.getCoordinates().getLatitude());
-        userLocation.setLongitude(userProfileDtoRequest.getCoordinates().getLongitude());
-        userLocation = userLocationRepo.save(userLocation);
-        user.setUserLocation(userLocation);
         if (userProfileDtoRequest.getUserCredo() != null) {
             user.setUserCredo(userProfileDtoRequest.getUserCredo());
         }
+        setLocationForUser(user, userProfileDtoRequest);
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
         if (userProfileDtoRequest.getSocialNetworks() != null) {
             socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
@@ -668,6 +633,56 @@ public class UserServiceImpl implements UserService {
         }
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
+    }
+
+    private void setLocationForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        if (user.getUserLocation() != null && (userProfileDtoRequest.getCoordinates().getLatitude() == null
+            || userProfileDtoRequest.getCoordinates().getLongitude() == null)) {
+            UserLocation old = user.getUserLocation();
+            old.getUsers().remove(user);
+            user.setUserLocation(null);
+        } else {
+            GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude(),
+                "uk");
+            GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude(),
+                "en");
+            UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude()).orElse(new UserLocation());
+
+            /*
+             * check if user already has a location and if he is the only one assigned to
+             * this location. If user do not have a location check if such location is in
+             * database, if true then assign it to user, if not - add new location to
+             * database and assign it to user. If user has a location and this location
+             * belongs only to him, modify this location. If user has a location but there
+             * are more users assigned to this location, then create a new location for this
+             * user. If user inserted same location get his location and do not change
+             * anything.
+             */
+            if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
+                if (userLocation.getId() != null && user.getUserLocation() != userLocation) {
+                    UserLocation deleteLocation = user.getUserLocation();
+                    user.setUserLocation(userLocation);
+                    userLocationRepo.delete(deleteLocation);
+                } else {
+                    userLocation = user.getUserLocation();
+                }
+            } else if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() > 1) {
+                UserLocation old = user.getUserLocation();
+                old.getUsers().remove(user);
+            }
+            initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUk);
+            initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
+            userLocation.setLatitude(userProfileDtoRequest.getCoordinates().getLatitude());
+            userLocation.setLongitude(userProfileDtoRequest.getCoordinates().getLongitude());
+            userLocation = userLocationRepo.save(userLocation);
+            user.setUserLocation(userLocation);
+        }
     }
 
     private void initializeGeoCodingResults(Map<AddressComponentType, Consumer<String>> initializedMap,
@@ -708,7 +723,7 @@ public class UserServiceImpl implements UserService {
 
         UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
         if (user.getUserLocation() != null) {
-            userProfileDtoResponse = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
+            userProfileDtoResponse.setUserLocationDto(modelMapper.map(user.getUserLocation(), UserLocationDto.class));
         }
         modelMapper.map(user, userProfileDtoResponse);
         return userProfileDtoResponse;
