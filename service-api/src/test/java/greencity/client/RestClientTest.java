@@ -262,4 +262,25 @@ class RestClientTest {
             any(HttpEntity.class),
             eq(FriendsChatDto.class));
     }
+    
+    @Test
+    void findAmountOfEventsOrganizedAndAttendedByUserTest() {
+        String accessToken = "accessToken";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        Long userId = 1L;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
+        when(restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT
+            + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class))
+                .thenReturn(ResponseEntity.ok(1L));
+
+        assertEquals(1, restClient.findAmountOfEventsOrganizedAndAttendedByUser(userId));
+
+        verify(httpServletRequest).getHeader(AUTHORIZATION);
+        verify(restTemplate).exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT
+            + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class);
+    }
 }

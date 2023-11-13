@@ -603,16 +603,30 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
-            userProfileDtoRequest.getLongitude(), "uk");
-        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(userProfileDtoRequest.getLatitude(),
-            userProfileDtoRequest.getLongitude(), "en");
-
+        GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(
+            userProfileDtoRequest.getCoordinates().getLatitude(),
+            userProfileDtoRequest.getCoordinates().getLongitude(),
+            "uk");
+        GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(
+            userProfileDtoRequest.getCoordinates().getLatitude(),
+            userProfileDtoRequest.getCoordinates().getLongitude(),
+            "en");
         UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
-            userProfileDtoRequest.getLatitude(), userProfileDtoRequest.getLongitude()).orElse(new UserLocation());
+            userProfileDtoRequest.getCoordinates().getLatitude(),
+            userProfileDtoRequest.getCoordinates().getLongitude()).orElse(new UserLocation());
 
+        /*
+         * check if user already has a location and if he is the only one assigned to
+         * this location. If user do not have a location check if such location is in
+         * database, if true then assign it to user, if not - add new location to
+         * database and assign it to user. If user has a location and this location
+         * belongs only to him, modify this location. If user has a location but there
+         * are more users assigned to this location, then create a new location for this
+         * user. If user inserted same location get his location and do not change
+         * anything.
+         */
         if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
-            if (userLocation.getId() != null) {
+            if (userLocation.getId() != null && user.getUserLocation() != userLocation) {
                 UserLocation deleteLocation = user.getUserLocation();
                 user.setUserLocation(userLocation);
                 userLocationRepo.delete(deleteLocation);
@@ -622,8 +636,8 @@ public class UserServiceImpl implements UserService {
         }
         initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUk);
         initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
-        userLocation.setLatitude(userProfileDtoRequest.getLatitude());
-        userLocation.setLongitude(userProfileDtoRequest.getLongitude());
+        userLocation.setLatitude(userProfileDtoRequest.getCoordinates().getLatitude());
+        userLocation.setLongitude(userProfileDtoRequest.getCoordinates().getLongitude());
         userLocation = userLocationRepo.save(userLocation);
         user.setUserLocation(userLocation);
         if (userProfileDtoRequest.getUserCredo() != null) {
@@ -740,17 +754,21 @@ public class UserServiceImpl implements UserService {
      *
      * @param userId - {@link UserVO}'s id
      * @author Marian Datsko
+     * @author Olena Sotnik
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
         Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
         Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
         Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
+        Long amountOfOrganizedAndAttendedEventsByUserId = restClient
+            .findAmountOfEventsOrganizedAndAttendedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)
             .amountHabitsAcquired(amountOfAcquiredHabitsByUserId)
             .amountHabitsInProgress(amountOfHabitsInProgressByUserId)
+            .amountOrganizedAndAttendedEvents(amountOfOrganizedAndAttendedEventsByUserId)
             .build();
     }
 

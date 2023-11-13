@@ -17,6 +17,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
+import greencity.validator.LanguageValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -34,7 +35,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -52,7 +52,6 @@ public class EmailServiceImpl implements EmailService {
     private final String ecoNewsLink;
     private final String serverLink;
     private final String senderEmailAddress;
-    private static final Locale LOCALE_UA = new Locale("uk", "UA");
     private static final String PARAM_USER_ID = "&user_id=";
 
     /**
@@ -169,7 +168,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.VERIFY_ADDRESS, baseLink + "?token=" + token + PARAM_USER_ID + id);
-        changeLocale(language);
+        validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.VERIFY_EMAIL_PAGE);
         sendEmail(email, EmailConstants.VERIFY_EMAIL, template);
@@ -208,27 +207,20 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.USER_NAME, userName);
         model.put(EmailConstants.RESTORE_PASS, baseLink + "/auth/restore?" + "token=" + token
             + PARAM_USER_ID + userId);
-        changeLocale(language);
+        validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
         sendEmail(userEmail, EmailConstants.CONFIRM_RESTORING_PASS, template);
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @param language language which will be used for sending recovery letter.
+     * This method validates language.
+     * 
+     * @param language language which will be used for sending letter.
      */
-    private void changeLocale(String language) {
-        switch (language) {
-            case "ua":
-                Locale.setDefault(LOCALE_UA);
-                break;
-            case "en":
-                Locale.setDefault(Locale.ENGLISH);
-                break;
-            default:
-                throw new LanguageNotSupportedException("Unexpected language: " + language);
+    private void validateLanguage(String language) {
+        if (!LanguageValidationUtils.isValid(language)) {
+            throw new LanguageNotSupportedException("Invalid language");
         }
     }
 
@@ -267,7 +259,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userDeactivationDto.getName());
         model.put(EmailConstants.REASONS, userDeactivationDto.getDeactivationReasons());
-        changeLocale(userDeactivationDto.getLang());
+        validateLanguage(userDeactivationDto.getLang());
         String template = createEmailTemplate(model, EmailConstants.REASONS_OF_DEACTIVATION_PAGE);
         sendEmail(userDeactivationDto.getEmail(), EmailConstants.DEACTIVATION, template);
     }
@@ -277,7 +269,7 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userActivationDto.getName());
-        changeLocale(userActivationDto.getLang());
+        validateLanguage(userActivationDto.getLang());
         String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
         sendEmail(userActivationDto.getEmail(), EmailConstants.ACTIVATION, template);
     }
@@ -289,7 +281,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.USER_NAME, dto.getName());
         model.put(EmailConstants.DESCRIPTION, dto.getViolationDescription());
         model.put(EmailConstants.LANGUAGE, dto.getLanguage());
-        changeLocale(dto.getLanguage());
+        validateLanguage(dto.getLanguage());
         String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
         sendEmail(dto.getEmail(), EmailConstants.VIOLATION_EMAIL, template);
     }
@@ -309,7 +301,7 @@ public class EmailServiceImpl implements EmailService {
         String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
         model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, userName);
-        changeLocale(language);
+        validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
         sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);

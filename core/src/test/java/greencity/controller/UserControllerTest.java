@@ -355,8 +355,10 @@ class UserControllerTest {
             + "\t\"showLocation\": true,\n"
             + "\t\"showEcoPlace\": true,\n"
             + "\t\"showShoppingList\": false,\n"
+            + "\t\"coordinates\":{ \n "
             + "\t\"latitude\": 20.000000,\n"
             + "\t\"longitude\": 20.000000\n"
+            + "\t}\n"
             + "}";
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
