@@ -69,8 +69,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -1311,5 +1313,44 @@ class UserServiceImplTest {
 
         userService.updateUserRating(userRatingDto);
         verify(userRepo).save(TEST_USER);
+    }
+
+    @Test
+    void updateStatusWithFailedCheckUpdatableUserTest() {
+        when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
+        assertThrows(BadUpdateRequestException.class,
+            () -> userService.updateStatus(user2.getId(), DEACTIVATED, "email"));
+    }
+
+    @Test
+    void updateUserProfilePictureTest() {
+        String fileName = "test.txt";
+        String content = "test file content";
+        byte[] bytes = content.getBytes();
+        MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(restClient.uploadImage(any())).thenReturn("picturePath");
+        when(modelMapper.map(any(), any())).thenReturn(userVO);
+        UserVO actual = userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
+        assertEquals(userVO, actual);
+        verify(restClient).uploadImage(any());
+        verify(modelMapper).map(any(), any());
+        verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
+    void updateUserProfilePictureBaseTest() {
+        String fileName = "test.txt";
+        String content = "test file content";
+        byte[] bytes = content.getBytes();
+        MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(modelMapper.map(any(), any())).thenReturn(null);
+        assertThrows(BadRequestException.class,
+            () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
+                "test"));
+        verify(modelMapper).map(any(), any());
+        verify(userRepo).findByEmail(anyString());
     }
 }
