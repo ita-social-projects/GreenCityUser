@@ -26,5 +26,5 @@ public class UserProfileDtoResponse {
     private Boolean showShoppingList;
     private Float rating;
     private Role role;
-    private UserLocationDto userLocation;
+    private UserLocationDto userLocationDto;
 }
