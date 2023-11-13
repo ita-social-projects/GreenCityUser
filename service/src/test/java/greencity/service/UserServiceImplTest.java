@@ -1325,8 +1325,9 @@ class UserServiceImplTest {
     void updateStatusWithFailedCheckUpdatableUserTest() {
         when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
         when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
+        Long id = user2.getId();
         assertThrows(BadUpdateRequestException.class,
-            () -> userService.updateStatus(user2.getId(), DEACTIVATED, "email"));
+            () -> userService.updateStatus(id, DEACTIVATED, "email"));
         verify(userRepo).findByEmail(any());
         verify(modelMapper).map(user2, UserVO.class);
     }
