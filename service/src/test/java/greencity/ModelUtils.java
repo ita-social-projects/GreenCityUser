@@ -6,6 +6,7 @@ import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.Geometry;
 import com.google.maps.model.LatLng;
 import greencity.constant.AppConstant;
+import greencity.dto.CoordinatesDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
@@ -150,6 +151,7 @@ public class ModelUtils {
             .amountHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER)
             .amountHabitsAcquired(TestConst.SIMPLE_LONG_NUMBER)
             .amountPublishedNews(TestConst.SIMPLE_LONG_NUMBER)
+            .amountOrganizedAndAttendedEvents(TestConst.SIMPLE_LONG_NUMBER)
             .build();
     }
 
@@ -365,7 +367,6 @@ public class ModelUtils {
     public static UserProfileDtoRequest getUserProfileDtoRequest() {
         return UserProfileDtoRequest.builder()
             .name("Name")
-            // .city("City")
             .userCredo("userCredo")
             .socialNetworks(List.of(
                 "https://www.facebook.com",
@@ -373,6 +374,7 @@ public class ModelUtils {
                 "https://www.youtube.com",
                 "https://www.gmail.com",
                 "https://www.google.com"))
+            .coordinates(new CoordinatesDto(null, null))
             .showLocation(true)
             .showEcoPlace(true)
             .showShoppingList(true)
