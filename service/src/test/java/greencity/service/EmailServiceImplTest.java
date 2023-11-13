@@ -203,7 +203,7 @@ class EmailServiceImplTest {
     void sendUserViolationEmailWithEmptyLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("");
-        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+        assertThrows(IllegalArgumentException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test
@@ -237,5 +237,12 @@ class EmailServiceImplTest {
     void sendEventCreatedNotificationTest() {
         service.sendEventCreationNotification("test@gmail.com", "message");
         verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendUserViolationEmailWithUnsupportedLanguageTest() {
+        UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
+        dto.setLanguage("de");
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
     }
 }
