@@ -35,7 +35,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -53,7 +52,6 @@ public class EmailServiceImpl implements EmailService {
     private final String ecoNewsLink;
     private final String serverLink;
     private final String senderEmailAddress;
-    private static final Locale LOCALE_UA = new Locale("uk", "UA");
     private static final String PARAM_USER_ID = "&user_id=";
 
     /**

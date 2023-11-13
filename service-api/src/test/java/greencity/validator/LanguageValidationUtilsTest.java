@@ -1,42 +1,39 @@
 package greencity.validator;
 
-import greencity.exception.exceptions.LanguageNotSupportedException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LanguageValidationUtilsTest {
 
     @Test
-    public void testIsValidWithSupportedLanguage() {
+    void testIsValidWithSupportedLanguage() {
         assertTrue(LanguageValidationUtils.isValid("en"));
         assertTrue(LanguageValidationUtils.isValid("ua"));
     }
 
     @Test
-    public void testIsValidWithUnsupportedLanguage() {
+    void testIsValidWithUnsupportedLanguage() {
         assertFalse(LanguageValidationUtils.isValid("es"));
         assertFalse(LanguageValidationUtils.isValid("de"));
     }
 
     @Test
-    public void testIsValidWithNullLanguage() {
+    void testIsValidWithNullLanguage() {
         assertThrows(NullPointerException.class, () -> {
             LanguageValidationUtils.isValid(null);
         });
     }
 
     @Test
-    public void testIsValidWithEmptyLanguage() {
+    void testIsValidWithEmptyLanguage() {
         assertThrows(IllegalArgumentException.class, () -> {
             LanguageValidationUtils.isValid("");
         });
     }
 
     @Test
-    public void testIsValidWithBlankLanguage() {
+    void testIsValidWithBlankLanguage() {
         assertThrows(IllegalArgumentException.class, () -> {
             LanguageValidationUtils.isValid("   ");
         });
