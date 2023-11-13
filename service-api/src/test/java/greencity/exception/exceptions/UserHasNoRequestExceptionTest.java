@@ -14,13 +14,6 @@ class UserHasNoRequestExceptionTest {
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        UserHasNoRequestException exception = new UserHasNoRequestException(message);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    void testMessageConstructorWithMockito() {
-        String message = "Custom exception message";
         UserHasNoRequestException exception = Mockito.spy(new UserHasNoRequestException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);

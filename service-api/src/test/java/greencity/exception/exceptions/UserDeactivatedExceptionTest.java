@@ -14,13 +14,6 @@ class UserDeactivatedExceptionTest {
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        UserDeactivatedException exception = new UserDeactivatedException(message);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    void testMessageConstructorWithMockito() {
-        String message = "Custom exception message";
         UserDeactivatedException exception = Mockito.spy(new UserDeactivatedException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);

@@ -14,13 +14,6 @@ class BadUserStatusExceptionTest {
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        BadUserStatusException exception = new BadUserStatusException(message);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    void testMessageConstructorWithMockito() {
-        String message = "Custom exception message";
         BadUserStatusException exception = Mockito.spy(new BadUserStatusException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);

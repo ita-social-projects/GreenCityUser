@@ -9,12 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class NotDeletedExceptionTest {
+class CheckRepeatingValueExceptionTest {
 
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        NotDeletedException exception = Mockito.spy(new NotDeletedException(message));
+        CheckRepeatingValueException exception = Mockito.spy(new CheckRepeatingValueException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);
         verify(exception).getMessage();

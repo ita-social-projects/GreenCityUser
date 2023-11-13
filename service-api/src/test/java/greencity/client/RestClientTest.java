@@ -1,6 +1,7 @@
 package greencity.client;
 
 import greencity.constant.RestTemplateLinks;
+import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
@@ -26,9 +27,8 @@ import java.util.Arrays;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.constant.AppConstant.IMAGE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class RestClientTest {
@@ -100,6 +100,7 @@ class RestClientTest {
             + profilePicturePath, HttpMethod.POST, entity, MultipartFile.class))
                 .thenReturn(ResponseEntity.ok(image));
         assertEquals(image, restClient.convertToMultipartImage(profilePicturePath));
+        verify(httpServletRequest).getHeader(any());
     }
 
     @Test
@@ -128,6 +129,10 @@ class RestClientTest {
             String.class)).thenReturn(imagePath);
         assertEquals(imagePath,
             restClient.uploadImage(image));
+        verify(httpServletRequest).getHeader(any());
+        verify(restTemplate).postForObject(greenCityServerAddress +
+            RestTemplateLinks.FILES_IMAGE, requestEntity,
+            String.class);
     }
 
     @Test
@@ -234,5 +239,27 @@ class RestClientTest {
             greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
             ubsProfileCreationDto, Long.class);
         assertEquals(1L, id);
+    }
+
+    @Test
+    void testChatBetweenTwo() {
+        Long firstUserId = 1L;
+        Long secondUserId = 2L;
+        FriendsChatDto expectedBody = new FriendsChatDto();
+
+        when(restTemplate.exchange(
+            any(String.class),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(FriendsChatDto.class)))
+                .thenReturn(new ResponseEntity<>(expectedBody, HttpStatus.OK));
+
+        FriendsChatDto result = restClient.chatBetweenTwo(firstUserId, secondUserId);
+
+        assertNotNull(result);
+        verify(restTemplate).exchange(any(String.class),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(FriendsChatDto.class));
     }
 }

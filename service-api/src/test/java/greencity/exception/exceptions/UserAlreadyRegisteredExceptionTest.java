@@ -14,13 +14,6 @@ class UserAlreadyRegisteredExceptionTest {
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        UserAlreadyRegisteredException exception = new UserAlreadyRegisteredException(message);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    void testMessageConstructorWithMockito() {
-        String message = "Custom exception message";
         UserAlreadyRegisteredException exception = Mockito.spy(new UserAlreadyRegisteredException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);

@@ -14,13 +14,6 @@ class UserActivationEmailTokenExpiredExceptionTest {
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        UserActivationEmailTokenExpiredException exception = new UserActivationEmailTokenExpiredException(message);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    void testMessageConstructorWithMockito() {
-        String message = "Custom exception message";
         UserActivationEmailTokenExpiredException exception =
             Mockito.spy(new UserActivationEmailTokenExpiredException(message));
         String actualMessage = exception.getMessage();

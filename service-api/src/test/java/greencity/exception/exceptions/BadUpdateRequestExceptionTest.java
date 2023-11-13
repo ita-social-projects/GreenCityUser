@@ -9,12 +9,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class NotDeletedExceptionTest {
+class BadUpdateRequestExceptionTest {
 
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        NotDeletedException exception = Mockito.spy(new NotDeletedException(message));
+        BadUpdateRequestException exception = Mockito.spy(new BadUpdateRequestException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);
         verify(exception).getMessage();

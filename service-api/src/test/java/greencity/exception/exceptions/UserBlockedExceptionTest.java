@@ -14,13 +14,6 @@ class UserBlockedExceptionTest {
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        UserBlockedException exception = new UserBlockedException(message);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    void testMessageConstructorWithMockito() {
-        String message = "Custom exception message";
         UserBlockedException exception = Mockito.spy(new UserBlockedException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);

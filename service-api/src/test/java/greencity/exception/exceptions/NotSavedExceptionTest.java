@@ -14,13 +14,6 @@ class NotSavedExceptionTest {
     @Test
     void testMessageConstructor() {
         String message = "Custom exception message";
-        NotSavedException exception = new NotSavedException(message);
-        assertEquals(message, exception.getMessage());
-    }
-
-    @Test
-    void testMessageConstructorWithMockito() {
-        String message = "Custom exception message";
         NotSavedException exception = Mockito.spy(new NotSavedException(message));
         String actualMessage = exception.getMessage();
         assertEquals(message, actualMessage);
