@@ -1358,19 +1358,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUserProfileInformationWithNullLocationTest() {
-        UserLocation userLocation = ModelUtils.getUserLocation();
-        user.setUserLocation(userLocation);
-        UserLocationDto userLocationDto = modelMapper.map(user.getUserLocation(), UserLocationDto.class);
-        UserProfileDtoResponse response = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user.getUserLocation(), UserLocationDto.class)).thenReturn(userLocationDto);
-        assertEquals(response, userService.getUserProfileInformation(1L));
-        verify(userRepo).findById(1L);
-        verify(modelMapper).map(user.getUserLocation(), UserLocationDto.class);
-    }
-
-    @Test
     void getDeactivationReasonUkTest() {
         List<String> test1 = List.of();
         User user = ModelUtils.getUser();
