@@ -1321,4 +1321,52 @@ class UserServiceImplTest {
         verify(userRepo).save(TEST_USER);
     }
 
+    @Test
+    void updateStatusWithFailedCheckUpdatableUserTest() {
+        when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
+        assertThrows(BadUpdateRequestException.class,
+            () -> userService.updateStatus(user2.getId(), DEACTIVATED, "email"));
+        verify(userRepo).findByEmail(any());
+        verify(modelMapper).map(user2, UserVO.class);
+    }
+
+    @Test
+    void updateUserProfilePictureTest() {
+        String fileName = "test.txt";
+        String content = "test file content";
+        byte[] bytes = content.getBytes();
+        MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(restClient.uploadImage(any())).thenReturn("picturePath");
+        when(modelMapper.map(any(), any())).thenReturn(userVO);
+        UserVO actual = userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
+        assertEquals(userVO, actual);
+        verify(restClient).uploadImage(any());
+        verify(modelMapper).map(any(), any());
+        verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
+    void updateUserProfilePictureBaseTest() {
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(modelMapper.map(any(), any())).thenReturn(null);
+        assertThrows(BadRequestException.class,
+            () -> userService.updateUserProfilePicture(null, "testmail@gmail.com", "test"));
+        verify(modelMapper).map(any(), any());
+        verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
+    void getUserProfileInformationWithNullLocationTest() {
+        UserLocation userLocation = ModelUtils.getUserLocation();
+        user.setUserLocation(userLocation);
+        UserLocationDto userLocationDto = modelMapper.map(user.getUserLocation(), UserLocationDto.class);
+        UserProfileDtoResponse response = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user.getUserLocation(), UserLocationDto.class)).thenReturn(userLocationDto);
+        when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
+        assertEquals(response, userService.getUserProfileInformation(1L));
+    }
+
 }
