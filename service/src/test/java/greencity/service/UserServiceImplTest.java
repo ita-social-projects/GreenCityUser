@@ -22,6 +22,7 @@ import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -850,6 +851,7 @@ class UserServiceImplTest {
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
         assertEquals(response, userService.getUserProfileInformation(1L));
+        verify(userRepo).findById(1L);
     }
 
     @Test
@@ -879,6 +881,8 @@ class UserServiceImplTest {
         when(userRepo.findLastActivityTimeById(anyLong())).thenReturn(Optional.of(userLastActivityTime));
 
         assertTrue(userService.checkIfTheUserIsOnline(1L));
+        verify(userRepo).findById(anyLong());
+        verify(userRepo).findLastActivityTimeById(anyLong());
     }
 
     @Test
@@ -893,6 +897,8 @@ class UserServiceImplTest {
         when(userRepo.findLastActivityTimeById(anyLong())).thenReturn(Optional.empty());
 
         assertFalse(userService.checkIfTheUserIsOnline(1L));
+        verify(userRepo).findById(anyLong());
+        verify(userRepo).findLastActivityTimeById(anyLong());
     }
 
     @Test
@@ -918,6 +924,7 @@ class UserServiceImplTest {
             users.isLast());
         when(userRepo.findAll(pageable)).thenReturn(users);
         assertEquals(userManagementDtoPageableDto, userService.findUserForManagementByPage(pageable));
+        verify(userRepo).findAll(pageable);
     }
 
     @Test
@@ -1018,7 +1025,6 @@ class UserServiceImplTest {
             .id(1L)
             .code("en")
             .build());
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         user.setUserStatus(DEACTIVATED);
         when(userRepo.save(user)).thenReturn(user);
@@ -1341,16 +1347,24 @@ class UserServiceImplTest {
 
     @Test
     void updateUserProfilePictureBaseTest() {
-        String fileName = "test.txt";
-        String content = "test file content";
-        byte[] bytes = content.getBytes();
-        MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         when(modelMapper.map(any(), any())).thenReturn(null);
         assertThrows(BadRequestException.class,
-            () -> userService.updateUserProfilePicture(null, "testmail@gmail.com",
-                "test"));
+            () -> userService.updateUserProfilePicture(null, "testmail@gmail.com", "test"));
         verify(modelMapper).map(any(), any());
         verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
+    void getUserProfileInformationWithNullLocationTest() {
+        UserLocation userLocation = ModelUtils.getUserLocation();
+        user.setUserLocation(userLocation);
+        UserLocationDto userLocationDto = modelMapper.map(user.getUserLocation(), UserLocationDto.class);
+        UserProfileDtoResponse response = modelMapper.map(user.getUserLocation(), UserProfileDtoResponse.class);
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user.getUserLocation(), UserLocationDto.class)).thenReturn(userLocationDto);
+        when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
+        System.out.println(response);
+        assertEquals(response, userService.getUserProfileInformation(1L));
     }
 }
