@@ -844,5 +844,4 @@ class UserControllerTest {
 
         verify(userService).updateUserRating(dto);
     }
-
 }
