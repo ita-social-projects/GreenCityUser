@@ -62,8 +62,6 @@ public class UserVO {
 
     private String profilePicturePath;
 
-    private String city;
-
     private Boolean showLocation;
 
     private Boolean showEcoPlace;
@@ -76,5 +74,5 @@ public class UserVO {
 
     private LanguageVO languageVO;
 
-    private UserLocation userLocation;
+    private UserLocationDto userLocationDto;
 }
