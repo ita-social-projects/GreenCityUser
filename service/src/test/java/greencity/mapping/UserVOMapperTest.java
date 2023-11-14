@@ -1,6 +1,7 @@
 package greencity.mapping;
 
 import greencity.ModelUtils;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.*;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,19 @@ class UserVOMapperTest {
             .refreshTokenKey(expected.getRefreshTokenKey())
             .dateOfRegistration(expected.getDateOfRegistration())
             .profilePicturePath(expected.getProfilePicturePath())
-            .userLocation(expected.getUserLocation())
+            .userLocation(
+                UserLocation.builder()
+                    .id(expected.getUserLocationDto().getId())
+                    .cityEn(expected.getUserLocationDto().getCityEn())
+                    .cityUa(expected.getUserLocationDto().getCityUa())
+                    .regionEn(expected.getUserLocationDto().getRegionEn())
+                    .regionUa(expected.getUserLocationDto().getRegionUa())
+                    .countryEn(expected.getUserLocationDto().getCountryEn())
+                    .countryUa(expected.getUserLocationDto().getCountryUa())
+                    .latitude(expected.getUserLocationDto().getLatitude())
+                    .longitude(expected.getUserLocationDto().getLongitude())
+                    .users(null)
+                    .build())
             .showShoppingList(expected.getShowShoppingList())
             .showEcoPlace(expected.getShowEcoPlace())
             .showLocation(expected.getShowLocation())
