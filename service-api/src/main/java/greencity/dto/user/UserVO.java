@@ -6,7 +6,6 @@ import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
-import greencity.entity.UserLocation;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
