@@ -29,7 +29,12 @@ import org.thymeleaf.ITemplateEngine;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executors;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
