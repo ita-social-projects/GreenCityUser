@@ -1,12 +1,14 @@
 package greencity.dto.user;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class UserLocationDto {
     private Long id;
     private String cityEn;

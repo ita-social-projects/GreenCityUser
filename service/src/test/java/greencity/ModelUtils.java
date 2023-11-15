@@ -21,6 +21,7 @@ import greencity.dto.user.EcoNewsAuthorDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserProfileDtoRequest;
@@ -315,8 +316,9 @@ public class ModelUtils {
             .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
-                20.000000, null))
+            .userLocationDto(
+                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
+                    20.000000))
             .showShoppingList(true)
             .showEcoPlace(true)
             .showLocation(true)
