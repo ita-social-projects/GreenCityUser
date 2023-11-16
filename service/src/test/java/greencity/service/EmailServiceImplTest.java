@@ -15,6 +15,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
+import greencity.exception.exceptions.InvalidEmailException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
@@ -72,7 +73,7 @@ class EmailServiceImplTest {
         String authorFirstName = "test author first name";
         String placeName = "test place name";
         String placeStatus = "test place status";
-        String authorEmail = "test author email";
+        String authorEmail = "useremail@gmail.com";
         service.sendChangePlaceStatusEmail(authorFirstName, placeName, placeStatus, authorEmail);
         verify(javaMailSender).createMimeMessage();
     }
@@ -169,8 +170,14 @@ class EmailServiceImplTest {
 
     @Test
     void sendHabitNotification() {
-        service.sendHabitNotification("userName", "userEmail");
+        service.sendHabitNotification("userName", "userEmail@gmail.com");
         verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendHabitNotificationWithInvalidEmail() {
+        assertThrows(InvalidEmailException.class,
+            () -> service.sendHabitNotification("userName", "userEmail"));
     }
 
     @Test

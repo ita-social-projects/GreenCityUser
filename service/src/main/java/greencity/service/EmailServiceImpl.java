@@ -14,9 +14,11 @@ import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.exception.exceptions.InvalidEmailException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
+import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,6 +234,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendEmail(String receiverEmail, String subject, String content) {
+        validateEmailAddress(receiverEmail);
         log.info(LogMessage.IN_SEND_EMAIL, receiverEmail, subject);
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
@@ -311,5 +314,16 @@ public class EmailServiceImpl implements EmailService {
     public void sendEventCreationNotification(String email, String messageBody) {
         String subject = "Notification about event creation status";
         sendEmail(email, subject, messageBody);
+    }
+
+    /**
+     * This method validates email address.
+     *
+     * @param emailAddress which will be used for sending letter.
+     */
+    private void validateEmailAddress(String emailAddress) {
+        if (!EmailAddressValidator.isValid(emailAddress)) {
+            throw new InvalidEmailException("Invalid email address");
+        }
     }
 }
