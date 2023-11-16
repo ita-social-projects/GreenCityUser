@@ -22,7 +22,7 @@ public class EmailAddressValidator {
      */
     public static boolean isValid(String emailAddress) {
         Validate.notBlank(emailAddress, "Email address couldn't be blank");
-        Pattern regexPattern = Pattern.compile("^[(A-z-0-9+_.)]+@[(A-z)]+\\.[(A-z)]{2,3}$");
+        Pattern regexPattern = Pattern.compile("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
         Matcher regMatcher = regexPattern.matcher(emailAddress);
         return regMatcher.matches();
     }
