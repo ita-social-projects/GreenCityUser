@@ -31,6 +31,8 @@ class EmailAddressValidatorTest {
 
     @Test
     void testEmptyEmail() {
-        assertFalse(EmailAddressValidator.isValid(""));
+        assertThrows(IllegalArgumentException.class, () -> {
+            EmailAddressValidator.isValid("");
+        });
     }
 }
