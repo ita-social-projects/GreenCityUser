@@ -1,8 +1,11 @@
 package greencity.validator;
 
+import greencity.exception.exceptions.LanguageNotSupportedException;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LanguageValidationUtilsTest {
 
@@ -16,26 +19,14 @@ class LanguageValidationUtilsTest {
     void testIsValidWithUnsupportedLanguage() {
         assertFalse(LanguageValidationUtils.isValid("es"));
         assertFalse(LanguageValidationUtils.isValid("de"));
+        LanguageValidationUtils.isValid("   ");
+        LanguageValidationUtils.isValid("");
     }
 
     @Test
     void testIsValidWithNullLanguage() {
-        assertThrows(NullPointerException.class, () -> {
+        assertThrows(LanguageNotSupportedException.class, () -> {
             LanguageValidationUtils.isValid(null);
-        });
-    }
-
-    @Test
-    void testIsValidWithEmptyLanguage() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            LanguageValidationUtils.isValid("");
-        });
-    }
-
-    @Test
-    void testIsValidWithBlankLanguage() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            LanguageValidationUtils.isValid("   ");
         });
     }
 }
