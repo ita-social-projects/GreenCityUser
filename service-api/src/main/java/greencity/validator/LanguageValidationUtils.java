@@ -3,7 +3,6 @@ package greencity.validator;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.Validate;
 
 import java.util.List;
 import java.util.Locale;
