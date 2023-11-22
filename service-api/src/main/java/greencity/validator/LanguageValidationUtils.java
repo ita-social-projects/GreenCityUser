@@ -1,6 +1,8 @@
 package greencity.validator;
 
 import greencity.exception.exceptions.LanguageNotSupportedException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.Validate;
 
 import java.util.List;
@@ -11,15 +13,9 @@ import java.util.Locale;
  * 
  * @author Volodymyr Mladonov
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LanguageValidationUtils {
     private static final List<String> SUPPORTED_LANGUAGES = List.of("en", "ua");
-
-    /**
-     * To fix codeSmell.
-     */
-    private LanguageValidationUtils() {
-        throw new IllegalStateException("Utility class");
-    }
 
     /**
      * This method validate language.
