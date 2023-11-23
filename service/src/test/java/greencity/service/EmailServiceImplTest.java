@@ -208,7 +208,9 @@ class EmailServiceImplTest {
     void sendUserViolationEmailWithEmptyLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("");
-        assertThrows(IllegalArgumentException.class, () -> service.sendUserViolationEmail(dto));
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+        dto.setLanguage(null);
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test
