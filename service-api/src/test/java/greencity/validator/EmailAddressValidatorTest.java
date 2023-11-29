@@ -5,11 +5,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EmailAddressValidatorTest {
+    @ParameterizedTest
+    @ValueSource(strings = {"test@example.com", "user123@mail.co", "john.doe123@company.org"})
+    void testValidEmail(String email) {
+        assertDoesNotThrow(() -> EmailAddressValidator.validate(email));
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {"invalid-email", "user@company", "test@com", "missing.at.sign.example.com"})
     void testInvalidEmail(String invalidEmail) {
@@ -19,7 +24,7 @@ class EmailAddressValidatorTest {
     }
 
     @Test
-    void testValidateWithNullLanguage() {
+    void testvalidateWithNullLanguage() {
         assertThrows(NullPointerException.class, () -> {
             EmailAddressValidator.validate(null);
         });
