@@ -15,9 +15,9 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
-import greencity.exception.exceptions.InvalidEmailException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.WrongEmailException;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -176,7 +176,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendHabitNotificationWithInvalidEmail() {
-        assertThrows(InvalidEmailException.class,
+        assertThrows(WrongEmailException.class,
             () -> service.sendHabitNotification("userName", "userEmail"));
     }
 

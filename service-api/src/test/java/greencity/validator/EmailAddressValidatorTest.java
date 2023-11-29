@@ -1,38 +1,34 @@
 package greencity.validator;
 
+import greencity.exception.exceptions.WrongEmailException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EmailAddressValidatorTest {
-    @Test
-    void testValidEmail() {
-        assertTrue(EmailAddressValidator.isValid("test@example.com"));
-        assertTrue(EmailAddressValidator.isValid("user123@mail.co"));
-        assertTrue(EmailAddressValidator.isValid("john.doe123@company.org"));
+    @ParameterizedTest
+    @ValueSource(strings = {"invalid-email", "user@company", "test@com", "missing.at.sign.example.com"})
+    void testInvalidEmail(String invalidEmail) {
+        assertThrows(WrongEmailException.class, () -> {
+            EmailAddressValidator.validate(invalidEmail);
+        });
     }
 
     @Test
-    void testInvalidEmail() {
-        assertFalse(EmailAddressValidator.isValid("invalid-email"));
-        assertFalse(EmailAddressValidator.isValid("user@company"));
-        assertFalse(EmailAddressValidator.isValid("test@com"));
-        assertFalse(EmailAddressValidator.isValid("missing.at.sign.example.com"));
-    }
-
-    @Test
-    void testIsValidWithNullLanguage() {
+    void testValidateWithNullLanguage() {
         assertThrows(NullPointerException.class, () -> {
-            EmailAddressValidator.isValid(null);
+            EmailAddressValidator.validate(null);
         });
     }
 
     @Test
     void testEmptyEmail() {
         assertThrows(IllegalArgumentException.class, () -> {
-            EmailAddressValidator.isValid("");
+            EmailAddressValidator.validate("");
         });
     }
 }

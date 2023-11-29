@@ -360,21 +360,4 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
-
-    /**
-     * Method intercept exception {@link InvalidEmailException}.
-     *
-     * @param ex      Exception witch should be intercepted.
-     * @param request contain detail about occur exception
-     * @return ResponseEntity witch contain http status and body with message of
-     *         exception.
-     * @author Volodymyr Mladonov
-     */
-    @ExceptionHandler({InvalidEmailException.class})
-    public ResponseEntity<Object> handleInvalidEmailException(InvalidEmailException ex,
-        WebRequest request) {
-        log.info(ex.getMessage());
-        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
-    }
 }

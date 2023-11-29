@@ -4,7 +4,6 @@ import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadSocialNetworkLinksException;
 import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.InvalidEmailException;
 import greencity.exception.exceptions.InvalidURLException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
@@ -224,16 +223,6 @@ class CustomExceptionHandlerTest {
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleLanguageNotFoundException(languageNotSupportedException, webRequest),
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
-        verify(errorAttributes).getErrorAttributes(webRequest, true);
-    }
-
-    @Test
-    void handleInvalidEmailExceptionTest() {
-        InvalidEmailException invalidEmailException = new InvalidEmailException("Invalid email address");
-        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
-        when(errorAttributes.getErrorAttributes(webRequest, true)).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleInvalidEmailException(invalidEmailException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
         verify(errorAttributes).getErrorAttributes(webRequest, true);
     }
