@@ -10,7 +10,7 @@ public final class AppConstant {
     public static final String UBS_EMPLOYEE = "UBS_EMPLOYEE";
     public static final String ROLE = "role";
     public static final String AUTHORIZATION = "Authorization";
-    public static final String VALIDATION_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+    public static final String VALIDATION_EMAIL = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     public static final Double DEFAULT_RATING = 0.0;
     public static final String USERNAME = "name";
     public static final String FACEBOOK_OBJECT_ID = "me";
