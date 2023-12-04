@@ -677,6 +677,50 @@ class UserServiceImplTest {
     }
 
     @Test
+    void saveUserProfileUpdatesWithNullLatitudeTest() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName(null);
+        request.setUserCredo(null);
+        request.setSocialNetworks(null);
+        request.setShowLocation(null);
+        request.setShowEcoPlace(null);
+        request.setShowShoppingList(null);
+        request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(1.0d).build());
+
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+
+        String result = userService.saveUserProfile(request, "test@gmail.com");
+        assertEquals(UpdateConstants.SUCCESS_EN, result);
+
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void saveUserProfileUpdatesWithNullLongitudeTest() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName(null);
+        request.setUserCredo(null);
+        request.setSocialNetworks(null);
+        request.setShowLocation(null);
+        request.setShowEcoPlace(null);
+        request.setShowShoppingList(null);
+        request.setCoordinates(CoordinatesDto.builder().latitude(1.0d).longitude(null).build());
+
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+
+        String result = userService.saveUserProfile(request, "test@gmail.com");
+        assertEquals(UpdateConstants.SUCCESS_EN, result);
+
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
+    }
+
+    @Test
     void testUpdateUserProfileLocationWithTwoAssignedUsers() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
