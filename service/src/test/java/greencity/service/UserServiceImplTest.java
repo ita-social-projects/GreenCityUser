@@ -655,29 +655,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void saveUserProfileUpdatesWithNullUserLocationTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName(null);
-        request.setUserCredo(null);
-        request.setSocialNetworks(null);
-        request.setShowLocation(null);
-        request.setShowEcoPlace(null);
-        request.setShowShoppingList(null);
-        request.setCoordinates(new CoordinatesDto());
-
-        var user = ModelUtils.getUserWithSocialNetworks();
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
-        when(userRepo.save(user)).thenReturn(user);
-
-        String result = userService.saveUserProfile(request, "test@gmail.com");
-        assertEquals(UpdateConstants.SUCCESS_EN, result);
-
-        verify(userRepo).findByEmail("test@gmail.com");
-        verify(userRepo).save(user);
-    }
-
-    @Test
-    void saveUserProfileUpdatesValuesNullTest() {
+    void saveUserProfileUpdatesWithNullValuesTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName(null);
         request.setUserCredo(null);
