@@ -636,6 +636,11 @@ public class UserServiceImpl implements UserService {
     }
 
     private void setLocationForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        if (user.getUserLocation() == null && (userProfileDtoRequest.getCoordinates().getLatitude() == null
+            || userProfileDtoRequest.getCoordinates().getLongitude() == null)) {
+            return;
+        }
+
         if (user.getUserLocation() != null && (userProfileDtoRequest.getCoordinates().getLatitude() == null
             || userProfileDtoRequest.getCoordinates().getLongitude() == null)) {
             UserLocation old = user.getUserLocation();
