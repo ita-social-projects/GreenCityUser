@@ -255,6 +255,7 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
+            .userLocation(null)
             .build();
     }
 
@@ -376,7 +377,7 @@ public class ModelUtils {
                 "https://www.youtube.com",
                 "https://www.gmail.com",
                 "https://www.google.com"))
-            .coordinates(new CoordinatesDto(null, null))
+            .coordinates(new CoordinatesDto(1.0d, 1.0d))
             .showLocation(true)
             .showEcoPlace(true)
             .showShoppingList(true)
