@@ -1,6 +1,6 @@
 package greencity.dto.newssubscriber;
 
-import static greencity.constant.AppConstant.VALIDATION_EMAIL;
+import static greencity.constant.AppConstant.VALIDATION_EMAIL_REGEXP;
 
 import java.io.Serializable;
 import javax.validation.constraints.Email;
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class NewsSubscriberResponseDto implements Serializable {
     @NotBlank
-    @Email(regexp = VALIDATION_EMAIL)
+    @Email(regexp = VALIDATION_EMAIL_REGEXP)
     private String email;
     @NotBlank
     private String unsubscribeToken;
