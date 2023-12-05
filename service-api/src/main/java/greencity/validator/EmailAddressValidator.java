@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EmailAddressValidator {
-    private static final Pattern regexPattern  = Pattern.compile(AppConstant.VALIDATION_EMAIL);
+    private static final Pattern regexPattern = Pattern.compile(AppConstant.VALIDATION_EMAIL);
 
     /**
      * This method validate emailAddress.
