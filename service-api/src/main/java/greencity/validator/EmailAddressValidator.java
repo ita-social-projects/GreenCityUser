@@ -4,7 +4,9 @@ import greencity.constant.AppConstant;
 import greencity.exception.exceptions.WrongEmailException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.Validate;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class should validate email.
@@ -14,13 +16,17 @@ import org.apache.commons.lang3.Validate;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EmailAddressValidator {
     /**
-     * This method validate language.
+     * This method validate emailAddress.
      *
      * @param emailAddress to be validated
      */
     public static void validate(String emailAddress) {
-        Validate.notBlank(emailAddress, "Email address couldn't be blank");
-        if (!emailAddress.matches(AppConstant.VALIDATION_EMAIL)) {
+        if (emailAddress == null) {
+            throw new WrongEmailException("Email address cannot be null");
+        }
+        Pattern p = Pattern.compile(AppConstant.VALIDATION_EMAIL);
+        Matcher m = p.matcher(emailAddress);
+        if (!m.matches()) {
             throw new WrongEmailException("Invalid email address " + emailAddress);
         }
     }
