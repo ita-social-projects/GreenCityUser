@@ -15,6 +15,8 @@ import java.util.regex.Pattern;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EmailAddressValidator {
+    private static final Pattern regexPattern  = Pattern.compile(AppConstant.VALIDATION_EMAIL);
+
     /**
      * This method validate emailAddress.
      *
@@ -24,8 +26,7 @@ public class EmailAddressValidator {
         if (emailAddress == null) {
             throw new WrongEmailException("Email address cannot be null");
         }
-        Pattern p = Pattern.compile(AppConstant.VALIDATION_EMAIL);
-        Matcher m = p.matcher(emailAddress);
+        Matcher m = regexPattern.matcher(emailAddress.toLowerCase());
         if (!m.matches()) {
             throw new WrongEmailException("Invalid email address " + emailAddress);
         }
