@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EmailAddressValidatorTest {
     @ParameterizedTest
-    @ValueSource(strings = {"test@example.com", "user123@mail.co", "john.doe123@company.org"})
+    @ValueSource(strings = {"test@example.com", "user123@mail.co", "john.doe123@company.org", "Te_ST@example.com"})
     void testValidEmail(String email) {
         assertDoesNotThrow(() -> EmailAddressValidator.validate(email));
     }
