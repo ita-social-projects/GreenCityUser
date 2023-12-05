@@ -10,7 +10,7 @@ public final class AppConstant {
     public static final String UBS_EMPLOYEE = "UBS_EMPLOYEE";
     public static final String ROLE = "role";
     public static final String AUTHORIZATION = "Authorization";
-    public static final String VALIDATION_EMAIL =
+    public static final String VALIDATION_EMAIL_REGEXP =
         "(?:[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-"
             + "\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-zA-Z0-9](?:"
             + "[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|"
