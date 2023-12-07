@@ -42,7 +42,6 @@ import java.util.concurrent.Executor;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final ITemplateEngine templateEngine;
-    private final UserRepo userRepo;
     private final Executor executor;
     private final String clientLink;
     private final String ecoNewsLink;
@@ -56,7 +55,6 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender,
         ITemplateEngine templateEngine,
-        UserRepo userRepo,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
         @Value("${econews.address}") String ecoNewsLink,
@@ -64,7 +62,6 @@ public class EmailServiceImpl implements EmailService {
         @Value("${sender.email.address}") String senderEmailAddress) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
-        this.userRepo = userRepo;
         this.executor = executor;
         this.clientLink = clientLink;
         this.ecoNewsLink = ecoNewsLink;
