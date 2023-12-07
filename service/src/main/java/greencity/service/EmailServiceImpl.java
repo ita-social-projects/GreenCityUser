@@ -14,6 +14,7 @@ import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.repository.UserRepo;
+import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -229,6 +230,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private void sendEmail(String receiverEmail, String subject, String content) {
+        EmailAddressValidator.validate(receiverEmail);
         log.info(LogMessage.IN_SEND_EMAIL, receiverEmail, subject);
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);

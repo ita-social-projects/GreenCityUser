@@ -22,7 +22,6 @@ import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -89,6 +88,7 @@ import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
 import static greencity.ModelUtils.TEST_ADMIN;
 import static greencity.ModelUtils.TEST_USER;
 import static greencity.ModelUtils.TEST_USER_VO;
+import static greencity.ModelUtils.getUserLocation;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
@@ -650,42 +650,74 @@ class UserServiceImplTest {
                 .thenReturn(ModelUtils.getGeocodingResult().get(0));
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
-        verify(googleApiService, times(2)).getLocationByCoordinates(eq(null), eq(null), anyString());
+        verify(googleApiService, times(2)).getLocationByCoordinates(eq(1.0d), eq(1.0d), anyString());
         verify(userRepo).save(user);
     }
 
     @Test
-    void saveUserProfileUpdatesValuesNull() {
+    void saveUserProfileUpdatesWithNullValuesTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
-        CoordinatesDto coordinates = new CoordinatesDto();
         request.setName(null);
         request.setUserCredo(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
         request.setShowShoppingList(null);
-        request.setCoordinates(coordinates);
+        request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(null).build());
 
         var user = ModelUtils.getUserWithSocialNetworks();
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
-        when(googleApiService.getLocationByCoordinates(
-            request.getCoordinates().getLatitude(),
-            request.getCoordinates().getLongitude(),
-            "uk"))
-                .thenReturn(ModelUtils.getGeocodingResult().get(0));
-
-        when(googleApiService.getLocationByCoordinates(
-            request.getCoordinates().getLatitude(),
-            request.getCoordinates().getLongitude(),
-            "en"))
-                .thenReturn(ModelUtils.getGeocodingResult().get(0));
 
         String result = userService.saveUserProfile(request, "test@gmail.com");
+        assertEquals(UpdateConstants.SUCCESS_EN, result);
+
         verify(userRepo).findByEmail("test@gmail.com");
         verify(userRepo).save(user);
-        verify(googleApiService, times(2)).getLocationByCoordinates(eq(null), eq(null), anyString());
+    }
+
+    @Test
+    void saveUserProfileUpdatesWithNullLatitudeTest() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName(null);
+        request.setUserCredo(null);
+        request.setSocialNetworks(null);
+        request.setShowLocation(null);
+        request.setShowEcoPlace(null);
+        request.setShowShoppingList(null);
+        request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(1.0d).build());
+
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+
+        String result = userService.saveUserProfile(request, "test@gmail.com");
         assertEquals(UpdateConstants.SUCCESS_EN, result);
+
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void saveUserProfileUpdatesWithNullLongitudeTest() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName(null);
+        request.setUserCredo(null);
+        request.setSocialNetworks(null);
+        request.setShowLocation(null);
+        request.setShowEcoPlace(null);
+        request.setShowShoppingList(null);
+        request.setCoordinates(CoordinatesDto.builder().latitude(1.0d).longitude(null).build());
+
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+
+        String result = userService.saveUserProfile(request, "test@gmail.com");
+        assertEquals(UpdateConstants.SUCCESS_EN, result);
+
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
     }
 
     @Test
@@ -903,6 +935,16 @@ class UserServiceImplTest {
     void getUserProfileInformationTest() {
         UserProfileDtoResponse response = new UserProfileDtoResponse();
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
+        assertEquals(response, userService.getUserProfileInformation(1L));
+        verify(userRepo).findById(1L);
+    }
+
+    @Test
+    void getUserProfileInformationWithUserLocationTest() {
+        UserProfileDtoResponse response = new UserProfileDtoResponse();
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        user.setUserLocation(getUserLocation());
         when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
         assertEquals(response, userService.getUserProfileInformation(1L));
         verify(userRepo).findById(1L);

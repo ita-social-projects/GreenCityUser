@@ -14,6 +14,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.WrongEmailException;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +70,7 @@ class EmailServiceImplTest {
         String authorFirstName = "test author first name";
         String placeName = "test place name";
         String placeStatus = "test place status";
-        String authorEmail = "test author email";
+        String authorEmail = "useremail@gmail.com";
         service.sendChangePlaceStatusEmail(authorFirstName, placeName, placeStatus, authorEmail);
         verify(javaMailSender).createMimeMessage();
     }
@@ -166,8 +167,14 @@ class EmailServiceImplTest {
 
     @Test
     void sendHabitNotification() {
-        service.sendHabitNotification("userName", "userEmail");
+        service.sendHabitNotification("userName", "userEmail@gmail.com");
         verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendHabitNotificationWithInvalidEmail() {
+        assertThrows(WrongEmailException.class,
+            () -> service.sendHabitNotification("userName", "userEmail"));
     }
 
     @Test
@@ -205,7 +212,9 @@ class EmailServiceImplTest {
     void sendUserViolationEmailWithEmptyLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("");
-        assertThrows(IllegalArgumentException.class, () -> service.sendUserViolationEmail(dto));
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+        dto.setLanguage(null);
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test

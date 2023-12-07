@@ -636,6 +636,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private void setLocationForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        if (shouldSkipLocationUpdate(user, userProfileDtoRequest)) {
+            return;
+        }
+
         if (user.getUserLocation() != null && (userProfileDtoRequest.getCoordinates().getLatitude() == null
             || userProfileDtoRequest.getCoordinates().getLongitude() == null)) {
             UserLocation old = user.getUserLocation();
@@ -683,6 +687,12 @@ public class UserServiceImpl implements UserService {
             userLocation = userLocationRepo.save(userLocation);
             user.setUserLocation(userLocation);
         }
+    }
+
+    private boolean shouldSkipLocationUpdate(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        return user.getUserLocation() == null
+            && (userProfileDtoRequest.getCoordinates().getLatitude() == null
+                || userProfileDtoRequest.getCoordinates().getLongitude() == null);
     }
 
     private void initializeGeoCodingResults(Map<AddressComponentType, Consumer<String>> initializedMap,
