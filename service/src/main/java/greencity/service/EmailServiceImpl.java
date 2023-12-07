@@ -1,21 +1,18 @@
 package greencity.service;
 
 import greencity.constant.EmailConstants;
-import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
-import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
-import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import greencity.validator.LanguageValidationUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -287,15 +284,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendNotificationByEmail(NotificationDto notification, String email) {
-        if (userRepo.findByEmail(email).isPresent()) {
-            sendEmail(email, notification.getTitle(), notification.getBody());
-        } else {
-            throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
-        }
-    }
-
-    @Override
     public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
         String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
@@ -307,9 +295,13 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @author Yurii Midianyi
+     */
     @Override
-    public void sendEventCreationNotification(String email, String messageBody) {
-        String subject = "Notification about event creation status";
-        sendEmail(email, subject, messageBody);
+    public void sendEmailNotification(String email, String subject, String message) {
+        sendEmail(email, subject, message);
     }
 }

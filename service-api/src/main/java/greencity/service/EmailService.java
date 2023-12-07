@@ -5,12 +5,10 @@ import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
-import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-
 import greencity.dto.violation.UserViolationMailDto;
 import java.util.List;
 import java.util.Map;
@@ -131,16 +129,6 @@ public interface EmailService {
     void sendUserViolationEmail(UserViolationMailDto dto);
 
     /**
-     * Method for send notification to user.
-     *
-     * @param notification {@link NotificationDto}-includes all information about
-     *                     notification.
-     * @param email        letter is sent to this email.
-     * @author Ann Sakhno.
-     */
-    void sendNotificationByEmail(NotificationDto notification, String email);
-
-    /**
      * Method for send information about success restoring password.
      *
      * @param email    letter is sent to this email.
@@ -151,12 +139,13 @@ public interface EmailService {
     void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
 
     /**
-     * Method for email notification on email about event creation status.
+     * Method for sending general email notifications.
      *
-     * @param email       notification is sent to this email.
-     * @param messageBody contains message which will be send on user's email.
+     * @param email   letter is sent to this email.
+     * @param subject subject of the email message.
+     * @param message subject of the email message.
      *
-     * @author Olena Sotnik.
+     * @author Yurii Midianyi
      */
-    void sendEventCreationNotification(String email, String messageBody);
+    void sendEmailNotification(String email, String subject, String message);
 }
