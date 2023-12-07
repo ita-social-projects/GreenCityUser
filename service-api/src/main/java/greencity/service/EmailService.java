@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
@@ -36,14 +35,6 @@ public interface EmailService {
      */
     void sendNewNewsForSubscriber(List<NewsSubscriberResponseDto> subscribers,
         AddEcoNewsDtoResponse newsDto);
-
-    /**
-     * Method for sending notification to the event organizer about the
-     * EventComment. addition
-     *
-     * @param dto - includes all information about EventComment and author.
-     */
-    void sendNewCommentForEventOrganizer(EventCommentForSendEmailDto dto);
 
     /**
      * Method for sending created news for author.

@@ -4,9 +4,6 @@ import greencity.ModelUtils;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventAuthorDto;
-import greencity.dto.eventcomment.EventCommentAuthorDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
@@ -25,7 +22,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -105,29 +101,6 @@ class EmailServiceImplTest {
             Collections.singletonList(new NewsSubscriberResponseDto("test@gmail.com", "someUnsubscribeToken"));
         AddEcoNewsDtoResponse addEcoNewsDtoResponse = ModelUtils.getAddEcoNewsDtoResponse();
         service.sendNewNewsForSubscriber(newsSubscriberResponseDtos, addEcoNewsDtoResponse);
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendNewCommentForEventOrganizer() {
-        var dto = EventCommentForSendEmailDto.builder()
-            .id(1L)
-            .email("inna@gmail.com")
-            .createdDate(LocalDateTime.MIN)
-            .text("new comment")
-            .eventId(2L)
-            .author(EventCommentAuthorDto.builder()
-                .id(3L)
-                .name("Author")
-                .build())
-            .organizer(EventAuthorDto.builder()
-                .id(4L)
-                .name("Organizer")
-                .build())
-            .build();
-
-        service.sendNewCommentForEventOrganizer(dto);
-
         verify(javaMailSender).createMimeMessage();
     }
 
@@ -244,7 +217,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendEmailNotificationToNullEmailTest() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(WrongEmailException.class,
             () -> service.sendEmailNotification(null, "testSubject", "testMessage"));
     }
 }

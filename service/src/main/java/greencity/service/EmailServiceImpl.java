@@ -5,7 +5,6 @@ import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
@@ -25,7 +24,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
@@ -122,19 +120,6 @@ public class EmailServiceImpl implements EmailService {
             String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
             sendEmail(dto.getEmail(), EmailConstants.NEWS, template);
         }
-    }
-
-    @Override
-    public void sendNewCommentForEventOrganizer(EventCommentForSendEmailDto dto) {
-        Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.USER_NAME, dto.getOrganizer().getName());
-        model.put(EmailConstants.AUTHOR_NAME, dto.getAuthor().getName());
-        model.put(EmailConstants.COMMENT_BODY, dto.getText());
-        model.put(EmailConstants.COMMENT_TIME, dto.getCreatedDate());
-        String eventLink = clientLink + "#/events/" + dto.getEventId();
-        model.put(EmailConstants.CLIENT_LINK, eventLink);
-        String template = createEmailTemplate(model, EmailConstants.NEW_EVENT_COMMENT_EMAIL_PAGE);
-        sendEmail(dto.getEmail(), EmailConstants.EVENT_COMMENT, template);
     }
 
     @Override
