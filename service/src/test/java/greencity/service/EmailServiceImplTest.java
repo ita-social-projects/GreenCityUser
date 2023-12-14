@@ -12,6 +12,7 @@ import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.WrongEmailException;
+import greencity.message.GeneralEmailMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -207,7 +208,8 @@ class EmailServiceImplTest {
 
     @Test
     void sendEmailNotificationTest() {
-        assertDoesNotThrow(() -> service.sendEmailNotification("test@gmail.com", "testSubject", "testMessage"));
+        assertDoesNotThrow(() -> service
+            .sendEmailNotification(new GeneralEmailMessage("test@gmail.com", "testSubject", "testMessage")));
         await().atMost(5, SECONDS)
             .untilAsserted(() -> javaMailSender.send(any(MimeMessage.class)));
     }
@@ -215,6 +217,6 @@ class EmailServiceImplTest {
     @Test
     void sendEmailNotificationToNullEmailTest() {
         assertThrows(WrongEmailException.class,
-            () -> service.sendEmailNotification(null, "testSubject", "testMessage"));
+            () -> service.sendEmailNotification(new GeneralEmailMessage(null, "testSubject", "testMessage")));
     }
 }

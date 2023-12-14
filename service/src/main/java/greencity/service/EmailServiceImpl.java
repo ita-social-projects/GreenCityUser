@@ -12,6 +12,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.message.GeneralEmailMessage;
 import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
@@ -285,7 +286,7 @@ public class EmailServiceImpl implements EmailService {
      * @author Yurii Midianyi
      */
     @Override
-    public void sendEmailNotification(String email, String subject, String message) {
-        sendEmail(email, subject, message);
+    public void sendEmailNotification(GeneralEmailMessage notification) {
+        sendEmail(notification.getEmail(), notification.getSubject(), notification.getMessage());
     }
 }

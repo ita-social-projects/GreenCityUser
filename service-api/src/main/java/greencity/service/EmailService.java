@@ -9,6 +9,8 @@ import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.message.GeneralEmailMessage;
+
 import java.util.List;
 import java.util.Map;
 
@@ -132,11 +134,8 @@ public interface EmailService {
     /**
      * Method for sending general email notifications.
      *
-     * @param email   letter is sent to this email.
-     * @param subject subject of the email message.
-     * @param message subject of the email message.
-     *
+     * @param notification {@link GeneralEmailMessage}
      * @author Yurii Midianyi
      */
-    void sendEmailNotification(String email, String subject, String message);
+    void sendEmailNotification(GeneralEmailMessage notification);
 }

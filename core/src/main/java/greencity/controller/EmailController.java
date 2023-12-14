@@ -102,8 +102,7 @@ public class EmailController {
     @PostMapping("/general/notification")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> sendEmailNotification(@RequestBody GeneralEmailMessage notification) {
-        emailService.sendEmailNotification(notification.getEmail(), notification.getSubject(),
-            notification.getMessage());
+        emailService.sendEmailNotification(notification);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
