@@ -216,7 +216,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendEmailNotificationToNullEmailTest() {
-        assertThrows(WrongEmailException.class,
-            () -> service.sendEmailNotification(new GeneralEmailMessage(null, "testSubject", "testMessage")));
+        GeneralEmailMessage emailMessage = new GeneralEmailMessage(null, "testSubject", "testMessage");
+        assertThrows(WrongEmailException.class, () -> service.sendEmailNotification(emailMessage));
     }
 }
