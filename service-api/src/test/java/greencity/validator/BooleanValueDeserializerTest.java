@@ -2,6 +2,7 @@ package greencity.validator;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import greencity.exception.exceptions.NotValidBooleanValueException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -16,12 +17,12 @@ class BooleanValueDeserializerTest {
     @Test
     void deserializeInvalidBooleanTest() throws IOException {
         JsonParser jsonParser = objectMapper.getFactory().createParser("invalid value");
-        assertThrows(RuntimeException.class, () -> deserializer.deserialize(jsonParser, null));
+        assertThrows(NotValidBooleanValueException.class, () -> deserializer.deserialize(jsonParser, null));
     }
 
     @Test
     void deserializeMissingValueTest() throws IOException {
         JsonParser jsonParser = objectMapper.getFactory().createParser("");
-        assertThrows(RuntimeException.class, () -> deserializer.deserialize(jsonParser, null));
+        assertThrows(NotValidBooleanValueException.class, () -> deserializer.deserialize(jsonParser, null));
     }
 }
