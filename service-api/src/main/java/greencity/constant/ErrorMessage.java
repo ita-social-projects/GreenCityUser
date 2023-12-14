@@ -8,11 +8,6 @@ public final class ErrorMessage {
     public static final String IMPOSSIBLE_UPDATE_USER_STATUS = "Impossible to update status of admin or moderator";
     public static final String PROFILE_PICTURE_NOT_FOUND_BY_ID = "Profile picture not found by id : ";
     public static final String IMAGE_EXISTS = "Image should be download, PNG or JPEG ";
-    public static final String OWN_USER_ID = "You can not perform actions with your own id : ";
-    public static final String USER_FRIENDS_LIST = "You don't have a friend with this id : ";
-    public static final String FRIEND_EXISTS = "Friend with this id has already been added : ";
-    public static final String NOT_FOUND_REQUEST = "Not found friend request from user with id: ";
-    public static final String NOT_FOUND_ANY_FRIENDS = "Not found any friends by id: ";
     public static final String USER_CANNOT_ADD_MORE_THAN_5_SOCIAL_NETWORK_LINKS =
         "User cannot add more than 5 social network links";
     public static final String INVALID_URI = "The string could not be parsed as a URI reference.";
@@ -44,6 +39,7 @@ public final class ErrorMessage {
     public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
     public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
     public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
+    public static final String NOT_VALID_BOOLEAN_VALUE = "%s is not a valid Boolean value for %s";
 
     private ErrorMessage() {
     }
