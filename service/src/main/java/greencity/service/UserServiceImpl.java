@@ -622,15 +622,10 @@ public class UserServiceImpl implements UserService {
                     .build())
                 .collect(Collectors.toList()));
         }
-        if (userProfileDtoRequest.getShowLocation() != null) {
-            user.setShowLocation(userProfileDtoRequest.getShowLocation());
-        }
-        if (userProfileDtoRequest.getShowEcoPlace() != null) {
-            user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
-        }
-        if (userProfileDtoRequest.getShowShoppingList() != null) {
-            user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-        }
+        user.setShowLocation(userProfileDtoRequest.getShowLocation());
+        user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
+        user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
+
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
