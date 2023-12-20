@@ -4,21 +4,15 @@ import greencity.ModelUtils;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventAuthorDto;
-import greencity.dto.eventcomment.EventCommentAuthorDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
-import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.entity.User;
 import greencity.exception.exceptions.LanguageNotSupportedException;
-import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongEmailException;
-import greencity.repository.UserRepo;
+import greencity.message.GeneralEmailMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,20 +20,19 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
-
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Executors;
-
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -51,13 +44,11 @@ class EmailServiceImplTest {
     private JavaMailSender javaMailSender;
     @Mock
     private ITemplateEngine templateEngine;
-    @Mock
-    private UserRepo userRepo;
 
     @BeforeEach
     public void setup() {
         initMocks(this);
-        service = new EmailServiceImpl(javaMailSender, templateEngine, userRepo, Executors.newCachedThreadPool(),
+        service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
             "http://localhost:4200", "http://localhost:4200", "http://localhost:8080",
             "test@email.com");
         placeAuthorDto = PlaceAuthorDto.builder()
@@ -108,29 +99,6 @@ class EmailServiceImplTest {
             Collections.singletonList(new NewsSubscriberResponseDto("test@gmail.com", "someUnsubscribeToken"));
         AddEcoNewsDtoResponse addEcoNewsDtoResponse = ModelUtils.getAddEcoNewsDtoResponse();
         service.sendNewNewsForSubscriber(newsSubscriberResponseDtos, addEcoNewsDtoResponse);
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendNewCommentForEventOrganizer() {
-        var dto = EventCommentForSendEmailDto.builder()
-            .id(1L)
-            .email("inna@gmail.com")
-            .createdDate(LocalDateTime.MIN)
-            .text("new comment")
-            .eventId(2L)
-            .author(EventCommentAuthorDto.builder()
-                .id(3L)
-                .name("Author")
-                .build())
-            .organizer(EventAuthorDto.builder()
-                .id(4L)
-                .name("Organizer")
-                .build())
-            .build();
-
-        service.sendNewCommentForEventOrganizer(dto);
-
         verify(javaMailSender).createMimeMessage();
     }
 
@@ -232,31 +200,23 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendNotificationByEmail() {
-        User user = User.builder().build();
-        NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-        service.sendNotificationByEmail(dto, "test@gmail.com");
-        verify(userRepo).findByEmail(anyString());
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendNotificationByEmailNotFoundException() {
-        NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
-        assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
-    }
-
-    @Test
-    void sendEventCreatedNotificationTest() {
-        service.sendEventCreationNotification("test@gmail.com", "message");
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
     void sendUserViolationEmailWithUnsupportedLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("de");
         assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+    }
+
+    @Test
+    void sendEmailNotificationTest() {
+        assertDoesNotThrow(() -> service
+            .sendEmailNotification(new GeneralEmailMessage("test@gmail.com", "testSubject", "testMessage")));
+        await().atMost(5, SECONDS)
+            .untilAsserted(() -> javaMailSender.send(any(MimeMessage.class)));
+    }
+
+    @Test
+    void sendEmailNotificationToNullEmailTest() {
+        GeneralEmailMessage emailMessage = new GeneralEmailMessage(null, "testSubject", "testMessage");
+        assertThrows(WrongEmailException.class, () -> service.sendEmailNotification(emailMessage));
     }
 }

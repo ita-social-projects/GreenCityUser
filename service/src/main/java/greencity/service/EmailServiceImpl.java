@@ -1,21 +1,18 @@
 package greencity.service;
 
 import greencity.constant.EmailConstants;
-import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
-import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
-import greencity.exception.exceptions.NotFoundException;
+import greencity.message.GeneralEmailMessage;
 import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
@@ -28,7 +25,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
-
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
@@ -47,7 +43,6 @@ import java.util.concurrent.Executor;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender javaMailSender;
     private final ITemplateEngine templateEngine;
-    private final UserRepo userRepo;
     private final Executor executor;
     private final String clientLink;
     private final String ecoNewsLink;
@@ -61,7 +56,6 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender,
         ITemplateEngine templateEngine,
-        UserRepo userRepo,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
         @Value("${econews.address}") String ecoNewsLink,
@@ -69,7 +63,6 @@ public class EmailServiceImpl implements EmailService {
         @Value("${sender.email.address}") String senderEmailAddress) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
-        this.userRepo = userRepo;
         this.executor = executor;
         this.clientLink = clientLink;
         this.ecoNewsLink = ecoNewsLink;
@@ -125,19 +118,6 @@ public class EmailServiceImpl implements EmailService {
             String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
             sendEmail(dto.getEmail(), EmailConstants.NEWS, template);
         }
-    }
-
-    @Override
-    public void sendNewCommentForEventOrganizer(EventCommentForSendEmailDto dto) {
-        Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.USER_NAME, dto.getOrganizer().getName());
-        model.put(EmailConstants.AUTHOR_NAME, dto.getAuthor().getName());
-        model.put(EmailConstants.COMMENT_BODY, dto.getText());
-        model.put(EmailConstants.COMMENT_TIME, dto.getCreatedDate());
-        String eventLink = clientLink + "#/events/" + dto.getEventId();
-        model.put(EmailConstants.CLIENT_LINK, eventLink);
-        String template = createEmailTemplate(model, EmailConstants.NEW_EVENT_COMMENT_EMAIL_PAGE);
-        sendEmail(dto.getEmail(), EmailConstants.EVENT_COMMENT, template);
     }
 
     @Override
@@ -289,15 +269,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendNotificationByEmail(NotificationDto notification, String email) {
-        if (userRepo.findByEmail(email).isPresent()) {
-            sendEmail(email, notification.getTitle(), notification.getBody());
-        } else {
-            throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
-        }
-    }
-
-    @Override
     public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
         String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
@@ -309,9 +280,13 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @author Yurii Midianyi
+     */
     @Override
-    public void sendEventCreationNotification(String email, String messageBody) {
-        String subject = "Notification about event creation status";
-        sendEmail(email, subject, messageBody);
+    public void sendEmailNotification(GeneralEmailMessage notification) {
+        sendEmail(notification.getEmail(), notification.getSubject(), notification.getMessage());
     }
 }

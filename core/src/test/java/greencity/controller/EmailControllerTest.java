@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
-import greencity.dto.notification.NotificationDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.message.GeneralEmailMessage;
 import greencity.message.SendChangePlaceStatusEmailMessage;
-import greencity.message.SendEventCreationNotification;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
@@ -22,8 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -66,27 +64,6 @@ class EmailControllerTest {
         EcoNewsForSendEmailDto message = objectMapper.readValue(content, EcoNewsForSendEmailDto.class);
 
         verify(emailService).sendCreatedNewsForAuthor(message);
-    }
-
-    @Test
-    void addEventComment() throws Exception {
-        String content =
-            "{\"id\":\"1\"," +
-                "\"createdDate\":\"2021-02-05T15:10:22.434Z\"," +
-                "\"text\":\"string\"," +
-                "\"organizer\":{\"id\":0,\"name\":\"string\",\"userProfilePicturePath\":\"string\" }," +
-                "\"author\":{\"id\":0,\"name\":\"string\",\"organizerRating\":\"1.0\" }," +
-                "\"eventId\":\"2\"," +
-                "\"email\":\"inna@gmail.com\"}";
-
-        mockPerform(content, "/addEventComment");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.registerModule(new JavaTimeModule());
-        EventCommentForSendEmailDto message = objectMapper.readValue(content, EventCommentForSendEmailDto.class);
-
-        verify(emailService).sendNewCommentForEventOrganizer(message);
     }
 
     @Test
@@ -171,39 +148,14 @@ class EmailControllerTest {
 
     @Test
     @SneakyThrows
-    void sendUserNotification() {
-        String content = "{" +
-            "\"title\":\"title\"," +
-            "\"body\":\"body\"" +
-            "}";
-        String email = "email@mail.com";
-
-        mockMvc.perform(post(LINK + "/notification")
+    void sendEmailNotificationTest() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        GeneralEmailMessage emailMessage = new GeneralEmailMessage("test@example.com", "Test Subject", "Test Message");
+        String jsonRequest = objectMapper.writeValueAsString(emailMessage);
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/general/notification")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(content)
-            .param("email", email))
+            .content(jsonRequest))
             .andExpect(status().isOk());
-
-        NotificationDto notification = new ObjectMapper().readValue(content, NotificationDto.class);
-        verify(emailService).sendNotificationByEmail(notification, email);
     }
 
-    @Test
-    @SneakyThrows
-    void sendEventCreatedNotificationTest() {
-        String content = "{" +
-            "\"email\":\"email@mail.com\"," +
-            "\"messageBody\":\"messageBody\"" +
-            "}";
-        String email = "email@mail.com";
-
-        mockMvc.perform(post(LINK + "/sendEventNotification")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(content))
-            .andExpect(status().isOk());
-
-        SendEventCreationNotification notification = new ObjectMapper()
-            .readValue(content, SendEventCreationNotification.class);
-        verify(emailService).sendEventCreationNotification(email, notification.getMessageBody());
-    }
 }
