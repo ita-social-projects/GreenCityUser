@@ -132,5 +132,11 @@
             <artifactId>google-maps-services</artifactId>
             <version>${google.maps.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>3.1.6</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

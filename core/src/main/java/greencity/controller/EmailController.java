@@ -2,11 +2,9 @@ package greencity.controller;
 
 import greencity.constant.HttpStatuses;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
-import greencity.dto.notification.NotificationDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.message.GeneralEmailMessage;
 import greencity.message.SendChangePlaceStatusEmailMessage;
-import greencity.message.SendEventCreationNotification;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
@@ -33,18 +31,6 @@ public class EmailController {
     @PostMapping("/addEcoNews")
     public ResponseEntity<Object> addEcoNews(@RequestBody EcoNewsForSendEmailDto message) {
         emailService.sendCreatedNewsForAuthor(message);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
-     * Method for sending notification to the event organizer about the EventComment
-     * addition.
-     *
-     * @param message - object with all necessary data for sending email
-     */
-    @PostMapping("/addEventComment")
-    public ResponseEntity<Object> addEventComment(@RequestBody EventCommentForSendEmailDto message) {
-        emailService.sendNewCommentForEventOrganizer(message);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
@@ -104,40 +90,19 @@ public class EmailController {
     /**
      * Sends notification to user on email.
      *
-     * @param notification {@link NotificationDto} - object with all necessary data
-     *                     for sending notification via email.
-     * @param email        {@link String} - user's email.
-     * @author Ann Sakhno
+     * @param notification {@link GeneralEmailMessage} - object with all necessary
+     *                     data for sending notification via email.
+     * @author Yurii Midianyi
      */
-    @ApiOperation(value = "Send notification to user via email")
-    @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
-    })
-    @PostMapping("/notification")
-    public ResponseEntity<Object> sendUserNotification(@RequestBody NotificationDto notification,
-        @RequestParam("email") String email) {
-        emailService.sendNotificationByEmail(notification, email);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
-     * Sends email notification about event status when it has been created by user.
-     *
-     * @param notification - object with all necessary data for sending notification
-     *                     via email
-     * @author Olena Sotnik
-     */
-    @ApiOperation(value = "Send event creation notification to user via email")
+    @ApiOperation(value = "Send general email notification")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
         @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
     })
-    @PostMapping("/sendEventNotification")
+    @PostMapping("/general/notification")
     @ResponseStatus(HttpStatus.OK)
-    public void sendEventNotification(@RequestBody SendEventCreationNotification notification) {
-        emailService.sendEventCreationNotification(notification.getEmail(), notification.getMessageBody());
+    public ResponseEntity<Object> sendEmailNotification(@RequestBody GeneralEmailMessage notification) {
+        emailService.sendEmailNotification(notification);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
