@@ -26,7 +26,6 @@ import java.time.LocalDateTime;
 @Slf4j
 @RequiredArgsConstructor
 public class VerifyEmailServiceImpl implements VerifyEmailService {
-
     private final VerifyEmailRepo verifyEmailRepo;
     private final UserRepo userRepo;
     private final RestClient restClient;

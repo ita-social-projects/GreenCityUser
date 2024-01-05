@@ -1,7 +1,6 @@
 package greencity.constant;
 
 public final class ErrorMessage {
-
     public static final String USER_NOT_FOUND_BY_ID = "The user does not exist by this id: ";
     public static final String USER_ID_IS_NULL = "User id is null";
     public static final String USER_NOT_FOUND_BY_UUID = "The user does not exist by this uuid: ";

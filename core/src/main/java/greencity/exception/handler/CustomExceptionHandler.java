@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 @Slf4j
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
-
     private ErrorAttributes errorAttributes;
 
     /**
@@ -385,7 +384,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(BadVerifyEmailTokenException.class)
     public final ResponseEntity<Object> handleBadVerifyEmailTokenException(
         BadVerifyEmailTokenException exception, WebRequest request) {
-
         log.error(exception.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
 

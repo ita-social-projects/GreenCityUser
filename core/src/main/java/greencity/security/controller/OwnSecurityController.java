@@ -44,7 +44,6 @@ import static greencity.constant.ValidationConstants.USER_CREATED;
 @Validated
 @Slf4j
 public class OwnSecurityController {
-
     private final OwnSecurityService service;
     private final VerifyEmailService verifyEmailService;
     private final PasswordRecoveryService passwordRecoveryService;
