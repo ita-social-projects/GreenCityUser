@@ -27,51 +27,51 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class VerifyEmailServiceImpl implements VerifyEmailService {
 
-  private final VerifyEmailRepo verifyEmailRepo;
-  private final UserRepo userRepo;
-  private final RestClient restClient;
-  private final ModelMapper modelMapper;
+    private final VerifyEmailRepo verifyEmailRepo;
+    private final UserRepo userRepo;
+    private final RestClient restClient;
+    private final ModelMapper modelMapper;
 
-  /**
-   * {@inheritDoc}
-   */
-  @Transactional
-  @Override
-  public Boolean verifyByToken(Long userId, String token) {
-    if (userId == null) {
-      throw new WrongIdException(ErrorMessage.USER_ID_IS_NULL);
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public Boolean verifyByToken(Long userId, String token) {
+        if (userId == null) {
+            throw new WrongIdException(ErrorMessage.USER_ID_IS_NULL);
+        }
+
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+
+        VerifyEmail verifyEmail = verifyEmailRepo
+            .findByTokenAndUserId(userId, token)
+            .orElseThrow(() -> new BadVerifyEmailTokenException(
+                ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN));
+
+        if (isNotExpired(verifyEmail.getExpiryDate())) {
+            int rows = verifyEmailRepo.deleteVerifyEmailByTokenAndUserId(userId, token);
+            user.setUserStatus(UserStatus.ACTIVATED);
+            userRepo.save(user);
+            log.info("User has successfully verify the email by token {}. Records deleted {}.", token,
+                rows);
+            UbsProfileCreationDto ubsProfile = modelMapper.map(user, UbsProfileCreationDto.class);
+            Long ubsProfileId = restClient.createUbsProfile(ubsProfile);
+            log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId,
+                user.getUuid());
+            return true;
+        } else {
+            log.info("User didn't verify his/her email on time with token {}.", token);
+            throw new UserActivationEmailTokenExpiredException(ErrorMessage.EMAIL_TOKEN_EXPIRED);
+        }
     }
 
-    User user = userRepo.findById(userId)
-        .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
-
-    VerifyEmail verifyEmail = verifyEmailRepo
-        .findByTokenAndUserId(userId, token)
-        .orElseThrow(() -> new BadVerifyEmailTokenException(
-            ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN));
-
-    if (isNotExpired(verifyEmail.getExpiryDate())) {
-      int rows = verifyEmailRepo.deleteVerifyEmailByTokenAndUserId(userId, token);
-      user.setUserStatus(UserStatus.ACTIVATED);
-      userRepo.save(user);
-      log.info("User has successfully verify the email by token {}. Records deleted {}.", token,
-          rows);
-      UbsProfileCreationDto ubsProfile = modelMapper.map(user, UbsProfileCreationDto.class);
-      Long ubsProfileId = restClient.createUbsProfile(ubsProfile);
-      log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId,
-          user.getUuid());
-      return true;
-    } else {
-      log.info("User didn't verify his/her email on time with token {}.", token);
-      throw new UserActivationEmailTokenExpiredException(ErrorMessage.EMAIL_TOKEN_EXPIRED);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isNotExpired(LocalDateTime emailExpiredDate) {
+        return LocalDateTime.now().isBefore(emailExpiredDate);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isNotExpired(LocalDateTime emailExpiredDate) {
-    return LocalDateTime.now().isBefore(emailExpiredDate);
-  }
 }
