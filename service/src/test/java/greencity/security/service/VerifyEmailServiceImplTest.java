@@ -6,6 +6,7 @@ import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.UserStatus;
+import greencity.exception.exceptions.BadVerifyEmailTokenException;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.repository.UserRepo;
@@ -94,6 +95,21 @@ class VerifyEmailServiceImplTest {
 
         assertEquals(expectedExceptionMessage + userId, exception.getMessage());
     }
+
+    @Test
+    void verifyByTokenNoTokenFoundTest() {
+        String expectedExceptionMessage = ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN;
+
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(verifyEmailRepo.findByTokenAndUserId(1L, "nonexistent_token")).thenReturn(Optional.empty());
+
+        BadVerifyEmailTokenException exception = assertThrows(BadVerifyEmailTokenException.class, () -> {
+            verifyEmailService.verifyByToken(1L, "nonexistent_token");
+        });
+
+        assertEquals(expectedExceptionMessage, exception.getMessage());
+    }
+
 
     /*
      * @Test void deleteAllUsersThatDidNotVerifyEmailTest() {

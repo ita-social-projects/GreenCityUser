@@ -2,6 +2,7 @@ package greencity.security.controller;
 
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
+import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import greencity.security.dto.ownsecurity.*;
 import greencity.dto.user.UserAdminRegistrationDto;
@@ -129,7 +130,8 @@ public class OwnSecurityController {
     @ApiOperation("Verify email by email token (hash that contains link for verification)")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 401, message = NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN)
+        @ApiResponse(code = 401, message = NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN),
+        @ApiResponse(code = 404, message = USER_ID_IS_NULL)
     })
     @GetMapping("/verifyEmail")
     public ResponseEntity<Boolean> verify(@RequestParam @NotBlank String token,
