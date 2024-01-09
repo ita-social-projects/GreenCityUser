@@ -1,11 +1,13 @@
 package greencity.security.service;
 
 import greencity.client.RestClient;
+import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
+import greencity.exception.exceptions.WrongIdException;
 import greencity.repository.UserRepo;
 import greencity.security.repository.VerifyEmailRepo;
 import org.junit.jupiter.api.Assertions;
@@ -20,6 +22,8 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static greencity.ModelUtils.getUbsProfileCreationDto;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,8 +68,31 @@ class VerifyEmailServiceImplTest {
         verifyEmail.setExpiryDate(LocalDateTime.MIN);
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(verifyEmailRepo.findByTokenAndUserId(1L, "token")).thenReturn(Optional.of(verifyEmail));
-        Assertions.assertThrows(UserActivationEmailTokenExpiredException.class,
+        assertThrows(UserActivationEmailTokenExpiredException.class,
             () -> verifyEmailService.verifyByToken(1L, "token"));
+    }
+
+    @Test
+    void verifyByTokenNullUserIdTest() {
+        String expectedExceptionMessage = ErrorMessage.USER_ID_IS_NULL;
+
+        WrongIdException exception = assertThrows(WrongIdException.class, () -> {
+            verifyEmailService.verifyByToken(null, "token");
+        });
+
+        assertEquals(expectedExceptionMessage, exception.getMessage());
+    }
+
+    @Test
+    void verifyByTokenNegativeUserIdTest() {
+        Long userId = -1L;
+        String expectedExceptionMessage = ErrorMessage.USER_NOT_FOUND_BY_ID;
+
+        WrongIdException exception = assertThrows(WrongIdException.class, () -> {
+            verifyEmailService.verifyByToken(userId, "token");
+        });
+
+        assertEquals(expectedExceptionMessage + userId, exception.getMessage());
     }
 
     /*
