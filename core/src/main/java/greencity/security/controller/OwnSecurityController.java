@@ -2,6 +2,7 @@ package greencity.security.controller;
 
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
+import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import greencity.security.dto.ownsecurity.*;
 import greencity.dto.user.UserAdminRegistrationDto;
@@ -80,7 +81,8 @@ public class OwnSecurityController {
     @ApiLocale
     public ResponseEntity<SuccessSignUpDto> singUp(@Valid @RequestBody OwnSignUpDto dto,
         @ApiIgnore @ValidLanguage Locale locale) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.signUp(dto, locale.getLanguage()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(service.signUp(dto, locale.getLanguage()));
     }
 
     /**
@@ -99,7 +101,8 @@ public class OwnSecurityController {
     @ApiLocale
     public ResponseEntity<SuccessSignUpDto> singUpEmployee(@Valid @RequestBody EmployeeSignUpDto dto,
         @ApiIgnore @ValidLanguage Locale locale) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.signUpEmployee(dto, locale.getLanguage()));
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(service.signUpEmployee(dto, locale.getLanguage()));
     }
 
     /**
@@ -127,12 +130,14 @@ public class OwnSecurityController {
     @ApiOperation("Verify email by email token (hash that contains link for verification)")
     @ApiResponses(value = {
         @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = NO_ANY_EMAIL_TO_VERIFY_BY_THIS_TOKEN)
+        @ApiResponse(code = 401, message = NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN),
+        @ApiResponse(code = 404, message = USER_ID_IS_NULL)
     })
     @GetMapping("/verifyEmail")
     public ResponseEntity<Boolean> verify(@RequestParam @NotBlank String token,
         @RequestParam("user_id") Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(verifyEmailService.verifyByToken(userId, token));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(verifyEmailService.verifyByToken(userId, token));
     }
 
     /**
@@ -244,7 +249,8 @@ public class OwnSecurityController {
         @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED)
     })
     @GetMapping("/password-status")
-    public ResponseEntity<PasswordStatusDto> passwordStatus(@ApiIgnore @AuthenticationPrincipal Principal principal) {
+    public ResponseEntity<PasswordStatusDto> passwordStatus(
+        @ApiIgnore @AuthenticationPrincipal Principal principal) {
         String email = principal.getName();
         return ResponseEntity.ok().body(new PasswordStatusDto(service.hasPassword(email)));
     }

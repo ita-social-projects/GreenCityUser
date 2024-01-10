@@ -37,19 +37,28 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
     @Transactional
     @Override
     public Boolean verifyByToken(Long userId, String token) {
-        VerifyEmail verifyEmail = verifyEmailRepo
-            .findByTokenAndUserId(userId, token)
-            .orElseThrow(() -> new BadVerifyEmailTokenException(ErrorMessage.NO_ANY_EMAIL_TO_VERIFY_BY_THIS_TOKEN));
+        if (userId == null) {
+            throw new WrongIdException(ErrorMessage.USER_ID_IS_NULL);
+        }
+
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+
+        VerifyEmail verifyEmail = verifyEmailRepo
+            .findByTokenAndUserId(userId, token)
+            .orElseThrow(() -> new BadVerifyEmailTokenException(
+                ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN));
+
         if (isNotExpired(verifyEmail.getExpiryDate())) {
             int rows = verifyEmailRepo.deleteVerifyEmailByTokenAndUserId(userId, token);
             user.setUserStatus(UserStatus.ACTIVATED);
             userRepo.save(user);
-            log.info("User has successfully verify the email by token {}. Records deleted {}.", token, rows);
+            log.info("User has successfully verify the email by token {}. Records deleted {}.", token,
+                rows);
             UbsProfileCreationDto ubsProfile = modelMapper.map(user, UbsProfileCreationDto.class);
             Long ubsProfileId = restClient.createUbsProfile(ubsProfile);
-            log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId, user.getUuid());
+            log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId,
+                user.getUuid());
             return true;
         } else {
             log.info("User didn't verify his/her email on time with token {}.", token);
