@@ -1,8 +1,8 @@
 package greencity.dto.user;
 
 import greencity.dto.socialnetwork.SocialNetworkResponseDTO;
-import java.util.List;
 import greencity.enums.Role;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

@@ -1,25 +1,24 @@
 package greencity.security.jwt;
 
+import static greencity.constant.AppConstant.ROLE;
 import greencity.dto.user.UserVO;
 import greencity.enums.Role;
 import io.jsonwebtoken.Jwts;
+import jakarta.servlet.http.HttpServletRequest;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import static greencity.constant.AppConstant.ROLE;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 /**
  * @author Yurii Koval
@@ -48,17 +47,19 @@ class JwtToolTest {
         System.out.println(accessToken);
         String actualEmail = Jwts.parser()
             .setSigningKey(jwtTool.getAccessTokenKey())
+            .build()
             .parseClaimsJws(accessToken)
-            .getBody()
+            .getPayload()
             .getSubject();
         assertEquals(expectedEmail, actualEmail);
         @SuppressWarnings({"unchecked, rawtype"})
         List<String> authorities = (List<String>) Jwts.parser()
             .setSigningKey(jwtTool.getAccessTokenKey())
+            .build()
             .parseClaimsJws(accessToken)
-            .getBody()
+            .getPayload()
             .get(ROLE);
-        assertEquals(expectedRole, Role.valueOf(authorities.get(0)));
+        assertEquals(expectedRole, Role.valueOf(authorities.getFirst()));
     }
 
     @Test
@@ -71,25 +72,29 @@ class JwtToolTest {
         String refreshToken = jwtTool.createRefreshToken(userVO);
         String actualEmail = Jwts.parser()
             .setSigningKey(userVO.getRefreshTokenKey())
+            .build()
             .parseClaimsJws(refreshToken)
-            .getBody()
+            .getPayload()
             .getSubject();
         assertEquals(expectedEmail, actualEmail);
         @SuppressWarnings({"unchecked, rawtype"})
         List<String> authorities = (List<String>) Jwts.parser()
             .setSigningKey(userVO.getRefreshTokenKey())
+            .build()
             .parseClaimsJws(refreshToken)
             .getBody()
             .get(ROLE);
-        assertEquals(expectedRole, Role.valueOf(authorities.get(0)));
+        assertEquals(expectedRole, Role.valueOf(authorities.getFirst()));
     }
 
     @Test
     void getEmailOutOfAccessToken() {
-        String actualEmail = jwtTool.getEmailOutOfAccessToken("eyJhbGciOiJIUzI1NiJ9"
-            + ".eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGh"
-            + "vcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE1NzU4MzY5NjUsImV4cCI6OTk5OTk5OTk5OTk5fQ"
-            + ".YFicrqBFN0Q662HqkI2P8yuykgvJjiTgUqsUhN4ICHI");
+        String actualEmail = jwtTool.getEmailOutOfAccessToken("""
+            eyJhbGciOiJIUzI1NiJ9\
+            .eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGh\
+            vcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE1NzU4MzY5NjUsImV4cCI6OTk5OTk5OTk5OTk5fQ\
+            .YFicrqBFN0Q662HqkI2P8yuykgvJjiTgUqsUhN4ICHI\
+            """);
         assertEquals(expectedEmail, actualEmail);
     }
 
@@ -97,22 +102,27 @@ class JwtToolTest {
     void isTokenValidWithInvalidTokenTest() {
         String random = UUID.randomUUID().toString();
         assertFalse(jwtTool.isTokenValid(random, jwtTool.getAccessTokenKey()));
-        boolean valid = jwtTool.isTokenValid("eyJhbGciOiJIUzI1NiJ9"
-            + ".eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUi"
-            + "JdLCJpYXQiOjE1NzU4MzY5NjUsImV4cCI6MTU3NTgzNzg2NX0"
-            + ".1kVcts6LCzUov-j0zMQqRXqIxeChUUv2gsw_zoLXtc8", jwtTool.getAccessTokenKey());
+        boolean valid = jwtTool.isTokenValid("""
+            eyJhbGciOiJIUzI1NiJ9\
+            .eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUi\
+            JdLCJpYXQiOjE1NzU4MzY5NjUsImV4cCI6MTU3NTgzNzg2NX0\
+            .1kVcts6LCzUov-j0zMQqRXqIxeChUUv2gsw_zoLXtc8\
+            """, jwtTool.getAccessTokenKey());
         assertFalse(valid);
     }
 
     @Test
     void isTokenValidWithValidTokenTest() {
-        final String accessToken = "eyJhbGciOiJIUzI1NiJ9"
-            + ".eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVN"
-            + "FUiJdLCJpYXQiOjE1NzU4NDUzNTAsImV4cCI6NjE1NzU4NDUyOTB9"
-            + ".x1D799yGc0dj2uWDQYusnLyG5r6-Rjj6UgBhp2JjVDE";
+        final String accessToken = """
+            eyJhbGciOiJIUzI1NiJ9\
+            .eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVN\
+            FUiJdLCJpYXQiOjE1NzU4NDUzNTAsImV4cCI6NjE1NzU4NDUyOTB9\
+            .x1D799yGc0dj2uWDQYusnLyG5r6-Rjj6UgBhp2JjVDE\
+            """;
         Date expectedExpiration = new Date(61575845290000L); // 3921 year
         Date actualExpiration = Jwts.parser()
             .setSigningKey(jwtTool.getAccessTokenKey())
+            .build()
             .parseClaimsJws(accessToken)
             .getBody()
             .getExpiration();

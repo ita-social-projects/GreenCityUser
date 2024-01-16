@@ -1,17 +1,15 @@
 package greencity.security.providers;
 
+import static greencity.constant.AppConstant.ROLE;
 import greencity.security.jwt.JwtTool;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.UnsupportedJwtException;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static greencity.constant.AppConstant.ROLE;
 
 /**
  * Class that provides authentication logic.
@@ -48,16 +46,17 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) {
         String email = Jwts.parser()
-            .setSigningKey(jwtTool.getAccessTokenKey())
+            .setSigningKey(jwtTool.getAccessTokenKey()).build()
             .parseClaimsJws(authentication.getName())
-            .getBody()
+            .getPayload()
             .getSubject();
         @SuppressWarnings({"unchecked, rawtype"})
         List<String> authorities = (List<String>) Jwts.parser()
-            .setSigningKey(jwtTool.getAccessTokenKey())
+            .setSigningKey(jwtTool.getAccessTokenKey()).build()
             .parseClaimsJws(authentication.getName())
-            .getBody()
+            .getPayload()
             .get(ROLE);
+
         return new UsernamePasswordAuthenticationToken(
             email,
             "",

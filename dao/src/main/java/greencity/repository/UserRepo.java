@@ -2,7 +2,6 @@ package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.entity.User;
-import greencity.entity.UserLocation;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
 import org.springframework.data.domain.Page;
@@ -13,8 +12,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.NamedNativeQuery;
+import jakarta.persistence.NamedNativeQuery;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -114,9 +112,11 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @return list of {@link User}.
      */
-    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND')"
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'));")
+    @Query(nativeQuery = true, value = """
+        SELECT * FROM users WHERE users.id IN ( \
+        (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND')\
+        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'));\
+        """)
     List<User> getAllUserFriends(Long userId);
 
     /**
@@ -126,18 +126,22 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return {@link Page}
      * @author Yurii Yhurakovskyi
      */
-    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND') "
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'))")
+    @Query(nativeQuery = true, value = """
+        SELECT * FROM users WHERE users.id IN ( \
+        (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND') \
+        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'))\
+        """)
     Page<User> getAllUserFriends(Long userId, Pageable pageable);
 
     /**
      * Get six friends with the highest rating {@link User}.
      */
-    @Query(nativeQuery = true, value = "SELECT * FROM users WHERE users.id IN ( "
-        + "(SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 'FRIEND') "
-        + "UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 'FRIEND')) "
-        + "ORDER BY users.rating DESC LIMIT 6;")
+    @Query(nativeQuery = true, value = """
+        SELECT * FROM users WHERE users.id IN ( \
+        (SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 'FRIEND') \
+        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 'FRIEND')) \
+        ORDER BY users.rating DESC LIMIT 6;\
+        """)
     List<User> getSixFriendsWithTheHighestRating(Long userId);
 
     /**
@@ -171,8 +175,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @author Vasyl Zhovnir
      **/
     @Modifying
-    @Query(nativeQuery = true, value = "DELETE FROM users where status = 1 "
-        + "AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP")
+    @Query(nativeQuery = true, value = """
+        DELETE FROM users where status = 1 \
+        AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP\
+        """)
     int scheduleDeleteDeactivatedUsers();
 
     /**
@@ -192,10 +198,12 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param query  query to search.
      * @return list of {@link User}.
      */
-    @Query("SELECT u FROM User u WHERE CONCAT(u.id,'') LIKE LOWER(CONCAT('%', :query, '%')) "
-        + "OR LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))"
-        + "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) "
-        + "OR LOWER(u.userCredo) LIKE LOWER(CONCAT('%', :query, '%'))")
+    @Query("""
+        SELECT u FROM User u WHERE CONCAT(u.id,'') LIKE LOWER(CONCAT('%', :query, '%')) \
+        OR LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))\
+        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) \
+        OR LOWER(u.userCredo) LIKE LOWER(CONCAT('%', :query, '%'))\
+        """)
     Page<User> searchBy(Pageable paging, String query);
 
     /**
@@ -206,8 +214,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @author Vasyl Zhovnir
      **/
     @Modifying
-    @Query(nativeQuery = true, value = "DELETE FROM users u WHERE u.user_status = 3 "
-        + "AND u.date_of_registration + interval '1 day' <= CURRENT_TIMESTAMP")
+    @Query(nativeQuery = true, value = """
+        DELETE FROM users u WHERE u.user_status = 3 \
+        AND u.date_of_registration + interval '1 day' <= CURRENT_TIMESTAMP\
+        """)
     int scheduleDeleteCreatedUsers();
 
     /**
@@ -253,20 +263,24 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Method that finds all users by name.
      */
-    @Query(nativeQuery = true, value = "select * from users u where u.id <> :userId and\n"
-        + " LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))")
+    @Query(nativeQuery = true, value = """
+        select * from users u where u.id <> :userId and
+         LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))\
+        """)
     Page<User> findAllUsersByName(String name, Pageable page, Long userId);
 
     /**
      * Method that returns count of mutual friends.
      */
-    @Query(nativeQuery = true, value = "SELECT count(*) "
-        + " FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT"
-        + " FROM users_friends U1\n"
-        + "LEFT JOIN users_friends U2 on U1.friend_id = U2.friend_id\n"
-        + "left join users on users.id = u2.user_id\n"
-        + "WHERE U1.user_id =:id GROUP BY U2.user_id Having u2.user_id not in (:id)\n"
-        + "ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id\n")
+    @Query(nativeQuery = true, value = """
+        SELECT count(*) \
+         FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT\
+         FROM users_friends U1
+        LEFT JOIN users_friends U2 on U1.friend_id = U2.friend_id
+        left join users on users.id = u2.user_id
+        WHERE U1.user_id =:id GROUP BY U2.user_id Having u2.user_id not in (:id)
+        ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id
+        """)
     int countOfMutualFriends(Long id);
 
     /**
