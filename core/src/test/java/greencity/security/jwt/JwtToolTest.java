@@ -2,17 +2,14 @@ package greencity.security.jwt;
 
 import static greencity.constant.AppConstant.ROLE;
 import greencity.dto.user.UserVO;
-import greencity.entity.User;
 import greencity.enums.Role;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -73,7 +70,6 @@ class JwtToolTest {
     @Test
     void createRefreshToken() {
         String s = "secret-refresh-token-key-bigger-key";
-        User userf = new User();
         UserVO userVO = new UserVO();
         userVO.setEmail(expectedEmail);
         userVO.setRole(expectedRole);
@@ -101,7 +97,8 @@ class JwtToolTest {
     void getEmailOutOfAccessToken() {
         String actualEmail = jwtTool.getEmailOutOfAccessToken("""
             eyJhbGciOiJIUzI1NiJ9\
-            .eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdLCJpYXQiOjE1NzU4MzY5NjUsImV4cCI6OTk5OTk5OTk5OTk5fQ\
+            .eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVNFUiJdL\
+            CJpYXQiOjE1NzU4MzY5NjUsImV4cCI6OTk5OTk5OTk5OTk5fQ\
             .YFicrqBFN0Q662HqkI2P8yuykgvJjiTgUqsUhN4ICHI""");
         assertEquals(expectedEmail, actualEmail);
     }
@@ -121,20 +118,15 @@ class JwtToolTest {
 
     @Test
     void isTokenValidWithValidTokenTest() {
-        //jwtTool.getAccessTokenKey().getBytes()
-        final String accessToken = """
-            eyJhbGciOiJIUzI1NiJ9\
-            .eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJPTEVfVVN\
-            FUiJdLCJpYXQiOjE1NzU4NDUzNTAsImV4cCI6NjE1NzU4NDUyOTB9\
-            .x1D799yGc0dj2uWDQYusnLyG5r6-Rjj6UgBhp2JjVDE\
+        final String accessToken = """ 
+            eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJP\
+            TEVfVVNFUiJdLCJpYXQiOjE1NzU4NDUzNTAsImV4cCI6NjE1NzU4NDUyOTB9.E5IaeqJNd6DGp6FG\
+            YRV6rx-colw4wDD2hCYHnliRYlw\
             """;
-
-
-        //Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes(StandardCharsets.UTF_8)), Jwts.SIG.HS256);
-
+        SecretKey key = Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes());
         Date expectedExpiration = new Date(61575845290000L); // 3921 year
         Date actualExpiration = Jwts.parser()
-            .verifyWith(Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes(StandardCharsets.UTF_8))).build()
+            .verifyWith(key).build()
             .parseSignedClaims(accessToken)
             .getPayload()
             .getExpiration();

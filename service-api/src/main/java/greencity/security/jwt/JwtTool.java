@@ -1,16 +1,16 @@
 package greencity.security.jwt;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import static greencity.constant.AppConstant.ROLE;
 import greencity.dto.user.UserVO;
 import greencity.enums.Role;
 import greencity.security.service.AuthorityService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ClaimsBuilder;
-import io.jsonwebtoken.Jwe;
 import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.JwtParserBuilder;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -112,23 +113,17 @@ public class JwtTool {
      * @throws io.jsonwebtoken.ExpiredJwtException - if token is expired.
      */
     public String getEmailOutOfAccessToken(String token) {
-        /*String[] splitToken = token.split("\\.");
-        String unsignedToken = splitToken[0] + "." + splitToken[1] + ".";
-        *//*Jwt<?, ?> jwt = parser.parse(unsignedToken);*//*
-        Jws<Claims> jwt = Jwts.parser().build().parseSignedClaims(unsignedToken);
-        return  jwt.getPayload().getSubject();*/
-
-        /*String[] splitToken = token.split("\\.");
-        Base64.Decoder decoder = Base64.getUrlDecoder();
-
-        String header = new String(decoder.decode(splitToken[0]));
-        String payload = new String(decoder.decode(splitToken[1]));
-        return payload;*/
-
         String[] splitToken = token.split("\\.");
-        String unsignedToken = splitToken[0] + "." + splitToken[1] + ".";
-        Jws<Claims> jwt = Jwts.parser().build().parseSignedClaims(unsignedToken);
-        return jwt.getPayload().getSubject();
+        Base64.Decoder decoder = Base64.getUrlDecoder();
+        String payload = new String(decoder.decode(splitToken[1]));
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode;
+        try {
+            jsonNode = objectMapper.readTree(payload);
+        } catch (Exception e) {
+            throw new RuntimeException("Error parsing JSON payload", e);
+        }
+        return jsonNode.path("sub").asText();
     }
 
     /**
