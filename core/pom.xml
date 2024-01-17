@@ -15,7 +15,7 @@
         <google.api-client.version>2.1.4</google.api-client.version>
         <springfox-bean-validators.version>2.9.2</springfox-bean-validators.version>
         <jjwt.version>0.12.3</jjwt.version>
-        <modelmapper.version>2.3.6</modelmapper.version>
+        <modelmapper.version>3.2.0</modelmapper.version>
         <mockito-junit-jupiter.version>3.3.3</mockito-junit-jupiter.version>
     </properties>
 

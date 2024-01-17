@@ -33,6 +33,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.type.descriptor.jdbc.IntegerJdbcType;
 
 @Entity
 @SqlResultSetMapping(
@@ -78,6 +80,7 @@ public class User {
     private Role role;
 
     @Enumerated(value = EnumType.ORDINAL)
+    @JdbcType(IntegerJdbcType.class)
     private UserStatus userStatus;
 
     @Column(nullable = false)
@@ -93,6 +96,7 @@ public class User {
     private RestorePasswordEmail restorePasswordEmail;
 
     @Enumerated(value = EnumType.ORDINAL)
+    @JdbcType(IntegerJdbcType.class)
     private EmailNotification emailNotification;
 
     @Column(name = "refresh_token_key", nullable = false)
@@ -101,12 +105,14 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicturePath;
 
+    @Builder.Default
     @OneToMany
     @JoinTable(name = "users_friends",
         joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
     private List<User> userFriends = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserAchievement> userAchievements = new ArrayList<>();
 
@@ -139,6 +145,7 @@ public class User {
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserAction> userActions = new ArrayList<>();
 
