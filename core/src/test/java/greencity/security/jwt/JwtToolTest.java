@@ -146,4 +146,15 @@ class JwtToolTest {
     void generateTokenKeyTest() {
         assertNotNull(jwtTool.generateTokenKey());
     }
+
+    @Test
+    void generateTokenKeyWithCodedDateTest() {
+        assertNotNull(jwtTool.generateTokenKeyWithCodedDate());
+    }
+
+    @Test
+    void generateTokenKeyWithCodedDateLengthTest() {
+        int tokenLength = 68;
+        assertEquals(tokenLength, jwtTool.generateTokenKeyWithCodedDate().length());
+    }
 }
