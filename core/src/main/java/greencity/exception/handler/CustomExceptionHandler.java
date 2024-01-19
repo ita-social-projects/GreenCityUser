@@ -6,6 +6,7 @@ import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadSocialNetworkLinksException;
 import greencity.exception.exceptions.BadUpdateRequestException;
 import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.BadVerifyEmailTokenException;
 import greencity.exception.exceptions.EmailNotVerified;
 import greencity.exception.exceptions.InvalidURLException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
@@ -62,7 +63,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @author Yurii Savchenko
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public final ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex,
+    public final ResponseEntity<Object> handleConstraintViolationException(
+        ConstraintViolationException ex,
         WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
@@ -83,7 +85,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @author Yurii Savchenko
      */
     @ExceptionHandler(BadRequestException.class)
-    public final ResponseEntity<Object> handleBadRequestException(BadRequestException ex, WebRequest request) {
+    public final ResponseEntity<Object> handleBadRequestException(BadRequestException ex,
+        WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
@@ -91,7 +94,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Exception handler for BadUpdateRequestException.
-     * 
+     *
      * @param exception which is being intercepted
      * @param request   contains details about occurred exception
      * @return ResponseEntity which contains details about exception and 400 status
@@ -115,7 +118,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @author Marian Milian
      */
     @ExceptionHandler(NotFoundException.class)
-    public final ResponseEntity<Object> handleNotFoundException(NotFoundException ex, WebRequest request) {
+    public final ResponseEntity<Object> handleNotFoundException(NotFoundException ex,
+        WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
@@ -131,7 +135,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @author Julia Seti
      */
     @ExceptionHandler(WrongIdException.class)
-    public final ResponseEntity<Object> handleWrongIdException(WrongIdException ex, WebRequest request) {
+    public final ResponseEntity<Object> handleWrongIdException(WrongIdException ex,
+        WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
@@ -200,7 +205,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler(BadSocialNetworkLinksException.class)
-    public final ResponseEntity<Object> handleBadSocialNetworkLinkException(BadSocialNetworkLinksException ex,
+    public final ResponseEntity<Object> handleBadSocialNetworkLinkException(
+        BadSocialNetworkLinksException ex,
         WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
@@ -232,7 +238,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler(EmailNotVerified.class)
-    public final ResponseEntity<Object> handleEmailNotVerified(EmailNotVerified ex, WebRequest request) {
+    public final ResponseEntity<Object> handleEmailNotVerified(EmailNotVerified ex,
+        WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
@@ -314,7 +321,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler(PasswordsDoNotMatchesException.class)
-    public final ResponseEntity<Object> handlePasswordsDoNotMatchesException(PasswordsDoNotMatchesException ex) {
+    public final ResponseEntity<Object> handlePasswordsDoNotMatchesException(
+        PasswordsDoNotMatchesException ex) {
         ValidationExceptionDto validationExceptionDto =
             new ValidationExceptionDto(AppConstant.PASSWORD, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
@@ -355,7 +363,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler(MultipartException.class)
-    public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(MultipartException me) {
+    public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(
+        MultipartException me) {
         log.error("Error when profile picture was being uploaded {}", me);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(me.getMessage());
     }
@@ -375,5 +384,22 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
+     * Exception handler for BadUpdateRequestException.
+     *
+     * @param exception which is being intercepted
+     * @param request   contains details about occurred exception
+     * @return ResponseEntity which contains details about exception and 401 status
+     *         code
+     */
+    @ExceptionHandler(BadVerifyEmailTokenException.class)
+    public final ResponseEntity<Object> handleBadVerifyEmailTokenException(
+        BadVerifyEmailTokenException exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exceptionResponse);
     }
 }

@@ -2,7 +2,7 @@ package greencity.security.controller;
 
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
-import static greencity.constant.ErrorMessage.NO_ANY_EMAIL_TO_VERIFY_BY_THIS_TOKEN;
+import static greencity.constant.ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN;
 import static greencity.constant.ErrorMessage.PASSWORD_DOES_NOT_MATCH;
 import static greencity.constant.ErrorMessage.REFRESH_TOKEN_NOT_VALID;
 import static greencity.constant.ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID;
@@ -148,7 +148,7 @@ public class OwnSecurityController {
     @Operation(summary = "Verify email by email token (hash that contains link for verification)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = NO_ANY_EMAIL_TO_VERIFY_BY_THIS_TOKEN)
+        @ApiResponse(responseCode = "400", description = NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN)
     })
     @GetMapping("/verifyEmail")
     public ResponseEntity<Boolean> verify(@RequestParam @NotBlank String token,
