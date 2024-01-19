@@ -51,19 +51,19 @@ class JwtToolTest {
         SecretKey key = Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes());
 
         String actualEmail = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(accessToken)
-                .getPayload()
-                .getSubject();
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(accessToken)
+            .getPayload()
+            .getSubject();
         assertEquals(expectedEmail, actualEmail);
         @SuppressWarnings({"unchecked, rawtype"})
         List<String> authorities = (List<String>) Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(accessToken)
-                .getPayload()
-                .get(ROLE);
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(accessToken)
+            .getPayload()
+            .get(ROLE);
         assertEquals(expectedRole, Role.valueOf(authorities.getFirst()));
     }
 
@@ -77,19 +77,19 @@ class JwtToolTest {
         SecretKey key = Keys.hmacShaKeyFor(userVO.getRefreshTokenKey().getBytes());
         String refreshToken = jwtTool.createRefreshToken(userVO);
         String actualEmail = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(refreshToken)
-                .getPayload()
-                .getSubject();
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(refreshToken)
+            .getPayload()
+            .getSubject();
         assertEquals(expectedEmail, actualEmail);
         @SuppressWarnings({"unchecked, rawtype"})
         List<String> authorities = (List<String>) Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(refreshToken)
-                .getPayload()
-                .get(ROLE);
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(refreshToken)
+            .getPayload()
+            .get(ROLE);
         assertEquals(expectedRole, Role.valueOf(authorities.getFirst()));
     }
 
@@ -118,7 +118,7 @@ class JwtToolTest {
 
     @Test
     void isTokenValidWithValidTokenTest() {
-        final String accessToken = """ 
+        final String accessToken = """
             eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGdtYWlsLmNvbSIsImF1dGhvcml0aWVzIjpbIlJP\
             TEVfVVNFUiJdLCJpYXQiOjE1NzU4NDUzNTAsImV4cCI6NjE1NzU4NDUyOTB9.E5IaeqJNd6DGp6FG\
             YRV6rx-colw4wDD2hCYHnliRYlw\
@@ -126,10 +126,10 @@ class JwtToolTest {
         SecretKey key = Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes());
         Date expectedExpiration = new Date(61575845290000L); // 3921 year
         Date actualExpiration = Jwts.parser()
-                .verifyWith(key).build()
-                .parseSignedClaims(accessToken)
-                .getPayload()
-                .getExpiration();
+            .verifyWith(key).build()
+            .parseSignedClaims(accessToken)
+            .getPayload()
+            .getExpiration();
         jwtTool.isTokenValid(accessToken, jwtTool.getAccessTokenKey());
         assertEquals(expectedExpiration, actualExpiration);
     }

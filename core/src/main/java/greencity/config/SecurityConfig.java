@@ -88,7 +88,7 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((req, resp, exc) -> resp.sendError(SC_UNAUTHORIZED, "Authorize first."))
                 .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities.")))
-            .authorizeRequests(req -> req
+            .authorizeHttpRequests(req -> req
                 .requestMatchers("/static/css/**", "/static/img/**").permitAll()
                 .requestMatchers(HttpMethod.GET,
                     "/ownSecurity/verifyEmail",
@@ -190,7 +190,8 @@ public class SecurityConfig {
                     "/user/update/role")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.POST, "/management/login")
-                .not().fullyAuthenticated()
+                // .not().fullyAuthenticated()
+                .rememberMe()
                 .requestMatchers(HttpMethod.GET, "/management/login")
                 .permitAll()
                 .requestMatchers("/css/**", "/img/**")
@@ -210,10 +211,12 @@ public class SecurityConfig {
     public WebSecurityCustomizer webSecurityCustomizer() {
         return web -> {
             web.ignoring().requestMatchers("/v2/api-docs/**");
+            web.ignoring().requestMatchers("/v3/api-docs/**");
             web.ignoring().requestMatchers("/swagger.json");
             web.ignoring().requestMatchers("/swagger-ui.html");
             web.ignoring().requestMatchers("/swagger-resources/**");
             web.ignoring().requestMatchers("/webjars/**");
+            web.ignoring().requestMatchers("/swagger-ui/**");
         };
     }
 

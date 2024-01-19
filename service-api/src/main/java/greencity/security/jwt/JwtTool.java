@@ -6,15 +6,11 @@ import static greencity.constant.AppConstant.ROLE;
 import greencity.dto.user.UserVO;
 import greencity.enums.Role;
 import greencity.security.service.AuthorityService;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ClaimsBuilder;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collections;
@@ -22,7 +18,6 @@ import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,8 +72,8 @@ public class JwtTool {
             .issuedAt(now)
             .expiration(calendar.getTime())
             .signWith(Keys.hmacShaKeyFor(
-                    accessTokenKey.getBytes(StandardCharsets.UTF_8)),
-                    Jwts.SIG.HS256)
+                accessTokenKey.getBytes(StandardCharsets.UTF_8)),
+                Jwts.SIG.HS256)
             .compact();
     }
 
@@ -99,8 +94,8 @@ public class JwtTool {
             .issuedAt(now)
             .expiration(calendar.getTime())
             .signWith(
-                    Keys.hmacShaKeyFor(user.getRefreshTokenKey().getBytes(StandardCharsets.UTF_8)),
-                    Jwts.SIG.HS256)
+                Keys.hmacShaKeyFor(user.getRefreshTokenKey().getBytes(StandardCharsets.UTF_8)),
+                Jwts.SIG.HS256)
             .compact();
     }
 
