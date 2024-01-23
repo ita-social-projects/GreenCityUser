@@ -61,6 +61,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -354,11 +355,11 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
-    @PatchMapping(path = "/profilePicture")
+    @PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE} ,path = "/profilePicture")
     public ResponseEntity<HttpStatus> updateUserProfilePicture(
         @Parameter(description = "pass image as base64") @RequestPart(required = false) String base64,
         @Parameter(description = "Profile picture") @ImageValidation @RequestPart(required = false) MultipartFile image,
-        @Parameter(hidden = true) @AuthenticationPrincipal Principal principal) {
+        @Parameter(hidden = true) Principal principal) {
         String email = principal.getName();
         userService.updateUserProfilePicture(image, email, base64);
         return ResponseEntity.status(HttpStatus.OK).build();
