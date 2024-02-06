@@ -65,7 +65,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -110,7 +109,7 @@ public class UserController {
     })
     @PatchMapping("status")
     public ResponseEntity<UserStatusDto> updateStatus(
-        @Valid @RequestBody UserStatusDto userStatusDto, @Parameter(hidden = true) Principal principal) {
+        @Valid @RequestBody UserStatusDto userStatusDto, Principal principal) {
         return ResponseEntity.status(HttpStatus.OK)
             .body(
                 userService.updateStatus(
@@ -139,7 +138,7 @@ public class UserController {
     public ResponseEntity<UserRoleDto> updateRole(
         @PathVariable Long id,
         @NotNull @RequestBody Map<String, String> body,
-        @Parameter(hidden = true) Principal principal) {
+        Principal principal) {
         Role role = Role.valueOf(body.get("role"));
         UserRoleDto userRoleDto = new UserRoleDto(id, role);
         return ResponseEntity.status(HttpStatus.OK)
@@ -207,8 +206,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     })
     @GetMapping("emailNotifications")
-    public ResponseEntity<List<EmailNotification>> getEmailNotifications(
-        @Parameter(hidden = true) @AuthenticationPrincipal Principal principal) {
+    public ResponseEntity<List<EmailNotification>> getEmailNotifications(Principal principal) {
         String email = principal.getName();
         return ResponseEntity.status(HttpStatus.OK)
             .body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
@@ -256,8 +254,7 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping
-    public ResponseEntity<UserUpdateDto> getUserByPrincipal(
-        @Parameter(hidden = true) @AuthenticationPrincipal Principal principal) {
+    public ResponseEntity<UserUpdateDto> getUserByPrincipal(Principal principal) {
         String email = principal.getName();
         return ResponseEntity.status(HttpStatus.OK).body(userService.getUserUpdateDtoByEmail(email));
     }
@@ -277,8 +274,7 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @PatchMapping
-    public ResponseEntity<UserUpdateDto> updateUser(@Valid @RequestBody UserUpdateDto dto,
-        @Parameter(hidden = true) @AuthenticationPrincipal Principal principal) {
+    public ResponseEntity<UserUpdateDto> updateUser(@Valid @RequestBody UserUpdateDto dto, Principal principal) {
         String email = principal.getName();
         return ResponseEntity.status(HttpStatus.OK).body(userService.update(dto, email));
     }
@@ -360,7 +356,7 @@ public class UserController {
     public ResponseEntity<HttpStatus> updateUserProfilePicture(
         @Parameter(description = "pass image as base64") @RequestPart(required = false) String base64,
         @Parameter(description = "Profile picture") @ImageValidation @RequestPart(required = false) MultipartFile image,
-        @Parameter(hidden = true) Principal principal) {
+        Principal principal) {
         String email = principal.getName();
         userService.updateUserProfilePicture(image, email, base64);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -379,8 +375,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @PatchMapping(path = "/deleteProfilePicture")
-    public ResponseEntity<HttpStatus> deleteUserProfilePicture(
-        @Parameter(hidden = true) @AuthenticationPrincipal Principal principal) {
+    public ResponseEntity<HttpStatus> deleteUserProfilePicture(Principal principal) {
         String email = principal.getName();
         userService.deleteUserProfilePicture(email);
         return ResponseEntity.status(HttpStatus.OK).build();
@@ -402,7 +397,7 @@ public class UserController {
     @PutMapping(path = "/profile")
     public ResponseEntity<String> save(
         @Parameter(required = true) @RequestBody @Valid UserProfileDtoRequest userProfileDtoRequest,
-        @Parameter(hidden = true) Principal principal) {
+        Principal principal) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.saveUserProfile(userProfileDtoRequest,
             principal.getName()));
     }
