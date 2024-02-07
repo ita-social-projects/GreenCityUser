@@ -48,7 +48,6 @@ import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
-
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -57,7 +56,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
@@ -85,7 +83,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final UserRepo userRepo;
     private static final String VALID_PW_CHARS =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
-    private final AchievementService achievementService;
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
 
@@ -101,8 +98,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         @Value("${verifyEmailTimeHour}") Integer expirationTime,
         RestorePasswordEmailRepo restorePasswordEmailRepo,
         ModelMapper modelMapper,
-        UserRepo userRepo,
-        AchievementService achievementService, EmailService emailService, AuthorityRepo authorityRepo) {
+        UserRepo userRepo, EmailService emailService, AuthorityRepo authorityRepo) {
         this.ownSecurityRepo = ownSecurityRepo;
         this.positionRepo = positionRepo;
         this.userService = userService;
@@ -112,7 +108,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         this.restorePasswordEmailRepo = restorePasswordEmailRepo;
         this.modelMapper = modelMapper;
         this.userRepo = userRepo;
-        this.achievementService = achievementService;
         this.emailService = emailService;
         this.authorityRepo = authorityRepo;
     }
@@ -120,13 +115,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     /**
      * {@inheritDoc}
      *
-     * @return
+     * @return {@link SuccessSignUpDto}
      */
     @Transactional
     @Override
     public SuccessSignUpDto signUp(OwnSignUpDto dto, String language) {
         User user = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
-        setUsersFields(dto, user);
+        user.setOwnSecurity(createOwnSecurity(dto, user));
         user.setVerifyEmail(createVerifyEmail(user, jwtTool.generateTokenKey()));
         user.setUuid(UUID.randomUUID().toString());
         try {
@@ -161,15 +156,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .build();
     }
 
-    private void setUsersFields(OwnSignUpDto dto, User user) {
-        OwnSecurity ownSecurity = createOwnSecurity(dto, user);
-        List<UserAchievement> userAchievementList = createUserAchievements(user);
-        List<UserAction> userActionsList = createUserActions(user);
-        user.setOwnSecurity(ownSecurity);
-        user.setUserAchievements(userAchievementList);
-        user.setUserActions(userActionsList);
-    }
-
     private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
         return RestorePasswordEmail.builder()
             .user(user)
@@ -193,25 +179,17 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .build();
     }
 
-    private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, achievementService);
-    }
-
-    private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, achievementService);
-    }
-
     /**
      * {@inheritDoc}
      *
-     * @return
+     * @return {@link SuccessSignUpDto}
      */
     public SuccessSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto, String language) {
         String password = generatePassword();
         employeeSignUpDto.setPassword(password);
         OwnSignUpDto dto = modelMapper.map(employeeSignUpDto, OwnSignUpDto.class);
         User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
-        setUsersFields(dto, employee);
+        employee.setOwnSecurity(createOwnSecurity(dto, employee));
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
         employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate()));
         employee.setUuid(employeeSignUpDto.getUuid());

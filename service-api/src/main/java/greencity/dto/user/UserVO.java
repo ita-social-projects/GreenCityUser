@@ -9,6 +9,9 @@ import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,10 +19,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -61,8 +60,6 @@ public class UserVO {
 
     private String profilePicturePath;
 
-    private String city;
-
     private Boolean showLocation;
 
     private Boolean showEcoPlace;
@@ -74,4 +71,6 @@ public class UserVO {
     private List<UserActionVO> userActions = new ArrayList<>();
 
     private LanguageVO languageVO;
+
+    private UserLocationDto userLocationDto;
 }

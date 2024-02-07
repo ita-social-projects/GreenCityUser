@@ -1,5 +1,7 @@
 package greencity.service;
 
+import com.google.maps.model.AddressComponentType;
+import com.google.maps.model.GeocodingResult;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -13,11 +15,14 @@ import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -35,6 +40,7 @@ import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
+import greencity.entity.UserLocation;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -49,8 +55,20 @@ import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
+import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -63,17 +81,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * The class provides implementation of the {@code UserService}.
@@ -88,7 +95,9 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
+    private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
+    private final GoogleApiService googleApiService;
     /**
      * Autowired mapper.
      */
@@ -104,6 +113,17 @@ public class UserServiceImpl implements UserService {
     public UserVO save(UserVO userVO) {
         User user = modelMapper.map(userVO, User.class);
         return modelMapper.map(userRepo.save(user), UserVO.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateUserRating(UserAddRatingDto userRatingDto) {
+        var user = userRepo.findById(userRatingDto.getId())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        user.setRating(user.getRating() + userRatingDto.getRating());
+        userRepo.save(user);
     }
 
     /**
@@ -366,8 +386,14 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public RoleDto getRoles() {
-        return new RoleDto(Role.class.getEnumConstants());
+    public RoleDto getRoles(Long id) {
+        User user = userRepo.findById(id).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+
+        Role role = user.getRole();
+        return RoleDto.builder()
+            .roles(new Role[] {role})
+            .build();
     }
 
     /**
@@ -376,8 +402,10 @@ public class UserServiceImpl implements UserService {
      * @author Nazar Vladyka
      */
     @Override
-    public List<EmailNotification> getEmailNotificationsStatuses() {
-        return Arrays.asList(EmailNotification.class.getEnumConstants());
+    public EmailNotification getEmailNotificationsStatuses(String email) {
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+        return user.getEmailNotification();
     }
 
     /**
@@ -576,12 +604,10 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        if (userProfileDtoRequest.getCity() != null) {
-            user.setCity(userProfileDtoRequest.getCity());
-        }
         if (userProfileDtoRequest.getUserCredo() != null) {
             user.setUserCredo(userProfileDtoRequest.getUserCredo());
         }
+        setLocationForUser(user, userProfileDtoRequest);
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
         if (userProfileDtoRequest.getSocialNetworks() != null) {
             socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
@@ -596,17 +622,97 @@ public class UserServiceImpl implements UserService {
                     .build())
                 .collect(Collectors.toList()));
         }
-        if (userProfileDtoRequest.getShowLocation() != null) {
-            user.setShowLocation(userProfileDtoRequest.getShowLocation());
-        }
-        if (userProfileDtoRequest.getShowEcoPlace() != null) {
-            user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
-        }
-        if (userProfileDtoRequest.getShowShoppingList() != null) {
-            user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-        }
+        user.setShowLocation(userProfileDtoRequest.getShowLocation());
+        user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
+        user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
+
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
+    }
+
+    private void setLocationForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        if (shouldSkipLocationUpdate(user, userProfileDtoRequest)) {
+            return;
+        }
+
+        if (user.getUserLocation() != null && (userProfileDtoRequest.getCoordinates().getLatitude() == null
+            || userProfileDtoRequest.getCoordinates().getLongitude() == null)) {
+            UserLocation old = user.getUserLocation();
+            old.getUsers().remove(user);
+            user.setUserLocation(null);
+        } else {
+            GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude(),
+                "uk");
+            GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude(),
+                "en");
+            UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude()).orElse(new UserLocation());
+
+            /*
+             * check if user already has a location and if he is the only one assigned to
+             * this location. If user do not have a location check if such location is in
+             * database, if true then assign it to user, if not - add new location to
+             * database and assign it to user. If user has a location and this location
+             * belongs only to him, modify this location. If user has a location but there
+             * are more users assigned to this location, then create a new location for this
+             * user. If user inserted same location get his location and do not change
+             * anything.
+             */
+            if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
+                if (userLocation.getId() != null && user.getUserLocation() != userLocation) {
+                    UserLocation deleteLocation = user.getUserLocation();
+                    user.setUserLocation(userLocation);
+                    userLocationRepo.delete(deleteLocation);
+                } else {
+                    userLocation = user.getUserLocation();
+                }
+            } else if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() > 1) {
+                UserLocation old = user.getUserLocation();
+                old.getUsers().remove(user);
+            }
+            initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUk);
+            initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
+            userLocation.setLatitude(userProfileDtoRequest.getCoordinates().getLatitude());
+            userLocation.setLongitude(userProfileDtoRequest.getCoordinates().getLongitude());
+            userLocation = userLocationRepo.save(userLocation);
+            user.setUserLocation(userLocation);
+        }
+    }
+
+    private boolean shouldSkipLocationUpdate(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        return user.getUserLocation() == null
+            && (userProfileDtoRequest.getCoordinates().getLatitude() == null
+                || userProfileDtoRequest.getCoordinates().getLongitude() == null);
+    }
+
+    private void initializeGeoCodingResults(Map<AddressComponentType, Consumer<String>> initializedMap,
+        GeocodingResult geocodingResult) {
+        initializedMap
+            .forEach((key, value) -> Arrays.stream(geocodingResult.addressComponents)
+                .forEach(addressComponent -> Arrays.stream(addressComponent.types)
+                    .filter(componentType -> componentType.equals(key))
+                    .forEach(componentType -> value.accept(addressComponent.longName))));
+    }
+
+    private Map<AddressComponentType, Consumer<String>> initializeEnglishGeoCodingResult(
+        UserLocation userLocation) {
+        return Map.of(
+            AddressComponentType.LOCALITY, userLocation::setCityEn,
+            AddressComponentType.COUNTRY, userLocation::setCountryEn,
+            AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionEn);
+    }
+
+    private Map<AddressComponentType, Consumer<String>> initializeUkrainianGeoCodingResult(
+        UserLocation userLocation) {
+        return Map.of(
+            AddressComponentType.LOCALITY, userLocation::setCityUa,
+            AddressComponentType.COUNTRY, userLocation::setCountryUa,
+            AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionUa);
     }
 
     /**
@@ -619,7 +725,13 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findById(userId)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
-        return modelMapper.map(user, UserProfileDtoResponse.class);
+
+        UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
+        if (user.getUserLocation() != null) {
+            userProfileDtoResponse.setUserLocationDto(modelMapper.map(user.getUserLocation(), UserLocationDto.class));
+        }
+        modelMapper.map(user, userProfileDtoResponse);
+        return userProfileDtoResponse;
     }
 
     /**
@@ -670,17 +782,21 @@ public class UserServiceImpl implements UserService {
      *
      * @param userId - {@link UserVO}'s id
      * @author Marian Datsko
+     * @author Olena Sotnik
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
         Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
         Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
         Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
+        Long amountOfOrganizedAndAttendedEventsByUserId = restClient
+            .findAmountOfEventsOrganizedAndAttendedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)
             .amountHabitsAcquired(amountOfAcquiredHabitsByUserId)
             .amountHabitsInProgress(amountOfHabitsInProgressByUserId)
+            .amountOrganizedAndAttendedEvents(amountOfOrganizedAndAttendedEventsByUserId)
             .build();
     }
 
@@ -882,8 +998,10 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<String> findAllUsersCities() {
-        return userRepo.findAllUsersCities();
+    public UserCityDto findAllUsersCities(Long userId) {
+        UserLocation userLocation = userLocationRepo.findAllUsersCities(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DID_NOT_SET_ANY_CITY));
+        return modelMapper.map(userLocation, UserCityDto.class);
     }
 
     /**
@@ -932,6 +1050,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepo.findUserByUuid(uuid).orElseThrow(
             () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
         user.setUserStatus(UserStatus.DEACTIVATED);
+        userRepo.save(user);
+    }
+
+    @Override
+    public void markUserAsActivated(String uuid) {
+        User user = userRepo.findUserByUuid(uuid).orElseThrow(
+            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
+        user.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(user);
     }
 

@@ -1,6 +1,6 @@
 package greencity;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 import java.net.MalformedURLException;
 import java.net.URL;
 

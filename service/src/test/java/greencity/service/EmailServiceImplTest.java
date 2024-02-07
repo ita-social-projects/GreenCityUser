@@ -4,35 +4,38 @@ import greencity.ModelUtils;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
 import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
-import greencity.dto.notification.NotificationDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.entity.User;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.repository.UserRepo;
+import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.message.GeneralEmailMessage;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.thymeleaf.ITemplateEngine;
-
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-import java.util.*;
-import java.util.concurrent.Executors;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.thymeleaf.ITemplateEngine;
 
 class EmailServiceImplTest {
     private EmailService service;
@@ -41,13 +44,11 @@ class EmailServiceImplTest {
     private JavaMailSender javaMailSender;
     @Mock
     private ITemplateEngine templateEngine;
-    @Mock
-    private UserRepo userRepo;
 
     @BeforeEach
     public void setup() {
         initMocks(this);
-        service = new EmailServiceImpl(javaMailSender, templateEngine, userRepo, Executors.newCachedThreadPool(),
+        service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
             "http://localhost:4200", "http://localhost:4200", "http://localhost:8080",
             "test@email.com");
         placeAuthorDto = PlaceAuthorDto.builder()
@@ -63,7 +64,7 @@ class EmailServiceImplTest {
         String authorFirstName = "test author first name";
         String placeName = "test place name";
         String placeStatus = "test place status";
-        String authorEmail = "test author email";
+        String authorEmail = "useremail@gmail.com";
         service.sendChangePlaceStatusEmail(authorFirstName, placeName, placeStatus, authorEmail);
         verify(javaMailSender).createMimeMessage();
     }
@@ -101,17 +102,8 @@ class EmailServiceImplTest {
         verify(javaMailSender).createMimeMessage();
     }
 
-    @Test
-    void sendNewCommentForEventOrganizer() {
-        EventCommentForSendEmailDto dto = new EventCommentForSendEmailDto();
-        dto.setEmail("inna@gmail.com");
-        service.sendNewCommentForEventOrganizer(dto);
-        verify(javaMailSender).createMimeMessage();
-    }
-
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ru",
-        "1, Test, test@gmail.com, token, ua",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua",
         "1, Test, test@gmail.com, token, en"})
     void sendVerificationEmail(Long id, String name, String email, String token, String language) {
         service.sendVerificationEmail(id, name, email, token, language, false);
@@ -119,8 +111,8 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendVerificationEmailIllegalStateException() {
-        assertThrows(IllegalStateException.class,
+    void sendVerificationEmailLanguageNotFoundException() {
+        assertThrows(LanguageNotSupportedException.class,
             () -> service.sendVerificationEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
@@ -131,8 +123,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ru, true",
-        "1, Test, test@gmail.com, token, ua, false",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
         "1, Test, test@gmail.com, token, en, false"})
     void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
         service.sendRestoreEmail(id, name, email, token, language, isUbs);
@@ -140,15 +131,21 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendRestoreEmailIllegalStateException() {
-        assertThrows(IllegalStateException.class,
+    void sendRestoreEmailLanguageNotFoundException() {
+        assertThrows(LanguageNotSupportedException.class,
             () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
     @Test
     void sendHabitNotification() {
-        service.sendHabitNotification("userName", "userEmail");
+        service.sendHabitNotification("userName", "userEmail@gmail.com");
         verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendHabitNotificationWithInvalidEmail() {
+        assertThrows(WrongEmailException.class,
+            () -> service.sendHabitNotification("userName", "userEmail"));
     }
 
     @Test
@@ -166,7 +163,6 @@ class EmailServiceImplTest {
 
     @Test
     void sendMessageOfActivation() {
-        List<String> test = List.of("test", "test");
         UserActivationDto test1 = UserActivationDto.builder()
             .lang("en")
             .email("test@ukr.net")
@@ -184,6 +180,15 @@ class EmailServiceImplTest {
     }
 
     @Test
+    void sendUserViolationEmailWithEmptyLanguageTest() {
+        UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
+        dto.setLanguage("");
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+        dto.setLanguage(null);
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+    }
+
+    @Test
     void sendSuccessRestorePasswordByEmailTest() {
         String email = "test@gmail.com";
         String lang = "en";
@@ -195,18 +200,23 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendNotificationByEmail() {
-        User user = User.builder().build();
-        NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-        service.sendNotificationByEmail(dto, "test@gmail.com");
-        verify(javaMailSender).createMimeMessage();
+    void sendUserViolationEmailWithUnsupportedLanguageTest() {
+        UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
+        dto.setLanguage("de");
+        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test
-    void sendNotificationByEmailNotFoundException() {
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.empty());
-        NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
-        assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
+    void sendEmailNotificationTest() {
+        assertDoesNotThrow(() -> service
+            .sendEmailNotification(new GeneralEmailMessage("test@gmail.com", "testSubject", "testMessage")));
+        await().atMost(5, SECONDS)
+            .untilAsserted(() -> javaMailSender.send(any(MimeMessage.class)));
+    }
+
+    @Test
+    void sendEmailNotificationToNullEmailTest() {
+        GeneralEmailMessage emailMessage = new GeneralEmailMessage(null, "testSubject", "testMessage");
+        assertThrows(WrongEmailException.class, () -> service.sendEmailNotification(emailMessage));
     }
 }

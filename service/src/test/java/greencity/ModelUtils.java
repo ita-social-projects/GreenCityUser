@@ -1,6 +1,12 @@
 package greencity;
 
+import com.google.maps.model.AddressComponent;
+import com.google.maps.model.AddressComponentType;
+import com.google.maps.model.GeocodingResult;
+import com.google.maps.model.Geometry;
+import com.google.maps.model.LatLng;
 import greencity.constant.AppConstant;
+import greencity.dto.CoordinatesDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
@@ -15,6 +21,7 @@ import greencity.dto.user.EcoNewsAuthorDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserProfileDtoRequest;
@@ -25,7 +32,6 @@ import greencity.dto.user.UsersFriendDto;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
-
 import greencity.entity.Achievement;
 import greencity.entity.AchievementCategory;
 import greencity.entity.Authority;
@@ -36,16 +42,14 @@ import greencity.entity.RestorePasswordEmail;
 import greencity.entity.SocialNetwork;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
+import greencity.entity.UserLocation;
 import greencity.entity.VerifyEmail;
-import greencity.entity.localization.AchievementTranslation;
-import greencity.enums.AchievementStatus;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
-
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -108,6 +112,22 @@ public class ModelUtils {
             .build();
     }
 
+    public static User getUserWithUserLocation() {
+        return User.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.DEACTIVATED)
+            .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
+            .verifyEmail(new VerifyEmail())
+            .dateOfRegistration(LocalDateTime.now())
+            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
+                20.000000, new ArrayList<User>()))
+            .language(new Language(1L, "en", null))
+            .build();
+    }
+
     private static UserManagementDto createUserManagerDto() {
         return UserManagementDto.builder()
             .id(1L)
@@ -132,6 +152,7 @@ public class ModelUtils {
             .amountHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER)
             .amountHabitsAcquired(TestConst.SIMPLE_LONG_NUMBER)
             .amountPublishedNews(TestConst.SIMPLE_LONG_NUMBER)
+            .amountOrganizedAndAttendedEvents(TestConst.SIMPLE_LONG_NUMBER)
             .build();
     }
 
@@ -234,6 +255,7 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
+            .userLocation(null)
             .build();
     }
 
@@ -295,7 +317,9 @@ public class ModelUtils {
             .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-            .city("Lviv")
+            .userLocationDto(
+                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
+                    20.000000))
             .showShoppingList(true)
             .showEcoPlace(true)
             .showLocation(true)
@@ -310,7 +334,6 @@ public class ModelUtils {
             .userAchievements(List.of(
                 UserAchievementVO.builder()
                     .id(47L)
-                    .achievementStatus(AchievementStatus.ACTIVE)
                     .user(UserVO.builder()
                         .id(13L)
                         .build())
@@ -320,7 +343,6 @@ public class ModelUtils {
                     .build(),
                 UserAchievementVO.builder()
                     .id(39L)
-                    .achievementStatus(AchievementStatus.INACTIVE)
                     .user(UserVO.builder()
                         .id(13L)
                         .build())
@@ -348,7 +370,6 @@ public class ModelUtils {
     public static UserProfileDtoRequest getUserProfileDtoRequest() {
         return UserProfileDtoRequest.builder()
             .name("Name")
-            .city("City")
             .userCredo("userCredo")
             .socialNetworks(List.of(
                 "https://www.facebook.com",
@@ -356,6 +377,7 @@ public class ModelUtils {
                 "https://www.youtube.com",
                 "https://www.gmail.com",
                 "https://www.google.com"))
+            .coordinates(new CoordinatesDto(1.0d, 1.0d))
             .showLocation(true)
             .showEcoPlace(true)
             .showShoppingList(true)
@@ -371,20 +393,18 @@ public class ModelUtils {
     }
 
     public static Achievement getAchievement() {
-        return new Achievement(1L, Collections.singletonList(getAchievementTranslation()), Collections.emptyList(),
+        return new Achievement(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
+            "Acquired habit 14 days", Collections.emptyList(),
             new AchievementCategory(), 1);
     }
 
     public static AchievementVO getAchievementVO() {
-        return new AchievementVO(1L, Collections.emptyList(), Collections.emptyList(), new AchievementCategoryVO(), 1);
-    }
-
-    public static AchievementTranslation getAchievementTranslation() {
-        return new AchievementTranslation(1L, getLanguage(), "Title", "Description", "Message", null);
+        return new AchievementVO(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
+            "Acquired habit 14 days", new AchievementCategoryVO(), 1);
     }
 
     public static UserAchievement getUserAchievement() {
-        return new UserAchievement(1L, getUser(), getAchievement(), AchievementStatus.ACTIVE, false);
+        return new UserAchievement(1L, getUser(), getAchievement(), false);
     }
 
     public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
@@ -457,6 +477,7 @@ public class ModelUtils {
             .email("test@mail.com")
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_USER)
+            .rating(100D)
             .build();
     }
 
@@ -658,5 +679,113 @@ public class ModelUtils {
                 .name("Auth")
                 .build()))
             .build();
+    }
+
+    public static UserLocation getUserLocation() {
+        return UserLocation.builder()
+            .id(1L)
+            .cityEn("Lviv")
+            .cityUa("Львів")
+            .countryEn("Ukraine")
+            .countryUa("Україна")
+            .regionUa("Львівська")
+            .regionEn("Lvivska")
+            .latitude(49.842957)
+            .longitude(24.031111)
+            .users(Collections.singletonList(getUser()))
+            .build();
+    }
+
+    public static UserLocation getUserLocation2() {
+        return UserLocation.builder()
+            .id(2L)
+            .cityEn("Ternopil")
+            .cityUa("Тернопіль")
+            .countryEn("Ukraine")
+            .countryUa("Україна")
+            .regionUa("Тернопільська")
+            .regionEn("Ternopilska")
+            .latitude(49.842957)
+            .longitude(24.031111)
+            .users(Collections.singletonList(getUser()))
+            .build();
+    }
+
+    public static List<GeocodingResult> getGeocodingResult() {
+        List<GeocodingResult> geocodingResults = new ArrayList<>();
+
+        GeocodingResult geocodingResult1 = new GeocodingResult();
+
+        Geometry geometry = new Geometry();
+        geometry.location = new LatLng(50.5555555d, 50.5555555d);
+
+        AddressComponent locality = new AddressComponent();
+        locality.longName = "fake street";
+        locality.types = new AddressComponentType[] {AddressComponentType.LOCALITY};
+
+        AddressComponent streetNumber = new AddressComponent();
+        streetNumber.longName = "13";
+        streetNumber.types = new AddressComponentType[] {AddressComponentType.STREET_NUMBER};
+
+        AddressComponent region = new AddressComponent();
+        region.longName = "fake region";
+        region.types = new AddressComponentType[] {AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1};
+
+        AddressComponent sublocality = new AddressComponent();
+        sublocality.longName = "fake district";
+        sublocality.types = new AddressComponentType[] {AddressComponentType.SUBLOCALITY};
+
+        AddressComponent route = new AddressComponent();
+        route.longName = "fake street name";
+        route.types = new AddressComponentType[] {AddressComponentType.ROUTE};
+
+        geocodingResult1.addressComponents = new AddressComponent[] {
+            locality,
+            streetNumber,
+            region,
+            sublocality,
+            route
+        };
+
+        geocodingResult1.formattedAddress = "fake address";
+        geocodingResult1.geometry = geometry;
+
+        GeocodingResult geocodingResult2 = new GeocodingResult();
+
+        AddressComponent locality2 = new AddressComponent();
+        locality2.longName = "fake street";
+        locality2.types = new AddressComponentType[] {AddressComponentType.LOCALITY};
+
+        AddressComponent streetNumber2 = new AddressComponent();
+        streetNumber2.longName = "13";
+        streetNumber2.types = new AddressComponentType[] {AddressComponentType.STREET_NUMBER};
+
+        AddressComponent region2 = new AddressComponent();
+        region2.longName = "fake region";
+        region2.types = new AddressComponentType[] {AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1};
+
+        AddressComponent sublocality2 = new AddressComponent();
+        sublocality2.longName = "fake district";
+        sublocality2.types = new AddressComponentType[] {AddressComponentType.SUBLOCALITY};
+
+        AddressComponent route2 = new AddressComponent();
+        route2.longName = "fake street name";
+        route2.types = new AddressComponentType[] {AddressComponentType.ROUTE};
+
+        geocodingResult2.addressComponents = new AddressComponent[] {
+            locality2,
+            streetNumber2,
+            region2,
+            sublocality2,
+            route2
+        };
+
+        geocodingResult2.formattedAddress = "fake address 2";
+        geocodingResult2.geometry = geometry;
+
+        geocodingResults.add(geocodingResult1);
+        geocodingResults.add(geocodingResult2);
+
+        return geocodingResults;
     }
 }

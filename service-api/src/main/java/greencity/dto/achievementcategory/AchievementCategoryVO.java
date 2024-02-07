@@ -2,10 +2,14 @@ package greencity.dto.achievementcategory;
 
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.useraction.UserActionVO;
-import lombok.*;
-
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor

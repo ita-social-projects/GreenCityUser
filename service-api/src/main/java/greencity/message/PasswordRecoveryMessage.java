@@ -1,9 +1,8 @@
 package greencity.message;
 
+import java.io.Serializable;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.io.Serializable;
 
 /**
  * The serializable message that is used for password recovery messages sending.

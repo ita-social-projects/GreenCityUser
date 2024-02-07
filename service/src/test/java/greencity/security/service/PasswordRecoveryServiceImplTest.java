@@ -1,6 +1,12 @@
 package greencity.security.service;
 
 import greencity.ModelUtils;
+import static greencity.ModelUtils.TEST_OWN_RESTORE_DTO;
+import static greencity.ModelUtils.TEST_OWN_RESTORE_DTO_WRONG;
+import static greencity.ModelUtils.TEST_OWN_SECURITY;
+import static greencity.ModelUtils.TEST_RESTORE_PASSWORD_EMAIL;
+import static greencity.ModelUtils.TEST_RESTORE_PASSWORD_EMAIL_EXPIRED_TOKEN;
+import static greencity.ModelUtils.TEST_USER;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
@@ -12,24 +18,23 @@ import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
+import java.util.Optional;
+import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.refEq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Optional;
-
-import static greencity.ModelUtils.*;
-import static java.util.Optional.empty;
-import static java.util.Optional.ofNullable;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.refEq;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PasswordRecoveryServiceImplTest {

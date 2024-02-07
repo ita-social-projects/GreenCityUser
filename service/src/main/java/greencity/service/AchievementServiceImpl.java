@@ -3,17 +3,15 @@ package greencity.service;
 import greencity.constant.CacheConstants;
 import greencity.dto.achievement.AchievementVO;
 import greencity.entity.UserAchievement;
-import greencity.enums.AchievementStatus;
 import greencity.repository.AchievementRepo;
 import greencity.repository.UserAchievementRepo;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -44,7 +42,6 @@ public class AchievementServiceImpl implements AchievementService {
     public void findUserAchievement(Long userId, Long achievementId) {
         UserAchievement userAchievement = userAchievementRepo
             .getUserAchievementByIdAndAchievementId(userId, achievementId);
-        userAchievement.setAchievementStatus(AchievementStatus.ACTIVE);
         userAchievementRepo.save(userAchievement);
     }
 }

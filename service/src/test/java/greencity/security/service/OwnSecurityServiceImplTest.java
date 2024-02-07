@@ -1,21 +1,7 @@
 package greencity.security.service;
 
-import greencity.TestConst;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.refEq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import greencity.ModelUtils;
+import greencity.TestConst;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
@@ -51,20 +37,30 @@ import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
-import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
 import org.mockito.Mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -102,9 +98,6 @@ class OwnSecurityServiceImplTest {
     UserRepo userRepo;
 
     @Mock
-    AchievementService achievementService;
-
-    @Mock
     EmailService emailService;
 
     @Mock
@@ -123,7 +116,7 @@ class OwnSecurityServiceImplTest {
         initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, 1, restorePasswordEmailRepo, modelMapper,
-            userRepo, achievementService, emailService, authorityRepo);
+            userRepo, emailService, authorityRepo);
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")
@@ -164,7 +157,6 @@ class OwnSecurityServiceImplTest {
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
         List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
         user.setUserAchievements(userAchievementList);
-        when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
@@ -190,7 +182,6 @@ class OwnSecurityServiceImplTest {
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
         List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
         user.setUserAchievements(userAchievementList);
-        when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
@@ -201,7 +192,6 @@ class OwnSecurityServiceImplTest {
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(achievementService, times(2)).findAll();
         verify(modelMapper, times(2)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
@@ -220,7 +210,6 @@ class OwnSecurityServiceImplTest {
         List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
         user.setUserAchievements(userAchievementList);
 
-        when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
@@ -231,7 +220,6 @@ class OwnSecurityServiceImplTest {
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(achievementService, times(2)).findAll();
         verify(modelMapper, times(2)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
@@ -250,7 +238,6 @@ class OwnSecurityServiceImplTest {
         List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
         user.setUserAchievements(userAchievementList);
 
-        when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
@@ -261,7 +248,6 @@ class OwnSecurityServiceImplTest {
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(achievementService, times(2)).findAll();
         verify(modelMapper, times(2)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
@@ -278,7 +264,6 @@ class OwnSecurityServiceImplTest {
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
         List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
         user.setUserAchievements(userAchievementList);
-        when(achievementService.findAll()).thenReturn(achievementVOList);
 
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
@@ -305,7 +290,6 @@ class OwnSecurityServiceImplTest {
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
         List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
         user.setUserAchievements(userAchievementList);
-        when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
         }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);

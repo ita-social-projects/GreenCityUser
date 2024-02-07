@@ -10,9 +10,11 @@ import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserManagementDto;
@@ -26,16 +28,16 @@ import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
+import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Provides the interface to manage {UserVO} entity.
@@ -44,6 +46,14 @@ import java.util.Optional;
  * @version 1.0
  */
 public interface UserService {
+    /**
+     * Updates an employee's rating information using the provided UserRatingDto.
+     *
+     * @param userRatingDto The UserRatingDto containing the updated rating
+     *                      information.
+     */
+    void updateUserRating(UserAddRatingDto userRatingDto);
+
     /**
      * Find all {@link User}'s with {@link EmailNotification} type.
      *
@@ -61,11 +71,11 @@ public interface UserService {
     int scheduleDeleteDeactivatedUsers();
 
     /**
-     * Find and return all cities for all users.
+     * Find and return city and coordinates .
      *
-     * @return {@link List} of {@link String} of cities
+     * @return {@link UserCityDto}
      **/
-    List<String> findAllUsersCities();
+    UserCityDto findAllUsersCities(Long userId);
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described
@@ -190,19 +200,19 @@ public interface UserService {
     void updateUser(Long userId, UserManagementUpdateDto dto);
 
     /**
-     * Get all exists roles.
+     * The method which return array of user role by user id.
      *
      * @return {@link RoleDto}.
      * @author Rostyslav Khasanov
      */
-    RoleDto getRoles();
+    RoleDto getRoles(Long id);
 
     /**
-     * Get list of available {@link EmailNotification} statuses for {@link UserVO}.
+     * Get {@link EmailNotification} status for {@link UserVO}.
      *
-     * @return available {@link EmailNotification} statuses.
+     * @return user {@link EmailNotification} status.
      */
-    List<EmailNotification> getEmailNotificationsStatuses();
+    EmailNotification getEmailNotificationsStatuses(String email);
 
     /**
      * Update last visit of user.
@@ -471,6 +481,13 @@ public interface UserService {
      * @author Bratakh Liubomyr
      */
     void markUserAsDeactivated(String uuid);
+
+    /**
+     * Method that mark User Activated.
+     *
+     * @author Oksana Spodaryk
+     */
+    void markUserAsActivated(String uuid);
 
     /**
      * Method find user with admin authority.

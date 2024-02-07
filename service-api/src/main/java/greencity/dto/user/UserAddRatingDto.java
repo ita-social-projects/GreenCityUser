@@ -1,15 +1,16 @@
-package greencity.dto.notification;
+package greencity.dto.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 @Builder
-public class NotificationDto {
-    private String title;
-    private String body;
+public class UserAddRatingDto {
+    private Long id;
+
+    private Double rating;
 }

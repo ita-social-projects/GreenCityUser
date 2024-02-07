@@ -1,10 +1,12 @@
 package greencity.dto.achievement;
 
 import greencity.dto.user.UserVO;
-import greencity.enums.AchievementStatus;
-import lombok.*;
-
-import javax.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -20,9 +22,6 @@ public class UserAchievementVO {
 
     @NotEmpty
     private AchievementVO achievement;
-
-    @NotEmpty
-    private AchievementStatus achievementStatus;
 
     @NotEmpty
     private boolean notified;

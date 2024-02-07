@@ -5,10 +5,9 @@ import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.user.UserVO;
 import greencity.entity.User;
+import java.util.stream.Collectors;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 @Component
 public class UserVOAchievementMapper extends AbstractConverter<User, UserVOAchievement> {
@@ -20,7 +19,6 @@ public class UserVOAchievementMapper extends AbstractConverter<User, UserVOAchie
             .userAchievements(user.getUserAchievements() != null ? user.getUserAchievements()
                 .stream().map(userAchievement -> UserAchievementVO.builder()
                     .id(userAchievement.getId())
-                    .achievementStatus(userAchievement.getAchievementStatus())
                     .user(UserVO.builder()
                         .id(userAchievement.getUser().getId())
                         .build())

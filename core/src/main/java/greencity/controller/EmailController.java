@@ -2,27 +2,28 @@ package greencity.controller;
 
 import greencity.constant.HttpStatuses;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
-import greencity.dto.notification.NotificationDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.message.GeneralEmailMessage;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/email")
 @AllArgsConstructor
 public class EmailController {
-    @Autowired
     private final EmailService emailService;
 
     /**
@@ -38,19 +39,7 @@ public class EmailController {
     }
 
     /**
-     * Method for sending notification to the event organizer about the EventComment
-     * addition.
-     *
-     * @param message - object with all necessary data for sending email
-     */
-    @PostMapping("/addEventComment")
-    public ResponseEntity<Object> addEventComment(@RequestBody EventCommentForSendEmailDto message) {
-        emailService.sendNewCommentForEventOrganizer(message);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
-     * Method for sending notification to userss who subscribed for updates about
+     * Method for sending notification to users who subscribed for updates about
      * added new places.
      *
      * @param message - object with all necessary data for sending email
@@ -105,22 +94,19 @@ public class EmailController {
     /**
      * Sends notification to user on email.
      *
-     * @param notification {@link NotificationDto} - object with all necessary data
-     *                     for sending notification via email.
-     * @param email        {@link String} - user's email.
-     * @author Ann Sakhno
+     * @param notification {@link GeneralEmailMessage} - object with all necessary
+     *                     data for sending notification via email.
+     * @author Yurii Midianyi
      */
-    @ApiOperation(value = "Send notification to user via email")
+    @Operation(summary = "Send general email notification")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
     })
-    @PostMapping("/notification")
-    public ResponseEntity<Object> sendUserNotification(@RequestBody NotificationDto notification,
-        @RequestParam("email") String email) {
-        emailService.sendNotificationByEmail(notification, email);
+    @PostMapping("/general/notification")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Object> sendEmailNotification(@RequestBody GeneralEmailMessage notification) {
+        emailService.sendEmailNotification(notification);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

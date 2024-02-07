@@ -18,6 +18,9 @@ public final class EmailConstants {
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
+    public static final String AUTHOR_NAME = "authorName";
+    public static final String COMMENT_BODY = "commentBody";
+    public static final String COMMENT_TIME = "commentTime";
     public static final String VERIFY_ADDRESS = "verifyAddress";
     public static final String RESTORE_PASS = "restorePassword";
     public static final String APPROVE_REGISTRATION = "approveRegistration";
@@ -28,7 +31,6 @@ public final class EmailConstants {
     public static final String ECO_NEWS_LINK = "ecoNewsLink";
     public static final String UNSUBSCRIBE_LINK = "unsubscribeLink";
     public static final String NEWS_RESULT = "news";
-    public static final String EVENT_COMMENT_LINK = "event-comment-link";
     public static final String REASONS = "reasons";
     public static final String DESCRIPTION = "description";
     public static final String LANGUAGE = "language";

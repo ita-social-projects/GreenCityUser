@@ -1,35 +1,97 @@
 package greencity.service;
 
 import greencity.ModelUtils;
+import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
+import static greencity.ModelUtils.TEST_ADMIN;
+import static greencity.ModelUtils.TEST_USER;
+import static greencity.ModelUtils.TEST_USER_VO;
+import static greencity.ModelUtils.getUserLocation;
 import greencity.TestConst;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
+import greencity.dto.CoordinatesDto;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.friends.FriendsChatDto;
-import greencity.dto.friends.SixFriendsPageResponceDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
-import greencity.entity.*;
+import greencity.dto.user.RoleDto;
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserAllFriendsDto;
+import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserCityDto;
+import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserProfileDtoResponse;
+import greencity.dto.user.UserProfilePictureDto;
+import greencity.dto.user.UserRoleDto;
+import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserUpdateDto;
+import greencity.dto.user.UserVO;
+import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.entity.Language;
+import greencity.entity.User;
+import greencity.entity.UserDeactivationReason;
+import greencity.entity.UserLocation;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
-import greencity.exception.exceptions.*;
+import static greencity.enums.Role.ROLE_USER;
+import static greencity.enums.UserStatus.ACTIVATED;
+import static greencity.enums.UserStatus.DEACTIVATED;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.LowRoleLevelException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongIdException;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
+import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -40,24 +102,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static greencity.ModelUtils.*;
-import static greencity.enums.Role.ROLE_USER;
-import static greencity.enums.UserStatus.ACTIVATED;
-import static greencity.enums.UserStatus.DEACTIVATED;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -74,6 +121,11 @@ class UserServiceImplTest {
     @Mock
     LanguageRepo languageRepo;
 
+    @Mock
+    GoogleApiService googleApiService;
+
+    @Mock
+    UserLocationRepo userLocationRepo;
     private User user = User.builder()
         .id(1L)
         .name("Taras")
@@ -158,10 +210,21 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findAllUsersCities() {
-        List<String> expected = Collections.singletonList("city");
-        when(userRepo.findAllUsersCities()).thenReturn(expected);
-        assertEquals(expected, userService.findAllUsersCities());
+    void findAllUsersCitiesTest() {
+        UserLocation userLocation = ModelUtils.getUserLocation();
+        UserCityDto userCityDto = modelMapper.map(userLocation, UserCityDto.class);
+        when(userLocationRepo.findAllUsersCities(1L)).thenReturn(Optional.of(userLocation));
+        assertEquals(userCityDto, userService.findAllUsersCities(1L));
+        verify(userLocationRepo).findAllUsersCities(1L);
+    }
+
+    @Test
+    void findAllUsersCitiesExceptionTest() {
+        when(userLocationRepo.findAllUsersCities(1L))
+            .thenThrow(new NotFoundException(ErrorMessage.USER_DID_NOT_SET_ANY_CITY));
+        Exception exception = assertThrows(NotFoundException.class, () -> userService.findAllUsersCities(1L));
+        assertEquals(ErrorMessage.USER_DID_NOT_SET_ANY_CITY, exception.getMessage());
+        verify(userLocationRepo).findAllUsersCities(1L);
     }
 
     @Test
@@ -349,7 +412,7 @@ class UserServiceImplTest {
 
     @Test
     void findAllTest() {
-        List<UserVO> userVO = List.of(getUserVO(), getUserVO(), getUserVO());
+        List<UserVO> userVO = List.of(ModelUtils.getUserVO(), ModelUtils.getUserVO(), ModelUtils.getUserVO());
         when(modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVO>>() {
         }.getType())).thenReturn(userVO);
         assertEquals(userVO, userService.findAll());
@@ -385,16 +448,27 @@ class UserServiceImplTest {
 
     @Test
     void getRoles() {
-        RoleDto roleDto = new RoleDto(Role.class.getEnumConstants());
-        assertEquals(roleDto, userService.getRoles());
+        User user = new User();
+        user.setRole(ROLE_USER);
+
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+
+        RoleDto result = userService.getRoles(1L);
+
+        assertEquals(ROLE_USER, result.getRoles()[0]);
+        assertThrows(NotFoundException.class, () -> userService.getRoles(0L));
     }
 
     @Test
-    void getEmailStatusesTest() {
-        List<EmailNotification> placeStatuses =
-            Arrays.asList(EmailNotification.class.getEnumConstants());
+    void getEmailNotificationsStatusesTest() {
+        User user = new User();
+        String email = "test@gmail.com";
+        user.setEmailNotification(EmailNotification.IMMEDIATELY);
 
-        assertEquals(placeStatuses, userService.getEmailNotificationsStatuses());
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+        EmailNotification result = userService.getEmailNotificationsStatuses(email);
+
+        assertEquals(EmailNotification.IMMEDIATELY, result);
     }
 
     @Test
@@ -493,18 +567,25 @@ class UserServiceImplTest {
     }
 
     @Test
-    void geTUserProfileStatistics() {
+    void getUserProfileStatistics() {
         when(restClient.findAmountOfPublishedNews(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
         when(restClient.findAmountOfAcquiredHabits(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
         when(restClient.findAmountOfHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
-        userService.getUserProfileStatistics(TestConst.SIMPLE_LONG_NUMBER);
+        when(restClient.findAmountOfEventsOrganizedAndAttendedByUser(TestConst.SIMPLE_LONG_NUMBER))
+            .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
+
         assertEquals(ModelUtils.USER_PROFILE_STATISTICS_DTO,
             userService.getUserProfileStatistics(TestConst.SIMPLE_LONG_NUMBER));
         assertNotEquals(ModelUtils.USER_PROFILE_STATISTICS_DTO,
             userService.getUserProfileStatistics(TestConst.SIMPLE_LONG_NUMBER_BAD_VALUE));
+
+        verify(restClient, times(2)).findAmountOfPublishedNews(anyLong());
+        verify(restClient, times(2)).findAmountOfAcquiredHabits(anyLong());
+        verify(restClient, times(2)).findAmountOfHabitsInProgress(anyLong());
+        verify(restClient, times(2)).findAmountOfEventsOrganizedAndAttendedByUser(anyLong());
     }
 
     @Test
@@ -555,26 +636,251 @@ class UserServiceImplTest {
         var user = ModelUtils.getUserWithSocialNetworks();
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(googleApiService, times(2)).getLocationByCoordinates(eq(1.0d), eq(1.0d), anyString());
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void saveUserProfileUpdatesWithNullValuesTest() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName(null);
+        request.setUserCredo(null);
+        request.setSocialNetworks(null);
+        request.setShowLocation(null);
+        request.setShowEcoPlace(null);
+        request.setShowShoppingList(null);
+        request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(null).build());
+
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+
+        String result = userService.saveUserProfile(request, "test@gmail.com");
+        assertEquals(UpdateConstants.SUCCESS_EN, result);
+
         verify(userRepo).findByEmail("test@gmail.com");
         verify(userRepo).save(user);
     }
 
     @Test
-    void saveUserProfileUpdatesValuesNull() {
+    void saveUserProfileUpdatesWithNullLatitudeTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName(null);
         request.setUserCredo(null);
-        request.setCity(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
         request.setShowShoppingList(null);
+        request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(1.0d).build());
+
         var user = ModelUtils.getUserWithSocialNetworks();
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
+
         String result = userService.saveUserProfile(request, "test@gmail.com");
         assertEquals(UpdateConstants.SUCCESS_EN, result);
+
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void saveUserProfileUpdatesWithNullLongitudeTest() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName(null);
+        request.setUserCredo(null);
+        request.setSocialNetworks(null);
+        request.setShowLocation(null);
+        request.setShowEcoPlace(null);
+        request.setShowShoppingList(null);
+        request.setCoordinates(CoordinatesDto.builder().latitude(1.0d).longitude(null).build());
+
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+
+        String result = userService.saveUserProfile(request, "test@gmail.com");
+        assertEquals(UpdateConstants.SUCCESS_EN, result);
+
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void testUpdateUserProfileLocationWithTwoAssignedUsers() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
+        request.setName("Dmutro");
+        var user = ModelUtils.getUserWithSocialNetworks();
+        var user2 = ModelUtils.getUser();
+        UserLocation userLocation = new UserLocation();
+        userLocation.setUsers(new ArrayList<>(Arrays.asList(user, user2)));
+        when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(userLocation));
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void testUpdateUserProfileLocationWhenUserHasAUserLocation() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmutro");
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
+        var user = ModelUtils.getUserWithUserLocation();
+        UserLocation userLocation2 = ModelUtils.getUserLocation2();
+        user.getUserLocation().setUsers(Collections.singletonList(user));
+
+        when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(userLocation2));
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        when(userLocationRepo.save(userLocation2)).thenReturn(userLocation2);
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
+        verify(userLocationRepo).save(userLocation2);
+        verify(userRepo).save(user);
+        verify(userLocationRepo).delete(any());
+    }
+
+    @Test
+    void testUpdateUserProfileDeleteLocation() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmutro");
+        CoordinatesDto coordinates = new CoordinatesDto(null, null);
+        request.setCoordinates(coordinates);
+        var user = ModelUtils.getUserWithUserLocation();
+        user.getUserLocation().getUsers().add(user);
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).save(user);
+        assertNull(user.getUserLocation());
+    }
+
+    @Test
+    void testUpdateUserProfileRemoveUserFromUserLocationList() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmutro");
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
+        var user = ModelUtils.getUserWithUserLocation();
+        var user2 = ModelUtils.getUser();
+        user.getUserLocation().getUsers().add(user);
+        user.getUserLocation().getUsers().add(user2);
+        UserLocation userLocation2 = ModelUtils.getUserLocation2();
+
+        when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(userLocation2));
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        when(userLocationRepo.save(userLocation2)).thenReturn(userLocation2);
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        assertEquals(1, user.getUserLocation().getUsers().size());
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
+        verify(userLocationRepo).save(userLocation2);
+        verify(userRepo).save(user);
+    }
+
+    @Test
+    void testUpdateUserProfileLocationWhenUserModifyUserLocation() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmutro");
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
+        var user = ModelUtils.getUserWithUserLocation();
+        user.getUserLocation().setUsers(Collections.singletonList(user));
+        when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(new UserLocation()));
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+
+        when(userLocationRepo.save(user.getUserLocation())).thenReturn(user.getUserLocation());
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
+        verify(userLocationRepo).save(any());
+        verify(userRepo).save(user);
+        verify(userLocationRepo, never()).delete(any());
     }
 
     @Test
@@ -588,11 +894,59 @@ class UserServiceImplTest {
     }
 
     @Test
+    void saveUserProfileWhenLocationIsNotUpdated() {
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmutro");
+        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
+        request.setCoordinates(coordinates);
+        var user = ModelUtils.getUserWithUserLocation();
+        user.getUserLocation().setUsers(Collections.singletonList(user));
+        when(userLocationRepo.getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude()))
+                .thenReturn(Optional.of(user.getUserLocation()));
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        when(userLocationRepo.save(user.getUserLocation())).thenReturn(user.getUserLocation());
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResult().get(0));
+
+        assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userLocationRepo).getUserLocationByLatitudeAndLongitude(
+            request.getCoordinates().getLatitude(), request.getCoordinates().getLongitude());
+        verify(googleApiService, times(2)).getLocationByCoordinates(
+            eq(request.getCoordinates().getLatitude()), eq(request.getCoordinates().getLongitude()), anyString());
+        verify(userLocationRepo).save(any());
+        verify(userRepo).save(user);
+        verify(userLocationRepo, never()).delete(any());
+    }
+
+    @Test
     void getUserProfileInformationTest() {
         UserProfileDtoResponse response = new UserProfileDtoResponse();
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
         assertEquals(response, userService.getUserProfileInformation(1L));
+        verify(userRepo).findById(1L);
+    }
+
+    @Test
+    void getUserProfileInformationWithUserLocationTest() {
+        UserProfileDtoResponse response = new UserProfileDtoResponse();
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        user.setUserLocation(getUserLocation());
+        when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
+        assertEquals(response, userService.getUserProfileInformation(1L));
+        verify(userRepo).findById(1L);
     }
 
     @Test
@@ -629,6 +983,8 @@ class UserServiceImplTest {
         when(userRepo.findLastActivityTimeById(anyLong())).thenReturn(Optional.of(userLastActivityTime));
 
         assertTrue(userService.checkIfTheUserIsOnline(1L));
+        verify(userRepo).findById(anyLong());
+        verify(userRepo).findLastActivityTimeById(anyLong());
     }
 
     @Test
@@ -643,6 +999,8 @@ class UserServiceImplTest {
         when(userRepo.findLastActivityTimeById(anyLong())).thenReturn(Optional.empty());
 
         assertFalse(userService.checkIfTheUserIsOnline(1L));
+        verify(userRepo).findById(anyLong());
+        verify(userRepo).findLastActivityTimeById(anyLong());
     }
 
     @Test
@@ -668,6 +1026,7 @@ class UserServiceImplTest {
             users.isLast());
         when(userRepo.findAll(pageable)).thenReturn(users);
         assertEquals(userManagementDtoPageableDto, userService.findUserForManagementByPage(pageable));
+        verify(userRepo).findAll(pageable);
     }
 
     @Test
@@ -768,7 +1127,6 @@ class UserServiceImplTest {
             .id(1L)
             .code("en")
             .build());
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         user.setUserStatus(DEACTIVATED);
         when(userRepo.save(user)).thenReturn(user);
@@ -924,7 +1282,7 @@ class UserServiceImplTest {
         List<User> users = Collections.singletonList(new User());
         Page<User> pageUsers = new PageImpl<>(users, pageable, 0);
         when(userRepo.findAll(any(UserSpecification.class), eq(pageable))).thenReturn(pageUsers);
-        when(modelMapper.map(users.get(0), UserManagementVO.class)).thenReturn(userManagementVO);
+        when(modelMapper.map(users.getFirst(), UserManagementVO.class)).thenReturn(userManagementVO);
         PageableAdvancedDto<UserManagementVO> actual = new PageableAdvancedDto<>(userManagementVOS, 1, 0, 1, 0,
             false, false, true, true);
         PageableAdvancedDto<UserManagementVO> expected = userService.search(pageable, userViewDto);
@@ -957,6 +1315,25 @@ class UserServiceImplTest {
         String uuid = "uuid";
         assertThrows(NotFoundException.class,
             () -> userService.markUserAsDeactivated(uuid));
+    }
+
+    @Test
+    void markUserActivated() {
+        String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
+        User user = ModelUtils.getUser();
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user));
+        user.setUserStatus(ACTIVATED);
+        when(userRepo.save(user)).thenReturn(user);
+        userService.markUserAsActivated(uuid);
+        verify(userRepo).save(user);
+
+    }
+
+    @Test
+    void markUserActivatedException() {
+        String uuid = "uuid";
+        assertThrows(NotFoundException.class,
+            () -> userService.markUserAsActivated(uuid));
     }
 
     @Test
@@ -1030,7 +1407,74 @@ class UserServiceImplTest {
 
     private static Stream<Arguments> provideUuidOptionalUserResultForCheckIfUserExistsByUuidTest() {
         return Stream.of(
-            Arguments.of("444e66e8-8daa-4cb0-8269-a8d856e7dd15", Optional.of(getUser()), true),
+            Arguments.of("444e66e8-8daa-4cb0-8269-a8d856e7dd15", Optional.of(ModelUtils.getUser()), true),
             Arguments.of("uuid", Optional.empty(), false));
+    }
+
+    @Test
+    void editUserRatingTest() {
+        when(userRepo.findById(anyLong())).thenReturn(Optional.ofNullable(TEST_USER));
+        UserAddRatingDto userRatingDto = UserAddRatingDto.builder()
+            .id(1L)
+            .rating(200D)
+            .build();
+
+        userService.updateUserRating(userRatingDto);
+        verify(userRepo).save(TEST_USER);
+    }
+
+    @Test
+    void updateStatusWithFailedCheckUpdatableUserTest() {
+        when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
+        Long id = user2.getId();
+        assertThrows(BadUpdateRequestException.class,
+            () -> userService.updateStatus(id, DEACTIVATED, "email"));
+        verify(userRepo).findByEmail(any());
+        verify(modelMapper).map(user2, UserVO.class);
+    }
+
+    @Test
+    void updateUserProfilePictureTest() {
+        String fileName = "test.txt";
+        String content = "test file content";
+        byte[] bytes = content.getBytes();
+        MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(restClient.uploadImage(any())).thenReturn("picturePath");
+        when(modelMapper.map(any(), any())).thenReturn(userVO);
+        UserVO actual = userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
+        assertEquals(userVO, actual);
+        verify(restClient).uploadImage(any());
+        verify(modelMapper).map(any(), any());
+        verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
+    void updateUserProfilePictureBaseTest() {
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(modelMapper.map(any(), any())).thenReturn(null);
+        assertThrows(BadRequestException.class,
+            () -> userService.updateUserProfilePicture(null, "testmail@gmail.com", "test"));
+        verify(modelMapper).map(any(), any());
+        verify(userRepo).findByEmail(anyString());
+    }
+
+    @Test
+    void getDeactivationReasonUkTest() {
+        List<String> test1 = List.of();
+        User user = ModelUtils.getUser();
+        user.setLanguage(Language.builder()
+            .id(1L)
+            .code("en")
+            .build());
+        UserDeactivationReason test = UserDeactivationReason.builder()
+            .id(1L)
+            .user(user)
+            .reason("test")
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .build();
+        when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
+        assertEquals(test1, userService.getDeactivationReason(1L, "uk"));
     }
 }

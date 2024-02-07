@@ -1,34 +1,41 @@
 package greencity.client;
 
+import static greencity.constant.AppConstant.AUTHORIZATION;
+import static greencity.constant.AppConstant.IMAGE;
 import greencity.constant.RestTemplateLinks;
+import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.enums.AchievementCategoryType;
 import greencity.enums.AchievementType;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-
-import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.IMAGE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class RestClientTest {
@@ -100,6 +107,7 @@ class RestClientTest {
             + profilePicturePath, HttpMethod.POST, entity, MultipartFile.class))
                 .thenReturn(ResponseEntity.ok(image));
         assertEquals(image, restClient.convertToMultipartImage(profilePicturePath));
+        verify(httpServletRequest).getHeader(any());
     }
 
     @Test
@@ -128,6 +136,10 @@ class RestClientTest {
             String.class)).thenReturn(imagePath);
         assertEquals(imagePath,
             restClient.uploadImage(image));
+        verify(httpServletRequest).getHeader(any());
+        verify(restTemplate).postForObject(greenCityServerAddress +
+            RestTemplateLinks.FILES_IMAGE, requestEntity,
+            String.class);
     }
 
     @Test
@@ -212,7 +224,6 @@ class RestClientTest {
         String[] allLanguageCodes = new String[3];
         allLanguageCodes[0] = "en";
         allLanguageCodes[1] = "uk";
-        allLanguageCodes[2] = "ru";
         when(restTemplate.getForObject(greenCityServerAddress
             + RestTemplateLinks.LANGUAGE, String[].class)).thenReturn(allLanguageCodes);
 
@@ -235,5 +246,48 @@ class RestClientTest {
             greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
             ubsProfileCreationDto, Long.class);
         assertEquals(1L, id);
+    }
+
+    @Test
+    void testChatBetweenTwo() {
+        Long firstUserId = 1L;
+        Long secondUserId = 2L;
+        FriendsChatDto expectedBody = new FriendsChatDto();
+
+        when(restTemplate.exchange(
+            any(String.class),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(FriendsChatDto.class)))
+                .thenReturn(new ResponseEntity<>(expectedBody, HttpStatus.OK));
+
+        FriendsChatDto result = restClient.chatBetweenTwo(firstUserId, secondUserId);
+
+        assertNotNull(result);
+        verify(restTemplate).exchange(any(String.class),
+            eq(HttpMethod.GET),
+            any(HttpEntity.class),
+            eq(FriendsChatDto.class));
+    }
+
+    @Test
+    void findAmountOfEventsOrganizedAndAttendedByUserTest() {
+        String accessToken = "accessToken";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        Long userId = 1L;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
+        when(restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT
+            + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class))
+                .thenReturn(ResponseEntity.ok(1L));
+
+        assertEquals(1, restClient.findAmountOfEventsOrganizedAndAttendedByUser(userId));
+
+        verify(httpServletRequest).getHeader(AUTHORIZATION);
+        verify(restTemplate).exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT
+            + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class);
     }
 }

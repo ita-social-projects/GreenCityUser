@@ -1,5 +1,7 @@
 package greencity.client;
 
+import static greencity.constant.AppConstant.AUTHORIZATION;
+import static greencity.constant.AppConstant.IMAGE;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
@@ -8,6 +10,10 @@ import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import greencity.enums.AchievementCategoryType;
 import greencity.enums.AchievementType;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,14 +28,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-
-import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.IMAGE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -251,5 +249,21 @@ public class RestClient {
                 return image.getOriginalFilename();
             }
         };
+    }
+
+    /**
+     * Method for getting amount of organized and attended events by {@link UserVO}
+     * id.
+     *
+     * @param userId of {@link UserVO}
+     * @return {@link Long} count of organized and attended by user events.
+     *
+     * @author Olena Sotnik
+     */
+    public Long findAmountOfEventsOrganizedAndAttendedByUser(Long userId) {
+        HttpEntity<String> entity = new HttpEntity<>(setHeader());
+        return restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT + RestTemplateLinks.USER_ID + userId,
+            HttpMethod.GET, entity, Long.class).getBody();
     }
 }
