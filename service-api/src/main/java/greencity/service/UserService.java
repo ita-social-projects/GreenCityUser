@@ -7,10 +7,10 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
@@ -28,16 +28,16 @@ import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
+import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Provides the interface to manage {UserVO} entity.
@@ -328,6 +328,14 @@ public interface UserService {
      * @author Yurii Zhurakovskyi
      */
     void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime);
+
+    /**
+     * Updates last activity time for a given user by email.
+     *
+     * @param email                - {@link UserVO}'s email
+     * @param userLastActivityTime - new {@link UserVO}'s last activity time
+     */
+    void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
 
     /**
      * The method checks by id if a {@link UserVO} is online.

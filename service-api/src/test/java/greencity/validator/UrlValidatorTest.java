@@ -1,15 +1,13 @@
 package greencity.validator;
 
+import static greencity.ModelUtils.getUrl;
 import greencity.exception.exceptions.InvalidURLException;
+import java.net.MalformedURLException;
 import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.net.MalformedURLException;
-
-import static greencity.ModelUtils.getUrl;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(MockitoExtension.class)
 class UrlValidatorTest {
