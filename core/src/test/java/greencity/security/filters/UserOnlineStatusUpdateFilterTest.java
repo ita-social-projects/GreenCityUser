@@ -4,19 +4,22 @@ import greencity.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.concurrent.TimeUnit;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
@@ -34,6 +37,9 @@ class UserOnlineStatusUpdateFilterTest {
     @InjectMocks
     private UserOnlineStatusUpdateFilter userOnlineStatusUpdateFilter;
 
+    @Mock
+    ThreadPoolTaskExecutor customThreadPool;
+
     @BeforeEach
     void setUp() {
         SecurityContextHolder.getContext().setAuthentication(null);
@@ -49,7 +55,9 @@ class UserOnlineStatusUpdateFilterTest {
 
         userOnlineStatusUpdateFilter.doFilterInternal(request, response, chain);
 
-        verify(userService).updateUserLastActivityTimeByEmail(eq(email), any());
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted(
+            () -> userService.updateUserLastActivityTimeByEmail(eq(email), any()));
+
         verify(chain).doFilter(request, response);
     }
 

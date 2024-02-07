@@ -18,9 +18,11 @@ import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import java.util.Arrays;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -53,16 +55,20 @@ public class SecurityConfig {
     private static final String USER_LINK = "/user";
     private final AuthenticationConfiguration authenticationConfiguration;
 
+    private final ThreadPoolTaskExecutor customThreadPool;
+
     /**
      * Constructor.
      */
 
     @Autowired
     public SecurityConfig(JwtTool jwtTool, UserService userService,
-        AuthenticationConfiguration authenticationConfiguration) {
+        AuthenticationConfiguration authenticationConfiguration,
+        @Qualifier("taskExecutor") ThreadPoolTaskExecutor customThreadPool) {
         this.jwtTool = jwtTool;
         this.userService = userService;
         this.authenticationConfiguration = authenticationConfiguration;
+        this.customThreadPool = customThreadPool;
     }
 
     /**
@@ -86,8 +92,8 @@ public class SecurityConfig {
             .addFilterBefore(
                 new AccessTokenAuthenticationFilter(jwtTool, authenticationManager(), userService),
                 UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(new UserOnlineStatusUpdateFilter(userService),
-                    AccessTokenAuthenticationFilter.class)
+            .addFilterAfter(new UserOnlineStatusUpdateFilter(userService, customThreadPool),
+                AccessTokenAuthenticationFilter.class)
             .exceptionHandling(exception -> exception
                 .authenticationEntryPoint((req, resp, exc) -> resp.sendError(SC_UNAUTHORIZED, "Authorize first."))
                 .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities.")))
