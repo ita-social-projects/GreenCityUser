@@ -166,7 +166,7 @@ class OwnSecurityServiceImplTest {
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
-        OwnSignUpDto ownSignUpDto=new OwnSignUpDto();
+        OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
         ownSignUpDto.setEmail("test@gmail.com");
         ownSecurityService.signUp(ownSignUpDto, "en");
         verify(emailService, times(1)).sendVerificationEmail(
