@@ -144,7 +144,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return User.builder()
             .name(dto.getName())
             .firstName(dto.getName())
-            .email(dto.getEmail())
+            .email(dto.getEmail().toLowerCase())
             .dateOfRegistration(LocalDateTime.now())
             .role(Role.ROLE_USER)
             .refreshTokenKey(refreshTokenKey)
