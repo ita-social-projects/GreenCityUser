@@ -33,14 +33,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import java.security.Principal;
 import java.util.Locale;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -227,9 +227,9 @@ public class OwnSecurityController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     })
     @PutMapping("/changePassword")
-    public ResponseEntity<Object> updatePassword(@Valid @RequestBody UpdatePasswordDto updateDto,
-        @Parameter(hidden = true) @AuthenticationPrincipal Principal principal) {
-        String email = principal.getName();
+    public ResponseEntity<Object> updatePassword(@Valid @RequestBody UpdatePasswordDto updateDto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
         service.updateCurrentPassword(updateDto, email);
         return ResponseEntity.ok().build();
     }
@@ -266,9 +266,9 @@ public class OwnSecurityController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     })
     @GetMapping("/password-status")
-    public ResponseEntity<PasswordStatusDto> passwordStatus(
-        @Parameter(hidden = true) @AuthenticationPrincipal Principal principal) {
-        String email = principal.getName();
+    public ResponseEntity<PasswordStatusDto> passwordStatus() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
         return ResponseEntity.ok().body(new PasswordStatusDto(service.hasPassword(email)));
     }
 
@@ -286,9 +286,9 @@ public class OwnSecurityController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
     })
     @PostMapping("/set-password")
-    public ResponseEntity<Object> setPassword(@Valid @RequestBody SetPasswordDto dto,
-        @Parameter(hidden = true) @AuthenticationPrincipal Principal principal) {
-        String email = principal.getName();
+    public ResponseEntity<Object> setPassword(@Valid @RequestBody SetPasswordDto dto) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
         service.setPassword(dto, email);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
