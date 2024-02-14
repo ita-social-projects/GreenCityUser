@@ -23,6 +23,9 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -174,6 +177,9 @@ class OwnSecurityControllerTest {
             }\
             """;
 
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         mockMvc.perform(put(LINK + "/changePassword")
             .principal(principal)
             .contentType(MediaType.APPLICATION_JSON)
@@ -192,6 +198,9 @@ class OwnSecurityControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@mail.com");
 
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         mockMvc.perform(get(LINK + "/password-status")
             .principal(principal))
             .andExpect(status().isOk());
@@ -204,6 +213,9 @@ class OwnSecurityControllerTest {
     void setPassword() {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@mail.com");
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String content = """
             {
