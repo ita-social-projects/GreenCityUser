@@ -1,27 +1,37 @@
 package greencity.security.controller;
 
 import greencity.ModelUtils;
-import greencity.security.dto.ownsecurity.*;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
+import greencity.security.dto.ownsecurity.OwnRestoreDto;
+import greencity.security.dto.ownsecurity.OwnSignInDto;
+import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
+import java.security.Principal;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.security.Principal;
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 class OwnSecurityControllerTest {
@@ -50,12 +60,14 @@ class OwnSecurityControllerTest {
 
     @Test
     void singUpTest() throws Exception {
-        String content = "{\n" +
-            "  \"email\": \"test@mail.com\",\n" +
-            "  \"name\": \"String\",\n" +
-            "  \"password\": \"String123=\",\n" +
-            "  \"isUbs\": false\n" +
-            "}";
+        String content = """
+            {
+              "email": "test@mail.com",
+              "name": "String",
+              "password": "String123=",
+              "isUbs": false
+            }\
+            """;
 
         mockMvc.perform(post(LINK + "/signUp?lang=en")
             .contentType(MediaType.APPLICATION_JSON)
@@ -68,11 +80,13 @@ class OwnSecurityControllerTest {
 
     @Test
     void singUpEmployeeTest() throws Exception {
-        String content = "{\n" +
-            "  \"email\": \"test@mail.com\",\n" +
-            "  \"name\": \"String\",\n" +
-            "  \"isUbs\": true\n" +
-            "}";
+        String content = """
+            {
+              "email": "test@mail.com",
+              "name": "String",
+              "isUbs": true
+            }\
+            """;
 
         mockMvc.perform(post(LINK + "/sign-up-employee?lang=en")
             .contentType(MediaType.APPLICATION_JSON)
@@ -85,10 +99,12 @@ class OwnSecurityControllerTest {
 
     @Test
     void signInTest() throws Exception {
-        String content = "{\n" +
-            "  \"email\": \"test@mail.com\",\n" +
-            "  \"password\": \"String-123\"\n" +
-            "}";
+        String content = """
+            {
+              "email": "test@mail.com",
+              "password": "String-123"
+            }\
+            """;
 
         mockMvc.perform(post(LINK + "/signIn")
             .contentType(MediaType.APPLICATION_JSON)
@@ -130,12 +146,14 @@ class OwnSecurityControllerTest {
 
     @Test
     void changePasswordTest() throws Exception {
-        String content = "{\n" +
-            "  \"confirmPassword\": \"String123=\",\n" +
-            "  \"password\": \"String124=\",\n" +
-            "  \"token\": \"12345\",\n" +
-            "  \"isUbs\": \"false\"\n" +
-            "}";
+        String content = """
+            {
+              "confirmPassword": "String123=",
+              "password": "String124=",
+              "token": "12345",
+              "isUbs": "false"
+            }\
+            """;
 
         OwnRestoreDto form = new OwnRestoreDto("String124=", "String123=", "12345", false);
 
@@ -152,10 +170,15 @@ class OwnSecurityControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@mail.com");
 
-        String content = "{\n" +
-            "  \"confirmPassword\": \"String123=\",\n" +
-            "  \"password\": \"String124=\"\n" +
-            "}";
+        String content = """
+            {
+              "confirmPassword": "String123=",
+              "password": "String124="
+            }\
+            """;
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         mockMvc.perform(put(LINK + "/changePassword")
             .principal(principal)
@@ -175,6 +198,9 @@ class OwnSecurityControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@mail.com");
 
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         mockMvc.perform(get(LINK + "/password-status")
             .principal(principal))
             .andExpect(status().isOk());
@@ -188,10 +214,15 @@ class OwnSecurityControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@mail.com");
 
-        String content = "{\n" +
-            "  \"password\": \"String123=\",\n" +
-            "  \"confirmPassword\": \"String123=\"\n" +
-            "}";
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        String content = """
+            {
+              "password": "String123=",
+              "confirmPassword": "String123="
+            }\
+            """;
 
         SetPasswordDto dto = ModelUtils.getObjectMapper().readValue(content, SetPasswordDto.class);
 

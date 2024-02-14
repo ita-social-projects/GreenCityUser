@@ -1,9 +1,12 @@
 package greencity.dto.socialnetwork;
 
 import greencity.dto.user.UserVO;
-import lombok.*;
-
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor

@@ -1,5 +1,6 @@
 package greencity.security.service;
 
+import static greencity.ModelUtils.getUbsProfileCreationDto;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
@@ -11,21 +12,21 @@ import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.repository.UserRepo;
 import greencity.security.repository.VerifyEmailRepo;
-import org.junit.jupiter.api.Assertions;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static greencity.ModelUtils.getUbsProfileCreationDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class VerifyEmailServiceImplTest {
