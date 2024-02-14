@@ -1,5 +1,12 @@
 package greencity.security.service;
 
+import static greencity.ModelUtils.TEST_EMAIL;
+import static greencity.ModelUtils.createAdmin;
+import static greencity.ModelUtils.createEmployee;
+import static greencity.ModelUtils.getAuthority;
+import static greencity.ModelUtils.getPositions;
+import static greencity.ModelUtils.getUser;
+import static greencity.ModelUtils.getUserEmployeeAuthorityDto;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.position.PositionDto;
 import greencity.entity.Authority;
@@ -11,40 +18,27 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static greencity.ModelUtils.TEST_EMAIL;
-import static greencity.ModelUtils.createAdmin;
-import static greencity.ModelUtils.createEmployee;
-import static greencity.ModelUtils.createEmployeeAdmin;
-import static greencity.ModelUtils.createEmployeeDriver;
-import static greencity.ModelUtils.createSuperAdmin;
-import static greencity.ModelUtils.getPositions;
-import static greencity.ModelUtils.getAuthority;
-import static greencity.ModelUtils.getSuperAdminEmployeeAuthorityDto;
-import static greencity.ModelUtils.getUser;
-import static greencity.ModelUtils.getUserEmployeeAuthorityDto;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)

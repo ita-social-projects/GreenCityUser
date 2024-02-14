@@ -1,17 +1,15 @@
 package greencity.validator;
 
 import greencity.exception.exceptions.BadSocialNetworkLinksException;
+import jakarta.validation.ConstraintValidatorContext;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import javax.validation.ConstraintValidatorContext;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class SocialNetworkLinksValidatorTest {

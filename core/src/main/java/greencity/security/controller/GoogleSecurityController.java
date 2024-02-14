@@ -2,25 +2,24 @@ package greencity.security.controller;
 
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
+import static greencity.constant.ErrorMessage.BAD_GOOGLE_TOKEN;
 import greencity.constant.HttpStatuses;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.service.GoogleSecurityService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.constraints.NotBlank;
+import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import springfox.documentation.annotations.ApiIgnore;
-
-import javax.validation.constraints.NotBlank;
-
-import java.util.Locale;
-
-import static greencity.constant.ErrorMessage.BAD_GOOGLE_TOKEN;
 
 /**
  * Controller that provide google security logic.
@@ -50,15 +49,16 @@ public class GoogleSecurityController {
      * @param idToken {@link String} - google idToken
      * @return {@link SuccessSignInDto} if token valid
      */
-    @ApiOperation("Make authentication by Google")
+    @Operation(summary = "Make authentication by Google")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK, response = SuccessSignInDto.class),
-        @ApiResponse(code = 400, message = BAD_GOOGLE_TOKEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+            content = @Content(schema = @Schema(implementation = SuccessSignInDto.class))),
+        @ApiResponse(responseCode = "400", description = BAD_GOOGLE_TOKEN)
     })
     @GetMapping
     @ApiLocale
     public SuccessSignInDto authenticate(@RequestParam @NotBlank String idToken,
-        @ApiIgnore @ValidLanguage Locale locale) {
+        @Parameter(hidden = true) @ValidLanguage Locale locale) {
         return googleSecurityService.authenticate(idToken, locale.getLanguage());
     }
 }

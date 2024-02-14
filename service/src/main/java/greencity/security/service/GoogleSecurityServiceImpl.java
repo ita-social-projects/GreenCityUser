@@ -3,6 +3,9 @@ package greencity.security.service;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.client.RestClient;
+import static greencity.constant.AppConstant.DEFAULT_RATING;
+import static greencity.constant.AppConstant.GOOGLE_PICTURE;
+import static greencity.constant.AppConstant.USERNAME;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
@@ -17,25 +20,21 @@ import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
+import static greencity.security.service.OwnSecurityServiceImpl.getUserAchievements;
+import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 import greencity.service.AchievementService;
 import greencity.service.UserService;
-
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-import static greencity.constant.AppConstant.*;
-import static greencity.security.service.OwnSecurityServiceImpl.getUserAchievements;
-import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 
 /**
  * {@inheritDoc}

@@ -1,11 +1,10 @@
 package greencity.validator;
 
 import greencity.exception.exceptions.LanguageNotSupportedException;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 import java.util.List;
 import java.util.Locale;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * This class should validate language.

@@ -3,11 +3,11 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
-import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.constant.AppConstant;
+import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.converters.UserArgumentResolver;
-import greencity.dto.PageableAdvancedDto;
 import greencity.dto.EmployeePositionsDto;
+import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
@@ -15,6 +15,8 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -23,8 +25,6 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UserAddRatingDto;
-import greencity.dto.user.UserCityDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.security.service.AuthorityService;
@@ -59,15 +59,15 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -99,10 +99,12 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        String content = "{\n"
-            + "  \"id\": 0,\n"
-            + "  \"userStatus\": \"BLOCKED\"\n"
-            + "}";
+        String content = """
+            {
+              "id": 0,
+              "userStatus": "BLOCKED"
+            }\
+            """;
 
         mockMvc.perform(patch(userLink + "/status")
             .principal(principal)
@@ -131,9 +133,11 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        String content = "{\n"
-            + "  \"role\": \"ROLE_USER\"\n"
-            + "}";
+        String content = """
+            {
+              "role": "ROLE_USER"
+            }\
+            """;
 
         mockMvc.perform(patch(userLink + "/1/role")
             .principal(principal)
@@ -201,9 +205,11 @@ class UserControllerTest {
         int pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        String content = "{\n"
-            + "  \"searchReg\": \"string\"\n"
-            + "}";
+        String content = """
+            {
+              "searchReg": "string"
+            }\
+            """;
 
         mockMvc.perform(post(userLink + "/filter?page=1")
             .contentType(MediaType.APPLICATION_JSON)
@@ -234,10 +240,12 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        String content = "{\n"
-            + "  \"emailNotification\": \"DISABLED\",\n"
-            + "  \"name\": \"String\"\n"
-            + "}";
+        String content = """
+            {
+              "emailNotification": "DISABLED",
+              "name": "String"
+            }\
+            """;
 
         ObjectMapper mapper = new ObjectMapper();
         UserUpdateDto userUpdateDto =
@@ -277,10 +285,12 @@ class UserControllerTest {
         UserVO user = ModelUtils.getUserVO();
         Principal principal = mock(Principal.class);
 
-        String json = "{\n"
-            + "\t\"id\": 1,\n"
-            + "\t\"profilePicturePath\": \"ima\""
-            + "}";
+        String json = """
+            {
+            	"id": 1,
+            	"profilePicturePath": "ima"\
+            }\
+            """;
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
@@ -348,18 +358,21 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testName");
 
-        String json = "{\n"
-            + "\t\"name\": \"testName\",\n"
-            + "\t\"userCredo\": \"credo\",\n"
-            + "\t\"socialNetworks\": [],\n"
-            + "\t\"showLocation\": true,\n"
-            + "\t\"showEcoPlace\": true,\n"
-            + "\t\"showShoppingList\": false,\n"
-            + "\t\"coordinates\":{ \n "
-            + "\t\"latitude\": 20.000000,\n"
-            + "\t\"longitude\": 20.000000\n"
-            + "\t}\n"
-            + "}";
+        String json = """
+            {
+            	"name": "testName",
+            	"userCredo": "credo",
+            	"socialNetworks": [],
+            	"showLocation": true,
+            	"showEcoPlace": true,
+            	"showShoppingList": false,
+            	"coordinates":{\s
+             \
+            	"latitude": 20.000000,
+            	"longitude": 20.000000
+            	}
+            }\
+            """;
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
@@ -422,7 +435,7 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/findById")
             .param("id", "1"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType("application/json;charset=UTF-8"))
+            .andExpect(content().contentType("application/json"))
             .andExpect(jsonPath("$.id").value(1L))
             .andExpect(jsonPath("$.name").value(TestConst.NAME))
             .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
@@ -778,10 +791,12 @@ class UserControllerTest {
             .build();
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        String content = "{\n"
-            + "  \"authorities\":[ \"EDIT_ORDER\"],\n"
-            + "  \"employeeEmail\": \"test@mail.com\"\n"
-            + "}";
+        String content = """
+            {
+              "authorities":[ "EDIT_ORDER"],
+              "employeeEmail": "test@mail.com"
+            }\
+            """;
 
         mockMvc.perform(put(userLink + "/edit-authorities")
             .principal(principal)
