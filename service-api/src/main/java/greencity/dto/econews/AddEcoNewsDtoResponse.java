@@ -1,11 +1,11 @@
 package greencity.dto.econews;
 
 import greencity.dto.user.EcoNewsAuthorDto;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.List;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;

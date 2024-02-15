@@ -7,13 +7,15 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.user.UserVO;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
-import java.util.Collections;
-import java.util.stream.Collectors;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class UserVOAchievementMapperTest {

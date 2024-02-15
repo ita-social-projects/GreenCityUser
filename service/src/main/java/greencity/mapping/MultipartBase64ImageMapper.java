@@ -1,23 +1,20 @@
 package greencity.mapping;
 
-import greencity.exception.exceptions.NotSavedException;
-import greencity.service.MultipartFileImpl;
+import org.modelmapper.AbstractConverter;
+import org.springframework.web.multipart.MultipartFile;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import javax.imageio.ImageIO;
+
+import greencity.exception.exceptions.NotSavedException;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
-import static org.apache.tomcat.util.codec.binary.Base64.decodeBase64;
-import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import static org.apache.tomcat.util.codec.binary.Base64.decodeBase64;
 
 @Component
 public class MultipartBase64ImageMapper extends AbstractConverter<String, MultipartFile> {
@@ -41,8 +38,7 @@ public class MultipartBase64ImageMapper extends AbstractConverter<String, Multip
                 OutputStream outputStream = fileItem.getOutputStream()) {
                 IOUtils.copy(input, outputStream);
                 outputStream.flush();
-                return new MultipartFileImpl("mainFile", tempFile.getName(),
-                    Files.probeContentType(tempFile.toPath()), Files.readAllBytes(tempFile.toPath()));
+                return new CommonsMultipartFile(fileItem);
             }
         } catch (IOException e) {
             throw new NotSavedException("Cannot convert to BASE64 image");

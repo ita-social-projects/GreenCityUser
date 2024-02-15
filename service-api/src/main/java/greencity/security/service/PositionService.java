@@ -1,6 +1,7 @@
 package greencity.security.service;
 
 import greencity.dto.position.PositionAuthoritiesDto;
+
 import java.util.List;
 
 public interface PositionService {

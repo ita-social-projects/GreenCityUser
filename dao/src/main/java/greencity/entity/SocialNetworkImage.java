@@ -1,7 +1,8 @@
 package greencity.entity;
 
 import lombok.*;
-import jakarta.persistence.*;
+
+import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor

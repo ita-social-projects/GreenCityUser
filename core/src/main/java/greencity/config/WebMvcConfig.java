@@ -2,8 +2,6 @@ package greencity.config;
 
 import greencity.converters.UserArgumentResolver;
 import greencity.service.UserService;
-import java.util.List;
-import java.util.Locale;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -18,6 +16,9 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+
+import java.util.List;
+import java.util.Locale;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {

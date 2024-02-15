@@ -16,15 +16,15 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 class EmailControllerTest {
@@ -48,15 +48,13 @@ class EmailControllerTest {
     @Test
     void addEcoNews() throws Exception {
         String content =
-            """
-                {"unsubscribeToken":"string",\
-                "creationDate":"2021-02-05T15:10:22.434Z",\
-                "imagePath":"string",\
-                "source":"string",\
-                "author":{"id":0,"name":"string","email":"test.email@gmail.com" },\
-                "title":"string",\
-                "text":"string"}\
-                """;
+            "{\"unsubscribeToken\":\"string\"," +
+                "\"creationDate\":\"2021-02-05T15:10:22.434Z\"," +
+                "\"imagePath\":\"string\"," +
+                "\"source\":\"string\"," +
+                "\"author\":{\"id\":0,\"name\":\"string\",\"email\":\"test.email@gmail.com\" }," +
+                "\"title\":\"string\"," +
+                "\"text\":\"string\"}";
 
         mockPerform(content, "/addEcoNews");
 
@@ -70,20 +68,18 @@ class EmailControllerTest {
 
     @Test
     void sendReport() throws Exception {
-        String content = """
-            {\
-            "categoriesDtoWithPlacesDtoMap":\
-            {"additionalProp1":\
-            [{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}],\
-            "additionalProp2":\
-            [{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}],\
-            "additionalProp3":[{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}]},\
-            "emailNotification":"string",\
-            "subscribers":[{"email":"string","id":0,"name":"string"}]}\
-            """;
+        String content = "{" +
+            "\"categoriesDtoWithPlacesDtoMap\":" +
+            "{\"additionalProp1\":" +
+            "[{\"category\":{\"name\":\"string\",\"parentCategoryId\":0}," +
+            "\"name\":\"string\"}]," +
+            "\"additionalProp2\":" +
+            "[{\"category\":{\"name\":\"string\",\"parentCategoryId\":0}," +
+            "\"name\":\"string\"}]," +
+            "\"additionalProp3\":[{\"category\":{\"name\":\"string\",\"parentCategoryId\":0}," +
+            "\"name\":\"string\"}]}," +
+            "\"emailNotification\":\"string\"," +
+            "\"subscribers\":[{\"email\":\"string\",\"id\":0,\"name\":\"string\"}]}";
 
         mockPerform(content, "/sendReport");
 
@@ -97,14 +93,12 @@ class EmailControllerTest {
 
     @Test
     void changePlaceStatus() throws Exception {
-        String content = """
-            {\
-            "authorEmail":"string",\
-            "authorFirstName":"string",\
-            "placeName":"string",\
-            "placeStatus":"string"\
-            }\
-            """;
+        String content = "{" +
+            "\"authorEmail\":\"string\"," +
+            "\"authorFirstName\":\"string\"," +
+            "\"placeName\":\"string\"," +
+            "\"placeStatus\":\"string\"" +
+            "}";
 
         mockPerform(content, "/changePlaceStatus");
 
@@ -118,12 +112,10 @@ class EmailControllerTest {
 
     @Test
     void sendHabitNotification() throws Exception {
-        String content = """
-            {\
-            "email":"string",\
-            "name":"string"\
-            }\
-            """;
+        String content = "{" +
+            "\"email\":\"string\"," +
+            "\"name\":\"string\"" +
+            "}";
 
         mockPerform(content, "/sendHabitNotification");
 
@@ -142,13 +134,11 @@ class EmailControllerTest {
 
     @Test
     void sendUserViolationEmailTest() throws Exception {
-        String content = """
-            {\
-            "name":"String",\
-            "email":"String@gmail.com",\
-            "violationDescription":"string string"\
-            }\
-            """;
+        String content = "{" +
+            "\"name\":\"String\"," +
+            "\"email\":\"String@gmail.com\"," +
+            "\"violationDescription\":\"string string\"" +
+            "}";
 
         mockPerform(content, "/sendUserViolation");
 
