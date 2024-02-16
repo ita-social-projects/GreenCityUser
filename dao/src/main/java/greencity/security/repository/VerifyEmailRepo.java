@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.Optional;
 
 /**
@@ -45,9 +46,7 @@ public interface VerifyEmailRepo extends JpaRepository<VerifyEmail, Long> {
      **/
     @Modifying
     @Query(
-        value = """
-            DELETE FROM User WHERE id IN \
-            (SELECT v.user.id FROM VerifyEmail v WHERE expiryDate < CURRENT_TIMESTAMP)\
-            """)
+        value = "DELETE FROM User WHERE id IN "
+            + "(SELECT v.user.id FROM VerifyEmail v WHERE expiryDate < CURRENT_TIMESTAMP)")
     int deleteAllUsersThatDidNotVerifyEmail();
 }

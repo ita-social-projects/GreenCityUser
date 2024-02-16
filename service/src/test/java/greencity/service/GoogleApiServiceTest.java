@@ -11,18 +11,18 @@ import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.NotFoundException;
 import lombok.SneakyThrows;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class GoogleApiServiceTest {
@@ -67,7 +67,7 @@ class GoogleApiServiceTest {
             when(request.language(language)).thenReturn(request);
             when(request.latlng(coordinates)).thenReturn(request);
             when(request.await()).thenThrow(new InvalidRequestException("message"));
-            String formattedCoordinates = "%.8f,%.8f".formatted(coordinates.lat, coordinates.lng);
+            String formattedCoordinates = String.format("%.8f,%.8f", coordinates.lat, coordinates.lng);
             NotFoundException exception =
                 assertThrows(NotFoundException.class,
                     () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));

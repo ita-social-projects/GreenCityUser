@@ -2,24 +2,21 @@ package greencity.filters;
 
 import greencity.dto.user.UserManagementViewDto;
 import greencity.entity.User;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Path;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import java.util.ArrayList;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
-import static org.mockito.Mockito.when;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import javax.persistence.criteria.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class UserSpecificationTest {
@@ -86,8 +83,8 @@ class UserSpecificationTest {
     @Test
     void toPredicate() {
         when(criteriaBuilder.conjunction()).thenReturn(expected);
-        when(root.get(searchCriteriaList.getFirst().getKey())).thenReturn(objectPathExpected);
-        when(criteriaBuilder.equal(objectPathExpected, searchCriteriaList.getFirst().getValue()))
+        when(root.get(searchCriteriaList.get(0).getKey())).thenReturn(objectPathExpected);
+        when(criteriaBuilder.equal(objectPathExpected, searchCriteriaList.get(0).getValue()))
             .thenThrow(NumberFormatException.class);
         when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(criteriaBuilder.disjunction()).thenReturn(expected);

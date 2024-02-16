@@ -1,12 +1,8 @@
 package greencity.dto.achievement;
 
 import greencity.dto.user.UserVO;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import javax.validation.constraints.NotEmpty;
 
 @Data
 @NoArgsConstructor

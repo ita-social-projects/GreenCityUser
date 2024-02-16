@@ -2,9 +2,10 @@ package greencity.validator;
 
 import greencity.constant.AppConstant;
 import greencity.exception.exceptions.WrongEmailException;
-import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
+import java.util.regex.Pattern;
 
 /**
  * This class should validate email.
