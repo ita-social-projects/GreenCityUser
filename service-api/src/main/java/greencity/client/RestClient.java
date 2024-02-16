@@ -1,7 +1,5 @@
 package greencity.client;
 
-import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.IMAGE;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
@@ -10,10 +8,6 @@ import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import greencity.enums.AchievementCategoryType;
 import greencity.enums.AchievementType;
-import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +22,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import static greencity.constant.AppConstant.AUTHORIZATION;
+import static greencity.constant.AppConstant.IMAGE;
 
 @Slf4j
 @RequiredArgsConstructor

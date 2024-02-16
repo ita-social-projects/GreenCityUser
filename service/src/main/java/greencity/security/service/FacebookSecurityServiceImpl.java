@@ -1,7 +1,6 @@
 package greencity.security.service;
 
 import greencity.constant.AppConstant;
-import static greencity.constant.AppConstant.REGISTRATION_EMAIL_FIELD_NAME;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserVO;
 import greencity.entity.User;
@@ -11,7 +10,6 @@ import greencity.enums.UserStatus;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -23,6 +21,10 @@ import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+import static greencity.constant.AppConstant.REGISTRATION_EMAIL_FIELD_NAME;
 
 /**
  * {@inheritDoc}
@@ -66,7 +68,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     /**
      * {@inheritDoc}
      *
-     * @return {@link FacebookConnectionFactory}
+     * @return
      */
     @Override
     public String generateFacebookAuthorizeURL() {
@@ -81,7 +83,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     /**
      * {@inheritDoc}
      *
-     * @return {@link SuccessSignInDto}
+     * @return
      */
     @Transactional
     @Override

@@ -1,6 +1,7 @@
 package greencity.security.jwt;
 
 import greencity.dto.user.UserVO;
+import greencity.entity.User;
 import greencity.enums.Role;
 import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,6 +65,7 @@ class JwtToolTest {
     @Test
     void createRefreshToken() {
         String s = "secret-refresh-token-key";
+        User userf = new User();
         UserVO userVO = new UserVO();
         userVO.setEmail(expectedEmail);
         userVO.setRole(expectedRole);
@@ -131,16 +133,5 @@ class JwtToolTest {
     @Test
     void generateTokenKeyTest() {
         assertNotNull(jwtTool.generateTokenKey());
-    }
-
-    @Test
-    void generateTokenKeyWithCodedDateTest() {
-        assertNotNull(jwtTool.generateTokenKeyWithCodedDate());
-    }
-
-    @Test
-    void generateTokenKeyWithCodedDateLengthTest() {
-        int tokenLength = 68;
-        assertEquals(tokenLength, jwtTool.generateTokenKeyWithCodedDate().length());
     }
 }

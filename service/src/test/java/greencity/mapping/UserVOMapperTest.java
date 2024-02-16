@@ -2,22 +2,14 @@ package greencity.mapping;
 
 import greencity.ModelUtils;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
-import greencity.entity.AchievementCategory;
-import greencity.entity.Language;
-import greencity.entity.OwnSecurity;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
-import greencity.entity.UserLocation;
-import greencity.entity.VerifyEmail;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import greencity.entity.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class UserVOMapperTest {

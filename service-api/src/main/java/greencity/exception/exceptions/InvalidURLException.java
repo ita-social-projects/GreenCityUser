@@ -1,6 +1,6 @@
 package greencity.exception.exceptions;
 
-import jakarta.validation.ConstraintDeclarationException;
+import javax.validation.ConstraintDeclarationException;
 
 public class InvalidURLException extends ConstraintDeclarationException {
     /**

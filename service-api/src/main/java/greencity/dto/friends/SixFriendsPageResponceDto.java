@@ -2,12 +2,7 @@ package greencity.dto.friends;
 
 import greencity.dto.PageableDto;
 import greencity.dto.user.UserProfilePictureDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @NoArgsConstructor
 @AllArgsConstructor
