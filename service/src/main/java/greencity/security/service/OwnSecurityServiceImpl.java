@@ -48,6 +48,7 @@ import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
@@ -115,7 +117,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     /**
      * {@inheritDoc}
      *
-     * @return {@link SuccessSignUpDto}
+     * @return
      */
     @Transactional
     @Override
@@ -182,7 +184,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     /**
      * {@inheritDoc}
      *
-     * @return {@link SuccessSignUpDto}
+     * @return
      */
     public SuccessSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto, String language) {
         String password = generatePassword();

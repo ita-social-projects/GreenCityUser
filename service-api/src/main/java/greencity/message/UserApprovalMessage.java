@@ -1,10 +1,11 @@
 package greencity.message;
 
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+
+import java.io.Serializable;
 
 /**
  * Message, that is used for sending emails for approving user registration.

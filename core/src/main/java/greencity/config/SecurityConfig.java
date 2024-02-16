@@ -2,40 +2,39 @@ package greencity.config;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
-import static greencity.constant.AppConstant.ADMIN;
-import static greencity.constant.AppConstant.EMPLOYEE;
-import static greencity.constant.AppConstant.MODERATOR;
-import static greencity.constant.AppConstant.UBS_EMPLOYEE;
-import static greencity.constant.AppConstant.USER;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
 import greencity.service.UserService;
-import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
-import java.util.Arrays;
-import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
+
+import static greencity.constant.AppConstant.ADMIN;
+import static greencity.constant.AppConstant.EMPLOYEE;
+import static greencity.constant.AppConstant.MODERATOR;
+import static greencity.constant.AppConstant.UBS_EMPLOYEE;
+import static greencity.constant.AppConstant.USER;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 
 /**
  * Config for security.
@@ -45,23 +44,19 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalAuthentication
-public class SecurityConfig {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTool jwtTool;
     private final UserService userService;
     private static final String USER_LINK = "/user";
-    private final AuthenticationConfiguration authenticationConfiguration;
 
     /**
      * Constructor.
      */
 
     @Autowired
-    public SecurityConfig(JwtTool jwtTool, UserService userService,
-        AuthenticationConfiguration authenticationConfiguration) {
+    public SecurityConfig(JwtTool jwtTool, UserService userService) {
         this.jwtTool = jwtTool;
         this.userService = userService;
-        this.authenticationConfiguration = authenticationConfiguration;
     }
 
     /**
@@ -77,148 +72,155 @@ public class SecurityConfig {
      *
      * @param http {@link HttpSecurity}
      */
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(AbstractHttpConfigurer::disable)
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http.cors()
+            .and()
+            .csrf()
+            .disable()
+            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            .and()
             .addFilterBefore(
                 new AccessTokenAuthenticationFilter(jwtTool, authenticationManager(), userService),
                 UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint((req, resp, exc) -> resp.sendError(SC_UNAUTHORIZED, "Authorize first."))
-                .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities.")))
-            .authorizeHttpRequests(req -> req
-                .requestMatchers("/static/css/**", "/static/img/**").permitAll()
-                .requestMatchers(HttpMethod.GET,
-                    "/ownSecurity/verifyEmail",
-                    "/ownSecurity/updateAccessToken",
-                    "/ownSecurity/restorePassword",
-                    "/googleSecurity",
-                    "/facebookSecurity/generateFacebookAuthorizeURL",
-                    "/facebookSecurity/facebook", "/user/emailNotifications",
-                    "/user/activatedUsersAmount",
-                    "/user/{userId}/habit/assign",
-                    "/token",
-                    "/socket/**",
-                    "/user/findAllByEmailNotification",
-                    "/user/checkByUuid",
-                    "/user/get-user-rating")
-                .permitAll()
-                .requestMatchers(HttpMethod.POST,
-                    "/ownSecurity/signUp",
-                    "/ownSecurity/signIn",
-                    "/ownSecurity/updatePassword")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET,
-                    "/user/shopping-list-items/habits/{habitId}/shopping-list",
-                    "/user/{userId}/{habitId}/custom-shopping-list-items/available",
-                    "/user/{userId}/profile/", "/user/isOnline/{userId}/",
-                    "/user/{userId}/profileStatistics/",
-                    "/user/userAndSixFriendsWithOnlineStatus",
-                    "/user/userAndAllFriendsWithOnlineStatus",
-                    "/user/findByIdForAchievement",
-                    "/user/findNotDeactivatedByEmail",
-                    "/user/findByEmail",
-                    "/user/findIdByEmail",
-                    "/user/findAllUsersCities",
-                    "/user/findById",
-                    "/user/findUserByName/**",
-                    "/user/findByUuId",
-                    "/user/findUuidByEmail",
-                    "/user/lang",
-                    "/user/createUbsRecord",
-                    "/user/{userId}/sixUserFriends/",
-                    "/ownSecurity/password-status",
-                    "/user/emailNotifications")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.POST, USER_LINK,
-                    "/user/shopping-list-items",
-                    "/user/{userId}/habit",
-                    "/ownSecurity/set-password",
-                    "/email/sendReport",
-                    "/email/sendHabitNotification",
-                    "/email/addEcoNews",
-                    "/email/changePlaceStatus",
-                    "/email/general/notification")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.PUT,
-                    "/ownSecurity/changePassword",
-                    "/user/profile",
-                    "/user/{id}/updateUserLastActivityTime/{date}",
-                    "/user/language/{languageId}",
-                    "/user/employee-email")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.PUT,
-                    "/user/edit-authorities",
-                    "/user/authorities",
-                    "/user/deactivate-employee",
-                    "/user/markUserAsDeactivated",
-                    "/user/markUserAsActivated")
-                .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.GET,
-                    "/user/get-all-authorities",
-                    "/user/get-positions-authorities",
-                    "/user/get-employee-login-positions")
-                .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.PATCH,
-                    "/user/shopping-list-items/{userShoppingListItemId}",
-                    "/user/profilePicture",
-                    "/user/deleteProfilePicture")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.DELETE,
-                    "/user/shopping-list-items/user-shopping-list-items",
-                    "/user/shopping-list-items")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.GET,
-                    USER_LINK,
-                    "/user/all",
-                    "/user/roles",
-                    "/user/findUserForManagement",
-                    "/user/searchBy",
-                    "/user/findAll")
-                .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.POST,
-                    "/ownSecurity/sign-up-employee")
-                .hasAnyRole(UBS_EMPLOYEE)
-                .requestMatchers(HttpMethod.POST,
-                    "/user/filter",
-                    "/ownSecurity/register")
-                .hasAnyRole(ADMIN)
-                .requestMatchers(HttpMethod.PATCH,
-                    "/user/status",
-                    "/user/role",
-                    "/user/update/role")
-                .hasAnyRole(ADMIN)
-                .requestMatchers(HttpMethod.POST, "/management/login")
-                // .not().fullyAuthenticated()
-                .rememberMe()
-                .requestMatchers(HttpMethod.GET, "/management/login")
-                .permitAll()
-                .requestMatchers("/css/**", "/img/**")
-                .permitAll()
-                .requestMatchers(HttpMethod.PUT, "/user/user-rating")
-                .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE, UBS_EMPLOYEE, USER)
-                .anyRequest().hasAnyRole(ADMIN));
-        return http.build();
+            .exceptionHandling()
+            .authenticationEntryPoint((req, resp, exc) -> resp.sendError(SC_UNAUTHORIZED, "Authorize first."))
+            .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities."))
+            .and()
+            .authorizeRequests()
+            .antMatchers("/static/css/**",
+                "/static/img/**")
+            .permitAll()
+            .antMatchers(HttpMethod.GET,
+                "/ownSecurity/verifyEmail",
+                "/ownSecurity/updateAccessToken",
+                "/ownSecurity/restorePassword",
+                "/googleSecurity",
+                "/facebookSecurity/generateFacebookAuthorizeURL",
+                "/facebookSecurity/facebook",
+                "/user/emailNotifications",
+                "/user/activatedUsersAmount",
+                "/user/{userId}/habit/assign",
+                "/token",
+                "/socket/**",
+                "/user/findAllByEmailNotification",
+                "/user/checkByUuid",
+                "/user/get-user-rating")
+            .permitAll()
+            .antMatchers(HttpMethod.POST,
+                "/ownSecurity/signUp",
+                "/ownSecurity/signIn",
+                "/ownSecurity/updatePassword")
+            .permitAll()
+            .antMatchers(HttpMethod.GET,
+                USER_LINK,
+                "/user/shopping-list-items/habits/{habitId}/shopping-list",
+                "/user/{userId}/{habitId}/custom-shopping-list-items/available",
+                "/user/{userId}/profile/",
+                "/user/isOnline/{userId}/",
+                "/user/{userId}/profileStatistics/",
+                "/user/userAndSixFriendsWithOnlineStatus",
+                "/user/userAndAllFriendsWithOnlineStatus",
+                "/user/findByIdForAchievement",
+                "/user/findNotDeactivatedByEmail",
+                "/user/findByEmail",
+                "/user/findIdByEmail",
+                "/user/findAllUsersCities",
+                "/user/findById",
+                "/user/findUserByName/**",
+                "/user/findByUuId",
+                "/user/findUuidByEmail",
+                "/user/lang",
+                "/user/createUbsRecord",
+                "/user/{userId}/sixUserFriends/",
+                "/ownSecurity/password-status",
+                "/user/emailNotifications")
+            .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.POST,
+                USER_LINK,
+                "/user/shopping-list-items",
+                "/user/{userId}/habit",
+                "/ownSecurity/set-password",
+                "/email/sendReport",
+                "/email/sendHabitNotification",
+                "/email/addEcoNews",
+                "/email/changePlaceStatus",
+                "/email/general/notification")
+            .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.PUT,
+                "/ownSecurity/changePassword",
+                "/user/profile",
+                "/user/{id}/updateUserLastActivityTime/{date}",
+                "/user/language/{languageId}",
+                "/user/employee-email")
+            .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.PUT,
+                "/user/edit-authorities",
+                "/user/authorities",
+                "/user/deactivate-employee",
+                "/user/markUserAsDeactivated",
+                "/user/markUserAsActivated")
+            .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.GET,
+                "/user/get-all-authorities",
+                "/user/get-positions-authorities",
+                "/user/get-employee-login-positions")
+            .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.PATCH,
+                "/user/shopping-list-items/{userShoppingListItemId}",
+                "/user/profilePicture",
+                "/user/deleteProfilePicture")
+            .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.DELETE,
+                "/user/shopping-list-items/user-shopping-list-items",
+                "/user/shopping-list-items")
+            .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.GET,
+                "/user/all",
+                "/user/roles",
+                "/user/findUserForManagement",
+                "/user/searchBy",
+                "/user/findAll")
+            .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.POST,
+                "/ownSecurity/sign-up-employee")
+            .hasAnyRole(UBS_EMPLOYEE)
+            .antMatchers(HttpMethod.POST,
+                "/user/filter",
+                "/ownSecurity/register")
+            .hasAnyRole(ADMIN)
+            .antMatchers(HttpMethod.PATCH,
+                "/user/status",
+                "/user/role",
+                "/user/update/role")
+            .hasAnyRole(ADMIN)
+            .antMatchers(HttpMethod.POST,
+                "/management/login")
+            .not().fullyAuthenticated()
+            .antMatchers(HttpMethod.GET,
+                "/management/login")
+            .permitAll()
+            .antMatchers("/css/**",
+                "/img/**")
+            .permitAll()
+            .antMatchers(HttpMethod.PUT,
+                "/user/user-rating")
+            .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE, UBS_EMPLOYEE, USER)
+            .anyRequest().hasAnyRole(ADMIN);
     }
 
     /**
      * Method for configure matchers that will be ignored in security.
      *
-     * @return {@link WebSecurityCustomizer}
+     * @param web {@link WebSecurity}
      */
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> {
-            web.ignoring().requestMatchers("/v2/api-docs/**");
-            web.ignoring().requestMatchers("/v3/api-docs/**");
-            web.ignoring().requestMatchers("/swagger.json");
-            web.ignoring().requestMatchers("/swagger-ui.html");
-            web.ignoring().requestMatchers("/swagger-resources/**");
-            web.ignoring().requestMatchers("/webjars/**");
-            web.ignoring().requestMatchers("/swagger-ui/**");
-        };
+    @Override
+    public void configure(WebSecurity web) {
+        web.ignoring().antMatchers("/v2/api-docs/**");
+        web.ignoring().antMatchers("/swagger.json");
+        web.ignoring().antMatchers("/swagger-ui.html");
+        web.ignoring().antMatchers("/swagger-resources/**");
+        web.ignoring().antMatchers("/webjars/**");
     }
 
     /**
@@ -226,8 +228,8 @@ public class SecurityConfig {
      *
      * @param auth {@link AuthenticationManagerBuilder}
      */
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) {
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(new JwtAuthenticationProvider(jwtTool));
     }
 
@@ -237,8 +239,9 @@ public class SecurityConfig {
      * @return {@link AuthenticationManager}
      */
     @Bean
+    @Override
     public AuthenticationManager authenticationManager() throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+        return super.authenticationManager();
     }
 
     /**
@@ -265,6 +268,6 @@ public class SecurityConfig {
     @Bean
     public GoogleIdTokenVerifier googleIdTokenVerifier() {
         return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
-            GsonFactory.getDefaultInstance()).build();
+            JacksonFactory.getDefaultInstance()).build();
     }
 }

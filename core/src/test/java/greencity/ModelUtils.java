@@ -9,8 +9,13 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
 import greencity.entity.UserLocation;
 import greencity.enums.Role;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ModelUtils {
     public static final UserVO TEST_USER_VO = createUserVO();

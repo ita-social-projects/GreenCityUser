@@ -3,7 +3,6 @@ package greencity.converters;
 import greencity.annotations.CurrentUser;
 import greencity.dto.user.UserVO;
 import greencity.service.UserService;
-import java.security.Principal;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.MethodParameter;
@@ -12,6 +11,8 @@ import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
+import java.security.Principal;
 
 @Component
 @AllArgsConstructor

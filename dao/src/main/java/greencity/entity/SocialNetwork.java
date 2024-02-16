@@ -1,8 +1,9 @@
 package greencity.entity;
 
 import lombok.*;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+
+import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 @Entity
 @NoArgsConstructor

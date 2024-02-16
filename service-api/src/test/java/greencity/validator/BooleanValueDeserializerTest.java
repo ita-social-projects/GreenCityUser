@@ -3,10 +3,12 @@ package greencity.validator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.exception.exceptions.NotValidBooleanValueException;
-import java.io.IOException;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class BooleanValueDeserializerTest {
 

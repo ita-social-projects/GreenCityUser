@@ -17,21 +17,19 @@ import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -160,7 +158,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         if (requiredType != null) {
             className = requiredType.getSimpleName();
         }
-        String message = "Wrong %s. Should be '%s'".formatted(propName, className);
+        String message = String.format("Wrong %s. Should be '%s'", propName, className);
         exceptionResponse.setMessage(message);
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
@@ -288,7 +286,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
-        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status,
+        WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
@@ -298,7 +297,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         HttpHeaders headers,
-        HttpStatusCode status,
+        HttpStatus status,
         WebRequest request) {
         List<ValidationExceptionDto> collect =
             ex.getBindingResult().getFieldErrors().stream()
@@ -309,8 +308,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     private Map<String, Object> getErrorAttributes(WebRequest webRequest) {
-        return new HashMap<>(errorAttributes.getErrorAttributes(webRequest,
-            ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE)));
+        return new HashMap<>(errorAttributes.getErrorAttributes(webRequest, true));
     }
 
     /**
