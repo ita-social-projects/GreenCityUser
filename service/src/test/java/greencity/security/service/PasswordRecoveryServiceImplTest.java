@@ -7,6 +7,8 @@ import static greencity.ModelUtils.TEST_OWN_SECURITY;
 import static greencity.ModelUtils.TEST_RESTORE_PASSWORD_EMAIL;
 import static greencity.ModelUtils.TEST_RESTORE_PASSWORD_EMAIL_EXPIRED_TOKEN;
 import static greencity.ModelUtils.TEST_USER;
+
+import greencity.entity.Language;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
@@ -18,6 +20,8 @@ import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
+
+import java.util.Locale;
 import java.util.Optional;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -59,34 +63,35 @@ class PasswordRecoveryServiceImplTest {
     void sendPasswordRecoveryEmailToNonExistentUserTest() {
         String email = "foo";
         boolean isUbs = false;
-        String language = "en";
         when(userRepo.findByEmail(email)).thenReturn(empty());
         assertThrows(NotFoundException.class,
-            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language));
+            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs));
     }
 
     @Test
     void sendPasswordRecoveryEmailToUserWithExistentRestorePasswordEmailTest() {
         String email = "foo";
         boolean isUbs = false;
-        String language = "en";
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(
             User.builder().restorePasswordEmail(new RestorePasswordEmail()).build()));
         assertThrows(WrongEmailException.class,
-            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language));
+            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs));
     }
 
     @Test
     void sendPasswordRecoveryEmailToSimpleTest() {
         String email = "foo";
         boolean isUbs = true;
-        String language = "en";
+        Language language = new Language();
+        language.setId(2L);
+        language.setCode("en");
         User user = new User();
+        user.setLanguage(language);
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
         String token = "bar";
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn(token);
         ReflectionTestUtils.setField(passwordRecoveryService, "tokenExpirationTimeInHours", 24);
-        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language);
+        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs);
         verify(restorePasswordEmailRepo).save(refEq(
             RestorePasswordEmail.builder()
                 .user(user)
@@ -98,7 +103,7 @@ class PasswordRecoveryServiceImplTest {
             user.getName(),
             user.getEmail(),
             token,
-            language,
+            user.getLanguage().getCode(),
             true);
     }
 //
