@@ -3,35 +3,32 @@ package greencity.repository;
 import greencity.ModelUtils;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
+import static greencity.enums.EmailNotification.DISABLED;
+import static greencity.enums.EmailNotification.IMMEDIATELY;
 import greencity.enums.UserStatus;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static greencity.enums.EmailNotification.DISABLED;
-import static greencity.enums.EmailNotification.IMMEDIATELY;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
+import org.mockito.Mock;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class UserRepoTest {
@@ -116,7 +113,7 @@ class UserRepoTest {
         assertEquals(1, disabled.size());
         assertEquals(1L, immediately.get(1).getId());
         assertEquals(2, immediately.size());
-        assertEquals("test2@email.com", disabled.get(0).getEmail());
+        assertEquals("test2@email.com", disabled.getFirst().getEmail());
         verify(userRepo).findAllByEmailNotification(EmailNotification.DISABLED);
         verify(userRepo, times(1)).findAllByEmailNotification(EmailNotification.IMMEDIATELY);
     }

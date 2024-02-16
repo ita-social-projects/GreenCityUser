@@ -4,38 +4,37 @@ import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ColumnResult;
-import javax.persistence.ConstructorResult;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.NamedNativeQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.SqlResultSetMapping;
-import javax.persistence.Table;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ColumnResult;
+import jakarta.persistence.ConstructorResult;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedNativeQuery;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SqlResultSetMapping;
+import jakarta.persistence.Table;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.type.descriptor.jdbc.IntegerJdbcType;
 
 @Entity
 @SqlResultSetMapping(
@@ -49,10 +48,13 @@ import javax.persistence.Table;
             })
     })
 @NamedNativeQuery(name = "User.findAllRegistrationMonths",
-    query = "SELECT EXTRACT(MONTH FROM date_of_registration) - 1 as month, count(date_of_registration) FROM users "
-        + "WHERE EXTRACT(YEAR from date_of_registration) = EXTRACT(YEAR FROM CURRENT_DATE) "
-        + "GROUP BY month",
+    query = """
+        SELECT EXTRACT(MONTH FROM date_of_registration) - 1 as month, count(date_of_registration) FROM users/
+        WHERE EXTRACT(YEAR from date_of_registration) = EXTRACT(YEAR FROM CURRENT_DATE)/
+        GROUP BY month/
+        """,
     resultSetMapping = "monthsStatisticsMapping")
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -78,6 +80,7 @@ public class User {
     private Role role;
 
     @Enumerated(value = EnumType.ORDINAL)
+    @JdbcType(IntegerJdbcType.class)
     private UserStatus userStatus;
 
     @Column(nullable = false)
@@ -93,6 +96,7 @@ public class User {
     private RestorePasswordEmail restorePasswordEmail;
 
     @Enumerated(value = EnumType.ORDINAL)
+    @JdbcType(IntegerJdbcType.class)
     private EmailNotification emailNotification;
 
     @Column(name = "refresh_token_key", nullable = false)
@@ -101,12 +105,14 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicturePath;
 
+    @Builder.Default
     @OneToMany
     @JoinTable(name = "users_friends",
         joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
     private List<User> userFriends = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<UserAchievement> userAchievements = new ArrayList<>();
 
@@ -139,6 +145,7 @@ public class User {
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserAction> userActions = new ArrayList<>();
 

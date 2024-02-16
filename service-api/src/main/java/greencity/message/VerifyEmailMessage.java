@@ -1,10 +1,9 @@
 package greencity.message;
 
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
-
-import java.io.Serializable;
 
 @Getter
 @ToString

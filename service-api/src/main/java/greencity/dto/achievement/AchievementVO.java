@@ -1,12 +1,11 @@
 package greencity.dto.achievement;
 
 import greencity.dto.achievementcategory.AchievementCategoryVO;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.NotEmpty;
 
 @Data
 @NoArgsConstructor
