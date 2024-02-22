@@ -2,6 +2,7 @@ package greencity.dto.user;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import greencity.annotations.ValidSocialNetworkLinks;
+import greencity.constant.ValidationConstants;
 import greencity.dto.CoordinatesDto;
 import greencity.validator.BooleanValueDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,7 +25,7 @@ import lombok.Setter;
 @Builder
 public class UserProfileDtoRequest {
     @Size(min = 1, max = 30, message = "name must have no less than 1 and no more than 30 symbols")
-    @Pattern(regexp = "^(?!\\.)(?!.*\\.$)(?!.*?\\.\\.)(?!.*?\\-\\-)(?!.*?\\'\\')[-'ʼ ґҐіІєЄїЇА-Яа-я+\\w.]{1,30}$",
+    @Pattern(regexp = ValidationConstants.USERNAME_REGEXP,
         message = "name must contain only \"ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'0-9 .\", dot can only be in the center of the name")
     @Schema(example = "John")
     private String name;
