@@ -778,6 +778,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
+        if (userRepo.findById(userId).isEmpty()) {
+            throw new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId);
+        }
+
         Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
         Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
         Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
