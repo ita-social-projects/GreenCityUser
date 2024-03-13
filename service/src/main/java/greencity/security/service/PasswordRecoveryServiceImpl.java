@@ -79,7 +79,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
      */
     @Transactional
     @Override
-    public void sendPasswordRecoveryEmailTo(String email, boolean isUbs, String language) {
+    public void sendPasswordRecoveryEmailTo(String email, boolean isUbs) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
@@ -87,7 +87,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         if (restorePasswordEmail != null) {
             throw new WrongEmailException(ErrorMessage.PASSWORD_RESTORE_LINK_ALREADY_SENT + email);
         }
-        savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKeyWithCodedDate(), language, isUbs);
+        savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKeyWithCodedDate(), isUbs);
     }
 
     /**
@@ -131,7 +131,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
      * @param user  {@link User} - User whose password is to be recovered
      * @param token {@link String} - token for password restoration
      */
-    private void savePasswordRestorationTokenForUser(User user, String token, String language, boolean isUbs) {
+    private void savePasswordRestorationTokenForUser(User user, String token, boolean isUbs) {
         RestorePasswordEmail restorePasswordEmail =
             RestorePasswordEmail.builder()
                 .user(user)
@@ -144,7 +144,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             user.getFirstName(),
             user.getEmail(),
             token,
-            language, isUbs);
+            user.getLanguage().getCode(), isUbs);
     }
 
     /**

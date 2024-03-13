@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.ModelUtils;
+import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
@@ -15,27 +16,26 @@ import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.GeneralEmailMessage;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
+import org.springframework.context.MessageSource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.thymeleaf.ITemplateEngine;
+
+import java.util.*;
+import java.util.concurrent.Executors;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.thymeleaf.ITemplateEngine;
 
 class EmailServiceImplTest {
     private EmailService service;
@@ -44,13 +44,16 @@ class EmailServiceImplTest {
     private JavaMailSender javaMailSender;
     @Mock
     private ITemplateEngine templateEngine;
+    @Mock
+    private MessageSource messageSource;
+    private static final Locale UA_LOCALE = new Locale("uk", "UA");
 
     @BeforeEach
     public void setup() {
         initMocks(this);
         service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
             "http://localhost:4200", "http://localhost:4200", "http://localhost:8080",
-            "test@email.com");
+            "test@email.com", messageSource);
         placeAuthorDto = PlaceAuthorDto.builder()
             .id(1L)
             .email("testEmail@gmail.com")
@@ -126,6 +129,8 @@ class EmailServiceImplTest {
     @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
         "1, Test, test@gmail.com, token, en, false"})
     void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
+        when(messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)))
+            .thenReturn("Confirm restoring password");
         service.sendRestoreEmail(id, name, email, token, language, isUbs);
         verify(javaMailSender).createMimeMessage();
     }
@@ -194,6 +199,8 @@ class EmailServiceImplTest {
         String lang = "en";
         String userName = "Helgi";
         boolean isUbs = false;
+        when(messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(lang)))
+            .thenReturn("Restore password");
         service.sendSuccessRestorePasswordByEmail(email, lang, userName, isUbs);
 
         verify(javaMailSender).createMimeMessage();
@@ -218,5 +225,13 @@ class EmailServiceImplTest {
     void sendEmailNotificationToNullEmailTest() {
         GeneralEmailMessage emailMessage = new GeneralEmailMessage(null, "testSubject", "testMessage");
         assertThrows(WrongEmailException.class, () -> service.sendEmailNotification(emailMessage));
+    }
+
+    private static Locale getLocale(String language) {
+        return switch (language) {
+            case "ua" -> UA_LOCALE;
+            case "en" -> Locale.ENGLISH;
+            default -> throw new IllegalStateException("Unexpected value: " + language);
+        };
     }
 }
