@@ -15,8 +15,6 @@ import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.message.GeneralEmailMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -24,15 +22,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
+import java.util.*;
 
 /**
  * {@inheritDoc}
@@ -47,7 +49,9 @@ public class EmailServiceImpl implements EmailService {
     private final String ecoNewsLink;
     private final String serverLink;
     private final String senderEmailAddress;
+    private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
+    private static final Locale UA_LOCALE = new Locale("uk", "UA");
 
     /**
      * Constructor.
@@ -59,7 +63,7 @@ public class EmailServiceImpl implements EmailService {
         @Value("${client.address}") String clientLink,
         @Value("${econews.address}") String ecoNewsLink,
         @Value("${address}") String serverLink,
-        @Value("${sender.email.address}") String senderEmailAddress) {
+        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
@@ -67,6 +71,7 @@ public class EmailServiceImpl implements EmailService {
         this.ecoNewsLink = ecoNewsLink;
         this.serverLink = serverLink;
         this.senderEmailAddress = senderEmailAddress;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -189,13 +194,15 @@ public class EmailServiceImpl implements EmailService {
             + PARAM_USER_ID + userId);
         validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
+        model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
-        sendEmail(userEmail, EmailConstants.CONFIRM_RESTORING_PASS, template);
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)),
+            template);
     }
 
     /**
      * This method validates language.
-     * 
+     *
      * @param language language which will be used for sending letter.
      */
     private void validateLanguage(String language) {
@@ -208,6 +215,9 @@ public class EmailServiceImpl implements EmailService {
         log.info(LogMessage.IN_CREATE_TEMPLATE_NAME, null, templateName);
         Context context = new Context();
         context.setVariables(vars);
+        if (vars.get("language") != null) {
+            context.setLocale(getLocale((String) vars.get("language")));
+        }
         return templateEngine.process("email/" + templateName, context);
     }
 
@@ -274,9 +284,11 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, userName);
         validateLanguage(language);
+        model.put(EmailConstants.LANGUAGE, language);
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
-        sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
+        sendEmail(email, messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(language)),
+            template);
     }
 
     /**
@@ -287,5 +299,13 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendEmailNotification(GeneralEmailMessage notification) {
         sendEmail(notification.getEmail(), notification.getSubject(), notification.getMessage());
+    }
+
+    private static Locale getLocale(String language) {
+        return switch (language) {
+            case "ua" -> UA_LOCALE;
+            case "en" -> Locale.ENGLISH;
+            default -> throw new IllegalStateException("Unexpected value: " + language);
+        };
     }
 }

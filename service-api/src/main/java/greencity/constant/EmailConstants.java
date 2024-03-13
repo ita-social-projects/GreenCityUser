@@ -9,8 +9,8 @@ public final class EmailConstants {
     public static final String EVENT_COMMENT = "You have a new comment on your event";
     public static final String CREATED_NEWS = "You created news on GreenCity ";
     public static final String VERIFY_EMAIL = "Verify your email address";
-    public static final String RESTORED_PASSWORD = "Restore password";
-    public static final String CONFIRM_RESTORING_PASS = "Confirm restoring password";
+    public static final String RESTORED_PASSWORD = "restored.password";
+    public static final String CONFIRM_RESTORING_PASS = "confirm.restoring.pass";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
     public static final String DEACTIVATION = "Your account was deactivated";
     public static final String ACTIVATION = "Your account was activated";
