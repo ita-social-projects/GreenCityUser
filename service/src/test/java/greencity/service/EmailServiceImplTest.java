@@ -109,8 +109,12 @@ class EmailServiceImplTest {
     @CsvSource(value = {"1, Test, test@gmail.com, token, ua",
         "1, Test, test@gmail.com, token, en"})
     void sendVerificationEmail(Long id, String name, String email, String token, String language) {
+        when(messageSource.getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language)))
+            .thenReturn("Verify your email address");
+
         service.sendVerificationEmail(id, name, email, token, language, false);
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language));
     }
 
     @Test

@@ -103,6 +103,7 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/swagger.json",
                     "/swagger-ui.html",
+                    "/swagger-ui/index.html",
                     "/swagger-ui/**",
                     "/swagger-resources/**",
                     "/webjars/**")
