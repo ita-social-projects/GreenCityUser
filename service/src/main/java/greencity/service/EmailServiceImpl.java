@@ -158,7 +158,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.VERIFY_EMAIL_PAGE);
         sendEmail(email, messageSource.getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language)),
-                template);
+            template);
     }
 
     /**
