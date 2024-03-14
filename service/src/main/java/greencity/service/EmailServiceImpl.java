@@ -149,14 +149,16 @@ public class EmailServiceImpl implements EmailService {
     public void sendVerificationEmail(Long id, String name, String email, String token, String language,
         boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        String baseLink = clientLink + "#/" + (isUbs ? "ubs" : "");
+        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
         model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.VERIFY_ADDRESS, baseLink + "?token=" + token + PARAM_USER_ID + id);
         validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
+        model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.VERIFY_EMAIL_PAGE);
-        sendEmail(email, EmailConstants.VERIFY_EMAIL, template);
+        sendEmail(email, messageSource.getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language)),
+            template);
     }
 
     /**
