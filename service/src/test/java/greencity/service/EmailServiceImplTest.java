@@ -25,23 +25,26 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
+import greencity.constant.EmailConstants;
 
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Executors;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Locale;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import org.springframework.context.MessageSource;
 
 class EmailServiceImplTest {
     private EmailService service;
@@ -52,13 +55,16 @@ class EmailServiceImplTest {
     private ITemplateEngine templateEngine;
     @Mock
     private UserRepo userRepo;
+    @Mock
+    private MessageSource messageSource;
+    private static final Locale UA_LOCALE = new Locale("uk", "UA");
 
     @BeforeEach
     public void setup() {
         initMocks(this);
         service = new EmailServiceImpl(javaMailSender, templateEngine, userRepo, Executors.newCachedThreadPool(),
             "http://localhost:4200", "http://localhost:4200", "http://localhost:8080",
-            "test@email.com");
+            "test@email.com", messageSource);
         placeAuthorDto = PlaceAuthorDto.builder()
             .id(1L)
             .email("testEmail@gmail.com")
@@ -137,8 +143,13 @@ class EmailServiceImplTest {
     @CsvSource(value = {"1, Test, test@gmail.com, token, ua",
         "1, Test, test@gmail.com, token, en"})
     void sendVerificationEmail(Long id, String name, String email, String token, String language) {
+        when(messageSource.getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language)))
+            .thenReturn("Verify your email address");
         service.sendVerificationEmail(id, name, email, token, language, false);
+
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language));
+
     }
 
     @Test
@@ -157,6 +168,8 @@ class EmailServiceImplTest {
     @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
         "1, Test, test@gmail.com, token, en, false"})
     void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
+        when(messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)))
+            .thenReturn("Confirm restoring password");
         service.sendRestoreEmail(id, name, email, token, language, isUbs);
         verify(javaMailSender).createMimeMessage();
     }
@@ -219,6 +232,8 @@ class EmailServiceImplTest {
         String lang = "en";
         String userName = "Helgi";
         boolean isUbs = false;
+        when(messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(lang)))
+            .thenReturn("Restore password");
         service.sendSuccessRestorePasswordByEmail(email, lang, userName, isUbs);
 
         verify(javaMailSender).createMimeMessage();
@@ -251,5 +266,16 @@ class EmailServiceImplTest {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("de");
         assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+    }
+
+    private static Locale getLocale(String language) {
+        switch (language) {
+            case "ua":
+                return UA_LOCALE;
+            case "en":
+                return Locale.ENGLISH;
+            default:
+                throw new IllegalStateException("Unexpected value: " + language);
+        }
     }
 }

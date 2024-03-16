@@ -20,7 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
-
+import greencity.entity.Language;
 import java.util.Optional;
 
 import static greencity.ModelUtils.*;
@@ -54,34 +54,35 @@ class PasswordRecoveryServiceImplTest {
     void sendPasswordRecoveryEmailToNonExistentUserTest() {
         String email = "foo";
         boolean isUbs = false;
-        String language = "en";
         when(userRepo.findByEmail(email)).thenReturn(empty());
         assertThrows(NotFoundException.class,
-            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language));
+            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs));
     }
 
     @Test
     void sendPasswordRecoveryEmailToUserWithExistentRestorePasswordEmailTest() {
         String email = "foo";
         boolean isUbs = false;
-        String language = "en";
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(
             User.builder().restorePasswordEmail(new RestorePasswordEmail()).build()));
         assertThrows(WrongEmailException.class,
-            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language));
+            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs));
     }
 
     @Test
     void sendPasswordRecoveryEmailToSimpleTest() {
         String email = "foo";
         boolean isUbs = true;
-        String language = "en";
+        Language language = new Language();
+        language.setId(2L);
+        language.setCode("en");
         User user = new User();
+        user.setLanguage(language);
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
         String token = "bar";
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn(token);
         ReflectionTestUtils.setField(passwordRecoveryService, "tokenExpirationTimeInHours", 24);
-        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, language);
+        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs);
         verify(restorePasswordEmailRepo).save(refEq(
             RestorePasswordEmail.builder()
                 .user(user)
@@ -93,7 +94,7 @@ class PasswordRecoveryServiceImplTest {
             user.getName(),
             user.getEmail(),
             token,
-            language,
+            user.getLanguage().getCode(),
             true);
     }
 //

@@ -121,11 +121,10 @@ class OwnSecurityControllerTest {
     @Test
     void restoreTest() throws Exception {
         mockMvc.perform(get(LINK + "/restorePassword")
-            .param("email", "test@mail.com")
-            .param("lang", "en"))
+            .param("email", "test@mail.com"))
             .andExpect(status().isOk());
 
-        verify(passwordRecoveryService).sendPasswordRecoveryEmailTo("test@mail.com", false, "en");
+        verify(passwordRecoveryService).sendPasswordRecoveryEmailTo("test@mail.com", false);
     }
 
     @Test

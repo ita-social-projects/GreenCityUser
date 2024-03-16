@@ -27,7 +27,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
-
+import org.springframework.context.MessageSource;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.UnsupportedEncodingException;
@@ -35,6 +35,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
@@ -53,6 +54,8 @@ public class EmailServiceImpl implements EmailService {
     private final String serverLink;
     private final String senderEmailAddress;
     private static final String PARAM_USER_ID = "&user_id=";
+    private final MessageSource messageSource;
+    private static final Locale UA_LOCALE = new Locale("uk", "UA");
 
     /**
      * Constructor.
@@ -65,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
         @Value("${client.address}") String clientLink,
         @Value("${econews.address}") String ecoNewsLink,
         @Value("${address}") String serverLink,
-        @Value("${sender.email.address}") String senderEmailAddress) {
+        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.userRepo = userRepo;
@@ -74,6 +77,7 @@ public class EmailServiceImpl implements EmailService {
         this.ecoNewsLink = ecoNewsLink;
         this.serverLink = serverLink;
         this.senderEmailAddress = senderEmailAddress;
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -170,8 +174,10 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.VERIFY_ADDRESS, baseLink + "?token=" + token + PARAM_USER_ID + id);
         validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
+        model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.VERIFY_EMAIL_PAGE);
-        sendEmail(email, EmailConstants.VERIFY_EMAIL, template);
+        sendEmail(email, messageSource.getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language)),
+            template);
     }
 
     /**
@@ -207,10 +213,12 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.USER_NAME, userName);
         model.put(EmailConstants.RESTORE_PASS, baseLink + "/auth/restore?" + "token=" + token
             + PARAM_USER_ID + userId);
+        model.put(EmailConstants.LANGUAGE, language);
         validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
-        sendEmail(userEmail, EmailConstants.CONFIRM_RESTORING_PASS, template);
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)),
+            template);
     }
 
     /**
@@ -228,6 +236,9 @@ public class EmailServiceImpl implements EmailService {
         log.info(LogMessage.IN_CREATE_TEMPLATE_NAME, null, templateName);
         Context context = new Context();
         context.setVariables(vars);
+        if (vars.get("language") != null) {
+            context.setLocale(getLocale((String) vars.get("language")));
+        }
         return templateEngine.process("email/" + templateName, context);
     }
 
@@ -302,14 +313,27 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, userName);
         validateLanguage(language);
+        model.put(EmailConstants.LANGUAGE, language);
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
-        sendEmail(email, EmailConstants.RESTORED_PASSWORD, template);
+        sendEmail(email, messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(language)),
+            template);
     }
 
     @Override
     public void sendEventCreationNotification(String email, String messageBody) {
         String subject = "Notification about event creation status";
         sendEmail(email, subject, messageBody);
+    }
+
+    private static Locale getLocale(String language) {
+        switch (language) {
+            case "ua":
+                return UA_LOCALE;
+            case "en":
+                return Locale.ENGLISH;
+            default:
+                throw new IllegalStateException("Unexpected value: " + language);
+        }
     }
 }

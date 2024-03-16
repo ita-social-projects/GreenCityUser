@@ -164,12 +164,11 @@ public class OwnSecurityController {
         @ApiResponse(code = 400, message = USER_NOT_FOUND_BY_EMAIL)
     })
     @GetMapping("/restorePassword")
-    @ApiLocale
     public ResponseEntity<Object> restore(@RequestParam @Email String email,
-        @RequestParam Optional<String> ubs, @ApiIgnore @ValidLanguage Locale locale) {
+        @RequestParam Optional<String> ubs) {
         boolean isUbs = ubs.isPresent();
         log.info(Locale.getDefault().toString());
-        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs, locale.getLanguage());
+        passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs);
         return ResponseEntity.ok().build();
     }
 
