@@ -118,7 +118,11 @@ public class SecurityConfig {
                     "/user/activatedUsersAmount",
                     "/user/{userId}/habit/assign",
                     "/token",
+                    "/socket",
+                    "/socket/",
                     "/socket/**",
+                    "/socket/**/**",
+                    "/socket/info",
                     "/user/findAllByEmailNotification",
                     "/user/checkByUuid",
                     "/user/get-user-rating")
