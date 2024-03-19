@@ -15,7 +15,6 @@ import greencity.service.UserService;
 import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import java.util.Arrays;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -78,18 +77,17 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
             CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedOriginPatterns(List.of(
-                "https://www.greencity.social/",
-                "http://localhost:4200",
-                "http://localhost:4200/*",
-                "http://localhost:4205",
-                "http://localhost:4205/*"));
+            /*
+             * config.setAllowedOriginPatterns(List.of( "https://www.greencity.social/",
+             * "http://localhost:4200", "http://localhost:4200/*", "http://localhost:4205",
+             * "http://localhost:4205/*"));
+             */
             config.setAllowedMethods(
                 Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"));
             config.setAllowedHeaders(
                 Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Headers",
                     "X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
-            config.setAllowCredentials(true);
+            config.setAllowCredentials(false);
             config.setMaxAge(3600L);
             return config;
         })).csrf(AbstractHttpConfigurer::disable)
