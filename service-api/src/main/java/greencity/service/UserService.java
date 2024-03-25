@@ -379,7 +379,7 @@ public interface UserService {
     List<Long> deactivateAllUsers(List<Long> listId);
 
     /**
-     * change {@link UserVO}'s status to ACTIVATED.
+     * change {@link UserVO}'s status to ACTIVATE.
      *
      * @param id {@link UserVO}'s id
      * @author Vasyl Zhovnir
@@ -432,7 +432,7 @@ public interface UserService {
     UbsTableCreationDto createUbsRecord(UserVO currentUser);
 
     /**
-     * change {@link UserVO}'s status to DEACTIVATED.
+     * change {@link UserVO}'s status to DEACTIVATE.
      *
      * @param id          {@link UserVO}'s id
      * @param userReasons {@link List} of {@link String}.
@@ -496,4 +496,13 @@ public interface UserService {
      * @author Maksym Golik
      */
     Boolean checkIfUserExistsByUuid(String uuid);
+
+    /**
+     * Updates last activity time for a given user by email.
+     *
+     * @param email                - {@link UserVO}'s email.
+     * @param userLastActivityTime - new {@link UserVO}'s last activity time.
+     * @author Anton Bondar.
+     */
+    void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
 }

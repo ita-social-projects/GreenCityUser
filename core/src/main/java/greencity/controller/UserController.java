@@ -459,8 +459,7 @@ public class UserController {
      */
     @MessageMapping("/userAndSixFriendsWithOnlineStatus")
     @SendTo("/topic/sixUsersOnlineStatus")
-    public UserAndFriendsWithOnlineStatusDto getUserAndSixFriendsWithOnlineStatus(
-        Long userId) {
+    public UserAndFriendsWithOnlineStatusDto getUserAndSixFriendsWithOnlineStatus(Long userId) {
         return userService.getUserAndSixFriendsWithOnlineStatus(userId);
     }
 
@@ -473,8 +472,7 @@ public class UserController {
      */
     @MessageMapping("/userAndAllFriendsWithOnlineStatus")
     @SendTo("/topic/userAndAllFriendsOnlineStatus")
-    public UserAndAllFriendsWithOnlineStatusDto getUserAndAllFriendsWithOnlineStatus(
-        Long userId, Pageable pageable) {
+    public UserAndAllFriendsWithOnlineStatusDto getUserAndAllFriendsWithOnlineStatus(Long userId, Pageable pageable) {
         return userService.getAllFriendsWithTheOnlineStatus(userId, pageable);
     }
 
@@ -689,7 +687,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/updateUserLastActivityTime/{date}")
+    // @PutMapping("/updateUserLastActivityTime/{date}")
     public ResponseEntity<Object> updateUserLastActivityTime(@Parameter(hidden = true) @CurrentUser UserVO userVO,
         @PathVariable(value = "date") @DateTimeFormat(
             pattern = "yyyy-MM-dd.HH:mm:ss.SSSSSS") LocalDateTime userLastActivityTime) {

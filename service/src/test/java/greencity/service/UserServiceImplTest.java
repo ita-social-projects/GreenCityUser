@@ -1470,4 +1470,11 @@ class UserServiceImplTest {
         when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
         assertEquals(test1, userService.getDeactivationReason(1L, "uk"));
     }
+
+    @Test
+    void updateUserLastActivityTimeByEmailTest() {
+        LocalDateTime currentTime = LocalDateTime.now();
+        userService.updateUserLastActivityTimeByEmail(userEmail, currentTime);
+        verify(userRepo).updateUserLastActivityTimeByEmail(userEmail, currentTime);
+    }
 }

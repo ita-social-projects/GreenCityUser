@@ -1087,4 +1087,9 @@ public class UserServiceImpl implements UserService {
     public Boolean checkIfUserExistsByUuid(String uuid) {
         return userRepo.findUserByUuid(uuid).isPresent();
     }
+
+    @Override
+    public void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime) {
+        userRepo.updateUserLastActivityTimeByEmail(email, userLastActivityTime);
+    }
 }
