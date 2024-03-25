@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class AsyncConfigTest {
     @Test
-    public void testCustomTaskExecutor() {
+    void testCustomTaskExecutor() {
         AsyncConfig asyncConfig = new AsyncConfig();
         ThreadPoolTaskExecutor executor = asyncConfig.customTaskExecutor();
         assertEquals(5, executor.getCorePoolSize());

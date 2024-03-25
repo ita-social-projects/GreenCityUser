@@ -19,6 +19,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class UserOnlineStatusUpdateFilterTest {
@@ -58,5 +59,17 @@ class UserOnlineStatusUpdateFilterTest {
 
         filter.doFilterInternal(request, response, filterChain);
         verify(userService).updateUserLastActivityTimeByEmail(eq(expectedEmail), any(LocalDateTime.class));
+    }
+
+    @Test
+    void doFilterInternalAuthenticationIsNullTest() throws Exception {
+        SecurityContextHolder.clearContext();
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        MockFilterChain filterChain = new MockFilterChain();
+
+        filter.doFilterInternal(request, response, filterChain);
+        verifyNoInteractions(userService);
     }
 }
