@@ -139,6 +139,7 @@ public class SecurityConfig {
                     "/user/{userId}/profileStatistics/",
                     "/user/userAndSixFriendsWithOnlineStatus",
                     "/user/userAndAllFriendsWithOnlineStatus",
+                    "/user/usersOnlineStatus",
                     "/user/findByIdForAchievement",
                     "/user/findNotDeactivatedByEmail",
                     "/user/findByEmail",

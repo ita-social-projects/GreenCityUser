@@ -28,6 +28,7 @@ import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -505,4 +506,14 @@ public interface UserService {
      * @author Anton Bondar.
      */
     void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
+
+    /**
+     * Method for getting Users online status (true or false).
+     *
+     * @param request {@link UsersOnlineStatusRequestDto} - request with current
+     *                user ID and list of Users ID whose statuses need to be
+     *                checked.
+     * @author Anton Bondar.
+     */
+    void getUsersOnlineStatus(UsersOnlineStatusRequestDto request);
 }

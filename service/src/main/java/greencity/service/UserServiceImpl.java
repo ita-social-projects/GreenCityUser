@@ -35,6 +35,7 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
@@ -76,6 +77,7 @@ import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,6 +100,7 @@ public class UserServiceImpl implements UserService {
     private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
     private final GoogleApiService googleApiService;
+    private final SimpMessagingTemplate messagingTemplate;
     /**
      * Autowired mapper.
      */
@@ -1091,5 +1094,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime) {
         userRepo.updateUserLastActivityTimeByEmail(email, userLastActivityTime);
+    }
+
+    @Override
+    @Transactional
+    public void getUsersOnlineStatus(UsersOnlineStatusRequestDto request) {
+        List<User> friends = userRepo.getAllUserFriendsByFriendId(request.getCurrentUserId(), request.getUsersId());
+
+        List<UserWithOnlineStatusDto> friendsWithOnlineStatus = friends.stream()
+            .map(friend -> UserWithOnlineStatusDto.builder()
+                .id(friend.getId())
+                .onlineStatus(checkIfTheUserIsOnline(friend.getId()))
+                .build())
+            .collect(Collectors.toList());
+
+        messagingTemplate.convertAndSend("/topic/" + request.getCurrentUserId() + "/usersOnlineStatus",
+            friendsWithOnlineStatus);
     }
 }

@@ -314,4 +314,21 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Transactional
     @Query(value = "UPDATE User SET lastActivityTime=:userLastActivityTime WHERE email=:email")
     void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
+
+    /**
+     * Method to get all User's friends by friends ID.
+     *
+     * @param userId    {@link Long} - id of current user.
+     * @param friendsId {@link Long} - list of friend IDs whose statuses need to be
+     *                  checked.
+     * @return list of {@link User}.
+     * @author Anton Bondar.
+     */
+    @Query(nativeQuery = true, value = """
+        SELECT * FROM users WHERE users.id IN ( \
+        (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND') \
+        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'))\
+        AND users.id IN (:friendsId)
+        """)
+    List<User> getAllUserFriendsByFriendId(Long userId, List<Long> friendsId);
 }
