@@ -479,16 +479,16 @@ public class UserController {
     }
 
     /**
-     * Method for getting Users online status (true or false).
+     * Method for checking Users online status (true or false).
      *
      * @param request {@link UsersOnlineStatusRequestDto} - request with current
-     *                user ID and list of Users ID whose statuses need to be
+     *                User ID and list of Users ID whose statuses need to be
      *                checked.
      * @author Anton Bondar.
      */
     @MessageMapping("/usersOnlineStatus")
-    public void getUsersOnlineStatus(@Payload UsersOnlineStatusRequestDto request) {
-        userService.getUsersOnlineStatus(request);
+    public void checkUsersOnlineStatus(@Payload UsersOnlineStatusRequestDto request) {
+        userService.checkUsersOnlineStatus(request);
     }
 
     /**

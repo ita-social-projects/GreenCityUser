@@ -5,6 +5,7 @@ import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
 import static greencity.ModelUtils.TEST_ADMIN;
 import static greencity.ModelUtils.TEST_USER;
 import static greencity.ModelUtils.TEST_USER_VO;
+import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserLocation;
 import greencity.TestConst;
 import greencity.client.RestClient;
@@ -39,6 +40,7 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
@@ -83,6 +85,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -102,6 +105,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -126,6 +130,10 @@ class UserServiceImplTest {
 
     @Mock
     UserLocationRepo userLocationRepo;
+
+    @Mock
+    private SimpMessagingTemplate messagingTemplate;
+
     private User user = User.builder()
         .id(1L)
         .name("Taras")
@@ -1476,5 +1484,21 @@ class UserServiceImplTest {
         LocalDateTime currentTime = LocalDateTime.now();
         userService.updateUserLastActivityTimeByEmail(userEmail, currentTime);
         verify(userRepo).updateUserLastActivityTimeByEmail(userEmail, currentTime);
+    }
+
+    @Test
+    void getUsersOnlineStatusTest() {
+        var lastActivityTime = LocalDateTime.now().minusMinutes(1);
+        var lastActivityTimestamp = Timestamp.valueOf(lastActivityTime);
+
+        when(userRepo.findById(1L)).thenReturn(Optional.ofNullable(getUser()));
+        when(userRepo.getAllUsersByUsersId(List.of(1L))).thenReturn(List.of(User.builder().id(1L).build()));
+        when(userRepo.findLastActivityTimeById(anyLong())).thenReturn(Optional.of(lastActivityTimestamp));
+
+        userService.checkUsersOnlineStatus(new UsersOnlineStatusRequestDto(1L, List.of(1L)));
+        verify(messagingTemplate).convertAndSend(eq("/topic/1/usersOnlineStatus"), anyList());
+        verify(userRepo).findById(1L);
+        verify(userRepo).getAllUsersByUsersId(List.of(1L));
+        verify(userRepo).findLastActivityTimeById(anyLong());
     }
 }

@@ -1098,17 +1098,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void getUsersOnlineStatus(UsersOnlineStatusRequestDto request) {
-        List<User> friends = userRepo.getAllUserFriendsByFriendId(request.getCurrentUserId(), request.getUsersId());
+    public void checkUsersOnlineStatus(UsersOnlineStatusRequestDto request) {
+        List<User> users = userRepo.getAllUsersByUsersId(request.getUsersId());
 
-        List<UserWithOnlineStatusDto> friendsWithOnlineStatus = friends.stream()
-            .map(friend -> UserWithOnlineStatusDto.builder()
-                .id(friend.getId())
-                .onlineStatus(checkIfTheUserIsOnline(friend.getId()))
+        List<UserWithOnlineStatusDto> usersWithOnlineStatus = users.stream()
+            .map(user -> UserWithOnlineStatusDto.builder()
+                .id(user.getId())
+                .onlineStatus(checkIfTheUserIsOnline(user.getId()))
                 .build())
             .collect(Collectors.toList());
 
         messagingTemplate.convertAndSend("/topic/" + request.getCurrentUserId() + "/usersOnlineStatus",
-            friendsWithOnlineStatus);
+            usersWithOnlineStatus);
     }
 }

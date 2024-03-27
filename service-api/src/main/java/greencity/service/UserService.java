@@ -508,12 +508,12 @@ public interface UserService {
     void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
 
     /**
-     * Method for getting Users online status (true or false).
+     * Method for checking Users online status (true or false).
      *
      * @param request {@link UsersOnlineStatusRequestDto} - request with current
      *                user ID and list of Users ID whose statuses need to be
      *                checked.
      * @author Anton Bondar.
      */
-    void getUsersOnlineStatus(UsersOnlineStatusRequestDto request);
+    void checkUsersOnlineStatus(UsersOnlineStatusRequestDto request);
 }
