@@ -302,4 +302,26 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return - return true if User exists and false if not.
      */
     boolean existsUserByEmail(String email);
+
+    /**
+     * Updates last activity time for a given user by email.
+     *
+     * @param email                - {@link User}'s email.
+     * @param userLastActivityTime - new {@link User}'s last activity time.
+     * @author Anton Bondar.
+     */
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE User SET lastActivityTime=:userLastActivityTime WHERE email=:email")
+    void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
+
+    /**
+     * Method to get all User's by users IDs.
+     *
+     * @param usersId {@link Long} - list of users IDs.
+     * @return list of {@link User}.
+     * @author Anton Bondar.
+     */
+    @Query(nativeQuery = true, value = "SELECT * FROM users where users.id in (:usersId)")
+    List<User> getAllUsersByUsersId(List<Long> usersId);
 }

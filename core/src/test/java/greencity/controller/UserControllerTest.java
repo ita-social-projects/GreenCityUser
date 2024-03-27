@@ -25,6 +25,7 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.security.service.AuthorityService;
@@ -46,6 +47,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -55,6 +58,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
@@ -83,6 +87,8 @@ class UserControllerTest {
     @Mock
     private PositionService positionService;
     private ObjectMapper objectMapper;
+    @Mock
+    private SimpMessagingTemplate messagingTemplate;
 
     @BeforeEach
     void setup() {
@@ -860,4 +866,10 @@ class UserControllerTest {
         verify(userService).updateUserRating(dto);
     }
 
+    @Test
+    void checkUsersOnlineStatusTest() {
+        var request = new UsersOnlineStatusRequestDto();
+        userController.checkUsersOnlineStatus(request);
+        verify(userService).checkUsersOnlineStatus(request);
+    }
 }
