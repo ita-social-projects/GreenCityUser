@@ -6,11 +6,18 @@ import org.springframework.messaging.converter.DefaultContentTypeResolver;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.converter.MessageConverter;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.StompWebSocketEndpointRegistration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,7 +32,7 @@ public class WebSocketConfigTest {
     }
 
     @Test
-    public void configureMessageBrokerTest() {
+    void configureMessageBrokerTest() {
         MessageBrokerRegistry registry = mock(MessageBrokerRegistry.class);
         webSocketConfig.configureMessageBroker(registry);
         verify(registry).enableSimpleBroker("/topic");
@@ -33,7 +40,7 @@ public class WebSocketConfigTest {
     }
 
     @Test
-    public void registerStompEndpointsTest() {
+    void registerStompEndpointsTest() {
         StompEndpointRegistry registry = mock(StompEndpointRegistry.class);
         StompWebSocketEndpointRegistration registration = mock(StompWebSocketEndpointRegistration.class);
 
@@ -47,18 +54,21 @@ public class WebSocketConfigTest {
     }
 
     @Test
-    public void configureMessageConvertersTest() {
+    void configureMessageConvertersTest() {
         List<MessageConverter> messageConverters = new ArrayList<>();
         boolean result = webSocketConfig.configureMessageConverters(messageConverters);
-        assert !result;
 
-        assert messageConverters.size() == 1;
+        assertFalse(result);
+        assertEquals(1, messageConverters.size());
+
         MessageConverter converter = messageConverters.getFirst();
-        assert converter instanceof MappingJackson2MessageConverter;
+        assertInstanceOf(MappingJackson2MessageConverter.class, converter);
 
         MappingJackson2MessageConverter jacksonConverter = (MappingJackson2MessageConverter) converter;
         DefaultContentTypeResolver resolver = (DefaultContentTypeResolver) jacksonConverter.getContentTypeResolver();
-        assert Objects.equals(Objects.requireNonNull(resolver).getDefaultMimeType(),
-            org.springframework.util.MimeTypeUtils.APPLICATION_JSON);
+        assert resolver != null;
+        assertNotNull(resolver);
+
+        assertEquals(MimeTypeUtils.APPLICATION_JSON, resolver.getDefaultMimeType());
     }
 }
