@@ -20,7 +20,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.any;
 
-public class WebSocketConfigTest {
+class WebSocketConfigTest {
     private WebSocketConfig webSocketConfig;
 
     @BeforeEach
