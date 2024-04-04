@@ -166,7 +166,9 @@ class OwnSecurityServiceImplTest {
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
-        ownSecurityService.signUp(new OwnSignUpDto(), "en");
+        OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
+        ownSignUpDto.setEmail("test@gmail.com");
+        ownSecurityService.signUp(ownSignUpDto, "en");
         verify(emailService, times(1)).sendVerificationEmail(
             refEq(user.getId()),
             refEq(user.getName()),
@@ -288,6 +290,7 @@ class OwnSecurityServiceImplTest {
     @Test
     void signUpThrowsUserAlreadyRegisteredExceptionTest() {
         OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
+        ownSignUpDto.setEmail("test@gmail.com");
         User user = User.builder().verifyEmail(new VerifyEmail()).build();
         UserVO userVO = UserVO.builder().verifyEmail(new VerifyEmailVO()).build();
         List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
