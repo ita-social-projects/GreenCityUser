@@ -139,6 +139,7 @@ public class SecurityConfig {
                     "/user/{userId}/profileStatistics/",
                     "/user/userAndSixFriendsWithOnlineStatus",
                     "/user/userAndAllFriendsWithOnlineStatus",
+                    "/user/usersOnlineStatus",
                     "/user/findByIdForAchievement",
                     "/user/findNotDeactivatedByEmail",
                     "/user/findByEmail",
@@ -168,6 +169,7 @@ public class SecurityConfig {
                     "/ownSecurity/changePassword",
                     "/user/profile",
                     "/user/{id}/updateUserLastActivityTime/{date}",
+                    "/user/updateUserLastActivityTime/{date}",
                     "/user/language/{languageId}",
                     "/user/employee-email")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
