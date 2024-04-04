@@ -35,6 +35,7 @@ import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -64,6 +65,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -459,8 +461,7 @@ public class UserController {
      */
     @MessageMapping("/userAndSixFriendsWithOnlineStatus")
     @SendTo("/topic/sixUsersOnlineStatus")
-    public UserAndFriendsWithOnlineStatusDto getUserAndSixFriendsWithOnlineStatus(
-        Long userId) {
+    public UserAndFriendsWithOnlineStatusDto getUserAndSixFriendsWithOnlineStatus(Long userId) {
         return userService.getUserAndSixFriendsWithOnlineStatus(userId);
     }
 
@@ -473,9 +474,21 @@ public class UserController {
      */
     @MessageMapping("/userAndAllFriendsWithOnlineStatus")
     @SendTo("/topic/userAndAllFriendsOnlineStatus")
-    public UserAndAllFriendsWithOnlineStatusDto getUserAndAllFriendsWithOnlineStatus(
-        Long userId, Pageable pageable) {
+    public UserAndAllFriendsWithOnlineStatusDto getUserAndAllFriendsWithOnlineStatus(Long userId, Pageable pageable) {
         return userService.getAllFriendsWithTheOnlineStatus(userId, pageable);
+    }
+
+    /**
+     * Method for checking Users online status (true or false).
+     *
+     * @param request {@link UsersOnlineStatusRequestDto} - request with current
+     *                User ID and list of Users ID whose statuses need to be
+     *                checked.
+     * @author Anton Bondar.
+     */
+    @MessageMapping("/usersOnlineStatus")
+    public void checkUsersOnlineStatus(@Payload UsersOnlineStatusRequestDto request) {
+        userService.checkUsersOnlineStatus(request);
     }
 
     /**
@@ -689,7 +702,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
-    @PutMapping("/updateUserLastActivityTime/{date}")
+    // @PutMapping("/updateUserLastActivityTime/{date}")
     public ResponseEntity<Object> updateUserLastActivityTime(@Parameter(hidden = true) @CurrentUser UserVO userVO,
         @PathVariable(value = "date") @DateTimeFormat(
             pattern = "yyyy-MM-dd.HH:mm:ss.SSSSSS") LocalDateTime userLastActivityTime) {
