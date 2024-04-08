@@ -14,6 +14,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.GeneralEmailMessage;
+import greencity.repository.UserRepo;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,6 +47,8 @@ class EmailServiceImplTest {
     private ITemplateEngine templateEngine;
     @Mock
     private MessageSource messageSource;
+    @Mock
+    private UserRepo userRepo;
     private static final Locale UA_LOCALE = new Locale("uk", "UA");
 
     @BeforeEach
@@ -53,7 +56,7 @@ class EmailServiceImplTest {
         initMocks(this);
         service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
             "http://localhost:4200", "http://localhost:4200", "http://localhost:8080",
-            "test@email.com", messageSource);
+            "test@email.com", messageSource, userRepo);
         placeAuthorDto = PlaceAuthorDto.builder()
             .id(1L)
             .email("testEmail@gmail.com")
@@ -125,8 +128,14 @@ class EmailServiceImplTest {
 
     @Test
     void sendApprovalEmail() {
-        service.sendApprovalEmail(1L, "userName", "test@gmail.com", "someToken");
+        when(messageSource.getMessage(EmailConstants.APPROVE_REGISTRATION_SUBJECT, null,
+                getLocale("en")))
+                .thenReturn("Approve your registration");
+        service.sendApprovalEmail(1L, "userName", "test@gmail.com",
+                "someToken", "en");
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.APPROVE_REGISTRATION_SUBJECT, null,
+                getLocale("en"));
     }
 
     @ParameterizedTest
@@ -159,6 +168,8 @@ class EmailServiceImplTest {
 
     @Test
     void sendReasonOfDeactivation() {
+        when(messageSource.getMessage(EmailConstants.DEACTIVATION, null,
+                getLocale("en"))).thenReturn("Your account was deactivated");
         List<String> test = List.of("test", "test");
         UserDeactivationReasonDto test1 = UserDeactivationReasonDto.builder()
             .deactivationReasons(test)
@@ -168,10 +179,13 @@ class EmailServiceImplTest {
             .build();
         service.sendReasonOfDeactivation(test1);
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.DEACTIVATION, null, getLocale("en"));
     }
 
     @Test
     void sendMessageOfActivation() {
+        when(messageSource.getMessage(EmailConstants.ACTIVATION, null,
+                getLocale("en"))).thenReturn("Your account was activated");
         UserActivationDto test1 = UserActivationDto.builder()
             .lang("en")
             .email("test@ukr.net")
@@ -179,10 +193,13 @@ class EmailServiceImplTest {
             .build();
         service.sendMessageOfActivation(test1);
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.ACTIVATION, null, getLocale("en"));
     }
 
     @Test
     void sendUserViolationEmailTest() {
+        when(messageSource.getMessage(EmailConstants.VIOLATION_EMAIL, null,
+                getLocale("en"))).thenReturn("Violation email");
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         service.sendUserViolationEmail(dto);
         verify(javaMailSender).createMimeMessage();

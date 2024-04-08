@@ -4,7 +4,7 @@
 
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Password Reset</title>
+    <title th:text="#{approve.title}"></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
         /**
@@ -146,8 +146,9 @@
                 <tr>
                     <td align="left" bgcolor="#ffffff"
                         style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
-                        <h2 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">
-                            Approve your email address to submit registration</h2>
+                        <h2 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -1px; line-height: 48px;"
+                            th:text="#{approve.email}"
+                            ></h2>
                     </td>
                 </tr>
             </table>
@@ -174,7 +175,8 @@
                 <tr>
                     <td align="left" bgcolor="#ffffff"
                         style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                        <div style="margin: 0;" th:text="${'Hi ' + name + ', Your account was registered by Green City admin! To set password and finish your registration, press button below.'}"></div>
+                        <p th:text="#{hello} + ${name + ','}"></p>
+                        <div style="margin: 0;" th:text="#{approve.message}"></div>
                     </td>
                 </tr>
                 <!-- end copy -->
@@ -189,8 +191,8 @@
                                         <tr>
                                             <td align="center" bgcolor="#13aa57" style="border-radius: 6px;">
                                                 <a th:href="${approveRegistration}" target="_blank"
-                                                   style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;">
-                                                    Approve Registration</a>
+                                                   style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;"
+                                                   th:text="#{approve}"></a>
                                             </td>
                                         </tr>
                                     </table>
@@ -205,8 +207,7 @@
                 <tr>
                     <td align="left" bgcolor="#ffffff"
                         style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                        <p style="margin: 0;">If that doesn't work, copy and paste the following link in your
-                            browser:</p>
+                        <p style="margin: 0;" th:text="#{link.message}"></p>
                         <p style="margin: 0;" th:text="${approveRegistration}"><a th:href="${approveRegistration}"
                                                                             target="_blank"></a>
                         </p>
@@ -237,7 +238,7 @@
                 <tr>
                     <td align="center" bgcolor="#e9ecef"
                         style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                        <p style="margin: 0;">You are welcome</p>
+                        <p style="margin: 0;" th:text="#{welcome}"></p>
                     </td>
                 </tr>
                 <!-- end permission -->

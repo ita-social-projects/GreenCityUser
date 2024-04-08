@@ -364,7 +364,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Transactional
     @Override
-    public UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto) {
+    public UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto, String language) {
         if (userRepo.findByEmail(dto.getEmail()).isPresent()) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
@@ -372,7 +372,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         OwnSecurity ownSecurity = managementCreateOwnSecurity(user);
         user.setOwnSecurity(ownSecurity);
         return modelMapper.map(
-            savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey()), UserAdminRegistrationDto.class);
+            savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey(), language), UserAdminRegistrationDto.class);
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
@@ -437,7 +437,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * @param user  {@link User} - User whose password is to be recovered
      * @param token {@link String} - token for password restoration
      */
-    private User savePasswordRestorationTokenForUser(User user, String token) {
+    private User savePasswordRestorationTokenForUser(User user, String token, String language) {
         RestorePasswordEmail restorePasswordEmail =
             RestorePasswordEmail.builder()
                 .user(user)
@@ -446,7 +446,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
         user = userRepo.save(user);
-        emailService.sendApprovalEmail(user.getId(), user.getName(), user.getEmail(), token);
+        emailService.sendApprovalEmail(user.getId(), user.getName(), user.getEmail(), token, language);
         return user;
     }
 

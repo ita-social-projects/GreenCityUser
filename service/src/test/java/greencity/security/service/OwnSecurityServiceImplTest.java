@@ -479,12 +479,12 @@ class OwnSecurityServiceImplTest {
         when(userRepo.save(any())).thenReturn(user);
         when(modelMapper.map(user, UserAdminRegistrationDto.class)).thenReturn(dto);
 
-        UserAdminRegistrationDto expected = ownSecurityService.managementRegisterUser(userManagementDto);
+        UserAdminRegistrationDto expected = ownSecurityService.managementRegisterUser(userManagementDto, "en");
 
         assertEquals(dto, expected);
 
         verify(restorePasswordEmailRepo, times(1)).save(any());
-        verify(emailService).sendApprovalEmail(1L, TestConst.NAME, TestConst.EMAIL, "token-key");
+        verify(emailService).sendApprovalEmail(1L, TestConst.NAME, TestConst.EMAIL, "token-key", "en");
     }
 
     @Test
@@ -492,7 +492,7 @@ class OwnSecurityServiceImplTest {
         when(userRepo.findByEmail(any())).thenReturn(Optional.of(ModelUtils.getUser()));
 
         Exception thrown = assertThrows(UserAlreadyRegisteredException.class,
-            () -> ownSecurityService.managementRegisterUser(userManagementDto));
+            () -> ownSecurityService.managementRegisterUser(userManagementDto,"ua"));
 
         assertEquals(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL, thrown.getMessage());
     }

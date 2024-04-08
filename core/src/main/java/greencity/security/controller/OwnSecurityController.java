@@ -250,8 +250,9 @@ public class OwnSecurityController {
     })
     @PostMapping("/register")
     public ResponseEntity<UserAdminRegistrationDto> managementRegisterUser(
-        @Valid @RequestBody UserManagementDto userDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.managementRegisterUser(userDto));
+        @Valid @RequestBody UserManagementDto userDto, @Parameter(hidden = true) @ValidLanguage Locale locale) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(service.managementRegisterUser(userDto, locale.getLanguage()));
     }
 
     /**

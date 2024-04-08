@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.constant.EmailConstants;
+import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
@@ -11,8 +12,11 @@ import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.entity.User;
 import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.message.GeneralEmailMessage;
+import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
 import java.io.UnsupportedEncodingException;
@@ -50,6 +54,7 @@ public class EmailServiceImpl implements EmailService {
     private final String serverLink;
     private final String senderEmailAddress;
     private final MessageSource messageSource;
+    private final UserRepo userRepo;
     private static final String PARAM_USER_ID = "&user_id=";
     private static final Locale UA_LOCALE = new Locale("uk", "UA");
 
@@ -63,7 +68,8 @@ public class EmailServiceImpl implements EmailService {
         @Value("${client.address}") String clientLink,
         @Value("${econews.address}") String ecoNewsLink,
         @Value("${address}") String serverLink,
-        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource) {
+        @Value("${sender.email.address}") String senderEmailAddress,
+                            MessageSource messageSource, UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
@@ -72,20 +78,26 @@ public class EmailServiceImpl implements EmailService {
         this.serverLink = serverLink;
         this.senderEmailAddress = senderEmailAddress;
         this.messageSource = messageSource;
+        this.userRepo = userRepo;
     }
 
     @Override
     public void sendChangePlaceStatusEmail(String authorName, String placeName,
         String placeStatus, String authorEmail) {
+        User user =  userRepo.findByEmail(authorEmail)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        String language = user.getLanguage().getCode();
         log.info(LogMessage.IN_SEND_CHANGE_PLACE_STATUS_EMAIL, placeName);
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, authorName);
         model.put(EmailConstants.PLACE_NAME, placeName);
         model.put(EmailConstants.STATUS, placeStatus);
+        model.put(EmailConstants.LANGUAGE, language);
 
         String template = createEmailTemplate(model, EmailConstants.CHANGE_PLACE_STATUS_EMAIL_PAGE);
-        sendEmail(authorEmail, EmailConstants.GC_CONTRIBUTORS, template);
+        sendEmail(authorEmail, messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
+                        getLocale(language)), template);
     }
 
     @Override
@@ -98,10 +110,16 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.RESULT, categoriesWithPlaces);
         model.put(EmailConstants.REPORT_TYPE, notification);
 
-        for (PlaceAuthorDto user : subscribers) {
-            model.put(EmailConstants.USER_NAME, user.getName());
+        for (PlaceAuthorDto subscriber : subscribers) {
+            String email = subscriber.getEmail();
+            var user =  userRepo.findByEmail(email)
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            String language = user.getLanguage().getCode();
+            model.put(EmailConstants.USER_NAME, subscriber.getName());
+            model.put(EmailConstants.LANGUAGE, language);
             String template = createEmailTemplate(model, EmailConstants.NEW_PLACES_REPORT_EMAIL_PAGE);
-            sendEmail(user.getEmail(), EmailConstants.NEW_PLACES, template);
+            sendEmail(email, messageSource.getMessage(EmailConstants.NEW_PLACES, null, getLocale(language)),
+                    template);
         }
     }
 
@@ -111,7 +129,12 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.ECO_NEWS_LINK, ecoNewsLink);
         model.put(EmailConstants.NEWS_RESULT, newsDto);
+
         for (NewsSubscriberResponseDto dto : subscribers) {
+            var user =  userRepo.findByEmail(dto.getEmail())
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            String language = user.getLanguage().getCode();
+            model.put(EmailConstants.LANGUAGE, language);
             try {
                 model.put(EmailConstants.UNSUBSCRIBE_LINK, serverLink + "/newsSubscriber/unsubscribe?email="
                     + URLEncoder.encode(dto.getEmail(), StandardCharsets.UTF_8.toString())
@@ -120,7 +143,8 @@ public class EmailServiceImpl implements EmailService {
                 log.error(e.getMessage());
             }
             String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
-            sendEmail(dto.getEmail(), EmailConstants.NEWS, template);
+            sendEmail(dto.getEmail(), messageSource.getMessage(EmailConstants.NEWS, null, getLocale(language)),
+                    template);
         }
     }
 
@@ -129,6 +153,11 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.ECO_NEWS_LINK, ecoNewsLink);
         model.put(EmailConstants.NEWS_RESULT, newDto);
+        String email = newDto.getAuthor().getEmail();
+        var user =  userRepo.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        String language = user.getLanguage().getCode();
+        model.put(EmailConstants.LANGUAGE, language);
         try {
             model.put(EmailConstants.UNSUBSCRIBE_LINK, serverLink + "/newSubscriber/unsubscribe?email="
                 + URLEncoder.encode(newDto.getAuthor().getEmail(), StandardCharsets.UTF_8.toString())
@@ -137,7 +166,8 @@ public class EmailServiceImpl implements EmailService {
             log.error(e.getMessage());
         }
         String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
-        sendEmail(newDto.getAuthor().getEmail(), EmailConstants.CREATED_NEWS, template);
+        sendEmail(email, messageSource.getMessage(EmailConstants.CREATED_NEWS, null, getLocale(language)),
+                template);
     }
 
     /**
@@ -167,14 +197,16 @@ public class EmailServiceImpl implements EmailService {
      * @author Vasyl Zhovnir
      */
     @Override
-    public void sendApprovalEmail(Long userId, String name, String email, String token) {
+    public void sendApprovalEmail(Long userId, String name, String email, String token, String language) {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.APPROVE_REGISTRATION, clientLink + "#/auth/restore?" + "token=" + token
             + PARAM_USER_ID + userId);
+        model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.USER_APPROVAL_EMAIL_PAGE);
-        sendEmail(email, EmailConstants.APPROVE_REGISTRATION_SUBJECT, template);
+        sendEmail(email, messageSource.getMessage(EmailConstants.APPROVE_REGISTRATION_SUBJECT, null,
+                        getLocale(language)), template);
     }
 
     /**
@@ -249,34 +281,42 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendReasonOfDeactivation(UserDeactivationReasonDto userDeactivationDto) {
         Map<String, Object> model = new HashMap<>();
+        String language = userDeactivationDto.getLang();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userDeactivationDto.getName());
         model.put(EmailConstants.REASONS, userDeactivationDto.getDeactivationReasons());
-        validateLanguage(userDeactivationDto.getLang());
+        model.put(EmailConstants.LANGUAGE, language);
+        validateLanguage(language);
         String template = createEmailTemplate(model, EmailConstants.REASONS_OF_DEACTIVATION_PAGE);
-        sendEmail(userDeactivationDto.getEmail(), EmailConstants.DEACTIVATION, template);
+        sendEmail(userDeactivationDto.getEmail(),
+                messageSource.getMessage(EmailConstants.DEACTIVATION, null, getLocale(language)), template);
     }
 
     @Override
     public void sendMessageOfActivation(UserActivationDto userActivationDto) {
         Map<String, Object> model = new HashMap<>();
+        String language = userActivationDto.getLang();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userActivationDto.getName());
-        validateLanguage(userActivationDto.getLang());
+        validateLanguage(language);
+        model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
-        sendEmail(userActivationDto.getEmail(), EmailConstants.ACTIVATION, template);
+        sendEmail(userActivationDto.getEmail(),
+                messageSource.getMessage(EmailConstants.ACTIVATION, null, getLocale(language)), template);
     }
 
     @Override
     public void sendUserViolationEmail(UserViolationMailDto dto) {
         Map<String, Object> model = new HashMap<>();
+        String language = dto.getLanguage();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getName());
         model.put(EmailConstants.DESCRIPTION, dto.getViolationDescription());
-        model.put(EmailConstants.LANGUAGE, dto.getLanguage());
-        validateLanguage(dto.getLanguage());
+        model.put(EmailConstants.LANGUAGE, language);
+        validateLanguage(language);
         String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
-        sendEmail(dto.getEmail(), EmailConstants.VIOLATION_EMAIL, template);
+        sendEmail(dto.getEmail(), messageSource.getMessage(EmailConstants.VIOLATION_EMAIL, null,
+                        getLocale(language)), template);
     }
 
     @Override

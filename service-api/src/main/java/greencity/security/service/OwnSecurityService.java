@@ -75,7 +75,7 @@ public interface OwnSecurityService {
      * @param dto a value of {@link UserManagementDto}
      * @author Vasyl Zhovnir
      */
-    UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto);
+    UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto, String language);
 
     /**
      * Checks if user has password.

@@ -3,24 +3,20 @@ package greencity.constant;
 public final class EmailConstants {
     public static final String EMAIL_CONTENT_TYPE = "text/html; charset=utf-8";
     // subjects
-    public static final String GC_CONTRIBUTORS = "GreenCity contributors";
-    public static final String NEW_PLACES = "New places";
-    public static final String NEWS = "Eco news from GreenCity";
+    public static final String NEW_PLACES = "new.places";
+    public static final String NEWS = "news.receive.title";
     public static final String EVENT_COMMENT = "You have a new comment on your event";
-    public static final String CREATED_NEWS = "You created news on GreenCity ";
+    public static final String CREATED_NEWS = "news.receive.title";
     public static final String VERIFY_EMAIL = "verify.email";
     public static final String RESTORED_PASSWORD = "restored.password";
     public static final String CONFIRM_RESTORING_PASS = "confirm.restoring.pass";
-    public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
-    public static final String DEACTIVATION = "Your account was deactivated";
-    public static final String ACTIVATION = "Your account was activated";
-    public static final String VIOLATION_EMAIL = "Violation email";
+    public static final String APPROVE_REGISTRATION_SUBJECT = "approve.title";
+    public static final String DEACTIVATION = "deactivation.title";
+    public static final String ACTIVATION = "activation.title";
+    public static final String VIOLATION_EMAIL = "violation.title";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
-    public static final String AUTHOR_NAME = "authorName";
-    public static final String COMMENT_BODY = "commentBody";
-    public static final String COMMENT_TIME = "commentTime";
     public static final String VERIFY_ADDRESS = "verifyAddress";
     public static final String RESTORE_PASS = "restorePassword";
     public static final String APPROVE_REGISTRATION = "approveRegistration";
@@ -35,6 +31,7 @@ public final class EmailConstants {
     public static final String DESCRIPTION = "description";
     public static final String LANGUAGE = "language";
     public static final String IS_UBS = "isUbs";
+    public static final String CHANGE_PLACE_STATUS = "place.status.title";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";

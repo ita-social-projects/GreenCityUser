@@ -75,7 +75,7 @@ public interface EmailService {
      * @param userEmail email current user.
      * @param token     verify token.
      */
-    void sendApprovalEmail(Long userId, String userName, String userEmail, String token);
+    void sendApprovalEmail(Long userId, String userName, String userEmail, String token, String language);
 
     /**
      * Sends password recovery email using separated user parameters.
