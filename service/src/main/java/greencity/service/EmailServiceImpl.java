@@ -69,7 +69,7 @@ public class EmailServiceImpl implements EmailService {
         @Value("${econews.address}") String ecoNewsLink,
         @Value("${address}") String serverLink,
         @Value("${sender.email.address}") String senderEmailAddress,
-                            MessageSource messageSource, UserRepo userRepo) {
+        MessageSource messageSource, UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
@@ -84,10 +84,10 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendChangePlaceStatusEmail(String authorName, String placeName,
         String placeStatus, String authorEmail) {
-        User user =  userRepo.findByEmail(authorEmail)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        String language = user.getLanguage().getCode();
+        User user = userRepo.findByEmail(authorEmail)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         log.info(LogMessage.IN_SEND_CHANGE_PLACE_STATUS_EMAIL, placeName);
+        String language = user.getLanguage().getCode();
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, authorName);
@@ -97,7 +97,7 @@ public class EmailServiceImpl implements EmailService {
 
         String template = createEmailTemplate(model, EmailConstants.CHANGE_PLACE_STATUS_EMAIL_PAGE);
         sendEmail(authorEmail, messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
-                        getLocale(language)), template);
+            getLocale(language)), template);
     }
 
     @Override
@@ -112,14 +112,14 @@ public class EmailServiceImpl implements EmailService {
 
         for (PlaceAuthorDto subscriber : subscribers) {
             String email = subscriber.getEmail();
-            var user =  userRepo.findByEmail(email)
-                    .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            var user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
             String language = user.getLanguage().getCode();
             model.put(EmailConstants.USER_NAME, subscriber.getName());
             model.put(EmailConstants.LANGUAGE, language);
             String template = createEmailTemplate(model, EmailConstants.NEW_PLACES_REPORT_EMAIL_PAGE);
             sendEmail(email, messageSource.getMessage(EmailConstants.NEW_PLACES, null, getLocale(language)),
-                    template);
+                template);
         }
     }
 
@@ -131,8 +131,8 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.NEWS_RESULT, newsDto);
 
         for (NewsSubscriberResponseDto dto : subscribers) {
-            var user =  userRepo.findByEmail(dto.getEmail())
-                    .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            var user = userRepo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
             String language = user.getLanguage().getCode();
             model.put(EmailConstants.LANGUAGE, language);
             try {
@@ -144,7 +144,7 @@ public class EmailServiceImpl implements EmailService {
             }
             String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
             sendEmail(dto.getEmail(), messageSource.getMessage(EmailConstants.NEWS, null, getLocale(language)),
-                    template);
+                template);
         }
     }
 
@@ -154,8 +154,8 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.ECO_NEWS_LINK, ecoNewsLink);
         model.put(EmailConstants.NEWS_RESULT, newDto);
         String email = newDto.getAuthor().getEmail();
-        var user =  userRepo.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        var user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         String language = user.getLanguage().getCode();
         model.put(EmailConstants.LANGUAGE, language);
         try {
@@ -167,7 +167,7 @@ public class EmailServiceImpl implements EmailService {
         }
         String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
         sendEmail(email, messageSource.getMessage(EmailConstants.CREATED_NEWS, null, getLocale(language)),
-                template);
+            template);
     }
 
     /**
@@ -206,7 +206,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.USER_APPROVAL_EMAIL_PAGE);
         sendEmail(email, messageSource.getMessage(EmailConstants.APPROVE_REGISTRATION_SUBJECT, null,
-                        getLocale(language)), template);
+            getLocale(language)), template);
     }
 
     /**
@@ -289,7 +289,7 @@ public class EmailServiceImpl implements EmailService {
         validateLanguage(language);
         String template = createEmailTemplate(model, EmailConstants.REASONS_OF_DEACTIVATION_PAGE);
         sendEmail(userDeactivationDto.getEmail(),
-                messageSource.getMessage(EmailConstants.DEACTIVATION, null, getLocale(language)), template);
+            messageSource.getMessage(EmailConstants.DEACTIVATION, null, getLocale(language)), template);
     }
 
     @Override
@@ -302,7 +302,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
         sendEmail(userActivationDto.getEmail(),
-                messageSource.getMessage(EmailConstants.ACTIVATION, null, getLocale(language)), template);
+            messageSource.getMessage(EmailConstants.ACTIVATION, null, getLocale(language)), template);
     }
 
     @Override
@@ -316,7 +316,7 @@ public class EmailServiceImpl implements EmailService {
         validateLanguage(language);
         String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
         sendEmail(dto.getEmail(), messageSource.getMessage(EmailConstants.VIOLATION_EMAIL, null,
-                        getLocale(language)), template);
+            getLocale(language)), template);
     }
 
     @Override

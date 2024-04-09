@@ -372,7 +372,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         OwnSecurity ownSecurity = managementCreateOwnSecurity(user);
         user.setOwnSecurity(ownSecurity);
         return modelMapper.map(
-            savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey(), language), UserAdminRegistrationDto.class);
+            savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey(), language),
+            UserAdminRegistrationDto.class);
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {

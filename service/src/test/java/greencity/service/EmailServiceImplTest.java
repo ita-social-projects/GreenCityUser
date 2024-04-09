@@ -25,7 +25,6 @@ import org.mockito.Mock;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
-
 import java.util.*;
 import java.util.concurrent.Executors;
 
@@ -71,8 +70,13 @@ class EmailServiceImplTest {
         String placeName = "test place name";
         String placeStatus = "test place status";
         String authorEmail = "useremail@gmail.com";
+
+        when(userRepo.findByEmail(authorEmail)).thenReturn(Optional.of(ModelUtils.getUserWithUserLocation()));
+        when(messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
+            getLocale("en"))).thenReturn("Updated place status");
         service.sendChangePlaceStatusEmail(authorFirstName, placeName, placeStatus, authorEmail);
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.CHANGE_PLACE_STATUS, null, getLocale("en"));
     }
 
     @Test
@@ -84,9 +88,14 @@ class EmailServiceImplTest {
             PlaceNotificationDto.builder().name("PlaceName2").category(testCategory).build();
         Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlacesTest = new HashMap<>();
         categoriesWithPlacesTest.put(testCategory, Arrays.asList(testPlace1, testPlace2));
+
+        when(userRepo.findByEmail("author@gmail.com")).thenReturn(Optional.of(ModelUtils.getUserWithUserLocation()));
+        when(messageSource.getMessage(EmailConstants.NEW_PLACES, null,
+            getLocale("en"))).thenReturn("You have added new place");
         service.sendAddedNewPlacesReportEmail(
-            Collections.singletonList(placeAuthorDto), categoriesWithPlacesTest, "DAILY");
+            Collections.singletonList(ModelUtils.getPlaceAuthorDto()), categoriesWithPlacesTest, "DAILY");
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.NEW_PLACES, null, getLocale("en"));
     }
 
     @Test
@@ -95,8 +104,13 @@ class EmailServiceImplTest {
         PlaceAuthorDto placeAuthorDto = new PlaceAuthorDto();
         placeAuthorDto.setEmail("test@gmail.com");
         dto.setAuthor(placeAuthorDto);
+
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(ModelUtils.getUserWithUserLocation()));
+        when(messageSource.getMessage(EmailConstants.CREATED_NEWS, null,
+            getLocale("en"))).thenReturn("Created news");
         service.sendCreatedNewsForAuthor(dto);
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.CREATED_NEWS, null, getLocale("en"));
     }
 
     @Test
@@ -104,8 +118,12 @@ class EmailServiceImplTest {
         List<NewsSubscriberResponseDto> newsSubscriberResponseDtos =
             Collections.singletonList(new NewsSubscriberResponseDto("test@gmail.com", "someUnsubscribeToken"));
         AddEcoNewsDtoResponse addEcoNewsDtoResponse = ModelUtils.getAddEcoNewsDtoResponse();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(ModelUtils.getUserWithUserLocation()));
+        when(messageSource.getMessage(EmailConstants.NEWS, null,
+            getLocale("en"))).thenReturn("News");
         service.sendNewNewsForSubscriber(newsSubscriberResponseDtos, addEcoNewsDtoResponse);
         verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.NEWS, null, getLocale("en"));
     }
 
     @ParameterizedTest
@@ -129,13 +147,13 @@ class EmailServiceImplTest {
     @Test
     void sendApprovalEmail() {
         when(messageSource.getMessage(EmailConstants.APPROVE_REGISTRATION_SUBJECT, null,
-                getLocale("en")))
+            getLocale("en")))
                 .thenReturn("Approve your registration");
         service.sendApprovalEmail(1L, "userName", "test@gmail.com",
-                "someToken", "en");
+            "someToken", "en");
         verify(javaMailSender).createMimeMessage();
         verify(messageSource).getMessage(EmailConstants.APPROVE_REGISTRATION_SUBJECT, null,
-                getLocale("en"));
+            getLocale("en"));
     }
 
     @ParameterizedTest
@@ -169,7 +187,7 @@ class EmailServiceImplTest {
     @Test
     void sendReasonOfDeactivation() {
         when(messageSource.getMessage(EmailConstants.DEACTIVATION, null,
-                getLocale("en"))).thenReturn("Your account was deactivated");
+            getLocale("en"))).thenReturn("Your account was deactivated");
         List<String> test = List.of("test", "test");
         UserDeactivationReasonDto test1 = UserDeactivationReasonDto.builder()
             .deactivationReasons(test)
@@ -185,7 +203,7 @@ class EmailServiceImplTest {
     @Test
     void sendMessageOfActivation() {
         when(messageSource.getMessage(EmailConstants.ACTIVATION, null,
-                getLocale("en"))).thenReturn("Your account was activated");
+            getLocale("en"))).thenReturn("Your account was activated");
         UserActivationDto test1 = UserActivationDto.builder()
             .lang("en")
             .email("test@ukr.net")
@@ -199,7 +217,7 @@ class EmailServiceImplTest {
     @Test
     void sendUserViolationEmailTest() {
         when(messageSource.getMessage(EmailConstants.VIOLATION_EMAIL, null,
-                getLocale("en"))).thenReturn("Violation email");
+            getLocale("en"))).thenReturn("Violation email");
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         service.sendUserViolationEmail(dto);
         verify(javaMailSender).createMimeMessage();

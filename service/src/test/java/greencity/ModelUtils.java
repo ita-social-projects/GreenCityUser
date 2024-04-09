@@ -17,18 +17,7 @@ import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.position.PositionDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.EcoNewsAuthorDto;
-import greencity.dto.user.UserAdminRegistrationDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.dto.user.UserLocationDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UsersFriendDto;
+import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
@@ -787,5 +776,9 @@ public class ModelUtils {
         geocodingResults.add(geocodingResult2);
 
         return geocodingResults;
+    }
+
+    public static PlaceAuthorDto getPlaceAuthorDto() {
+        return PlaceAuthorDto.builder().id(1L).name("Name").email("author@gmail.com").build();
     }
 }

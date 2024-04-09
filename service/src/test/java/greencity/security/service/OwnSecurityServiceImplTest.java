@@ -492,7 +492,7 @@ class OwnSecurityServiceImplTest {
         when(userRepo.findByEmail(any())).thenReturn(Optional.of(ModelUtils.getUser()));
 
         Exception thrown = assertThrows(UserAlreadyRegisteredException.class,
-            () -> ownSecurityService.managementRegisterUser(userManagementDto,"ua"));
+            () -> ownSecurityService.managementRegisterUser(userManagementDto, "ua"));
 
         assertEquals(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL, thrown.getMessage());
     }

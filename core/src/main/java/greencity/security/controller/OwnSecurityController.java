@@ -252,7 +252,7 @@ public class OwnSecurityController {
     public ResponseEntity<UserAdminRegistrationDto> managementRegisterUser(
         @Valid @RequestBody UserManagementDto userDto, @Parameter(hidden = true) @ValidLanguage Locale locale) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(service.managementRegisterUser(userDto, locale.getLanguage()));
+            .body(service.managementRegisterUser(userDto, locale.getLanguage()));
     }
 
     /**
