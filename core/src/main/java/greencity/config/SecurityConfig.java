@@ -158,12 +158,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/shopping-list-items",
                     "/user/{userId}/habit",
-                    "/ownSecurity/set-password",
-                    "/email/sendReport",
-                    "/email/sendHabitNotification",
-                    "/email/addEcoNews",
-                    "/email/changePlaceStatus",
-                    "/email/general/notification")
+                    "/ownSecurity/set-password")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PUT,
                     "/ownSecurity/changePassword",
@@ -207,7 +202,12 @@ public class SecurityConfig {
                 .hasAnyRole(UBS_EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
                     "/user/filter",
-                    "/ownSecurity/register")
+                    "/ownSecurity/register",
+                    "/email/sendReport",
+                    "/email/sendHabitNotification",
+                    "/email/addEcoNews",
+                    "/email/changePlaceStatus",
+                    "/email/general/notification")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",
