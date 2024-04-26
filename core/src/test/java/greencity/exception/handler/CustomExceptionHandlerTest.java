@@ -258,7 +258,7 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleGoogleApiException_GeocodingResultNotFound_ReturnsNotFound() {
+    void handleGoogleApiException() {
         GoogleApiException actual = new GoogleApiException("Geocoding result was not found");
         ValidationExceptionDto validationDto = new ValidationExceptionDto("Google API", actual.getMessage());
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.NOT_FOUND);
