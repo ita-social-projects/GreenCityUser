@@ -405,9 +405,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Method interceptor exception {@link BadUserStatusException}.
+     * Method interceptor exception {@link GoogleApiException}.
      *
-     * @param ex Exception witch should be intercepted
+     * @param googleApiException Exception witch should be intercepted
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
      */
