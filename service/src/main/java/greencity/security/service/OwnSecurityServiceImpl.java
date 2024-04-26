@@ -200,7 +200,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
             .collect(Collectors.toList());
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
-        employee.setAuthorities(list);
+        checkAdminPosition(positionNames, employee, list);
 
         List<Position> positions = positionRepo.findPositionsByNames(positionNames);
         employee.setPositions(positions);
@@ -215,6 +215,23 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         }
 
         return new SuccessSignUpDto(employee.getId(), employee.getName(), employee.getEmail(), true);
+    }
+
+    private void checkAdminPosition(List<String> positionNames, User employee, List<Authority> list) {
+        if (positionNames.size() <= 2 && (positionNames.contains("Admin") || positionNames.contains("Адмін"))) {
+            employee.setAuthorities(list.stream()
+                .filter(authority -> !isExcludedAuthority(authority.getName()))
+                .toList());
+        } else {
+            employee.setAuthorities(list);
+        }
+    }
+
+    private boolean isExcludedAuthority(String name) {
+        return name.equals("CREATE_NEW_LOCATION")
+            || name.equals("CREATE_NEW_COURIER")
+            || name.equals("CREATE_NEW_STATION")
+            || name.equals("CREATE_PRICING_CARD");
     }
 
     static List<UserAchievement> getUserAchievements(User user, AchievementService achievementService) {
