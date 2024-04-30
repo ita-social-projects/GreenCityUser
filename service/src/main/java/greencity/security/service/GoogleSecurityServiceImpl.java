@@ -2,6 +2,8 @@ package greencity.security.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import greencity.client.RestClient;
 import static greencity.constant.AppConstant.DEFAULT_RATING;
 import static greencity.constant.AppConstant.GOOGLE_PICTURE;
@@ -27,6 +29,7 @@ import greencity.service.UserService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import com.google.api.client.json.JsonFactory;
 
 /**
  * {@inheritDoc}
@@ -43,13 +47,14 @@ import org.springframework.transaction.support.TransactionTemplate;
 @Service
 public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final UserService userService;
-    private final GoogleIdTokenVerifier googleIdTokenVerifier;
     private final JwtTool jwtTool;
     private final ModelMapper modelMapper;
     private final AchievementService achievementService;
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final PlatformTransactionManager transactionManager;
+
+    private static final String CLIENT_ID = "614765981451-lrqigs5918sdhcq69rdcqvmpj299qnv9.apps.googleusercontent.com";
 
     /**
      * Constructor.
@@ -74,7 +79,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         PlatformTransactionManager transactionManager) {
         this.userService = userService;
         this.jwtTool = jwtTool;
-        this.googleIdTokenVerifier = googleIdTokenVerifier;
         this.modelMapper = modelMapper;
         this.achievementService = achievementService;
         this.userRepo = userRepo;
@@ -88,7 +92,12 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     @Override
     public SuccessSignInDto authenticate(String idToken, String language) {
         try {
-            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
+            JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), jsonFactory)
+                .setAudience(Collections.singletonList(CLIENT_ID))
+                .build();
+
+            GoogleIdToken googleIdToken = verifier.verify(idToken);
             if (googleIdToken != null) {
                 GoogleIdToken.Payload payload = googleIdToken.getPayload();
                 String email = payload.getEmail();
