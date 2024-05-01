@@ -414,9 +414,9 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(GoogleApiException.class)
     public ResponseEntity<Object> handleGoogleApiException(GoogleApiException googleApiException) {
         ValidationExceptionDto validationExceptionDto =
-                new ValidationExceptionDto(AppConstant.GOOGLE_API, googleApiException.getMessage());
+            new ValidationExceptionDto(AppConstant.GOOGLE_API, googleApiException.getMessage());
         if (googleApiException.getMessage() != null
-                && googleApiException.getMessage().contains("Geocoding result was not found")) {
+            && googleApiException.getMessage().contains("Geocoding result was not found")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationExceptionDto);
         } else {
             validationExceptionDto.setMessage(googleApiException.getMessage());
