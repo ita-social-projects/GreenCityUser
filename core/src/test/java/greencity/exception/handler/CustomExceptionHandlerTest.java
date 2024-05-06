@@ -12,6 +12,7 @@ import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.GoogleApiException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -254,5 +255,23 @@ class CustomExceptionHandlerTest {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
         verify(errorAttributes).getErrorAttributes(eq(webRequest),
             any(ErrorAttributeOptions.class));
+    }
+
+    @Test
+    void handleGoogleApiException() {
+        GoogleApiException actual = new GoogleApiException("Geocoding result was not found");
+        ValidationExceptionDto validationDto = new ValidationExceptionDto("Google API", actual.getMessage());
+        ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.NOT_FOUND);
+        ResponseEntity<Object> body = status.body(validationDto);
+        assertEquals(customExceptionHandler.handleGoogleApiException(actual), body);
+    }
+
+    @Test
+    void handleGoogleApiException_GeocodingResultBadRequest_ReturnsBadRequest() {
+        GoogleApiException actual = new GoogleApiException("Some string");
+        ValidationExceptionDto validationDto = new ValidationExceptionDto("Google API", actual.getMessage());
+        ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
+        ResponseEntity<Object> body = status.body(validationDto);
+        assertEquals(customExceptionHandler.handleGoogleApiException(actual), body);
     }
 }
