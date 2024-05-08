@@ -16,6 +16,8 @@ import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -256,5 +258,13 @@ public class SecurityConfig {
     public GoogleIdTokenVerifier googleIdTokenVerifier() {
         return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
             GsonFactory.getDefaultInstance()).build();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Bean
+    public HttpClient httpClient() {
+        return HttpClients.createDefault();
     }
 }

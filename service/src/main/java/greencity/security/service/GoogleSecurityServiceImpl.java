@@ -1,15 +1,12 @@
 package greencity.security.service;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import greencity.client.RestClient;
 import static greencity.constant.AppConstant.DEFAULT_RATING;
-import static greencity.constant.AppConstant.GOOGLE_PICTURE;
-import static greencity.constant.AppConstant.USERNAME;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
+import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
@@ -27,18 +24,20 @@ import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 import greencity.service.AchievementService;
 import greencity.service.UserService;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-import com.google.api.client.json.JsonFactory;
 
 /**
  * {@inheritDoc}
@@ -47,6 +46,7 @@ import com.google.api.client.json.JsonFactory;
 @Service
 public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final UserService userService;
+    private final GoogleIdTokenVerifier googleIdTokenVerifier;
     private final JwtTool jwtTool;
     private final ModelMapper modelMapper;
     private final AchievementService achievementService;
@@ -54,7 +54,10 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final RestClient restClient;
     private final PlatformTransactionManager transactionManager;
 
-    private static final String CLIENT_ID = "614765981451-lrqigs5918sdhcq69rdcqvmpj299qnv9.apps.googleusercontent.com";
+    private final HttpClient httpClient;
+
+    @Value("${google.resource.userInfoUri}")
+    private String userInfoUrl;
 
     /**
      * Constructor.
@@ -67,6 +70,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
      * @param restClient            {@link RestClient} - tool for sending requests
      * @param transactionManager    {@link PlatformTransactionManager} - tool for
      *                              transaction management
+     * @param httpClient            {@link HttpClient} - ...
      */
     @Autowired
     public GoogleSecurityServiceImpl(UserService userService,
@@ -76,36 +80,35 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         AchievementService achievementService,
         UserRepo userRepo,
         RestClient restClient,
-        PlatformTransactionManager transactionManager) {
+        PlatformTransactionManager transactionManager,
+        HttpClient httpClient) {
         this.userService = userService;
         this.jwtTool = jwtTool;
+        this.googleIdTokenVerifier = googleIdTokenVerifier;
         this.modelMapper = modelMapper;
         this.achievementService = achievementService;
         this.userRepo = userRepo;
         this.restClient = restClient;
         this.transactionManager = transactionManager;
+        this.httpClient = httpClient;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public SuccessSignInDto authenticate(String idToken, String language) {
+    public SuccessSignInDto authenticate(String accessToken, String language) {
         try {
-            JsonFactory jsonFactory = GsonFactory.getDefaultInstance();
-            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), jsonFactory)
-                .setAudience(Collections.singletonList(CLIENT_ID))
-                .build();
-
-            GoogleIdToken googleIdToken = verifier.verify(idToken);
-            if (googleIdToken != null) {
-                GoogleIdToken.Payload payload = googleIdToken.getPayload();
-                String email = payload.getEmail();
-                String userName = (String) payload.get(USERNAME);
+            // GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(idToken);
+            UserInfo userInfo = getUserCredentials(accessToken);
+            if (userInfo != null) {
+                // GoogleIdToken.Payload payload = googleIdToken.getPayload();
+                String email = userInfo.getEmail();
+                String userName = userInfo.getName();
                 UserVO userVO = userService.findByEmail(email);
                 if (userVO == null) {
                     log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
-                    String profilePicture = (String) payload.get(GOOGLE_PICTURE);
+                    String profilePicture = userInfo.getPicture();
                     TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
                     User user = transactionTemplate.execute(status -> {
                         User savedUser = createNewUser(email, userName, profilePicture, language);
@@ -131,7 +134,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             } else {
                 throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN);
             }
-        } catch (GeneralSecurityException | IOException e) {
+        } catch (IOException e) {
             throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN + ". " + e.getMessage());
         }
     }
@@ -167,5 +170,14 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
+    }
+
+    private UserInfo getUserCredentials(String accessToken) throws IOException {
+        String requestUrl = userInfoUrl + accessToken;
+        HttpGet request = new HttpGet(requestUrl);
+        HttpResponse response = httpClient.execute(request);
+        String jsonResponse = EntityUtils.toString(response.getEntity());
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.readValue(jsonResponse, UserInfo.class);
     }
 }
