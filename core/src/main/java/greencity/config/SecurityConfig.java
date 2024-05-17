@@ -1,13 +1,13 @@
 package greencity.config;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import static greencity.constant.AppConstant.ADMIN;
 import static greencity.constant.AppConstant.EMPLOYEE;
 import static greencity.constant.AppConstant.MODERATOR;
 import static greencity.constant.AppConstant.UBS_EMPLOYEE;
 import static greencity.constant.AppConstant.USER;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
 import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
@@ -261,7 +261,9 @@ public class SecurityConfig {
     }
 
     /**
-     * {@inheritDoc}
+     * Bean {@link HttpClient} that uses in verify googleAccessToken.
+     *
+     * @return {@link HttpClient}
      */
     @Bean
     public HttpClient httpClient() {

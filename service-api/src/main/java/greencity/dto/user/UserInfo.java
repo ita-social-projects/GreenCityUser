@@ -1,5 +1,6 @@
 package greencity.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,13 +17,14 @@ import lombok.ToString;
 @Setter
 @Builder
 @EqualsAndHashCode
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserInfo {
     private String sub;
 
     private String name;
 
     @JsonProperty("given_name")
-    private String giveName;
+    private String givenName;
 
     @JsonProperty("family_name")
     private String familyName;
@@ -35,4 +37,9 @@ public class UserInfo {
     private String emailVerified;
 
     private String locale;
+
+    private String error;
+
+    @JsonProperty("error_description")
+    private String errorDescription;
 }

@@ -21,6 +21,7 @@ import greencity.dto.user.EcoNewsAuthorDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
@@ -28,7 +29,6 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfilePictureDto;
 import greencity.dto.user.UserProfileStatisticsDto;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UsersFriendDto;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
@@ -71,33 +71,6 @@ public class ModelUtils {
     public static final List<UserAllFriendsDto> CREATE_USER_ALL_FRIENDS_DTO = createUserAllFriendsDto();
     public static final String TEST_EMAIL = "taras@gmail.com";
 
-    public static UsersFriendDto usersFriendDto = new UsersFriendDto() {
-        @Override
-        public Long getId() {
-            return 1L;
-        }
-
-        @Override
-        public String getName() {
-            return TestConst.NAME;
-        }
-
-        @Override
-        public String getCity() {
-            return "test";
-        }
-
-        @Override
-        public Double getRating() {
-            return 20.0;
-        }
-
-        @Override
-        public String getProfilePicture() {
-            return "profile";
-        }
-    };
-
     public static User getUser() {
         return User.builder()
             .id(1L)
@@ -122,7 +95,8 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
+            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
+                "Львівська", "Ukraine", "Україна", 20.000000,
                 20.000000, new ArrayList<User>()))
             .language(new Language(1L, "en", null))
             .build();
@@ -210,13 +184,6 @@ public class ModelUtils {
     public static UserEmployeeAuthorityDto getUserEmployeeAuthorityDto() {
         return UserEmployeeAuthorityDto.builder()
             .employeeEmail("taras@gmail.com")
-            .authorities(List.of("test1"))
-            .build();
-    }
-
-    public static UserEmployeeAuthorityDto getSuperAdminEmployeeAuthorityDto() {
-        return UserEmployeeAuthorityDto.builder()
-            .employeeEmail("superadmin@gmail.com")
             .authorities(List.of("test1"))
             .build();
     }
@@ -318,7 +285,8 @@ public class ModelUtils {
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
             .userLocationDto(
-                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
+                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
+                    "Ukraine", "Україна", 20.000000,
                     20.000000))
             .showShoppingList(true)
             .showEcoPlace(true)
@@ -495,34 +463,6 @@ public class ModelUtils {
             .build();
     }
 
-    public static User createEmployeeDriver() {
-        return User.builder()
-            .id(1L)
-            .email("taras@gmail.com")
-            .authorities(authorities())
-            .role(Role.ROLE_UBS_EMPLOYEE)
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Водій")
-                .nameEn("Driver")
-                .build()))
-            .build();
-    }
-
-    public static User createSuperAdmin() {
-        return User.builder()
-            .id(1L)
-            .email("superadmin@gmail.com")
-            .authorities(authorities())
-            .role(Role.ROLE_UBS_EMPLOYEE)
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Супер адмін")
-                .nameEn("Super admin")
-                .build()))
-            .build();
-    }
-
     public static User createAdmin() {
         return User.builder()
             .id(2L)
@@ -530,20 +470,6 @@ public class ModelUtils {
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_ADMIN)
             .authorities(authorities())
-            .build();
-    }
-
-    public static User createEmployeeAdmin() {
-        return User.builder()
-            .id(1L)
-            .email("taras@gmail.com")
-            .authorities(authorities())
-            .role(Role.ROLE_UBS_EMPLOYEE)
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Адмін")
-                .nameEn("Admin")
-                .build()))
             .build();
     }
 
@@ -638,30 +564,6 @@ public class ModelUtils {
         return User.builder()
             .positions(List.of(Position.builder()
                 .id(1L).name("Адмін")
-                .nameEn("Admin")
-                .build()))
-            .authorities(List.of(Authority.builder()
-                .name("Auth")
-                .build()))
-            .build();
-    }
-
-    public static User getEmployeeWithPositionsAndRelatedAuthorities_UA() {
-        return User.builder()
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Адмін")
-                .build()))
-            .authorities(List.of(Authority.builder()
-                .name("Auth")
-                .build()))
-            .build();
-    }
-
-    public static User getEmployeeWithPositionsAndRelatedAuthorities_EN() {
-        return User.builder()
-            .positions(List.of(Position.builder()
-                .id(1L)
                 .nameEn("Admin")
                 .build()))
             .authorities(List.of(Authority.builder()
@@ -787,5 +689,20 @@ public class ModelUtils {
         geocodingResults.add(geocodingResult2);
 
         return geocodingResults;
+    }
+
+    public static UserInfo getUserInfo() {
+        return UserInfo.builder()
+            .sub("sub")
+            .name("name")
+            .givenName("given name")
+            .familyName("family name")
+            .picture("picture")
+            .email("test@mail.com")
+            .emailVerified("test@mail.com")
+            .locale("locale")
+            .error("error")
+            .errorDescription("error description")
+            .build();
     }
 }

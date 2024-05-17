@@ -44,9 +44,9 @@ public class GoogleSecurityController {
     }
 
     /**
-     * Method that provide authenticate with google token.
+     * Method that provide authenticate with Google token.
      *
-     * @param idToken {@link String} - google idToken
+     * @param token {@link String} - google token
      * @return {@link SuccessSignInDto} if token valid
      */
     @Operation(summary = "Make authentication by Google")
@@ -57,8 +57,8 @@ public class GoogleSecurityController {
     })
     @GetMapping
     @ApiLocale
-    public SuccessSignInDto authenticate(@RequestParam @NotBlank String idToken,
+    public SuccessSignInDto authenticate(@RequestParam @NotBlank String token,
         @Parameter(hidden = true) @ValidLanguage Locale locale) {
-        return googleSecurityService.authenticate(idToken, locale.getLanguage());
+        return googleSecurityService.authenticate(token, locale.getLanguage());
     }
 }
