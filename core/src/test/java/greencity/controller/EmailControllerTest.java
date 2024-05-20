@@ -5,10 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.GeneralEmailMessage;
-import greencity.message.SendChangePlaceStatusEmailMessage;
-import greencity.message.SendHabitNotification;
-import greencity.message.SendReportEmailMessage;
+import greencity.message.*;
 import greencity.service.EmailService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -165,6 +162,25 @@ class EmailControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/general/notification")
             .contentType(MediaType.APPLICATION_JSON)
             .content(jsonRequest))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void sendHabitAssignNotification() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        HabitAssignNotificationMessage message = HabitAssignNotificationMessage.builder()
+            .language("ua")
+            .habitAssignId(100L)
+            .habitName("TEST")
+            .receiverEmail("test@gmail.com")
+            .receiverName("TEST")
+            .senderName("TEST")
+            .build();
+        String content = objectMapper.writeValueAsString(message);
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/habitAssign/notification")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
             .andExpect(status().isOk());
     }
 
