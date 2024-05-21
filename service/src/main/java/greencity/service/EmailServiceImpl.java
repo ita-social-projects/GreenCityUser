@@ -13,6 +13,7 @@ import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.message.GeneralEmailMessage;
+import greencity.message.HabitAssignNotificationMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
 import java.io.UnsupportedEncodingException;
@@ -309,5 +310,27 @@ public class EmailServiceImpl implements EmailService {
             case "en" -> Locale.ENGLISH;
             default -> throw new IllegalStateException("Unexpected value: " + language);
         };
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     */
+    @Override
+    public void sendHabitAssignNotificationEmail(HabitAssignNotificationMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        String baseLink = clientLink + "/#/profile";
+        String language = message.getLanguage();
+        validateLanguage(language);
+        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.USER_NAME, message.getReceiverName());
+        model.put(EmailConstants.VERIFY_ADDRESS, serverLink + "/habit/assign/confirm/" + message.getHabitAssignId());
+        model.put(EmailConstants.LANGUAGE, language);
+        model.put(EmailConstants.IS_UBS, false);
+        model.put(EmailConstants.SENDER_NAME, message.getSenderName());
+        model.put(EmailConstants.HABIT_NAME, message.getHabitName());
+        String template = createEmailTemplate(model, EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST_PAGE);
+        sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST,
+            null, getLocale(language)), template);
     }
 }

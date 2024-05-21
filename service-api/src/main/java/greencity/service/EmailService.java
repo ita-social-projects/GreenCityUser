@@ -10,6 +10,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.GeneralEmailMessage;
+import greencity.message.HabitAssignNotificationMessage;
 import java.util.List;
 import java.util.Map;
 
@@ -137,4 +138,15 @@ public interface EmailService {
      * @author Yurii Midianyi
      */
     void sendEmailNotification(GeneralEmailMessage notification);
+
+    /**
+     * Sends an email notification based on the given
+     * {@link HabitAssignNotificationMessage}.
+     *
+     * @param message {@link HabitAssignNotificationMessage} represents the
+     *                information needed for the email notification. This includes
+     *                details such as recipient, subject, and content of the email.
+     * @author Kizeov Dmytro
+     */
+    void sendHabitAssignNotificationEmail(HabitAssignNotificationMessage message);
 }
