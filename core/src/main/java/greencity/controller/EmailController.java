@@ -125,7 +125,8 @@ public class EmailController {
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PostMapping("/habitAssign/notification")
-    public ResponseEntity<Void> sendHabitAssignNotification(@RequestBody @Valid HabitAssignNotificationMessage message) {
+    public ResponseEntity<Void> sendHabitAssignNotification(
+        @RequestBody @Valid HabitAssignNotificationMessage message) {
         emailService.sendHabitAssignNotificationEmail(message);
         return ResponseEntity.ok().build();
     }
