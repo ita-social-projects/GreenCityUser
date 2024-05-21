@@ -12,6 +12,7 @@ import greencity.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -120,10 +121,11 @@ public class EmailController {
     @Operation(summary = "Send habit assign email notification")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PostMapping("/habitAssign/notification")
-    public ResponseEntity<Void> sendHabitAssignNotification(@RequestBody HabitAssignNotificationMessage message) {
+    public ResponseEntity<Void> sendHabitAssignNotification(@RequestBody @Valid HabitAssignNotificationMessage message) {
         emailService.sendHabitAssignNotificationEmail(message);
         return ResponseEntity.ok().build();
     }
