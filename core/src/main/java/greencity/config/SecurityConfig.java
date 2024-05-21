@@ -133,7 +133,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST,
                     "/ownSecurity/signUp",
                     "/ownSecurity/signIn",
-                    "/ownSecurity/updatePassword")
+                    "/ownSecurity/updatePassword",
+                    "/email/habitAssign/notification")
                 .permitAll()
                 .requestMatchers(HttpMethod.GET,
                     "/user/shopping-list-items/habits/{habitId}/shopping-list",

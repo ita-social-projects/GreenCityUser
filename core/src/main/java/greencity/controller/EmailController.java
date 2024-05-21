@@ -7,10 +7,12 @@ import greencity.message.GeneralEmailMessage;
 import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
+import greencity.message.HabitAssignNotificationMessage;
 import greencity.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -108,5 +110,24 @@ public class EmailController {
     public ResponseEntity<Object> sendEmailNotification(@RequestBody GeneralEmailMessage notification) {
         emailService.sendEmailNotification(notification);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * Sends habit assign email notification.
+     *
+     * @param message {@link HabitAssignNotificationMessage} - object with all
+     *                necessary data for sending notification via email.
+     */
+    @Operation(summary = "Send habit assign email notification")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/habitAssign/notification")
+    public ResponseEntity<Void> sendHabitAssignNotification(
+        @RequestBody @Valid HabitAssignNotificationMessage message) {
+        emailService.sendHabitAssignNotificationEmail(message);
+        return ResponseEntity.ok().build();
     }
 }
