@@ -16,6 +16,7 @@ import greencity.entity.UserAction;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import greencity.exception.exceptions.IdTokenExpiredException;
 import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
@@ -42,6 +43,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.client.RestClientException;
 
 /**
  * {@inheritDoc}
@@ -105,46 +107,44 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
      * {@inheritDoc}
      */
     @Override
-    public SuccessSignInDto authenticate(String token, String language) {
+    public SuccessSignInDto authenticate(String googleToken, String language) {
         try {
-            return authenticateByTokenId(token, language);
-        } catch (IllegalArgumentException e) {
-            return authenticateByAccessToken(token, language);
-        }
-    }
-
-    private SuccessSignInDto authenticateByTokenId(String tokenId, String language) {
-        try {
-            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(tokenId);
+            GoogleIdToken googleIdToken = googleIdTokenVerifier.verify(googleToken);
             if (googleIdToken == null) {
-                throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN);
+                throw new IdTokenExpiredException(ErrorMessage.EXPIRED_GOOGLE_ID_TOKEN);
             }
-            return processAuthentication(googleIdToken, language);
+            String email = googleIdToken.getPayload().getEmail();
+            String userName = (String) googleIdToken.getPayload().get(USERNAME);
+            String profilePicture = (String) googleIdToken.getPayload().get(GOOGLE_PICTURE);
+            return processAuthentication(email, userName, profilePicture, language);
+        } catch (IllegalArgumentException e) {
+            return authenticateByGoogleAccessToken(googleToken, language);
         } catch (GeneralSecurityException | IOException e) {
-            throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN + ". " + e.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN + e.getMessage());
         }
     }
 
-    private SuccessSignInDto authenticateByAccessToken(String accessToken, String language) {
+    private SuccessSignInDto authenticateByGoogleAccessToken(String googleAccessToken, String language) {
         try {
-            UserInfo userInfo = verifyAccessToken(accessToken);
+            UserInfo userInfo = getUserInfoFromGoogleAccessToken(googleAccessToken);
             if (userInfo.getEmail() == null) {
                 throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN);
             }
-            return processAuthentication(userInfo, language);
+            String email = userInfo.getEmail();
+            String userName = userInfo.getName();
+            String profilePicture = userInfo.getPicture();
+            return processAuthentication(email, userName, profilePicture, language);
         } catch (IOException e) {
-            throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN + ". " + e.getMessage());
+            throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN + e.getMessage());
         }
     }
 
-    private SuccessSignInDto processAuthentication(Object credentials, String language) {
-        String email = getEmailFromCredentials(credentials);
-        String userName = getUserNameFromCredentials(credentials);
-
+    private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture,
+        String language) {
         UserVO userVO = userService.findByEmail(email);
         if (userVO == null) {
             log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
-            return handleNewUser(credentials, email, userName, language);
+            return handleNewUser(email, userName, profilePicture, language);
         } else {
             if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {
                 throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
@@ -154,31 +154,15 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         }
     }
 
-    private String getEmailFromCredentials(Object credentials) {
-        return (credentials instanceof GoogleIdToken)
-            ? ((GoogleIdToken) credentials).getPayload().getEmail()
-            : ((UserInfo) credentials).getEmail();
-    }
-
-    private String getUserNameFromCredentials(Object credentials) {
-        return (credentials instanceof GoogleIdToken)
-            ? (String) ((GoogleIdToken) credentials).getPayload().get(USERNAME)
-            : ((UserInfo) credentials).getName();
-    }
-
-    private SuccessSignInDto handleNewUser(Object credentials, String email, String userName, String language) {
-        String profilePicture = null;
-        if (credentials instanceof GoogleIdToken) {
-            GoogleIdToken.Payload payload = ((GoogleIdToken) credentials).getPayload();
-            profilePicture = (String) payload.get(GOOGLE_PICTURE);
-        } else if (credentials instanceof UserInfo) {
-            profilePicture = ((UserInfo) credentials).getPicture();
-        }
+    private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, profilePicture, language);
-
-        User savedUser = saveNewUserWithTransactions(newUser);
-        restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
-
+        User savedUser = saveNewUser(newUser);
+        try {
+            restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
+        } catch (RestClientException e) {
+            log.error("Failed to create UBS profile for user - {}", savedUser.getEmail(), e);
+            throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
+        }
         UserVO userVO = modelMapper.map(savedUser, UserVO.class);
         log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
         return getSuccessSignInDto(userVO);
@@ -200,7 +184,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .build();
     }
 
-    private User saveNewUserWithTransactions(User newUser) {
+    private User saveNewUser(User newUser) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUserAchievements(createUserAchievements(newUser));
@@ -226,7 +210,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
     }
 
-    private UserInfo verifyAccessToken(String accessToken) throws IOException {
+    private UserInfo getUserInfoFromGoogleAccessToken(String accessToken) throws IOException {
         String requestUrl = userInfoUrl + accessToken;
         HttpGet request = new HttpGet(requestUrl);
         HttpResponse response = httpClient.execute(request);

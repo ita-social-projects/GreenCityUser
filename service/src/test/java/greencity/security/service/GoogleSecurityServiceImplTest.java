@@ -6,7 +6,6 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.RestClient;
-import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
@@ -16,6 +15,7 @@ import greencity.entity.User;
 import greencity.entity.UserAchievement;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import greencity.exception.exceptions.IdTokenExpiredException;
 import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
@@ -86,45 +86,45 @@ class GoogleSecurityServiceImplTest {
     private GoogleSecurityServiceImpl googleSecurityService;
 
     @Test
-    void authenticateWithIdTokenTest() throws GeneralSecurityException, IOException {
+    void authenticateByIdTokenTest() throws GeneralSecurityException, IOException {
         User user = ModelUtils.getUser();
         UserVO userVO = ModelUtils.getUserVO();
 
-        when(googleIdTokenVerifier.verify("idToken")).thenReturn(googleIdToken);
+        when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("test@mail.com");
         when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
 
-        SuccessSignInDto result = googleSecurityService.authenticate("idToken", "ua");
+        SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
         assertEquals(user.getName(), result.getName());
         assertEquals(user.getId(), result.getUserId());
 
-        verify(googleIdTokenVerifier).verify("idToken");
-        verify(googleIdToken, times(2)).getPayload();
+        verify(googleIdTokenVerifier).verify("token");
+        verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
         verify(userService).findByEmail("test@mail.com");
     }
 
     @Test
-    void authenticateWithAccessTokenTest() throws GeneralSecurityException, IOException {
+    void authenticateByAccessTokenTest() throws GeneralSecurityException, IOException {
         UserInfo userInfo = getUserInfo();
         UserVO userVO = ModelUtils.getUserVO();
 
         String expectedJsonResponse = new ObjectMapper().writeValueAsString(userInfo);
         HttpEntity httpEntity = new StringEntity(expectedJsonResponse);
 
-        when(googleIdTokenVerifier.verify("accessToken")).thenThrow(GeneralSecurityException.class);
+        when(googleIdTokenVerifier.verify("token")).thenThrow(IllegalArgumentException.class);
         when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
         when(httpResponse.getEntity()).thenReturn(httpEntity);
         when(objectMapper.readValue(expectedJsonResponse, UserInfo.class)).thenReturn(userInfo);
         when(userService.findByEmail(userInfo.getEmail())).thenReturn(userVO);
 
-        SuccessSignInDto result = googleSecurityService.authenticate("accessToken", "ua");
+        SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
 
         assertEquals(userVO.getName(), result.getName());
         assertEquals(userVO.getId(), result.getUserId());
 
-        verify(googleIdTokenVerifier).verify("accessToken");
+        verify(googleIdTokenVerifier).verify("token");
         verify(httpClient).execute(any(HttpGet.class));
         verify(httpResponse).getEntity();
         verify(objectMapper).readValue(expectedJsonResponse, UserInfo.class);
@@ -146,7 +146,7 @@ class GoogleSecurityServiceImplTest {
         user.setName(null);
         user.setUserAchievements(userAchievementList);
 
-        when(googleIdTokenVerifier.verify("idToken")).thenReturn(googleIdToken);
+        when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("taras@mail.com");
 
@@ -160,12 +160,12 @@ class GoogleSecurityServiceImplTest {
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
         when(restClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
 
-        SuccessSignInDto result = googleSecurityService.authenticate("idToken", "ua");
+        SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
 
         assertNull(result.getUserId());
         assertNull(result.getName());
 
-        verify(googleIdTokenVerifier).verify("idToken");
+        verify(googleIdTokenVerifier).verify("token");
         verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
 
@@ -183,29 +183,66 @@ class GoogleSecurityServiceImplTest {
             .lastActivityTime(LocalDateTime.now()).dateOfRegistration(LocalDateTime.now())
             .build();
 
-        when(googleIdTokenVerifier.verify("idToken")).thenReturn(googleIdToken);
+        when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("test@mail.com");
         when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
 
         assertThrows(UserDeactivatedException.class,
-            () -> googleSecurityService.authenticate("idToken", "ua"));
+            () -> googleSecurityService.authenticate("token", "ua"));
 
-        verify(googleIdTokenVerifier).verify("idToken");
-        verify(googleIdToken, times(2)).getPayload();
+        verify(googleIdTokenVerifier).verify("token");
+        verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
         verify(userService).findByEmail("test@mail.com");
     }
 
     @Test
-    void authenticateThrowsIOExceptionTest() throws IOException {
-        when(httpClient.execute(any(HttpGet.class))).thenThrow(IOException.class);
+    void authenticateThrowsIllegalArgumentExceptionWhenAccessTokenIsInvalidOrExpiredTest()
+        throws GeneralSecurityException, IOException {
+        UserInfo userInfo = new UserInfo();
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> googleSecurityService.authenticate("accessToken", "ua"));
+        String expectedJsonResponse = new ObjectMapper().writeValueAsString(userInfo);
+        HttpEntity httpEntity = new StringEntity(expectedJsonResponse);
 
-        assertEquals(ErrorMessage.BAD_GOOGLE_TOKEN + ". null", exception.getMessage());
+        when(googleIdTokenVerifier.verify("token")).thenThrow(IllegalArgumentException.class);
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+        when(httpResponse.getEntity()).thenReturn(httpEntity);
+        when(objectMapper.readValue(expectedJsonResponse, UserInfo.class)).thenReturn(userInfo);
 
+        assertThrows(IllegalArgumentException.class,
+            () -> googleSecurityService.authenticate("token", "ua"));
+
+        verify(googleIdTokenVerifier).verify("token");
         verify(httpClient).execute(any(HttpGet.class));
+        verify(httpResponse).getEntity();
+        verify(objectMapper).readValue(expectedJsonResponse, UserInfo.class);
+    }
+
+    @Test
+    void authenticateThrowsIdTokenExpiredExceptionTest() throws IOException, GeneralSecurityException {
+        when(googleIdTokenVerifier.verify("token")).thenReturn(null);
+        assertThrows(IdTokenExpiredException.class,
+            () -> googleSecurityService.authenticate("token", "ua"));
+        verify(googleIdTokenVerifier).verify("token");
+    }
+
+    @Test
+    void authenticateThrowsIllegalArgumentExceptionWhenIdTokenIsInvalidTest()
+        throws IOException, GeneralSecurityException {
+        when(googleIdTokenVerifier.verify("token")).thenThrow(IOException.class);
+        assertThrows(IllegalArgumentException.class,
+            () -> googleSecurityService.authenticate("token", "ua"));
+        verify(googleIdTokenVerifier).verify("token");
+    }
+
+    @Test
+    void authenticateThrowsIllegalArgumentExceptionWhenAccessTokenIsInvalidTest()
+        throws IOException, GeneralSecurityException {
+        when(googleIdTokenVerifier.verify("token")).thenThrow(IllegalArgumentException.class);
+        when(httpClient.execute(any(HttpGet.class))).thenThrow(IOException.class);
+        assertThrows(IllegalArgumentException.class,
+            () -> googleSecurityService.authenticate("token", "ua"));
+        verify(googleIdTokenVerifier).verify("token");
     }
 }
