@@ -720,7 +720,6 @@ public class UserServiceImpl implements UserService {
 
     private Map<AddressComponentType, Consumer<String>> initializeUkrainianGeoCodingResult(
         UserLocation userLocation) {
-
         return Map.of(
             AddressComponentType.LOCALITY, userLocation::setCityUa,
             AddressComponentType.COUNTRY, userLocation::setCountryUa,
