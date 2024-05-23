@@ -1,10 +1,10 @@
 package greencity.exception.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadSocialNetworkLinksException;
 import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.InsufficientLocationDataException;
 import greencity.exception.exceptions.InvalidURLException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
@@ -273,5 +273,15 @@ class CustomExceptionHandlerTest {
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
         ResponseEntity<Object> body = status.body(validationDto);
         assertEquals(customExceptionHandler.handleGoogleApiException(actual), body);
+    }
+
+    @Test
+    void handleInsufficientLocationDataExceptionTest() {
+        InsufficientLocationDataException actual = new InsufficientLocationDataException("Some string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleInsufficientLocationDataException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
     }
 }
