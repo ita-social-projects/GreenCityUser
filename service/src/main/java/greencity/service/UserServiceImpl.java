@@ -48,6 +48,7 @@ import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.InsufficientLocationDataException;
 import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongEmailException;
@@ -695,11 +696,18 @@ public class UserServiceImpl implements UserService {
 
     private void initializeGeoCodingResults(Map<AddressComponentType, Consumer<String>> initializedMap,
         GeocodingResult geocodingResult) {
+        checkGeocodingResultContainsAllInformation(geocodingResult, initializedMap.size());
         initializedMap
             .forEach((key, value) -> Arrays.stream(geocodingResult.addressComponents)
                 .forEach(addressComponent -> Arrays.stream(addressComponent.types)
                     .filter(componentType -> componentType.equals(key))
                     .forEach(componentType -> value.accept(addressComponent.longName))));
+    }
+
+    private void checkGeocodingResultContainsAllInformation(GeocodingResult geocodingResult, int size) {
+        if (geocodingResult.addressComponents.length <= size) {
+            throw new InsufficientLocationDataException(ErrorMessage.INSUFFICIENT_LOCATION_DATA_FOUND);
+        }
     }
 
     private Map<AddressComponentType, Consumer<String>> initializeEnglishGeoCodingResult(
@@ -712,10 +720,12 @@ public class UserServiceImpl implements UserService {
 
     private Map<AddressComponentType, Consumer<String>> initializeUkrainianGeoCodingResult(
         UserLocation userLocation) {
-        return Map.of(
+        Map<AddressComponentType, Consumer<String>> map = Map.of(
             AddressComponentType.LOCALITY, userLocation::setCityUa,
             AddressComponentType.COUNTRY, userLocation::setCountryUa,
             AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionUa);
+
+        return map;
     }
 
     /**

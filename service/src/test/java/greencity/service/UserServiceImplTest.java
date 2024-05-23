@@ -53,6 +53,7 @@ import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.InsufficientLocationDataException;
 import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongEmailException;
@@ -659,6 +660,30 @@ class UserServiceImplTest {
         verify(userRepo).findByEmail("test@gmail.com");
         verify(googleApiService, times(2)).getLocationByCoordinates(eq(1.0d), eq(1.0d), anyString());
         verify(userRepo).save(user);
+    }
+
+    @Test
+    void saveUserProfileWithUnusualLongitudeAndLatitudeTest() {
+        var request = ModelUtils.getUserProfileDtoRequest();
+        var user = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "uk"))
+                .thenReturn(ModelUtils.getGeocodingResultWithInsufficientData());
+
+        when(googleApiService.getLocationByCoordinates(
+            request.getCoordinates().getLatitude(),
+            request.getCoordinates().getLongitude(),
+            "en"))
+                .thenReturn(ModelUtils.getGeocodingResultWithInsufficientData());
+
+        assertThrows(InsufficientLocationDataException.class, ()->
+            userService.saveUserProfile(request, "test@gmail.com"));
+
+        verify(userRepo).findByEmail("test@gmail.com");
+        verify(googleApiService, times(2)).getLocationByCoordinates(any(), any(), anyString());
     }
 
     @Test

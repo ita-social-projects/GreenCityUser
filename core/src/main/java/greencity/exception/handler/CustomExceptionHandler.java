@@ -8,6 +8,7 @@ import greencity.exception.exceptions.BadUpdateRequestException;
 import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.BadVerifyEmailTokenException;
 import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.InsufficientLocationDataException;
 import greencity.exception.exceptions.InvalidURLException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
@@ -310,7 +311,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     private Map<String, Object> getErrorAttributes(WebRequest webRequest) {
         return new HashMap<>(errorAttributes.getErrorAttributes(webRequest,
-            ErrorAttributeOptions.of(ErrorAttributeOptions.Include.STACK_TRACE)));
+            ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE)));
     }
 
     /**
@@ -401,5 +402,22 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exceptionResponse);
+    }
+
+    /**
+     * Exception handler for InsufficientLocationDataException.
+     *
+     * @param exception which is being intercepted
+     * @param request   contains details about occurred exception
+     * @return ResponseEntity which contains details about exception and 400 status
+     *         code
+     */
+    @ExceptionHandler(InsufficientLocationDataException.class)
+    public final ResponseEntity<Object> handleInsufficientLocationDataException(
+        InsufficientLocationDataException exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 }
