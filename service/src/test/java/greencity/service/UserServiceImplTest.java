@@ -665,8 +665,8 @@ class UserServiceImplTest {
     @Test
     void saveUserProfileWithUnusualLongitudeAndLatitudeTest() {
         var request = ModelUtils.getUserProfileDtoRequest();
-        var user = ModelUtils.getUserWithSocialNetworks();
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
+        var testUser = ModelUtils.getUserWithSocialNetworks();
+        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(testUser));
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
@@ -679,8 +679,8 @@ class UserServiceImplTest {
             "en"))
                 .thenReturn(ModelUtils.getGeocodingResultWithInsufficientData());
 
-        assertThrows(InsufficientLocationDataException.class,
-            () -> userService.saveUserProfile(request, "test@gmail.com"));
+        assertThrows(InsufficientLocationDataException.class, ()->
+            userService.saveUserProfile(request, "test@gmail.com"));
 
         verify(userRepo).findByEmail("test@gmail.com");
         verify(googleApiService, times(2)).getLocationByCoordinates(any(), any(), anyString());
