@@ -27,6 +27,7 @@ public final class AppConstant {
     public static final String USER_STATUS = "user_status";
     public static final String EMPLOYEE_ADMIN = "Адмін";
     public static final String EMPLOYEE_SUPER_ADMIN = "Супер адмін";
+    public static final String GOOGLE_API = "Google API";
 
     private AppConstant() {
     }

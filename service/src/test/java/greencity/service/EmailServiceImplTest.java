@@ -14,6 +14,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.GeneralEmailMessage;
+import greencity.message.HabitAssignNotificationMessage;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -229,6 +230,25 @@ class EmailServiceImplTest {
     void sendEmailNotificationToNullEmailTest() {
         GeneralEmailMessage emailMessage = new GeneralEmailMessage(null, "testSubject", "testMessage");
         assertThrows(WrongEmailException.class, () -> service.sendEmailNotification(emailMessage));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"ua", "en"})
+    void sendHabitAssignNotificationEmail(String language) {
+        HabitAssignNotificationMessage message = HabitAssignNotificationMessage.builder()
+            .language(language)
+            .habitAssignId(100L)
+            .habitName("TEST")
+            .receiverEmail("test@gmail.com")
+            .receiverName("TEST")
+            .senderName("TEST")
+            .build();
+        when(messageSource.getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST, null, getLocale(language)))
+            .thenReturn("Habit friend request");
+
+        service.sendHabitAssignNotificationEmail(message);
+        verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST, null, getLocale(language));
     }
 
     private static Locale getLocale(String language) {
