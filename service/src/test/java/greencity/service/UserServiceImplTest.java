@@ -679,8 +679,8 @@ class UserServiceImplTest {
             "en"))
                 .thenReturn(ModelUtils.getGeocodingResultWithInsufficientData());
 
-        assertThrows(InsufficientLocationDataException.class, ()->
-            userService.saveUserProfile(request, "test@gmail.com"));
+        assertThrows(InsufficientLocationDataException.class,
+            () -> userService.saveUserProfile(request, "test@gmail.com"));
 
         verify(userRepo).findByEmail("test@gmail.com");
         verify(googleApiService, times(2)).getLocationByCoordinates(any(), any(), anyString());

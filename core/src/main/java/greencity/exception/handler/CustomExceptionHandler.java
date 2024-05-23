@@ -18,6 +18,7 @@ import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.GoogleApiException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;
@@ -402,6 +403,26 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(exceptionResponse);
+    }
+
+    /**
+     * Method interceptor exception {@link GoogleApiException}.
+     *
+     * @param googleApiException Exception witch should be intercepted
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     */
+    @ExceptionHandler(GoogleApiException.class)
+    public ResponseEntity<Object> handleGoogleApiException(GoogleApiException googleApiException) {
+        ValidationExceptionDto validationExceptionDto =
+            new ValidationExceptionDto(AppConstant.GOOGLE_API, googleApiException.getMessage());
+        if (googleApiException.getMessage() != null
+            && googleApiException.getMessage().contains("Geocoding result was not found")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationExceptionDto);
+        } else {
+            validationExceptionDto.setMessage(googleApiException.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
+        }
     }
 
     /**
