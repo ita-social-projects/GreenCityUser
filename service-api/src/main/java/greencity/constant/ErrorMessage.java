@@ -44,6 +44,8 @@ public final class ErrorMessage {
     public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
     public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
     public static final String NOT_VALID_BOOLEAN_VALUE = "%s is not a valid Boolean value for %s";
+    public static final String INSUFFICIENT_LOCATION_DATA_FOUND =
+        "Insufficient location data found for the provided coordinates.";
 
     private ErrorMessage() {
     }

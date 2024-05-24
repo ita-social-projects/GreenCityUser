@@ -705,4 +705,14 @@ public class ModelUtils {
             .errorDescription("error description")
             .build();
     }
+
+    public static GeocodingResult getGeocodingResultWithInsufficientData() {
+        GeocodingResult geocodingResult = new GeocodingResult();
+        AddressComponent locality = new AddressComponent();
+        locality.longName = "fake data";
+        locality.types = new AddressComponentType[] {AddressComponentType.UNKNOWN};
+        geocodingResult.addressComponents = new AddressComponent[] {locality};
+
+        return geocodingResult;
+    }
 }
