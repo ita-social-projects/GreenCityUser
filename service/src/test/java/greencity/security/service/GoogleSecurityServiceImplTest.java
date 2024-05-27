@@ -77,7 +77,7 @@ class GoogleSecurityServiceImplTest {
     @Mock
     private PlatformTransactionManager platformTransactionManager;
     @Mock
-    private HttpClient httpClient;
+    private HttpClient googleAccessTokenVerifier;
     @Mock
     private HttpResponse httpResponse;
     @Mock
@@ -114,7 +114,7 @@ class GoogleSecurityServiceImplTest {
         HttpEntity httpEntity = new StringEntity(expectedJsonResponse);
 
         when(googleIdTokenVerifier.verify("token")).thenThrow(IllegalArgumentException.class);
-        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+        when(googleAccessTokenVerifier.execute(any(HttpGet.class))).thenReturn(httpResponse);
         when(httpResponse.getEntity()).thenReturn(httpEntity);
         when(objectMapper.readValue(expectedJsonResponse, UserInfo.class)).thenReturn(userInfo);
         when(userService.findByEmail(userInfo.getEmail())).thenReturn(userVO);
@@ -125,7 +125,7 @@ class GoogleSecurityServiceImplTest {
         assertEquals(userVO.getId(), result.getUserId());
 
         verify(googleIdTokenVerifier).verify("token");
-        verify(httpClient).execute(any(HttpGet.class));
+        verify(googleAccessTokenVerifier).execute(any(HttpGet.class));
         verify(httpResponse).getEntity();
         verify(objectMapper).readValue(expectedJsonResponse, UserInfo.class);
         verify(userService).findByEmail(userInfo.getEmail());
@@ -206,7 +206,7 @@ class GoogleSecurityServiceImplTest {
         HttpEntity httpEntity = new StringEntity(expectedJsonResponse);
 
         when(googleIdTokenVerifier.verify("token")).thenThrow(IllegalArgumentException.class);
-        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+        when(googleAccessTokenVerifier.execute(any(HttpGet.class))).thenReturn(httpResponse);
         when(httpResponse.getEntity()).thenReturn(httpEntity);
         when(objectMapper.readValue(expectedJsonResponse, UserInfo.class)).thenReturn(userInfo);
 
@@ -214,7 +214,7 @@ class GoogleSecurityServiceImplTest {
             () -> googleSecurityService.authenticate("token", "ua"));
 
         verify(googleIdTokenVerifier).verify("token");
-        verify(httpClient).execute(any(HttpGet.class));
+        verify(googleAccessTokenVerifier).execute(any(HttpGet.class));
         verify(httpResponse).getEntity();
         verify(objectMapper).readValue(expectedJsonResponse, UserInfo.class);
     }
@@ -240,7 +240,7 @@ class GoogleSecurityServiceImplTest {
     void authenticateThrowsIllegalArgumentExceptionWhenAccessTokenIsInvalidTest()
         throws IOException, GeneralSecurityException {
         when(googleIdTokenVerifier.verify("token")).thenThrow(IllegalArgumentException.class);
-        when(httpClient.execute(any(HttpGet.class))).thenThrow(IOException.class);
+        when(googleAccessTokenVerifier.execute(any(HttpGet.class))).thenThrow(IOException.class);
         assertThrows(IllegalArgumentException.class,
             () -> googleSecurityService.authenticate("token", "ua"));
         verify(googleIdTokenVerifier).verify("token");

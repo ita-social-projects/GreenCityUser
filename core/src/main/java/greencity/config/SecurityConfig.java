@@ -267,7 +267,7 @@ public class SecurityConfig {
      * @return {@link HttpClient}
      */
     @Bean
-    public HttpClient httpClient() {
+    public HttpClient googleAccessTokenVerifier() {
         return HttpClients.createDefault();
     }
 }

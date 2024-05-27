@@ -59,7 +59,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final PlatformTransactionManager transactionManager;
-    private final HttpClient httpClient;
+    private final HttpClient googleAccessTokenVerifier;
     private final ObjectMapper objectMapper;
 
     @Value("${google.resource.userInfoUri}")
@@ -68,17 +68,20 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     /**
      * Constructor.
      *
-     * @param userService           {@link UserService} - service of {@link User}
-     *                              logic.
-     * @param jwtTool               {@link JwtTool} - tool for jwt logic.
-     * @param googleIdTokenVerifier {@link GoogleIdTokenVerifier} - tool for verify.
-     * @param modelMapper           {@link ModelMapper} - tool for mapping models.
-     * @param restClient            {@link RestClient} - tool for sending requests
-     * @param transactionManager    {@link PlatformTransactionManager} - tool for
-     *                              transaction management
-     * @param httpClient            {@link HttpClient} - client for HTTP request
-     *                              execution.
-     * @param objectMapper          {@link ObjectMapper} - object mapper.
+     * @param userService               {@link UserService} - service of
+     *                                  {@link User} logic.
+     * @param jwtTool                   {@link JwtTool} - tool for jwt logic.
+     * @param googleIdTokenVerifier     {@link GoogleIdTokenVerifier} - tool for
+     *                                  verifying Google Id Token.
+     * @param modelMapper               {@link ModelMapper} - tool for mapping
+     *                                  models.
+     * @param restClient                {@link RestClient} - tool for sending
+     *                                  requests
+     * @param transactionManager        {@link PlatformTransactionManager} - tool
+     *                                  for transaction management
+     * @param googleAccessTokenVerifier {@link HttpClient} - client for HTTP request
+     *                                  execution for verifying Google Access Token.
+     * @param objectMapper              {@link ObjectMapper} - object mapper.
      */
     @Autowired
     public GoogleSecurityServiceImpl(UserService userService,
@@ -89,7 +92,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         UserRepo userRepo,
         RestClient restClient,
         PlatformTransactionManager transactionManager,
-        HttpClient httpClient,
+        HttpClient googleAccessTokenVerifier,
         ObjectMapper objectMapper) {
         this.userService = userService;
         this.jwtTool = jwtTool;
@@ -99,7 +102,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         this.userRepo = userRepo;
         this.restClient = restClient;
         this.transactionManager = transactionManager;
-        this.httpClient = httpClient;
+        this.googleAccessTokenVerifier = googleAccessTokenVerifier;
         this.objectMapper = objectMapper;
     }
 
@@ -213,7 +216,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private UserInfo getUserInfoFromGoogleAccessToken(String accessToken) throws IOException {
         String requestUrl = userInfoUrl + accessToken;
         HttpGet request = new HttpGet(requestUrl);
-        HttpResponse response = httpClient.execute(request);
+        HttpResponse response = googleAccessTokenVerifier.execute(request);
         String jsonResponse = EntityUtils.toString(response.getEntity());
         return objectMapper.readValue(jsonResponse, UserInfo.class);
     }
