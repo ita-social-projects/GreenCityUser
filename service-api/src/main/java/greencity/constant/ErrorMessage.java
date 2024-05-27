@@ -16,7 +16,9 @@ public final class ErrorMessage {
     public static final String USER_CANNOT_ADD_SAME_SOCIAL_NETWORK_LINKS =
         "User cannot add the same social network links";
     public static final String USER_DEACTIVATED = "User is deactivated";
-    public static final String BAD_GOOGLE_TOKEN = "Bad google token";
+    public static final String BAD_GOOGLE_TOKEN = "Bad google token. ";
+    public static final String EXPIRED_GOOGLE_ID_TOKEN = "Google id token is not valid or expired. ";
+    public static final String TRANSACTION_FAILED = "Transaction failed and rolled back due to restClient failure. ";
     public static final String BAD_FACEBOOK_TOKEN = "Bad facebook token";
     public static final String NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN =
         "No email found for verification with this token";

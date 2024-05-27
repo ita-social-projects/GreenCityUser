@@ -35,7 +35,7 @@ class GoogleSecurityControllerTest {
     @Test
     void authenticateTest() throws Exception {
         mockMvc.perform(get("/googleSecurity")
-            .param("idToken", "almostSecretToken")
+            .param("token", "almostSecretToken")
             .param("lang", "en"))
             .andExpect(status().isOk());
         verify(googleSecurityService).authenticate("almostSecretToken", "en");
