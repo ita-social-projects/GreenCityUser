@@ -133,8 +133,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST,
                     "/ownSecurity/signUp",
                     "/ownSecurity/signIn",
-                    "/ownSecurity/updatePassword",
-                    "/email/habitAssign/notification")
+                    "/ownSecurity/updatePassword")
                 .permitAll()
                 .requestMatchers(HttpMethod.GET,
                     "/user/shopping-list-items/habits/{habitId}/shopping-list",
@@ -211,7 +210,8 @@ public class SecurityConfig {
                     "/email/sendHabitNotification",
                     "/email/addEcoNews",
                     "/email/changePlaceStatus",
-                    "/email/general/notification")
+                    "/email/general/notification",
+                    "/email/habitAssign/notification")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",
