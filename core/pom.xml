@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>greencityuser</artifactId>
-        <groupId>greencity</groupId>
+        <groupId>greencityuser</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -22,19 +22,19 @@
     <artifactId>core</artifactId>
     <dependencies>
         <dependency>
-            <groupId>greencity</groupId>
+            <groupId>greencityuser</groupId>
             <artifactId>service-api</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>greencity</groupId>
+            <groupId>greencityuser</groupId>
             <artifactId>service</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>greencity</groupId>
+            <groupId>greencityuser</groupId>
             <artifactId>dao</artifactId>
             <version>${project.version}</version>
             <scope>runtime</scope>
