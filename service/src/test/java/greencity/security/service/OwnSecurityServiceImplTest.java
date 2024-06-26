@@ -13,12 +13,17 @@ import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.anyList;
+import static org.mockito.Mockito.anyBoolean;
+import static org.mockito.Mockito.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import greencity.ModelUtils;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
+import greencity.dto.position.PositionDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -28,6 +33,7 @@ import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
 import greencity.entity.VerifyEmail;
+import greencity.entity.Position;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRefreshTokenException;
@@ -43,6 +49,7 @@ import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
+import greencity.security.dto.SuccessSignUpDto;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
@@ -51,7 +58,6 @@ import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
-import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -569,5 +575,42 @@ class OwnSecurityServiceImplTest {
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
 
         assertThrows(PasswordsDoNotMatchesException.class, () -> ownSecurityService.setPassword(dto, email));
+    }
+
+    @Test
+    void signUpEmployeeWithoutEmailSending() {
+        EmployeeSignUpDto employeeSignUpDto = new EmployeeSignUpDto();
+        employeeSignUpDto.setPositions(List.of(PositionDto.builder()
+            .name("Водій")
+            .nameEn("Driver")
+            .build()));
+        employeeSignUpDto.setEmail("test@example.com");
+        OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
+        User employee = new User();
+        employee.setEmail("test@example.com");
+        employee.setPositions(List.of(Position.builder()
+            .name("Водій")
+            .nameEn("Driver")
+            .build()));
+        employee.setAuthorities(Collections.emptyList());
+
+        when(modelMapper.map(employeeSignUpDto, OwnSignUpDto.class)).thenReturn(ownSignUpDto);
+        when(jwtTool.generateTokenKey()).thenReturn("tokenKey");
+        when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn("tokenKeyWithDate");
+        when(userRepo.save(any(User.class))).thenReturn(employee);
+        when(authorityRepo.findAuthoritiesByPositions(anyList())).thenReturn(employee.getAuthorities());
+        when(positionRepo.findPositionsByNames(anyList())).thenReturn(employee.getPositions());
+
+        SuccessSignUpDto result = ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
+
+        assertNotNull(result);
+
+        verify(emailService, never()).sendRestoreEmail(
+            anyLong(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyString(),
+            anyBoolean());
     }
 }

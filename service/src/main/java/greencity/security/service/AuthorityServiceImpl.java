@@ -13,6 +13,7 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
+import greencity.service.EmailService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     private final UserRepo userRepo;
     private final AuthorityRepo authorityRepo;
     private final PositionRepo positionRepo;
-    private final PositionService positionService;
+    private final EmailService emailService;
 
     @Override
     public Set<String> getAllEmployeesAuthorities(String email) {
@@ -52,8 +53,35 @@ public class AuthorityServiceImpl implements AuthorityService {
         if (CollectionUtils.isNotEmpty(dto.getAuthorities())) {
             authorities = authorityRepo.findAuthoritiesByNames(dto.getAuthorities());
         }
+        if (validateOnlyDriverPosition(employee)) {
+            sendRestorePasswordEmail(employee);
+        }
         employee.setAuthorities(authorities);
         userRepo.save(employee);
+    }
+
+    private boolean validateOnlyDriverPosition(User employee) {
+        List<Position> employeePositions = employee.getPositions();
+        return employee.getAuthorities().isEmpty()
+            && employee.getRestorePasswordEmail() != null
+            && employeePositions.size() == 1
+            && employeePositions.stream()
+                .map(Position::getNameEn)
+                .anyMatch("Driver"::equals);
+    }
+
+    private void sendRestorePasswordEmail(User employee) {
+        emailService.sendRestoreEmail(
+            employee.getId(),
+            employee.getFirstName(),
+            employee.getEmail(),
+            employee.getRestorePasswordEmail().getToken(),
+            employee.getLanguage().getCode(),
+            checkRole(employee.getRole()));
+    }
+
+    private boolean checkRole(Role role) {
+        return role.equals(Role.ROLE_UBS_EMPLOYEE);
     }
 
     @Override
@@ -66,6 +94,10 @@ public class AuthorityServiceImpl implements AuthorityService {
 
         List<Position> positions = positionRepo.findPositionsByNames(positionNames);
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
+
+        if (validateOnlyDriverPosition(employee)) {
+            sendRestorePasswordEmail(employee);
+        }
 
         employee.setPositions(positions);
         employee.setAuthorities(list);

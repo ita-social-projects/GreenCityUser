@@ -787,4 +787,26 @@ public class ModelUtils {
 
         return geocodingResults;
     }
+
+    public static User createDriver() {
+        return User.builder()
+            .id(1L)
+            .email("taras@gmail.com")
+            .role(Role.ROLE_UBS_EMPLOYEE)
+            .positions(List.of(Position.builder()
+                .id(1L)
+                .name("Водій")
+                .nameEn("Driver")
+                .build()))
+            .authorities(List.of())
+            .language(Language.builder()
+                .code("en")
+                .build())
+            .firstName("Test")
+            .restorePasswordEmail(RestorePasswordEmail.builder()
+                .expiryDate(LocalDateTime.now().plusMonths(1))
+                .token("sadasdasv23e1asc0")
+                .build())
+            .build();
+    }
 }

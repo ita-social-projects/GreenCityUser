@@ -87,6 +87,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
+    private static final int EXPIRATION_MONTHS_FOR_DRIVERS_RESTORE_EMAIL = 6;
 
     /**
      * Constructor.
@@ -158,7 +159,15 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .build();
     }
 
-    private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
+    private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken,
+        boolean isOnlyDriver) {
+        if (isOnlyDriver) {
+            return RestorePasswordEmail.builder()
+                .user(user)
+                .token(emailVerificationToken)
+                .expiryDate(LocalDateTime.now().plusMonths(EXPIRATION_MONTHS_FOR_DRIVERS_RESTORE_EMAIL))
+                .build();
+        }
         return RestorePasswordEmail.builder()
             .user(user)
             .token(emailVerificationToken)
@@ -190,33 +199,66 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         String password = generatePassword();
         employeeSignUpDto.setPassword(password);
         OwnSignUpDto dto = modelMapper.map(employeeSignUpDto, OwnSignUpDto.class);
-        User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
-        employee.setOwnSecurity(createOwnSecurity(dto, employee));
-        employee.setRole(Role.ROLE_UBS_EMPLOYEE);
-        employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate()));
-        employee.setUuid(employeeSignUpDto.getUuid());
-        employee.setShowLocation(true);
-        employee.setShowEcoPlace(true);
-        employee.setShowShoppingList(true);
-        List<String> positionNames = employeeSignUpDto.getPositions().stream()
-            .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
-            .collect(Collectors.toList());
-        List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
-        employee.setAuthorities(list);
-
-        List<Position> positions = positionRepo.findPositionsByNames(positionNames);
-        employee.setPositions(positions);
+        User employee = createAndConfigureEmployee(dto, language, employeeSignUpDto);
 
         try {
             User savedUser = userRepo.save(employee);
-            employee.setId(savedUser.getId());
-            emailService.sendRestoreEmail(savedUser.getId(), savedUser.getFirstName(), employee.getEmail(),
-                savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
+            handlePostSaveActions(language, dto, employee, savedUser);
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
 
         return new SuccessSignUpDto(employee.getId(), employee.getName(), employee.getEmail(), true);
+    }
+
+    private User createAndConfigureEmployee(OwnSignUpDto dto, String language, EmployeeSignUpDto employeeSignUpDto) {
+        User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
+        employee.setOwnSecurity(createOwnSecurity(dto, employee));
+        employee.setRole(Role.ROLE_UBS_EMPLOYEE);
+        employee.setUuid(employeeSignUpDto.getUuid());
+        employee.setShowLocation(true);
+        employee.setShowEcoPlace(true);
+        employee.setShowShoppingList(true);
+        setEmployeePositionsAndAuthorities(employeeSignUpDto, employee);
+        employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate(),
+            validateOnlyDriverPosition(employee)));
+
+        return employee;
+    }
+
+    private void setEmployeePositionsAndAuthorities(EmployeeSignUpDto employeeSignUpDto, User employee) {
+        List<String> positionNames = employeeSignUpDto.getPositions().stream()
+            .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
+            .collect(Collectors.toList());
+
+        List<Authority> authorities = authorityRepo.findAuthoritiesByPositions(positionNames);
+        employee.setAuthorities(authorities);
+
+        List<Position> positions = positionRepo.findPositionsByNames(positionNames);
+        employee.setPositions(positions);
+    }
+
+    private void handlePostSaveActions(String language, OwnSignUpDto dto, User employee, User savedUser) {
+        employee.setId(savedUser.getId());
+        if (!validateOnlyDriverPosition(employee) && employee.getRestorePasswordEmail() != null) {
+            emailService.sendRestoreEmail(
+                savedUser.getId(),
+                savedUser.getFirstName(),
+                employee.getEmail(),
+                savedUser.getRestorePasswordEmail().getToken(),
+                language,
+                dto.isUbs());
+        }
+    }
+
+    private boolean validateOnlyDriverPosition(User employee) {
+        List<Position> employeePositions = employee.getPositions();
+        List<Authority> authorities = employee.getAuthorities();
+        return employeePositions.size() == 1
+            && authorities.isEmpty()
+            && employeePositions.stream()
+                .map(Position::getNameEn)
+                .anyMatch("Driver"::equals);
     }
 
     static List<UserAchievement> getUserAchievements(User user, AchievementService achievementService) {
