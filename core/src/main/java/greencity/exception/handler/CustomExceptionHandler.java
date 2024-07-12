@@ -1,7 +1,25 @@
 package greencity.exception.handler;
 
 import greencity.constant.AppConstant;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadSocialNetworkLinksException;
+import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.BadVerifyEmailTokenException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.InsufficientLocationDataException;
+import greencity.exception.exceptions.InvalidURLException;
+import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongIdException;
+import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.GoogleApiException;
+import greencity.exception.exceptions.UserDeactivationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;

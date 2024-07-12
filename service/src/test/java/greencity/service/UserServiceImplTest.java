@@ -198,7 +198,6 @@ class UserServiceImplTest {
             .email("nazar98struk.gmail.com")
             .build();
 
-    private String language = "ua";
     private Long userId = user.getId();
 
     private Long habitId = 1L;
@@ -1156,9 +1155,6 @@ class UserServiceImplTest {
     void deactivateUser() {
         String uuid = "user-uuid";
         String reason = "Account closed by user request";
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .build();
         DeactivateUserRequestDto request = new DeactivateUserRequestDto(reason);
 
         User requestedUser = User.builder()
@@ -1549,9 +1545,6 @@ class UserServiceImplTest {
     void testDeactivateUserUserNotFoundById() {
         String uuid = "user-uuid";
         DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .build();
 
         when(userRepo.findById(userVO.getId())).thenReturn(Optional.empty());
 
@@ -1562,9 +1555,6 @@ class UserServiceImplTest {
     void testDeactivateUserUserNotFoundByUuid() {
         String uuid = "user-uuid";
         DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .build();
 
         when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(new User()));
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.empty());
@@ -1576,9 +1566,6 @@ class UserServiceImplTest {
     void testDeactivateUserCannotDeactivateYourself() {
         String uuid = "user-uuid";
         DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .build();
 
         User requestedUser = User.builder()
             .id(userVO.getId())
@@ -1596,9 +1583,6 @@ class UserServiceImplTest {
     void testDeactivateUserCannotDeactivateOthers() {
         String uuid = "user-uuid";
         DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .build();
 
         User requestedUser = User.builder()
             .id(userVO.getId())
@@ -1620,9 +1604,6 @@ class UserServiceImplTest {
     void testDeactivateUserAdminCannotDeactivateOtherAdmin() {
         String uuid = "user-uuid";
         DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .build();
 
         User requestedUser = User.builder()
             .id(userVO.getId())
@@ -1644,9 +1625,6 @@ class UserServiceImplTest {
     void testDeactivateUserNoPermissionsToDeactivateUser() {
         String uuid = "user-uuid";
         DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .build();
 
         User requestedUser = User.builder()
             .id(userVO.getId())
@@ -1668,9 +1646,6 @@ class UserServiceImplTest {
     void testDeactivateUserUnauthorizedRoleToDeactivateUser() {
         String uuid = "user-uuid";
         DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
-        UserVO userVO = UserVO.builder()
-            .id(1L)
-            .build();
 
         User requestedUser = User.builder()
             .id(userVO.getId())
