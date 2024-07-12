@@ -144,11 +144,16 @@
                 <tr>
                     <td align="left" bgcolor="#ffffff"
                         style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                        <div style="margin: 0;" th:text="#{hello} + ${name}"></div>
+                        <div style="margin: 0;">
+                            <span th:text="'Hello ' + ${name} + ', your account has been deactivated for this reason:'"></span>
+                        </div>
                     </td>
                 </tr>
-                <tr th:each="reason :${reasons}">
-                    <td th:text="${reason}"></td>
+                <tr>
+                    <td align="left" bgcolor="#ffffff"
+                        style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
+                        <div style="margin: 0; color: #0e0e0e; font-weight: bold;" th:text="${reason}"></div>
+                    </td>
                 </tr>
 
                 <!-- end copy -->

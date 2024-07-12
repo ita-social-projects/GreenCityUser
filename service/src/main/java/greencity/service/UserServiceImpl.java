@@ -13,29 +13,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserActivationDto;
-import greencity.dto.user.UserAddRatingDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserCityDto;
-import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserLocationDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.*;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
@@ -46,13 +24,7 @@ import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadUpdateRequestException;
-import greencity.exception.exceptions.InsufficientLocationDataException;
-import greencity.exception.exceptions.LowRoleLevelException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongIdException;
+import greencity.exception.exceptions.*;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
@@ -858,22 +830,76 @@ public class UserServiceImpl implements UserService {
             .build();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons) {
-        User foundUser =
-            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+    public UserDeactivationReasonDto deactivateUser(String uuid, DeactivateUserRequestDto request, UserVO userVO) {
+        User requestedUser = userRepo.findById(userVO.getId())
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userVO.getId()));
+
+        User foundUser = userRepo.findUserByUuid(uuid)
+            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+
+        if (requestedUser.getId().equals(foundUser.getId())) {
+            if (requestedUser.getRole().equals(Role.ROLE_USER)) {
+                return deactivateAndLogReason(foundUser, request.getReason());
+            } else {
+                throw new UserDeactivationException(ErrorMessage.USER_CANNOT_DEACTIVATE_YOURSELF);
+            }
+        }
+
+        if (foundUser.getRole().equals(Role.ROLE_USER)) {
+            if (isAuthorizedToDeactivate(requestedUser.getRole())) {
+                return deactivateAndLogReason(foundUser, request.getReason());
+            } else {
+                throw new UserDeactivationException(ErrorMessage.USER_CANNOT_DEACTIVATE_OTHERS);
+            }
+        }
+
+        if (requestedUser.getRole().equals(Role.ROLE_ADMIN)) {
+            if (!foundUser.getRole().equals(Role.ROLE_ADMIN)) {
+                return deactivateAndLogReason(foundUser, request.getReason());
+            } else {
+                throw new UserDeactivationException(ErrorMessage.ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN);
+            }
+        }
+
+        throw new UserDeactivationException(ErrorMessage.YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER);
+    }
+
+    /**
+     * Helper method to determine if a user is authorized to deactivate other users.
+     *
+     * @param role the role of the requesting user
+     * @return true if the user is authorized to deactivate others, false otherwise
+     */
+    private boolean isAuthorizedToDeactivate(Role role) {
+        return role.equals(Role.ROLE_ADMIN)
+            || role.equals(Role.ROLE_MODERATOR)
+            || role.equals(Role.ROLE_EMPLOYEE)
+            || role.equals(Role.ROLE_UBS_EMPLOYEE);
+    }
+
+    /**
+     * Performs user deactivation and logs the deactivation reason.
+     *
+     * @param foundUser the user to deactivate
+     * @param reason    the reason for deactivation
+     * @return a UserDeactivationReasonDto object containing deactivation details
+     */
+    private UserDeactivationReasonDto deactivateAndLogReason(User foundUser, String reason) {
         foundUser.setUserStatus(UserStatus.DEACTIVATED);
         userRepo.save(foundUser);
-        String reasons = userReasons.stream().map(Object::toString).collect(Collectors.joining("/"));
         userDeactivationRepo.save(UserDeactivationReason.builder()
             .dateTimeOfDeactivation(LocalDateTime.now())
-            .reason(reasons)
+            .reason(reason)
             .user(foundUser)
             .build());
         return UserDeactivationReasonDto.builder()
             .email(foundUser.getEmail())
             .name(foundUser.getName())
-            .deactivationReasons(filterReasons(foundUser.getLanguage().getCode(), reasons))
+            .deactivationReasons(List.of(reason))
             .lang(foundUser.getLanguage().getCode())
             .build();
     }

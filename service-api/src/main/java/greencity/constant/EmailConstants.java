@@ -32,7 +32,7 @@ public final class EmailConstants {
     public static final String ECO_NEWS_LINK = "ecoNewsLink";
     public static final String UNSUBSCRIBE_LINK = "unsubscribeLink";
     public static final String NEWS_RESULT = "news";
-    public static final String REASONS = "reasons";
+    public static final String REASON = "reason";
     public static final String DESCRIPTION = "description";
     public static final String LANGUAGE = "language";
     public static final String IS_UBS = "isUbs";

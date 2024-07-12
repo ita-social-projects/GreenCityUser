@@ -7,28 +7,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.RegistrationStatisticsDtoResponse;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserActivationDto;
-import greencity.dto.user.UserAddRatingDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserCityDto;
-import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.*;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -435,11 +414,13 @@ public interface UserService {
     /**
      * change {@link UserVO}'s status to DEACTIVATE.
      *
-     * @param id          {@link UserVO}'s id
-     * @param userReasons {@link List} of {@link String}.
-     * @author Vasyl Zhovnir
+     * @param userVO  {@link UserVO} who send deactivation request.
+     * @param uuid    {@link UserVO}'s uuid.
+     * @param request {@link DeactivateUserRequestDto} deactivated information.
+     *
+     * @author Kizerov Dmytro
      */
-    UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons);
+    UserDeactivationReasonDto deactivateUser(String uuid, DeactivateUserRequestDto request, UserVO userVO);
 
     /**
      * Method for getting a {@link List} of {@link String} - reasons for
