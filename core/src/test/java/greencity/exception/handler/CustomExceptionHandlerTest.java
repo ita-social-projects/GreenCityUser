@@ -13,6 +13,7 @@ import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.exception.exceptions.GoogleApiException;
+import greencity.exception.exceptions.UserDeactivationException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -283,5 +284,15 @@ class CustomExceptionHandlerTest {
             any(ErrorAttributeOptions.class))).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleInsufficientLocationDataException(actual, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
+    void handleUserDeactivationExceptionTest() {
+        UserDeactivationException actual = new UserDeactivationException("Some string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleUserDeactivationException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse));
     }
 }

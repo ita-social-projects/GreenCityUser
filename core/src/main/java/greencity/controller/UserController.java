@@ -36,6 +36,7 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -713,24 +714,32 @@ public class UserController {
     }
 
     /**
-     * Method for setting {@link UserVO}'s status to DEACTIVATED, so the user will
-     * not be able to log in into the system.
+     * Method for deactivating a {@link UserVO} by setting its status to
+     * DEACTIVATED, preventing the user from logging into the system.
      *
-     * @param id          of the searched {@link UserVO}.
-     * @param userReasons {@link List} of {@link String}.
-     * @author Orest Mamchuk
+     * @param userVO  the {@link UserVO} object representing the current user
+     *                performing the deactivation.
+     * @param uuid    the UUID of the user to deactivate.
+     * @param request the {@link DeactivateUserRequestDto} containing deactivation
+     *                information.
+     * @return ResponseEntity indicating the success of the deactivation operation.
+     *
+     * @author Kizerov Dmytro
      */
-    @Operation(summary = "Deactivate user indicating the list of reasons for deactivation")
+    @Operation(summary = "Deactivate user indicating the reason for deactivation")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PutMapping("/deactivate")
-    public ResponseEntity<ResponseEntity.BodyBuilder> deactivateUser(@RequestParam Long id,
-        @RequestBody List<String> userReasons) {
-        UserDeactivationReasonDto userDeactivationDto = userService.deactivateUser(id, userReasons);
+    public ResponseEntity<ResponseEntity.BodyBuilder> deactivateUser(
+        @Parameter(hidden = true) @CurrentUser UserVO userVO,
+        @RequestParam String uuid,
+        @Valid @RequestBody DeactivateUserRequestDto request) {
+        UserDeactivationReasonDto userDeactivationDto = userService.deactivateUser(uuid, request, userVO);
         emailService.sendReasonOfDeactivation(userDeactivationDto);
         return ResponseEntity.status(HttpStatus.OK).build();
     }

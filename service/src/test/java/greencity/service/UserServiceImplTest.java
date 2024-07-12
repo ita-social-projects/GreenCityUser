@@ -7,6 +7,7 @@ import static greencity.ModelUtils.TEST_USER;
 import static greencity.ModelUtils.TEST_USER_VO;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserLocation;
+import static greencity.ModelUtils.getLanguage;
 import greencity.TestConst;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -41,6 +42,7 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
@@ -48,7 +50,10 @@ import greencity.entity.UserLocation;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
+
 import static greencity.enums.Role.ROLE_USER;
+import static greencity.enums.Role.ROLE_ADMIN;
+import static greencity.enums.Role.ROLE_MODERATOR;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import greencity.exception.exceptions.BadRequestException;
@@ -58,6 +63,7 @@ import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
+import greencity.exception.exceptions.UserDeactivationException;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
@@ -80,6 +86,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -191,7 +198,6 @@ class UserServiceImplTest {
             .email("nazar98struk.gmail.com")
             .build();
 
-    private String language = "ua";
     private Long userId = user.getId();
 
     private Long habitId = 1L;
@@ -1147,27 +1153,35 @@ class UserServiceImplTest {
 
     @Test
     void deactivateUser() {
-        List<String> test = List.of();
-        User user = ModelUtils.getUser();
-        user.setLanguage(Language.builder()
-            .id(1L)
-            .code("en")
-            .build());
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        user.setUserStatus(DEACTIVATED);
-        when(userRepo.save(user)).thenReturn(user);
-        UserDeactivationReason userReason = UserDeactivationReason.builder()
-            .dateTimeOfDeactivation(LocalDateTime.now())
-            .reason("test")
-            .user(user)
+        String uuid = "user-uuid";
+        String reason = "Account closed by user request";
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto(reason);
+
+        User requestedUser = User.builder()
+            .id(userVO.getId())
+            .role(Role.ROLE_ADMIN)
             .build();
-        when(userDeactivationRepo.save(userReason)).thenReturn(userReason);
-        assertEquals(UserDeactivationReasonDto.builder()
-            .email(user.getEmail())
-            .name(user.getName())
-            .deactivationReasons(test)
-            .lang(user.getLanguage().getCode())
-            .build(), userService.deactivateUser(1L, test));
+
+        User foundUser = User.builder()
+            .id(2L)
+            .role(ROLE_USER)
+            .language(getLanguage())
+            .build();
+
+        when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(foundUser));
+
+        when(userDeactivationRepo.save(any())).thenReturn(null);
+        when(userRepo.save(foundUser)).thenReturn(foundUser);
+
+        UserDeactivationReasonDto result = userService.deactivateUser(uuid, request, userVO);
+
+        assertNotNull(result);
+        assertEquals(foundUser.getEmail(), result.getEmail());
+        assertEquals(foundUser.getName(), result.getName());
+        assertEquals(1, result.getDeactivationReasons().size());
+        assertEquals(reason, result.getDeactivationReasons().getFirst());
+        assertEquals(foundUser.getLanguage().getCode(), result.getLang());
     }
 
     @Test
@@ -1525,5 +1539,127 @@ class UserServiceImplTest {
         verify(userRepo).findById(1L);
         verify(userRepo).getAllUsersByUsersId(List.of(1L));
         verify(userRepo).findLastActivityTimeById(anyLong());
+    }
+
+    @Test
+    void testDeactivateUserUserNotFoundById() {
+        String uuid = "user-uuid";
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
+
+        when(userRepo.findById(userVO.getId())).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.deactivateUser(uuid, request, userVO));
+    }
+
+    @Test
+    void testDeactivateUserUserNotFoundByUuid() {
+        String uuid = "user-uuid";
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
+
+        when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(new User()));
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.empty());
+
+        assertThrows(WrongIdException.class, () -> userService.deactivateUser(uuid, request, userVO));
+    }
+
+    @Test
+    void testDeactivateUserCannotDeactivateYourself() {
+        String uuid = "user-uuid";
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
+
+        User requestedUser = User.builder()
+            .id(userVO.getId())
+            .role(ROLE_ADMIN)
+            .language(getLanguage())
+            .build();
+
+        when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(requestedUser));
+
+        assertThrows(UserDeactivationException.class, () -> userService.deactivateUser(uuid, request, userVO));
+    }
+
+    @Test
+    void testDeactivateUserCannotDeactivateOthers() {
+        String uuid = "user-uuid";
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
+
+        User requestedUser = User.builder()
+            .id(userVO.getId())
+            .role(ROLE_USER)
+            .build();
+
+        User foundUser = User.builder()
+            .id(2L)
+            .role(ROLE_USER)
+            .build();
+
+        when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(foundUser));
+
+        assertThrows(UserDeactivationException.class, () -> userService.deactivateUser(uuid, request, userVO));
+    }
+
+    @Test
+    void testDeactivateUserAdminCannotDeactivateOtherAdmin() {
+        String uuid = "user-uuid";
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
+
+        User requestedUser = User.builder()
+            .id(userVO.getId())
+            .role(ROLE_ADMIN)
+            .build();
+
+        User foundUser = User.builder()
+            .id(2L)
+            .role(ROLE_ADMIN)
+            .build();
+
+        when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(foundUser));
+
+        assertThrows(UserDeactivationException.class, () -> userService.deactivateUser(uuid, request, userVO));
+    }
+
+    @Test
+    void testDeactivateUserNoPermissionsToDeactivateUser() {
+        String uuid = "user-uuid";
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
+
+        User requestedUser = User.builder()
+            .id(userVO.getId())
+            .role(ROLE_MODERATOR)
+            .build();
+
+        User foundUser = User.builder()
+            .id(2L)
+            .role(ROLE_ADMIN)
+            .build();
+
+        when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(foundUser));
+
+        assertThrows(UserDeactivationException.class, () -> userService.deactivateUser(uuid, request, userVO));
+    }
+
+    @Test
+    void testDeactivateUserUnauthorizedRoleToDeactivateUser() {
+        String uuid = "user-uuid";
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
+
+        User requestedUser = User.builder()
+            .id(userVO.getId())
+            .role(ROLE_USER)
+            .build();
+
+        User foundUser = User.builder()
+            .id(2L)
+            .role(ROLE_ADMIN)
+            .build();
+
+        when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));
+        when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(foundUser));
+
+        assertThrows(UserDeactivationException.class, () -> userService.deactivateUser(uuid, request, userVO));
     }
 }

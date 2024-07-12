@@ -29,6 +29,7 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -435,11 +436,13 @@ public interface UserService {
     /**
      * change {@link UserVO}'s status to DEACTIVATE.
      *
-     * @param id          {@link UserVO}'s id
-     * @param userReasons {@link List} of {@link String}.
-     * @author Vasyl Zhovnir
+     * @param userVO  {@link UserVO} who send deactivation request.
+     * @param uuid    {@link UserVO}'s uuid.
+     * @param request {@link DeactivateUserRequestDto} deactivated information.
+     *
+     * @author Kizerov Dmytro
      */
-    UserDeactivationReasonDto deactivateUser(Long id, List<String> userReasons);
+    UserDeactivationReasonDto deactivateUser(String uuid, DeactivateUserRequestDto request, UserVO userVO);
 
     /**
      * Method for getting a {@link List} of {@link String} - reasons for
