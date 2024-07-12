@@ -19,6 +19,7 @@ import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.exception.exceptions.GoogleApiException;
+import greencity.exception.exceptions.UserDeactivationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;
@@ -440,5 +441,23 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
+     * Handles UserDeactivationException and returns a ResponseEntity with a
+     * Forbidden status code and an ExceptionResponse body containing error details.
+     *
+     * @param exception the UserDeactivationException instance
+     * @param request   the current web request
+     * @return a ResponseEntity containing the HTTP status code and error response
+     *         body
+     */
+    @ExceptionHandler(UserDeactivationException.class)
+    public ResponseEntity<Object> handleUserDeactivationException(
+        UserDeactivationException exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
     }
 }

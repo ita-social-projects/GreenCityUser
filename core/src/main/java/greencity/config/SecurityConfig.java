@@ -169,7 +169,8 @@ public class SecurityConfig {
                     "/user/{id}/updateUserLastActivityTime/{date}",
                     "/user/updateUserLastActivityTime/{date}",
                     "/user/language/{languageId}",
-                    "/user/employee-email")
+                    "/user/employee-email",
+                    "/user/deactivate")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PUT,
                     "/user/edit-authorities",

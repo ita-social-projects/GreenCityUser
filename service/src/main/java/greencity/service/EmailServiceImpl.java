@@ -252,7 +252,7 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userDeactivationDto.getName());
-        model.put(EmailConstants.REASONS, userDeactivationDto.getDeactivationReasons());
+        model.put(EmailConstants.REASON, userDeactivationDto.getDeactivationReasons().getFirst());
         validateLanguage(userDeactivationDto.getLang());
         String template = createEmailTemplate(model, EmailConstants.REASONS_OF_DEACTIVATION_PAGE);
         sendEmail(userDeactivationDto.getEmail(), EmailConstants.DEACTIVATION, template);

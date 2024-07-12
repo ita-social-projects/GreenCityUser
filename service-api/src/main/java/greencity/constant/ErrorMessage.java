@@ -46,6 +46,11 @@ public final class ErrorMessage {
     public static final String NOT_VALID_BOOLEAN_VALUE = "%s is not a valid Boolean value for %s";
     public static final String INSUFFICIENT_LOCATION_DATA_FOUND =
         "Insufficient location data found for the provided coordinates.";
+    public static final String USER_CANNOT_DEACTIVATE_YOURSELF = "You cannot deactivate yourself if you are not a USER";
+    public static final String USER_CANNOT_DEACTIVATE_OTHERS = "USER cannot deactivate other users";
+    public static final String ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN = "ADMIN cannot deactivate other ADMIN users";
+    public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER =
+        "You do not have permission to deactivate this user";
 
     private ErrorMessage() {
     }
