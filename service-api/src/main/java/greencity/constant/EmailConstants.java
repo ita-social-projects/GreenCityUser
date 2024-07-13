@@ -10,7 +10,7 @@ public final class EmailConstants {
     public static final String CREATED_NEWS = "You created news on GreenCity ";
     public static final String VERIFY_EMAIL = "verify.email";
     public static final String RESTORED_PASSWORD = "restored.password";
-    public static final String CONFIRM_RESTORING_PASS = "confirm.restoring.pass";
+    public static final String CONFIRM_CREATING_PASS = "creating.new.password";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
     public static final String DEACTIVATION = "Your account was deactivated";
     public static final String ACTIVATION = "Your account was activated";

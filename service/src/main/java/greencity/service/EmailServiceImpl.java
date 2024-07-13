@@ -199,7 +199,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
-        sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)),
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS, null, getLocale(language)),
             template);
     }
 

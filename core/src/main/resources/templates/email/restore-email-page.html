@@ -5,7 +5,7 @@
 
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title th:text="#{password.reset}"></title>
+    <title th:text="${isUbs} ? #{creating.new.passwordUbs} : #{creating.new.password}"></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
         /**
@@ -150,7 +150,7 @@
                     <td align="left" bgcolor="#ffffff"
                         style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
                         <h2 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -1px; line-height: 48px;"
-                            th:text="#{password}"> </h2>
+                            th:text="${isUbs} ? #{passwordUbs} : #{password}"> </h2>
                     </td>
                 </tr>
             </table>
@@ -180,7 +180,7 @@
                         <p th:text="#{hello} + ${name + ','}"></p>
 
                         <div style="margin: 0;" th:text="${isUbs} ? #{thanksUbs} : #{thanks}"></div>
-                        <div style="margin: 0;" th:text="#{text.restore}"></div>
+                        <div style="margin: 0;" th:text="#{text.create.pass}"></div>
                     </td>
                 </tr>
                 <!-- end copy -->
@@ -196,7 +196,7 @@
                                             <td align="center" th:bgcolor="${backgroundColor}" style="border-radius: 6px;">
                                                 <a th:href="${restorePassword}" target="_blank"
                                                    style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; color: #ffffff; text-decoration: none; border-radius: 6px;"
-                                                   th:text="#{restore}" th:styleappend="'color:'+${headerTextColor}"></a>
+                                                   th:text="#{create}" th:styleappend="'color:'+${headerTextColor}"></a>
                                             </td>
                                         </tr>
                                     </table>
@@ -242,7 +242,7 @@
                 <tr>
                     <td align="center" bgcolor="#e9ecef"
                         style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                        <p style="margin: 0;" th:text="#{advice}"> "> </p>
+                        <p style="margin: 0;" th:text="#{advice}"></p>
                     </td>
                 </tr>
                 <!-- end permission -->

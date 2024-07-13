@@ -25,10 +25,8 @@ import org.mockito.Mock;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
-
 import java.util.*;
 import java.util.concurrent.Executors;
-
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -134,7 +132,7 @@ class EmailServiceImplTest {
     @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
         "1, Test, test@gmail.com, token, en, false"})
     void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
-        when(messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)))
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS, null, getLocale(language)))
             .thenReturn("Confirm restoring password");
         service.sendRestoreEmail(id, name, email, token, language, isUbs);
         verify(javaMailSender).createMimeMessage();
