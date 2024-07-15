@@ -25,10 +25,8 @@ import org.mockito.Mock;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
-
 import java.util.*;
 import java.util.concurrent.Executors;
-
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -249,6 +247,19 @@ class EmailServiceImplTest {
         service.sendHabitAssignNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
         verify(messageSource).getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST, null, getLocale(language));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
+        "1, Test, test@gmail.com, token, en, true"})
+    void sendCreateNewPasswordForEmployee(Long id, String name, String email, String token, String language,
+        Boolean isUbs) {
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS, null, getLocale(language)))
+            .thenReturn("Create password for Green City");
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS_UBS, null, getLocale(language)))
+            .thenReturn("Create password for Pick Up City");
+        service.sendCreateNewPasswordForEmployee(id, name, email, token, language, isUbs);
+        verify(javaMailSender).createMimeMessage();
     }
 
     private static Locale getLocale(String language) {

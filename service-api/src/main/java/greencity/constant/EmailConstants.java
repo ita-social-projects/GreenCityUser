@@ -11,6 +11,8 @@ public final class EmailConstants {
     public static final String VERIFY_EMAIL = "verify.email";
     public static final String RESTORED_PASSWORD = "restored.password";
     public static final String CONFIRM_RESTORING_PASS = "confirm.restoring.pass";
+    public static final String CONFIRM_CREATING_PASS = "creating.new.password";
+    public static final String CONFIRM_CREATING_PASS_UBS = "creating.new.passwordUbs";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
     public static final String DEACTIVATION = "Your account was deactivated";
     public static final String ACTIVATION = "Your account was activated";
@@ -41,6 +43,7 @@ public final class EmailConstants {
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
+    public static final String CRETE_PASSWORD_PAGE = "create-employee-password-page";
     public static final String SUCCESS_RESTORED_PASSWORD_PAGE = "success-restored-password-page";
     public static final String USER_APPROVAL_EMAIL_PAGE = "user-approval-email-page";
     public static final String CHANGE_PLACE_STATUS_EMAIL_PAGE = "change-place-status-email-page";

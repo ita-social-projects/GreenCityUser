@@ -149,4 +149,22 @@ public interface EmailService {
      * @author Kizeov Dmytro
      */
     void sendHabitAssignNotificationEmail(HabitAssignNotificationMessage message);
+
+    /**
+     * Sends email message to create new password for employee after signUp.
+     *
+     * @param employeeId       {@link Long} the user id is used for recovery link
+     *                         building
+     * @param employeeFistName {@link String} user first name is used in email model
+     *                         constants
+     * @param employeeEmail    {@link String} user email which will be used for
+     *                         sending recovery letter
+     * @param language         {@link String} language code used for email
+     *                         notification
+     * @param token            {@link String} token for password save(restoration)
+     *
+     * @author Olena Sotnik
+     */
+    void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail, String token,
+        String language, boolean isUbs);
 }

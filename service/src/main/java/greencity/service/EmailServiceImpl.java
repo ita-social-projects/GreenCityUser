@@ -189,15 +189,8 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language,
         boolean isUbs) {
-        Map<String, Object> model = new HashMap<>();
-        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
-        model.put(EmailConstants.CLIENT_LINK, baseLink);
-        model.put(EmailConstants.USER_NAME, userName);
-        model.put(EmailConstants.RESTORE_PASS, baseLink + "/auth/restore?" + "token=" + token
-            + PARAM_USER_ID + userId);
-        validateLanguage(language);
-        model.put(EmailConstants.IS_UBS, isUbs);
-        model.put(EmailConstants.LANGUAGE, language);
+        Map<String, Object> model =
+            buildModelMapForPasswordRestore(userId, userName, token, language, isUbs);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
         sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)),
             template);
@@ -332,5 +325,36 @@ public class EmailServiceImpl implements EmailService {
         String template = createEmailTemplate(model, EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST_PAGE);
         sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST,
             null, getLocale(language)), template);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     */
+    @Override
+    public void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail,
+        String token,
+        String language, boolean isUbs) {
+        Map<String, Object> model =
+            buildModelMapForPasswordRestore(employeeId, employeeFistName, token, language, isUbs);
+        String template = createEmailTemplate(model, EmailConstants.CRETE_PASSWORD_PAGE);
+        String emailSubject = isUbs ? EmailConstants.CONFIRM_CREATING_PASS_UBS : EmailConstants.CONFIRM_CREATING_PASS;
+        sendEmail(employeeEmail,
+            messageSource.getMessage(emailSubject, null, getLocale(language)),
+            template);
+    }
+
+    private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,
+        boolean isUbs) {
+        Map<String, Object> model = new HashMap<>();
+        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
+        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.USER_NAME, name);
+        model.put(EmailConstants.RESTORE_PASS, baseLink + "/auth/restore?" + "token=" + token
+            + PARAM_USER_ID + userId);
+        validateLanguage(language);
+        model.put(EmailConstants.IS_UBS, isUbs);
+        model.put(EmailConstants.LANGUAGE, language);
+        return model;
     }
 }
