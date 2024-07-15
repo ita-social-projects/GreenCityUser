@@ -268,6 +268,19 @@ class EmailServiceImplTest {
         assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
+        "1, Test, test@gmail.com, token, en, true"})
+    void sendCreateNewPasswordForEmployee(Long id, String name, String email, String token, String language,
+        Boolean isUbs) {
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS, null, getLocale(language)))
+            .thenReturn("Create password for Green City");
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS_UBS, null, getLocale(language)))
+            .thenReturn("Create password for Pick Up City");
+        service.sendCreateNewPasswordForEmployee(id, name, email, token, language, isUbs);
+        verify(javaMailSender).createMimeMessage();
+    }
+
     private static Locale getLocale(String language) {
         switch (language) {
             case "ua":

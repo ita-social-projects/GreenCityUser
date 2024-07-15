@@ -204,6 +204,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         try {
             User savedUser = userRepo.save(employee);
             handlePostSaveActions(language, dto, employee, savedUser);
+            emailService.sendCreateNewPasswordForEmployee(employee.getId(), employee.getFirstName(),
+                employee.getEmail(), employee.getRestorePasswordEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
