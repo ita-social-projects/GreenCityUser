@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Reasons of deactivation</title>
+    <title th:text="#{deactivation.title}"></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
         /**
@@ -176,7 +176,7 @@
                 <tr>
                     <td align="center" bgcolor="#e9ecef"
                         style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                        <p style="margin: 0;">You are welcome</p>
+                        <p style="margin: 0;" th:text="#{welcome}"></p>
                     </td>
                 </tr>
                 <!-- end permission -->
@@ -194,7 +194,5 @@
 </table>
 <!-- end body -->
 
-</body>
-</html>
 </body>
 </html>

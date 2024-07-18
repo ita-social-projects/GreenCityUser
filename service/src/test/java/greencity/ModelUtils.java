@@ -32,6 +32,7 @@ import greencity.dto.user.UsersFriendDto;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.dto.user.PlaceAuthorDto;
 import greencity.entity.Achievement;
 import greencity.entity.AchievementCategory;
 import greencity.entity.Authority;
@@ -808,5 +809,9 @@ public class ModelUtils {
                 .token("sadasdasv23e1asc0")
                 .build())
             .build();
+    }
+
+    public static PlaceAuthorDto getPlaceAuthorDto() {
+        return PlaceAuthorDto.builder().id(1L).name("Name").email("author@gmail.com").build();
     }
 }

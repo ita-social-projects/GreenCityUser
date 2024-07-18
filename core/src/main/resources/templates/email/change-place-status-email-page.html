@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title th:text="#{place.status.title}"></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
         /**
@@ -152,9 +153,9 @@
                 <tr>
                     <td class="background-msg-clr" align="left"
                         style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
-                        <h1 th:text="${'Dear ' + name + ', '}"
+                        <h1 th:text="#{dear} + ${name + ', '}"
                             style="margin: 0; font-size: 32px; font-weight: 700; letter-spacing: -1px; line-height: 48px;"></h1>
-                        <h2 th:text="${'Your place was ' + status}"
+                        <h2 th:text="#{place} + ${' ' + status}"
                             style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -1px; line-height: 48px;"></h2>
                     </td>
                 </tr>
@@ -179,12 +180,12 @@
                 <tr>
                     <td class="background-msg-clr" align="left"
                         style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                        <p th:text="${'Your proposed place &quot;' + placeName + '&quot; has been ' + status} + '.'"
+                        <p th:text="#{proposed.place} + ' ' + ${'&quot;' + placeName + '&quot;' + ' '} + #{has.been} + ' ' + ${status} + '.'"
                            style="margin: 0;">
                         </p>
                         <!--/*@thymesVar id="status" type="java.lang.String"*/-->
-                        <p th:if="${status} == 'approved'" style="margin: 0;">
-                            You can now view it in
+                        <p th:if="${status} == 'approved'" style="margin: 0;"
+                           th:text="#{view.place}">
                             <!--/*@thymesVar id="clientLink" type="String"*/-->
                             <a th:href="${clientLink}">GreenCity</a>
                         </p>
@@ -193,7 +194,7 @@
                 <tr>
                     <td class="background-msg-clr" align="left"
                         style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-bottom: 3px solid #d4dadf">
-                        <p style="margin: 0;">Sincerely yours, GreenCity's team</p>
+                        <p style="margin: 0;" th:text="#{informal.farewell}"></p>
                     </td>
                 </tr>
                 <!-- end copy -->
@@ -221,10 +222,7 @@
                 <tr>
                     <td class="background-clr" align="center"
                         style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                        <p style="margin: 0;">
-                            You received this email because you subscribed for notifications via e-mail.
-                            If you didn't request this action you can safely delete this email.
-                        </p>
+                        <p style="margin: 0;"th:text="#{advice.general}"></p>
                     </td>
                 </tr>
                 <!-- end permission -->
