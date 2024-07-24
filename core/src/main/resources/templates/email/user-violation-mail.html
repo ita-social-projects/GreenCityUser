@@ -140,7 +140,7 @@
             <![endif]-->
             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
                 <tr>
-                    <td align="center" bgcolor="#C7FFBC" width="300">
+                    <td align="center" width="100%">
                         <h5 align="center" >
                             <font size="4" th:text="#{violation.info}"></font></h5>
                     </td>
@@ -148,11 +148,14 @@
                 <!-- start copy -->
                 <tr>
                     <td align="left" bgcolor="#ffffff"
-                        style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                        <p th:text="#{dear} + ${name + ', '} + #{violation} + ':'"></p>
-                        <p th:text="#{description} + ': ' ${description}"></p>
+                        style="padding: 20px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 20px;">
+                        <p th:text="#{dear} + ' ' + ${name + ', '} + #{violation}"></p>
+                        <p th:text="#{description} + ': ' + ${description}"></p>
 
-                        <div style="margin: 0;" th:text="#{administrator.message}"></div>
+                        <div style="margin: 0;">
+                            <br><br> <!-- Adding two empty lines -->
+                            <span th:text="#{administrator.message}"></span>
+                        </div>
                     </td>
 
                     <td align="center" bgcolor="#FFFFFF">
@@ -162,15 +165,6 @@
                                 <td align="center" valign="top" width="600">
                         <![endif]-->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-
-                            <!-- start permission -->
-                            <tr>
-                                <td align="center" bgcolor="#C7FFBC"
-                                    style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                                    <p style="margin: 0;" th:text="#{wish}"></p>
-                                </td>
-                            </tr>
-                            <!-- end permission -->
 
                         </table>
                         <!--[if (gte mso 9)|(IE)]>
