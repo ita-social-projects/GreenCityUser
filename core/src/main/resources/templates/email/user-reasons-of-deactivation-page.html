@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>Reasons of deactivation</title>
+    <title th:text="#{deactivation.title}"></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style type="text/css">
         /**
@@ -145,12 +145,13 @@
                     <td align="left" bgcolor="#ffffff"
                         style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
                         <div style="margin: 0;" th:text="#{hello} + ${name}"></div>
+                        <div style="margin: 0;" th:text="#{deactivation.title}"></div>
+
                     </td>
                 </tr>
                 <tr th:each="reason :${reasons}">
                     <td th:text="${reason}"></td>
                 </tr>
-
                 <!-- end copy -->
             </table>
             <!--[if (gte mso 9)|(IE)]>
@@ -176,7 +177,7 @@
                 <tr>
                     <td align="center" bgcolor="#e9ecef"
                         style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                        <p style="margin: 0;">You are welcome</p>
+                        <p style="margin: 0;" th:text="#{advice.deactivation} + ' ' + #{informal.farewell}"></p>
                     </td>
                 </tr>
                 <!-- end permission -->
@@ -194,7 +195,5 @@
 </table>
 <!-- end body -->
 
-</body>
-</html>
 </body>
 </html>

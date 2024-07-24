@@ -148,6 +148,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/email/sendEventNotification",
                 "/email/addEventComment")
             .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+            .antMatchers(HttpMethod.POST,
+                "/email/sendUserViolation")
+            .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.PUT,
                 "/ownSecurity/changePassword",
                 "/user/profile",
@@ -160,7 +163,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 "/user/authorities",
                 "/user/deactivate-employee",
                 "/user/markUserAsDeactivated",
-                "/user/markUserAsActivated")
+                "/user/markUserAsActivated",
+                "user/activate",
+                "user/deactivate")
             .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
             .antMatchers(HttpMethod.GET,
                 "/user/get-all-authorities",
