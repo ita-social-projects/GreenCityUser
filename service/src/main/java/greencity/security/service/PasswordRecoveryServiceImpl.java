@@ -83,7 +83,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     @Override
     public void sendPasswordRecoveryEmailTo(String email, boolean isUbs) {
         User user = userRepo
-            .findByEmail(email)
+            .findByEmail(email.toLowerCase())
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         RestorePasswordEmail restorePasswordEmail = user.getRestorePasswordEmail();
         if (restorePasswordEmail != null) {

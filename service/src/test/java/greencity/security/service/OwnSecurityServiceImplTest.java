@@ -172,13 +172,13 @@ class OwnSecurityServiceImplTest {
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
-        ownSecurityService.signUp(new OwnSignUpDto(), "en");
+        ownSecurityService.signUp(ModelUtils.getOwnSignUpDto(), "en");
         verify(emailService, times(1)).sendVerificationEmail(
             refEq(user.getId()),
             refEq(user.getName()),
             refEq(user.getEmail()),
             refEq(user.getVerifyEmail().getToken()),
-            refEq("en"), eq(false));
+            refEq("en"), eq(true));
         verify(jwtTool, times(2)).generateTokenKey();
     }
 
@@ -293,7 +293,7 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void signUpThrowsUserAlreadyRegisteredExceptionTest() {
-        OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
+        OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
         User user = User.builder().verifyEmail(new VerifyEmail()).build();
         UserVO userVO = UserVO.builder().verifyEmail(new VerifyEmailVO()).build();
         List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
@@ -585,7 +585,7 @@ class OwnSecurityServiceImplTest {
             .nameEn("Driver")
             .build()));
         employeeSignUpDto.setEmail("test@example.com");
-        OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
+        OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
         User employee = new User();
         employee.setEmail("test@example.com");
         employee.setPositions(List.of(Position.builder()
