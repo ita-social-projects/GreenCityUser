@@ -145,7 +145,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return User.builder()
             .name(dto.getName())
             .firstName(dto.getName())
-            .email(dto.getEmail())
+            .email(dto.getEmail().toLowerCase())
             .dateOfRegistration(LocalDateTime.now())
             .role(Role.ROLE_USER)
             .refreshTokenKey(refreshTokenKey)
@@ -311,7 +311,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Override
     public SuccessSignInDto signIn(final OwnSignInDto dto) {
-        UserVO user = userService.findByEmail(dto.getEmail());
+        UserVO user = userService.findByEmail(dto.getEmail().toLowerCase());
         if (user == null) {
             throw new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail());
         }
