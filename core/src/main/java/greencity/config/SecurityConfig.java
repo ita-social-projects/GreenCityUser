@@ -105,6 +105,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(req -> req
                 .requestMatchers("/static/css/**", "/static/img/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/error").permitAll()
                 .requestMatchers(
                     "/v2/api-docs/**",
                     "/v3/api-docs/**",
