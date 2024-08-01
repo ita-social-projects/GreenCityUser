@@ -1,23 +1,14 @@
 package greencity.exception.handler;
 
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadSocialNetworkLinksException;
-import greencity.exception.exceptions.BadUserStatusException;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.InsufficientLocationDataException;
-import greencity.exception.exceptions.InvalidURLException;
-import greencity.exception.exceptions.LanguageNotSupportedException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongIdException;
-import greencity.exception.exceptions.WrongPasswordException;
-import greencity.exception.exceptions.GoogleApiException;
-import greencity.exception.exceptions.UserDeactivationException;
+import greencity.constant.AppConstant;
+import greencity.exception.exceptions.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -110,7 +101,7 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleBadSocialNetworkLinkException() {
+    void testHandleBadSocialNetworkLinkException() {
         InvalidURLException invalidURLException = new InvalidURLException("test");
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(eq(webRequest),
@@ -120,22 +111,12 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void testHandleBadSocialNetworkLinkException() {
-        BadSocialNetworkLinksException badSocialNetworkLinksException = new BadSocialNetworkLinksException("test");
-        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
-        when(errorAttributes.getErrorAttributes(eq(webRequest),
-            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
-        assertEquals(
-            customExceptionHandler.handleBadSocialNetworkLinkException(badSocialNetworkLinksException, webRequest),
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
-    }
-
-    @Test
     void testHandleBadRefreshTokenException() {
+        BadRequestException badRefreshTokenException = new BadRefreshTokenException("test");
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(eq(webRequest),
             any(ErrorAttributeOptions.class))).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleBadRefreshTokenException(webRequest),
+        assertEquals(customExceptionHandler.handleBadRequestException(badRefreshTokenException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
     }
 
@@ -294,5 +275,85 @@ class CustomExceptionHandlerTest {
             any(ErrorAttributeOptions.class))).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleUserDeactivationException(actual, webRequest),
             ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse));
+    }
+
+    @Test
+    void handleBadRequestExceptionTest() {
+        BadRequestException actual = new BadRequestException("test string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleBadRequestException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
+    void handleUserBlockedExceptionTest() {
+        UserBlockedException actual = new UserBlockedException("test string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleUserBlockedException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
+    void handlePasswordsDoNotMatchesExceptionTest() {
+        PasswordsDoNotMatchesException actual = new PasswordsDoNotMatchesException("test string");
+        ValidationExceptionDto validationExceptionDto =
+            new ValidationExceptionDto("password", actual.getMessage());
+        assertEquals(customExceptionHandler.handlePasswordsDoNotMatchesException(actual),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto));
+    }
+
+    @Test
+    void handleLowRoleLevelExceptionTest() {
+        LowRoleLevelException actual = new LowRoleLevelException("test string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleLowRoleLevelException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse));
+    }
+
+    @Test
+    void handleUserActivationEmailTokenExpiredExceptionTest() {
+        UserActivationEmailTokenExpiredException actual =
+            new UserActivationEmailTokenExpiredException("test string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleUserActivationEmailTokenExpiredException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
+    void handleNotValidBooleanValueExceptionTest() {
+        NotValidBooleanValueException actual = new NotValidBooleanValueException("test string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleNotValidBooleanValueException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
+    void handleIdTokenExpiredExceptionTest() {
+        IdTokenExpiredException actual = new IdTokenExpiredException("test string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleIdTokenExpiredException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
+    void handleBadSocialNetworkLinksExceptionTest() {
+        BadSocialNetworkLinksException actual = new BadSocialNetworkLinksException("test string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleBadSocialNetworkLinksException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
     }
 }

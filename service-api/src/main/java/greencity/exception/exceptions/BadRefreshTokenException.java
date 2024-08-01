@@ -6,9 +6,9 @@ package greencity.exception.exceptions;
  *
  * @author Nazar Stasyuk
  */
-public class BadRefreshTokenException extends RuntimeException {
+public class BadRefreshTokenException extends BadRequestException {
     /**
-     * Generated javadoc, must be replaced with real one.
+     * Exception we get when we receive wrong refresh token. returns code 400
      */
     public BadRefreshTokenException(String message) {
         super(message);

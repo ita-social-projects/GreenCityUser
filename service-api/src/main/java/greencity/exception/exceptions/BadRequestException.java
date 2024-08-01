@@ -8,9 +8,7 @@ package greencity.exception.exceptions;
  */
 public class BadRequestException extends RuntimeException {
     /**
-     * Constructor for BadRequestException.
-     *
-     * @param message - giving message.
+     * Base exception. returns code 400
      */
     public BadRequestException(String message) {
         super(message);

@@ -1,5 +1,6 @@
 package greencity.mapping;
 
+import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.NotSavedException;
 import greencity.service.MultipartFileImpl;
 import java.awt.image.BufferedImage;
@@ -45,7 +46,7 @@ public class MultipartBase64ImageMapper extends AbstractConverter<String, Multip
                     Files.probeContentType(tempFile.toPath()), Files.readAllBytes(tempFile.toPath()));
             }
         } catch (IOException e) {
-            throw new NotSavedException("Cannot convert to BASE64 image");
+            throw new NotSavedException(ErrorMessage.CONVERT_TO_BASE64_FAILED);
         } finally {
             tempFile.deleteOnExit();
         }

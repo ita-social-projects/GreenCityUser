@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.constant.EmailConstants;
+import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
@@ -203,7 +204,7 @@ public class EmailServiceImpl implements EmailService {
      */
     private void validateLanguage(String language) {
         if (!LanguageValidationUtils.isValid(language)) {
-            throw new LanguageNotSupportedException("Invalid language");
+            throw new LanguageNotSupportedException(ErrorMessage.INVALID_LANGUAGE);
         }
     }
 

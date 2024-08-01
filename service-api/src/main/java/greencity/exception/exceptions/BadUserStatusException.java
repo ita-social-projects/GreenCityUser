@@ -6,11 +6,9 @@ package greencity.exception.exceptions;
  * @author Volodymyr Kharchenko
  * @version 1.0
  */
-public class BadUserStatusException extends RuntimeException {
+public class BadUserStatusException extends BadRequestException {
     /**
-     * Constructor for BadUserStatusException.
-     *
-     * @param message - giving message.
+     * Exception we get when we receive wrong user status. returns code 400
      */
     public BadUserStatusException(String message) {
         super(message);

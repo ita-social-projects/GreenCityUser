@@ -1,5 +1,6 @@
 package greencity.validator;
 
+import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import java.util.List;
 import java.util.Locale;
@@ -23,7 +24,7 @@ public class LanguageValidationUtils {
      */
     public static boolean isValid(String language) {
         if (language == null) {
-            throw new LanguageNotSupportedException("Language couldn't be blank");
+            throw new LanguageNotSupportedException(ErrorMessage.LANGUAGE_IS_EMPTY);
         }
         return SUPPORTED_LANGUAGES.contains(language.toLowerCase(Locale.ROOT));
     }

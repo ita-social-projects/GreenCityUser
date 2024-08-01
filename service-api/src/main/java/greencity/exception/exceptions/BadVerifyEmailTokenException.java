@@ -5,9 +5,9 @@ package greencity.exception.exceptions;
  *
  * @author Nazar Stasyuk
  */
-public class BadVerifyEmailTokenException extends RuntimeException {
+public class BadVerifyEmailTokenException extends BadRequestException {
     /**
-     * Generated javadoc, must be replaced with real one.
+     * Exception we get when we receive wrong verify email token. returns code 400
      */
     public BadVerifyEmailTokenException(String message) {
         super(message);

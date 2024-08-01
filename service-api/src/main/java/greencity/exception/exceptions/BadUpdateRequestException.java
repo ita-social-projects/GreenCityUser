@@ -5,11 +5,9 @@ package greencity.exception.exceptions;
  *
  * @author Rostyslav Khasanov
  */
-public class BadUpdateRequestException extends RuntimeException {
+public class BadUpdateRequestException extends BadRequestException {
     /**
-     * Constructor for BadUpdateRequestException.
-     *
-     * @param message - giving message.
+     * Exception we get when we receive wrong update request. returns code 400
      */
     public BadUpdateRequestException(String message) {
         super(message);

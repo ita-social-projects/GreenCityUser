@@ -65,6 +65,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import static greencity.constant.ErrorMessage.USER_EMAIL_VERIFICATION_NEEDED;
 
 /**
  * {@inheritDoc}
@@ -274,7 +275,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
         }
         if (user.getVerifyEmail() != null) {
-            throw new EmailNotVerified("You should verify the email first, check your email box!");
+            throw new EmailNotVerified(USER_EMAIL_VERIFICATION_NEEDED);
         }
         if (user.getUserStatus() == UserStatus.DEACTIVATED) {
             throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED);
