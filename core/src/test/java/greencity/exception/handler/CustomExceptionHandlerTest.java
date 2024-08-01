@@ -1,6 +1,5 @@
 package greencity.exception.handler;
 
-import greencity.constant.AppConstant;
 import greencity.exception.exceptions.*;
 
 import java.util.Collections;
@@ -8,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
