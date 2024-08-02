@@ -13,5 +13,4 @@ public interface PositionService {
      * @author Anton Bondar
      */
     PositionAuthoritiesDto getPositionsAndRelatedAuthorities(String email);
-
 }
