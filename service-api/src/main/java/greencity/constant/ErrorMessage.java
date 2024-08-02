@@ -33,6 +33,8 @@ public final class ErrorMessage {
     public static final String SELECT_CORRECT_LANGUAGE = "Select correct language: 'en' or 'ua'";
     public static final String TOKEN_FOR_RESTORE_IS_INVALID = "Token is null or it doesn't exist.";
     public static final String LANGUAGE_NOT_FOUND_BY_ID = "The language does not exist by this id: ";
+    public static final String INVALID_LANGUAGE = "Invalid language";
+    public static final String LANGUAGE_IS_EMPTY = "Language couldn't be blank";
     public static final String USER_DEACTIVATION_REASON_IS_EMPTY = "The User deactivation reasons list is empty";
     public static final String USER_ALREADY_HAS_PASSWORD = "User already has password";
     public static final String USER_HAS_NO_PERMISSION = "Current user has no permission for this action";
@@ -41,6 +43,8 @@ public final class ErrorMessage {
     public static final String USER_CREATED = "User is not activated";
     public static final String USER_DOES_NOT_LOGIN = "User has not login in the system by this email: ";
     public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
+    public static final String USER_EMAIL_VERIFICATION_NEEDED =
+        "You should verify the email first, check your email box!";
     public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
     public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
     public static final String NOT_VALID_BOOLEAN_VALUE = "%s is not a valid Boolean value for %s";
@@ -51,6 +55,7 @@ public final class ErrorMessage {
     public static final String ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN = "ADMIN cannot deactivate other ADMIN users";
     public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER =
         "You do not have permission to deactivate this user";
+    public static final String CONVERT_TO_BASE64_FAILED = "Cannot convert to BASE64 image";
 
     private ErrorMessage() {
     }

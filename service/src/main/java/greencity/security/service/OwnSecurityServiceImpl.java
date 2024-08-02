@@ -20,16 +20,16 @@ import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRefreshTokenException;
-import greencity.exception.exceptions.BadUserStatusException;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.PasswordsDoNotMatchesException;
-import greencity.exception.exceptions.UserAlreadyHasPasswordException;
-import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.UserBlockedException;
-import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.authentication.BadRefreshTokenException;
+import greencity.exception.exceptions.user.BadUserStatusException;
+import greencity.exception.exceptions.verification.EmailNotVerified;
+import greencity.exception.exceptions.authentication.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.user.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.user.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.user.UserBlockedException;
+import greencity.exception.exceptions.user.UserDeactivatedException;
+import greencity.exception.exceptions.validation.WrongEmailException;
+import greencity.exception.exceptions.validation.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
@@ -65,6 +65,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import static greencity.constant.ErrorMessage.USER_EMAIL_VERIFICATION_NEEDED;
 
 /**
  * {@inheritDoc}
@@ -274,7 +275,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
         }
         if (user.getVerifyEmail() != null) {
-            throw new EmailNotVerified("You should verify the email first, check your email box!");
+            throw new EmailNotVerified(USER_EMAIL_VERIFICATION_NEEDED);
         }
         if (user.getUserStatus() == UserStatus.DEACTIVATED) {
             throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED);

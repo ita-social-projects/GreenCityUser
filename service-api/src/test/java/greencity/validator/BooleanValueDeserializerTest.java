@@ -2,7 +2,7 @@ package greencity.validator;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import greencity.exception.exceptions.NotValidBooleanValueException;
+import greencity.exception.exceptions.validation.NotValidBooleanValueException;
 import java.io.IOException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.params.ParameterizedTest;

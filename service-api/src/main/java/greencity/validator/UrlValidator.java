@@ -1,7 +1,7 @@
 package greencity.validator;
 
 import greencity.constant.ErrorMessage;
-import greencity.exception.exceptions.InvalidURLException;
+import greencity.exception.exceptions.validation.InvalidURLException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;

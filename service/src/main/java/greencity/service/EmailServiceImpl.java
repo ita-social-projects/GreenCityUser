@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.constant.EmailConstants;
+import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.AddEcoNewsDtoResponse;
@@ -11,7 +12,7 @@ import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.validation.LanguageNotSupportedException;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.validator.EmailAddressValidator;
@@ -203,7 +204,7 @@ public class EmailServiceImpl implements EmailService {
      */
     private void validateLanguage(String language) {
         if (!LanguageValidationUtils.isValid(language)) {
-            throw new LanguageNotSupportedException("Invalid language");
+            throw new LanguageNotSupportedException(ErrorMessage.INVALID_LANGUAGE);
         }
     }
 
