@@ -1,11 +1,11 @@
 package greencity.security.controller;
 
 import static greencity.ModelUtils.TEST_USER_VO;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.LowRoleLevelException;
-import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.verification.EmailNotVerified;
+import greencity.exception.exceptions.authentication.LowRoleLevelException;
+import greencity.exception.exceptions.user.UserDeactivatedException;
+import greencity.exception.exceptions.validation.WrongEmailException;
+import greencity.exception.exceptions.validation.WrongPasswordException;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.service.OwnSecurityService;

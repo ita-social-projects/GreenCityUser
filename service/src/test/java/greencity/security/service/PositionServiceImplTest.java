@@ -6,8 +6,8 @@ import static greencity.ModelUtils.getEmployeeWithPositionsAndRelatedAuthorities
 import static greencity.ModelUtils.getEmployeeWithPositionsAndRelatedAuthorities_Empty;
 import static greencity.ModelUtils.getPositionAuthoritiesDto;
 import greencity.entity.User;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.validation.BadRequestException;
+import greencity.exception.exceptions.resource.NotFoundException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
 import java.util.Collections;

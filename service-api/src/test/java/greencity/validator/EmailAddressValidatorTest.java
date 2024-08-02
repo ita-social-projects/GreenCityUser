@@ -1,6 +1,6 @@
 package greencity.validator;
 
-import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.validation.WrongEmailException;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.params.ParameterizedTest;

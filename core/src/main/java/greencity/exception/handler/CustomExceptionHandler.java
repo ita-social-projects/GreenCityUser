@@ -1,7 +1,14 @@
 package greencity.exception.handler;
 
 import greencity.constant.AppConstant;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.authentication.LowRoleLevelException;
+import greencity.exception.exceptions.authentication.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.google.GoogleApiException;
+import greencity.exception.exceptions.google.IdTokenExpiredException;
+import greencity.exception.exceptions.resource.NotFoundException;
+import greencity.exception.exceptions.user.*;
+import greencity.exception.exceptions.validation.*;
+import greencity.exception.exceptions.verification.EmailNotVerified;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;

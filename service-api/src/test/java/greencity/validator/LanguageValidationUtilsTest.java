@@ -1,6 +1,6 @@
 package greencity.validator;
 
-import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.validation.LanguageNotSupportedException;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;

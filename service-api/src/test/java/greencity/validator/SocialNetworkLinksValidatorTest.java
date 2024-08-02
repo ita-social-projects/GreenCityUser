@@ -1,6 +1,6 @@
 package greencity.validator;
 
-import greencity.exception.exceptions.BadSocialNetworkLinksException;
+import greencity.exception.exceptions.validation.BadSocialNetworkLinksException;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertThrows;

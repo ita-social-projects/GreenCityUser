@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.verification;
 
 /**
  * Should be thrown when a use tries to sign in before email verification.

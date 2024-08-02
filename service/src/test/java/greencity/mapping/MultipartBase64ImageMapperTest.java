@@ -1,6 +1,6 @@
 package greencity.mapping;
 
-import greencity.exception.exceptions.NotSavedException;
+import greencity.exception.exceptions.resource.NotSavedException;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

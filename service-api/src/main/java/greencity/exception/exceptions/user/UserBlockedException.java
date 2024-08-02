@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.user;
 
 /**
  * Exception that we get when user trying to add place or left comment that is

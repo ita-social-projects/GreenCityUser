@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import static greencity.constant.ErrorMessage.NOT_VALID_BOOLEAN_VALUE;
-import greencity.exception.exceptions.NotValidBooleanValueException;
+import greencity.exception.exceptions.validation.NotValidBooleanValueException;
 import java.io.IOException;
 import org.springframework.stereotype.Component;
 

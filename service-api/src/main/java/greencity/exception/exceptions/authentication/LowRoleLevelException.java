@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.authentication;
 
 import org.springframework.security.access.AccessDeniedException;
 

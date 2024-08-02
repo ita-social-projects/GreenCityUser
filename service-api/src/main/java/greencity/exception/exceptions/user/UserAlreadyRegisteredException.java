@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.user;
 
 /**
  * Exception that we get when user trying to sign-up with email that already

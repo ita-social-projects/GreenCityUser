@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.validation;
 
 /**
  * Exception, that is throw after saving object with language code, that doesn't

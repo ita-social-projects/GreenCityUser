@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.resource;
 
 /**
  * Exception that we get when we send request(for e.x. to findById) and there is

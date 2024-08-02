@@ -1,12 +1,19 @@
 package greencity.exception.handler;
 
-import greencity.exception.exceptions.*;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import greencity.exception.exceptions.authentication.BadRefreshTokenException;
+import greencity.exception.exceptions.authentication.LowRoleLevelException;
+import greencity.exception.exceptions.authentication.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.google.GoogleApiException;
+import greencity.exception.exceptions.google.IdTokenExpiredException;
+import greencity.exception.exceptions.resource.NotFoundException;
+import greencity.exception.exceptions.user.*;
+import greencity.exception.exceptions.validation.*;
+import greencity.exception.exceptions.verification.EmailNotVerified;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

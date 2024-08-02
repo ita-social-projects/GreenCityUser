@@ -1,4 +1,6 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.authentication;
+
+import greencity.exception.exceptions.validation.BadRequestException;
 
 /**
  * Exception that we get when user trying to refresh access token with bad

@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.google;
 
 /**
  * Exception could be thrown if application have issues to connecting to Google

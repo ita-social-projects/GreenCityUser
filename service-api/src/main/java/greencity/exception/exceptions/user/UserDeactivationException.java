@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.user;
 
 /**
  * Exception thrown when there is an issue with deactivating a user.

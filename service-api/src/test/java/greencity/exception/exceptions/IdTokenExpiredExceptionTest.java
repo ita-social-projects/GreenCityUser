@@ -1,6 +1,7 @@
 package greencity.exception.exceptions;
 
 import greencity.constant.ErrorMessage;
+import greencity.exception.exceptions.google.IdTokenExpiredException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

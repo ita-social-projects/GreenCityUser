@@ -1,7 +1,7 @@
 package greencity.validator;
 
 import greencity.constant.ErrorMessage;
-import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.validation.LanguageNotSupportedException;
 import java.util.List;
 import java.util.Locale;
 import lombok.AccessLevel;

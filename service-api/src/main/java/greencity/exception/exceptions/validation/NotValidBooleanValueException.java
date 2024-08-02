@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.validation;
 
 public class NotValidBooleanValueException extends RuntimeException {
     /**

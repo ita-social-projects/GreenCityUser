@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.resource;
 
 /**
  * Exception that we get when user trying to save schedule with repeating week

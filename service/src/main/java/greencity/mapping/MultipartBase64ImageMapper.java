@@ -1,7 +1,7 @@
 package greencity.mapping;
 
 import greencity.constant.ErrorMessage;
-import greencity.exception.exceptions.NotSavedException;
+import greencity.exception.exceptions.resource.NotSavedException;
 import greencity.service.MultipartFileImpl;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;

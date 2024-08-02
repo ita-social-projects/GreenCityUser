@@ -1,4 +1,6 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.user;
+
+import greencity.exception.exceptions.validation.BadRequestException;
 
 /**
  * Exception that user status is wrong for login.

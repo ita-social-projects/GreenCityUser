@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.user;
 
 import org.springframework.security.core.AuthenticationException;
 

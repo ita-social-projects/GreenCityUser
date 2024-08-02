@@ -1,4 +1,6 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.verification;
+
+import greencity.exception.exceptions.validation.BadRequestException;
 
 /**
  * Exception that we get when user trying to verify email with bad token.

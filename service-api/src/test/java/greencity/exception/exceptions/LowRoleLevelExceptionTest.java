@@ -1,6 +1,8 @@
 package greencity.exception.exceptions;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import greencity.exception.exceptions.authentication.LowRoleLevelException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;

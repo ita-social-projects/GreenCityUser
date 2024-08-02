@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.google;
 
 /**
  * Exception that we get when ID token (JWT) is not valid or expired.

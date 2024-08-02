@@ -1,4 +1,6 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.resource;
+
+import greencity.exception.exceptions.validation.BadRequestException;
 
 /**
  * Exception that we get when admin/moderator trying to update himself.

@@ -1,7 +1,7 @@
 package greencity.validator;
 
 import static greencity.ModelUtils.getUrl;
-import greencity.exception.exceptions.InvalidURLException;
+import greencity.exception.exceptions.validation.InvalidURLException;
 import java.net.MalformedURLException;
 import org.junit.jupiter.api.Assertions;
 import static org.junit.jupiter.api.Assertions.assertTrue;

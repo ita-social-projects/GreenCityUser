@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.resource;
 
 public class NotSavedException extends RuntimeException {
     /**

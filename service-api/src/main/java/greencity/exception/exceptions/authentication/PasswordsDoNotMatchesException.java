@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.authentication;
 
 /**
  * Exception that we get when user whan passwords don't matches.

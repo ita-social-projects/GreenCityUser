@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.user;
 
 /**
  * Exception that that is thrown when trying to set password for user that

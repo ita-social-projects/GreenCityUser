@@ -1,4 +1,4 @@
-package greencity.exception.exceptions;
+package greencity.exception.exceptions.validation;
 
 /**
  * Exception that we get when in some logic we have bad ID.
