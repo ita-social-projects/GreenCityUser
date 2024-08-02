@@ -1,17 +1,14 @@
 package greencity.security.service;
 
 import static greencity.ModelUtils.TEST_EMAIL;
-import static greencity.ModelUtils.createEmployee;
 import static greencity.ModelUtils.getEmployeeWithPositionsAndRelatedAuthorities;
 import static greencity.ModelUtils.getEmployeeWithPositionsAndRelatedAuthorities_Empty;
 import static greencity.ModelUtils.getPositionAuthoritiesDto;
 import greencity.entity.User;
-import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;

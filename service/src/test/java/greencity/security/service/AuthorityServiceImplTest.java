@@ -50,8 +50,6 @@ class AuthorityServiceImplTest {
     @Mock
     private PositionRepo positionRepo;
     @Mock
-    private PositionService positionService;
-    @Mock
     private Authentication auth;
     @InjectMocks
     private AuthorityServiceImpl authorityService;
