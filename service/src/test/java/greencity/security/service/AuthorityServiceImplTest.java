@@ -89,7 +89,6 @@ class AuthorityServiceImplTest {
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         when(authorityRepo.findAuthoritiesByNames(authoritiesName)).thenReturn(authority);
-        when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Супер адмін"));
 
         employee.setAuthorities(authority);
         authorityService.updateEmployeesAuthorities(getUserEmployeeAuthorityDto());
@@ -134,7 +133,6 @@ class AuthorityServiceImplTest {
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         when(positionRepo.findPositionsByNames(positionNames)).thenReturn(positions);
         when(authorityRepo.findAuthoritiesByPositions(positionNames)).thenReturn(List.of(getAuthority()));
-        when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Супер адмін"));
 
         authorityService.updateAuthoritiesToRelatedPositions(EmployeePositionsDto.builder()
             .email(TEST_EMAIL)

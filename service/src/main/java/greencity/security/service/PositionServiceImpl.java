@@ -35,34 +35,6 @@ public class PositionServiceImpl implements PositionService {
             .build();
     }
 
-    @Override
-    public List<String> getEmployeeLoginPositionNames(String email) {
-        String loginEmail = getEmployeeLogin();
-
-        if (!email.equals(loginEmail)) {
-            throw new BadRequestException(ErrorMessage.USER_DOES_NOT_LOGIN + email);
-        }
-
-        User employeeLogin = userRepo.findByEmail(loginEmail)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + loginEmail));
-
-        return employeeLogin.getPositions()
-            .stream()
-            .map(Position::getName).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<String> getEmployeeLoginPositionNames() {
-        String loginEmail = getEmployeeLogin();
-
-        User employeeLogin = userRepo.findByEmail(loginEmail)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + loginEmail));
-
-        return employeeLogin.getPositions()
-            .stream()
-            .map(Position::getName).collect(Collectors.toList());
-    }
-
     private String getEmployeeLogin() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();

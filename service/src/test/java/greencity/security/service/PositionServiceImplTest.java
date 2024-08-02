@@ -86,26 +86,4 @@ class PositionServiceImplTest {
             () -> positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
         verify(userRepo).findByEmail(TEST_EMAIL);
     }
-
-    @Test
-    void getEmployeeLoginPositionNamesTest() {
-        User employee = createEmployee();
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        assertEquals(List.of("Супер адмін"), positionService.getEmployeeLoginPositionNames(TEST_EMAIL));
-        verify(userRepo).findByEmail(TEST_EMAIL);
-    }
-
-    @Test
-    void getEmployeeLoginPositionNamesWithoutParametersTest() {
-        User employee = createEmployee();
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        assertEquals(List.of("Супер адмін"), positionService.getEmployeeLoginPositionNames());
-        verify(userRepo).findByEmail(TEST_EMAIL);
-    }
-
-    @Test
-    void getEmployeeLoginPositionNamesThrowsBadRequestExceptionTest() {
-        assertThrows(BadRequestException.class,
-            () -> positionService.getEmployeeLoginPositionNames("test@gmail.com"));
-    }
 }
