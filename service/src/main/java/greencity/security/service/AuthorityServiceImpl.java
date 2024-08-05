@@ -28,7 +28,6 @@ public class AuthorityServiceImpl implements AuthorityService {
     private final UserRepo userRepo;
     private final AuthorityRepo authorityRepo;
     private final PositionRepo positionRepo;
-    private final PositionService positionService;
 
     @Override
     public Set<String> getAllEmployeesAuthorities(String email) {

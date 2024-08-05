@@ -773,20 +773,6 @@ class UserControllerTest {
     }
 
     @Test
-    void getEmployeeLoginPositionNamesTest() throws Exception {
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("testmail@gmail.com");
-
-        mockMvc.perform(get(userLink + "/get-employee-login-positions" + "?email=" + principal.getName())
-            .principal(principal)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(principal.getName())))
-            .andExpect(status().isOk());
-
-        verify(positionService).getEmployeeLoginPositionNames(principal.getName());
-    }
-
-    @Test
     void editAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
         List<String> list = new ArrayList<>();
