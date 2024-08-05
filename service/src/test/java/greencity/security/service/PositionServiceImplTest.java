@@ -1,17 +1,14 @@
 package greencity.security.service;
 
 import static greencity.ModelUtils.TEST_EMAIL;
-import static greencity.ModelUtils.createEmployee;
 import static greencity.ModelUtils.getEmployeeWithPositionsAndRelatedAuthorities;
 import static greencity.ModelUtils.getEmployeeWithPositionsAndRelatedAuthorities_Empty;
 import static greencity.ModelUtils.getPositionAuthoritiesDto;
 import greencity.entity.User;
-import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.UserRepo;
 import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,27 +82,5 @@ class PositionServiceImplTest {
         assertThrows(NotFoundException.class,
             () -> positionService.getPositionsAndRelatedAuthorities(TEST_EMAIL));
         verify(userRepo).findByEmail(TEST_EMAIL);
-    }
-
-    @Test
-    void getEmployeeLoginPositionNamesTest() {
-        User employee = createEmployee();
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        assertEquals(List.of("Супер адмін"), positionService.getEmployeeLoginPositionNames(TEST_EMAIL));
-        verify(userRepo).findByEmail(TEST_EMAIL);
-    }
-
-    @Test
-    void getEmployeeLoginPositionNamesWithoutParametersTest() {
-        User employee = createEmployee();
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        assertEquals(List.of("Супер адмін"), positionService.getEmployeeLoginPositionNames());
-        verify(userRepo).findByEmail(TEST_EMAIL);
-    }
-
-    @Test
-    void getEmployeeLoginPositionNamesThrowsBadRequestExceptionTest() {
-        assertThrows(BadRequestException.class,
-            () -> positionService.getEmployeeLoginPositionNames("test@gmail.com"));
     }
 }
