@@ -4,6 +4,7 @@ import greencity.annotations.ApiPageable;
 import greencity.annotations.CurrentUser;
 import greencity.annotations.CurrentUserId;
 import greencity.annotations.ImageValidation;
+import greencity.annotations.ValidBase64;
 import greencity.constant.HttpStatuses;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.PageableAdvancedDto;
@@ -348,7 +349,7 @@ public class UserController {
     @PatchMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE},
         path = "/profilePicture")
     public ResponseEntity<HttpStatus> updateUserProfilePicture(
-        @Parameter(description = "pass image as base64") @RequestPart(required = false) String base64,
+        @Parameter(description = "pass image as base64") @ValidBase64 @RequestPart(required = false) String base64,
         @Parameter(description = "Profile picture") @ImageValidation @RequestPart(required = false) MultipartFile image,
         Principal principal) {
         String email = principal.getName();
