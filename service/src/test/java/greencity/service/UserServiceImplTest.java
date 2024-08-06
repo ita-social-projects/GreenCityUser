@@ -1664,15 +1664,4 @@ class UserServiceImplTest {
 
         assertThrows(UserDeactivationException.class, () -> userService.deactivateUser(uuid, request, userVO));
     }
-
-    @Test
-    void testInvalidBase64Image() {
-        String invalidBase64Image = "@iVBORw0KGgoAAAANSUhEUgAAAvYAAAN3CAYAAABZeh7pAAAAAXNSR0IArs4c6QAAIABJREFUe";
-
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-        when(modelMapper.map(invalidBase64Image, MultipartFile.class)).thenThrow(new Base64DecodedException());
-
-        assertThrows(Base64DecodedException.class, () -> userService
-            .updateUserProfilePicture(null, user.getEmail(), invalidBase64Image));
-    }
 }

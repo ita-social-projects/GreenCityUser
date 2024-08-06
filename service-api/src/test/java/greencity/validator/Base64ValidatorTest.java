@@ -20,25 +20,25 @@ class Base64ValidatorTest {
 
     @Test
     void testValidBase64() {
-        String validBase64_1 = "SGVsbG8gd29ybGQ=";
-        String validBase64_2 = "U29tZSB0ZXh0Lg==";
-        String validBase64_3 =
+        String validBase64Value1 = "SGVsbG8gd29ybGQ=";
+        String validBase64Value2 = "U29tZSB0ZXh0Lg==";
+        String validBase64Value3 =
             "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/wcAAwAB/rlGb8EAAAAASUVORK5CYII=";
 
-        assertTrue(base64Validator.isValid(validBase64_1, context));
-        assertTrue(base64Validator.isValid(validBase64_2, context));
-        assertTrue(base64Validator.isValid(validBase64_3, context));
+        assertTrue(base64Validator.isValid(validBase64Value1, context));
+        assertTrue(base64Validator.isValid(validBase64Value2, context));
+        assertTrue(base64Validator.isValid(validBase64Value3, context));
     }
 
     @Test
     void testInvalidBase64() {
-        String invalidBase64_1 = "SGVsbG8gd29ybGQ@";
-        String invalidBase64_2 = "U29tZSB0ZXh0.@#";
-        String invalidBase64_3 = "====";
+        String invalidBase64Value1 = "SGVsbG8gd29ybGQ@";
+        String invalidBase64Value2 = "U29tZSB0ZXh0.@#";
+        String invalidBase64Value3 = "====";
 
-        assertFalse(base64Validator.isValid(invalidBase64_1, context));
-        assertFalse(base64Validator.isValid(invalidBase64_2, context));
-        assertFalse(base64Validator.isValid(invalidBase64_3, context));
+        assertFalse(base64Validator.isValid(invalidBase64Value1, context));
+        assertFalse(base64Validator.isValid(invalidBase64Value2, context));
+        assertFalse(base64Validator.isValid(invalidBase64Value3, context));
     }
 
     @Test
