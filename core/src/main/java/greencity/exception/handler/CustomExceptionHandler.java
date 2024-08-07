@@ -20,6 +20,7 @@ import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.UserDeactivationException;
+import greencity.exception.exceptions.Base64DecodedException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;
@@ -459,5 +460,24 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
+    }
+
+    /**
+     * Handles exceptions of type {@link Base64DecodedException}.
+     *
+     * @param exception the exception that was thrown due to issues with Base64
+     *                  decoding.
+     * @param request   the current {@link WebRequest} in which the exception
+     *                  occurred.
+     * @return a {@link ResponseEntity} containing an {@link ExceptionResponse} with
+     *         error attributes and an HTTP status of 400 (Bad Request).
+     */
+    @ExceptionHandler(Base64DecodedException.class)
+    public ResponseEntity<Object> handleBase64DecodedException(Base64DecodedException exception,
+        WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 }
