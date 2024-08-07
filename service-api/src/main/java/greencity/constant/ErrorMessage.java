@@ -51,6 +51,7 @@ public final class ErrorMessage {
     public static final String ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN = "ADMIN cannot deactivate other ADMIN users";
     public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER =
         "You do not have permission to deactivate this user";
+    public static final String BASE64_DECODE_MESSAGE = "Can't decode from base64 format";
 
     private ErrorMessage() {
     }
