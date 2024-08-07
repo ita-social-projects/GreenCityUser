@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -26,20 +27,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @version 1.0
  */
 @Slf4j
+@RequiredArgsConstructor
 public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTool jwtTool;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-
-    /**
-     * Constructor.
-     */
-    public AccessTokenAuthenticationFilter(JwtTool jwtTool, AuthenticationManager authenticationManager,
-        UserService userService) {
-        this.jwtTool = jwtTool;
-        this.authenticationManager = authenticationManager;
-        this.userService = userService;
-    }
 
     private String getTokenFromCookies(Cookie[] cookies) {
         return Arrays.stream(cookies)
@@ -85,9 +77,9 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (ExpiredJwtException e) {
-                log.info("Token has expired: " + token);
+                log.info("Token has expired: {}", token);
             } catch (Exception e) {
-                log.info("Access denied with token: " + e.getMessage());
+                log.info("Access denied with token: {}", e.getMessage());
             }
         }
         chain.doFilter(request, response);

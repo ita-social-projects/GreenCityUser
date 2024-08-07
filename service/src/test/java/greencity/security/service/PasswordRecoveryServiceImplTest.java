@@ -21,7 +21,6 @@ import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
 
-import java.util.Locale;
 import java.util.Optional;
 import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
@@ -106,52 +105,6 @@ class PasswordRecoveryServiceImplTest {
             user.getLanguage().getCode(),
             true);
     }
-//
-//    @Test
-//    void updatePasswordUsingTokenWithNonExistentTokenTest() {
-//        String token = "foo";
-//        String newPassword = "bar";
-//        when(restorePasswordEmailRepo.findByToken(token)).thenReturn(Optional.empty());
-//        Assertions
-//            .assertThrows(BadVerifyEmailTokenException.class,
-//                () -> passwordRecoveryService.updatePasswordUsingToken(token, newPassword));
-//    }
-
-//    @Test
-//    void updatePasswordUsingTokenWithExpiredTokenTest() {
-//        String token = "foo";
-//        String newPassword = "bar";
-//        when(restorePasswordEmailRepo.findByToken(token)).thenReturn(Optional.of(
-//            RestorePasswordEmail.builder()
-//                .expiryDate(LocalDateTime.now().minusHours(1))
-//                .user(User.builder().email("foo@bar.com").build())
-//                .build()));
-//        Assertions
-//            .assertThrows(UserActivationEmailTokenExpiredException.class,
-//                () -> passwordRecoveryService.updatePasswordUsingToken(token, newPassword));
-//    }
-
-//    @Test
-//    void updatePasswordUsingTokenSimpleTest() {
-//        String token = "foo";
-//        String newPassword = "bar";
-//        User user = User.builder().id(1L).userStatus(UserStatus.CREATED).email("foo@bar.com").build();
-//        when(restorePasswordEmailRepo.findByToken(token)).thenReturn(Optional.of(
-//            RestorePasswordEmail.builder()
-//                .expiryDate(LocalDateTime.now().plusHours(1))
-//                .user(user)
-//                .token(token)
-//                .build()));
-//        passwordRecoveryService.updatePasswordUsingToken(token, newPassword);
-//        verify(restorePasswordEmailRepo).delete(refEq(
-//            RestorePasswordEmail.builder()
-//                .user(user)
-//                .token(token)
-//                .build(),
-//            "expiryDate"));
-//        verify(applicationEventPublisher).publishEvent(refEq(
-//            new UpdatePasswordEvent(passwordRecoveryService.getClass(), newPassword, user.getId()), "timestamp"));
-//    }
 
     @Test
     void deleteAllExpiredPasswordResetTokensTest() {

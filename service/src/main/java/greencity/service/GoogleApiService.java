@@ -11,17 +11,17 @@ import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.NotFoundException;
 import java.io.IOException;
 import java.util.Arrays;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class GoogleApiService {
     private final GeoApiContext context;
 
     /**
      * Method gets user location by coordinates.
-     * 
+     *
      * @param latitude  user's latitude
      * @param longitude user's longitude
      * @return {@link greencity.entity.UserLocation}

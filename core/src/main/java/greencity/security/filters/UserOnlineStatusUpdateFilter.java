@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UserOnlineStatusUpdateFilter extends OncePerRequestFilter {
     private final UserService userService;
-
     private final ThreadPoolTaskExecutor customThreadPool;
 
     @Override

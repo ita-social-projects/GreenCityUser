@@ -6,14 +6,14 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
 import java.util.Locale;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class LanguageValidator implements ConstraintValidator<ValidLanguage, Locale> {
-    private List<String> codes;
     private final RestClient restClient;
+    private List<String> codes;
 
     @Override
     public void initialize(ValidLanguage constraintAnnotation) {

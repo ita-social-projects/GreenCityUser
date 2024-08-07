@@ -53,15 +53,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -84,7 +82,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Validated
 @Slf4j
 public class UserController {
@@ -113,9 +111,8 @@ public class UserController {
     public ResponseEntity<UserStatusDto> updateStatus(
         @Valid @RequestBody UserStatusDto userStatusDto, Principal principal) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(
-                userService.updateStatus(
-                    userStatusDto.getId(), userStatusDto.getUserStatus(), principal.getName()));
+            .body(userService.updateStatus(
+                userStatusDto.getId(), userStatusDto.getUserStatus(), principal.getName()));
     }
 
     /**
@@ -143,9 +140,8 @@ public class UserController {
         Role role = Role.valueOf(body.get("role"));
         UserRoleDto userRoleDto = new UserRoleDto(id, role);
         return ResponseEntity.status(HttpStatus.OK)
-            .body(
-                userService.updateRole(
-                    userRoleDto.getId(), userRoleDto.getRole(), principal.getName()));
+            .body(userService.updateRole(
+                userRoleDto.getId(), userRoleDto.getRole(), principal.getName()));
     }
 
     /**
@@ -311,8 +307,7 @@ public class UserController {
     public ResponseEntity<List<CustomShoppingListItemResponseDto>> getAvailableCustomShoppingListItems(
         @Parameter(description = "Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId,
         @PathVariable Long habitId) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
             .body(userService.getAvailableCustomShoppingListItems(userId, habitId));
     }
 
@@ -392,8 +387,8 @@ public class UserController {
     public ResponseEntity<String> save(
         @Parameter(required = true) @RequestBody @Valid UserProfileDtoRequest userProfileDtoRequest,
         Principal principal) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.saveUserProfile(userProfileDtoRequest,
-            principal.getName()));
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(userService.saveUserProfile(userProfileDtoRequest, principal.getName()));
     }
 
     /**
@@ -412,8 +407,7 @@ public class UserController {
     @GetMapping("/{userId}/profile/")
     public ResponseEntity<UserProfileDtoResponse> getUserProfileInformation(
         @Parameter(description = "Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
             .body(userService.getUserProfileInformation(userId));
     }
 
@@ -432,8 +426,7 @@ public class UserController {
     @GetMapping("isOnline/{userId}/")
     public ResponseEntity<Boolean> checkIfTheUserIsOnline(
         @Parameter(description = "Id of the user. Cannot be empty.") @PathVariable Long userId) {
-        return ResponseEntity
-            .status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.OK)
             .body(userService.checkIfTheUserIsOnline(userId));
     }
 
@@ -636,8 +629,7 @@ public class UserController {
     @GetMapping("/findNotDeactivatedByEmail")
     public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
         UserVO userVO = userService.findNotDeactivatedByEmail(email).orElse(null);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userVO);
+        return ResponseEntity.status(HttpStatus.OK).body(userVO);
     }
 
     /**
@@ -690,27 +682,6 @@ public class UserController {
     @GetMapping("/findUuidByEmail")
     public ResponseEntity<String> findUuidByEmail(@RequestParam String email) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.findUuIdByEmail(email));
-    }
-
-    /**
-     * Update {@link UserVO} Last Activity Time.
-     *
-     * @param userVO {@link UserVO}.
-     * @author Orest Mamchuk
-     */
-    @Operation(summary = "Update User Last Activity Time")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    // @PutMapping("/updateUserLastActivityTime/{date}")
-    public ResponseEntity<Object> updateUserLastActivityTime(@Parameter(hidden = true) @CurrentUser UserVO userVO,
-        @PathVariable(value = "date") @DateTimeFormat(
-            pattern = "yyyy-MM-dd.HH:mm:ss.SSSSSS") LocalDateTime userLastActivityTime) {
-        userService.updateUserLastActivityTime(userVO.getId(), userLastActivityTime);
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
@@ -950,7 +921,7 @@ public class UserController {
     }
 
     /**
-     * Method seach users by name.
+     * Method search users by name.
      */
     @Operation(summary = "Search users by name")
     @ApiResponses(value = {

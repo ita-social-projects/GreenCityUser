@@ -1,11 +1,11 @@
 package greencity.constant;
 
+import lombok.RequiredArgsConstructor;
+
 /**
  * Class, that contains constants used for caching.
  */
-public final class CacheConstants {
+@RequiredArgsConstructor
+public class CacheConstants {
     public static final String ALL_ACHIEVEMENTS_CACHE_NAME = "achievements_cache";
-
-    private CacheConstants() {
-    }
 }

@@ -1,13 +1,15 @@
 package greencity.constant;
 
-public final class ErrorMessage {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ErrorMessage {
     public static final String USER_NOT_FOUND_BY_ID = "The user does not exist by this id: ";
     public static final String USER_ID_IS_NULL = "User id is null";
     public static final String USER_NOT_FOUND_BY_UUID = "The user does not exist by this uuid: ";
     public static final String USER_NOT_FOUND_BY_EMAIL = "The user does not exist by this email: ";
     public static final String USER_CANT_UPDATE_THEMSELVES = "User can't update themselves";
     public static final String IMPOSSIBLE_UPDATE_USER_STATUS = "Impossible to update status of admin or moderator";
-    public static final String PROFILE_PICTURE_NOT_FOUND_BY_ID = "Profile picture not found by id : ";
     public static final String IMAGE_EXISTS = "Image should be download, PNG or JPEG ";
     public static final String USER_CANNOT_ADD_MORE_THAN_5_SOCIAL_NETWORK_LINKS =
         "User cannot add more than 5 social network links";
@@ -39,7 +41,6 @@ public final class ErrorMessage {
     public static final String LINK_IS_NO_ACTIVE = "This link is no longer active";
     public static final String USER_BLOCKED = "User is blocked";
     public static final String USER_CREATED = "User is not activated";
-    public static final String USER_DOES_NOT_LOGIN = "User has not login in the system by this email: ";
     public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
     public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
     public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
@@ -51,7 +52,4 @@ public final class ErrorMessage {
     public static final String ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN = "ADMIN cannot deactivate other ADMIN users";
     public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER =
         "You do not have permission to deactivate this user";
-
-    private ErrorMessage() {
-    }
 }
