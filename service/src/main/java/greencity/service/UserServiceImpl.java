@@ -54,6 +54,7 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.UserDeactivationException;
+import greencity.exception.exceptions.Base64DecodedException;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
@@ -530,7 +531,11 @@ public class UserServiceImpl implements UserService {
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         if (base64 != null) {
-            image = modelMapper.map(base64, MultipartFile.class);
+            try {
+                image = modelMapper.map(base64, MultipartFile.class);
+            } catch (Exception e) {
+                throw new Base64DecodedException(ErrorMessage.BASE64_DECODE_MESSAGE);
+            }
         }
         if (image != null) {
             String profilePicturePath;
