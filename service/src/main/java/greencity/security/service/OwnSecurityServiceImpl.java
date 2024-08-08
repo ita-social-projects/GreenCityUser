@@ -366,7 +366,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     @Override
     public void deleteUserByEmail(String email) {
         User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
 
         if (user.getUserStatus() != UserStatus.ACTIVATED) {
             throw new EmailNotVerified(ErrorMessage.USER_EMAIL_IS_NOT_VERIFIED);
@@ -506,8 +506,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * DEACTIVATED, BLOCKED, CREATED, or DELETED.
      *
      * @param status - the status of the User
-     * @throws BadUserStatusException if the user status is
-     * DEACTIVATED, BLOCKED, CREATED, or DELETED.
+     * @throws BadUserStatusException if the user status is DEACTIVATED, BLOCKED,
+     *                                CREATED, or DELETED.
      */
     private void handleUserStatus(UserStatus status) {
         switch (status) {
