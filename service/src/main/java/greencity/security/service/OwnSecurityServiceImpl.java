@@ -6,18 +6,41 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.*;
+import greencity.entity.Achievement;
+import greencity.entity.AchievementCategory;
+import greencity.entity.Authority;
+import greencity.entity.Language;
+import greencity.entity.OwnSecurity;
+import greencity.entity.Position;
+import greencity.entity.RestorePasswordEmail;
+import greencity.entity.User;
+import greencity.entity.UserAchievement;
+import greencity.entity.UserAction;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserBlockedException;
+import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.*;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
+import greencity.security.dto.ownsecurity.OwnSignInDto;
+import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
@@ -459,8 +482,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * DEACTIVATED, BLOCKED, CREATED, or DELETED.
      *
      * @param status - the status of the User
-     * @throws BadUserStatusException if the user status is DEACTIVATED, BLOCKED,
-     *                                CREATED, or DELETED.
+     * @throws BadUserStatusException if the user status is
+     * DEACTIVATED, BLOCKED, CREATED, or DELETED.
      */
     private void handleUserStatus(UserStatus status) {
         switch (status) {

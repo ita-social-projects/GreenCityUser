@@ -9,14 +9,31 @@ import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
-import greencity.entity.*;
+import greencity.entity.Achievement;
+import greencity.entity.Language;
+import greencity.entity.User;
+import greencity.entity.UserAchievement;
+import greencity.entity.VerifyEmail;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserBlockedException;
+import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
-import greencity.security.dto.ownsecurity.*;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
+import greencity.security.dto.ownsecurity.OwnSignInDto;
+import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
@@ -27,12 +44,18 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -382,12 +405,12 @@ class OwnSecurityServiceImplTest {
     @Test
     void signInDeletedUserTest() {
         UserVO user = UserVO.builder()
-            .email("test@gmail.com")
-            .id(1L)
-            .userStatus(UserStatus.DELETED)
-            .ownSecurity(OwnSecurityVO.builder().password("password").build())
-            .role(Role.ROLE_USER)
-            .build();
+                .email("test@gmail.com")
+                .id(1L)
+                .userStatus(UserStatus.DELETED)
+                .ownSecurity(OwnSecurityVO.builder().password("password").build())
+                .role(Role.ROLE_USER)
+                .build();
 
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
