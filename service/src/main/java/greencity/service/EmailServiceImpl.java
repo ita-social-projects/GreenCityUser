@@ -14,6 +14,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.UserTaggedInCommentMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
 import java.io.UnsupportedEncodingException;
@@ -342,6 +343,29 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(employeeEmail,
             messageSource.getMessage(emailSubject, null, getLocale(language)),
             template);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     */
+    @Override
+    public void sendTaggedUserInCommentNotificationEmail(UserTaggedInCommentMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        String language = message.getLanguage();
+        validateLanguage(language);
+        String baseLink = clientLink + "/#/events/" + message.getCommentedEventId();
+        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.USER_NAME, message.getReceiverName());
+        model.put(EmailConstants.AUTHOR_NAME, message.getTaggerName());
+        model.put(EmailConstants.LANGUAGE, language);
+        model.put(EmailConstants.IS_UBS, false);
+        model.put(EmailConstants.EVENT_NAME, message.getEventName());
+        model.put(EmailConstants.COMMENT_TIME, message.getCreationDate());
+        model.put(EmailConstants.COMMENT_BODY, message.getCommentText());
+        String template = createEmailTemplate(model, EmailConstants.USER_TAGGED_IN_COMMENT_PAGE);
+        sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.USER_TAGGED_IN_COMMENT_REQUEST,
+            null, getLocale(language)), template);
     }
 
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,

@@ -11,6 +11,7 @@ import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.UserTaggedInCommentMessage;
 import java.util.List;
 import java.util.Map;
 
@@ -167,4 +168,13 @@ public interface EmailService {
      */
     void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail, String token,
         String language, boolean isUbs);
+
+    /**
+     * Sends an email notification to tagged in comment user
+     * {@link UserTaggedInCommentMessage}.
+     *
+     * @param message {@link UserTaggedInCommentMessage}
+     * @author Dmytro Dmytruk
+     */
+    void sendTaggedUserInCommentNotificationEmail(UserTaggedInCommentMessage message);
 }
