@@ -8,6 +8,8 @@ import static greencity.constant.ErrorMessage.REFRESH_TOKEN_NOT_VALID;
 import static greencity.constant.ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID;
 import static greencity.constant.ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL;
 import static greencity.constant.ErrorMessage.USER_NOT_FOUND_BY_EMAIL;
+
+import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import static greencity.constant.ValidationConstants.USER_CREATED;
 import greencity.dto.user.UserAdminRegistrationDto;
@@ -42,14 +44,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller that provides our sign-up and sign-in logic.
@@ -290,5 +285,23 @@ public class OwnSecurityController {
         String email = authentication.getName();
         service.setPassword(dto, email);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * Method for deleting (deactivating) a user by email.
+     *
+     * @return {@link ResponseEntity}
+     */
+    @Operation(summary = "Delete (deactivate) a user by email.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "404", description = ErrorMessage.USER_NOT_FOUND_BY_EMAIL)
+    })
+    @DeleteMapping("/user")
+    public ResponseEntity<Object> deleteUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        service.deleteUserByEmail(email);
+        return ResponseEntity.ok().build();
     }
 }
