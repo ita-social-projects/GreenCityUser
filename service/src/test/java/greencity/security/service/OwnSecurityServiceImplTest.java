@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -87,7 +86,6 @@ class OwnSecurityServiceImplTest {
 
     @BeforeEach
     public void init() {
-        initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo);
 
@@ -329,7 +327,13 @@ class OwnSecurityServiceImplTest {
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
-        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        Exception exception = assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        String expectedMessage = ErrorMessage.USER_DEACTIVATED;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -343,7 +347,13 @@ class OwnSecurityServiceImplTest {
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
-        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        Exception exception = assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        String expectedMessage = ErrorMessage.USER_BLOCKED;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -355,9 +365,37 @@ class OwnSecurityServiceImplTest {
             .ownSecurity(OwnSecurityVO.builder().password("password").build())
             .role(Role.ROLE_USER)
             .build();
+
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
-        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        Exception exception = assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        String expectedMessage = ErrorMessage.USER_CREATED;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void signInDeletedUserTest() {
+        UserVO user = UserVO.builder()
+                .email("test@gmail.com")
+                .id(1L)
+                .userStatus(UserStatus.DELETED)
+                .ownSecurity(OwnSecurityVO.builder().password("password").build())
+                .role(Role.ROLE_USER)
+                .build();
+
+        when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+        when(passwordEncoder.matches("password", "password")).thenReturn(true);
+
+        Exception exception = assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        String expectedMessage = ErrorMessage.USER_DELETED;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -403,13 +441,6 @@ class OwnSecurityServiceImplTest {
         when(userService.findByEmail("test@gmail.com")).thenReturn(verifiedUser);
         assertThrows(UserDeactivatedException.class,
             () -> ownSecurityService.updateAccessTokens("12345"));
-    }
-
-    @Test
-    void updatePasswordTest() {
-        when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
-        ownSecurityService.updatePassword("password", 1L);
-        verify(ownSecurityRepo).updatePassword("encodedPassword", 1L);
     }
 
     @Test
@@ -540,5 +571,47 @@ class OwnSecurityServiceImplTest {
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
 
         assertThrows(PasswordsDoNotMatchesException.class, () -> ownSecurityService.setPassword(dto, email));
+    }
+
+    @Test
+    void deleteUserByEmailTest() {
+        User deactivatedUser = User.builder()
+                .id(1L)
+                .email("test@somemail.com")
+                .userStatus(UserStatus.ACTIVATED)
+                .build();
+        Optional<User> optionalUser = Optional.of(deactivatedUser);
+
+        when(userRepo.findByEmail(deactivatedUser.getEmail())).thenReturn(optionalUser);
+
+        ownSecurityService.deleteUserByEmail(deactivatedUser.getEmail());
+        assertEquals(UserStatus.DELETED, deactivatedUser.getUserStatus());
+
+        verify(userRepo, times(1)).findByEmail(deactivatedUser.getEmail());
+        verify(userRepo, times(1)).save(deactivatedUser);
+    }
+
+    @Test
+    void deleteUserByEmail_UserNotExists() {
+        String nonExistUserEmail = "nonexistent@somemail.com";
+
+        when(userRepo.findByEmail(nonExistUserEmail)).thenReturn(Optional.empty());
+
+        assertThrows(WrongEmailException.class, () -> ownSecurityService.deleteUserByEmail(nonExistUserEmail));
+    }
+
+    @Test
+    void deleteUserByEmailNotVerifiedUserTest() {
+        User notVerifiedUser = User.builder()
+                .id(1L)
+                .email("test@somemail.com")
+                .userStatus(UserStatus.DEACTIVATED)
+                .build();
+        Optional<User> optionalUser = Optional.of(notVerifiedUser);
+
+        when(userRepo.findByEmail(notVerifiedUser.getEmail())).thenReturn(optionalUser);
+        assertThrows(EmailNotVerified.class, () -> ownSecurityService.deleteUserByEmail(notVerifiedUser.getEmail()));
+
+        verify(userRepo, times(1)).findByEmail(notVerifiedUser.getEmail());
     }
 }
