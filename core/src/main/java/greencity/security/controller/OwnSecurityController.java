@@ -2,14 +2,26 @@ package greencity.security.controller;
 
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
-import static greencity.constant.ErrorMessage.*;
+import static greencity.constant.ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN;
+import static greencity.constant.ErrorMessage.PASSWORD_DOES_NOT_MATCH;
+import static greencity.constant.ErrorMessage.REFRESH_TOKEN_NOT_VALID;
+import static greencity.constant.ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID;
+import static greencity.constant.ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL;
+import static greencity.constant.ErrorMessage.USER_NOT_FOUND_BY_EMAIL;
+import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import static greencity.constant.ValidationConstants.USER_CREATED;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.*;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
+import greencity.security.dto.ownsecurity.OwnRestoreDto;
+import greencity.security.dto.ownsecurity.OwnSignInDto;
+import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.PasswordStatusDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
@@ -31,7 +43,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Controller that provides our sign-up and sign-in logic.
@@ -256,5 +275,23 @@ public class OwnSecurityController {
         String email = authentication.getName();
         service.setPassword(dto, email);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * Method for deleting (deactivating) a user by email.
+     *
+     * @return {@link ResponseEntity}
+     */
+    @Operation(summary = "Delete (deactivate) a user by email.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "404", description = ErrorMessage.USER_NOT_FOUND_BY_EMAIL)
+    })
+    @DeleteMapping("/user")
+    public ResponseEntity<Object> deleteUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        service.deleteUserByEmail(email);
+        return ResponseEntity.ok().build();
     }
 }

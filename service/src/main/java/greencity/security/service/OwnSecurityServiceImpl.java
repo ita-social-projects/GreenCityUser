@@ -229,15 +229,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         if (user.getVerifyEmail() != null) {
             throw new EmailNotVerified("You should verify the email first, check your email box!");
         }
-        if (user.getUserStatus() == UserStatus.DEACTIVATED) {
-            throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED);
-        }
-        if (user.getUserStatus() == UserStatus.BLOCKED) {
-            throw new BadUserStatusException(ErrorMessage.USER_BLOCKED);
-        }
-        if (user.getUserStatus() == UserStatus.CREATED) {
-            throw new BadUserStatusException(ErrorMessage.USER_CREATED);
-        }
+
+        handleUserStatus(user.getUserStatus());
+
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), true);
@@ -286,17 +280,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Dmytro Dovhal
-     */
-    @Override
-    public void updatePassword(String pass, Long id) {
-        String password = passwordEncoder.encode(pass);
-        ownSecurityRepo.updatePassword(password, id);
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -327,6 +310,23 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setOwnSecurity(ownSecurity);
         return modelMapper.map(
             savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey()), UserAdminRegistrationDto.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public void deleteUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+
+        if (user.getUserStatus() != UserStatus.ACTIVATED) {
+            throw new EmailNotVerified(ErrorMessage.USER_EMAIL_IS_NOT_VERIFIED);
+        }
+
+        user.setUserStatus(UserStatus.DELETED);
+        userRepo.save(user);
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
@@ -442,5 +442,38 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .user(user)
             .build());
         userRepo.save(user);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @author Dmytro Dovhal
+     */
+    private void updatePassword(String pass, Long id) {
+        String password = passwordEncoder.encode(pass);
+        ownSecurityRepo.updatePassword(password, id);
+    }
+
+    /**
+     * Checks {@code UserStatus} and throws an exception if the user status is
+     * DEACTIVATED, BLOCKED, CREATED, or DELETED.
+     *
+     * @param status - the status of the User
+     * @throws BadUserStatusException if the user status is
+     * DEACTIVATED, BLOCKED, CREATED, or DELETED.
+     */
+    private void handleUserStatus(UserStatus status) {
+        switch (status) {
+            case DEACTIVATED:
+                throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED);
+            case BLOCKED:
+                throw new BadUserStatusException(ErrorMessage.USER_BLOCKED);
+            case CREATED:
+                throw new BadUserStatusException(ErrorMessage.USER_CREATED);
+            case DELETED:
+                throw new BadUserStatusException(ErrorMessage.USER_DELETED);
+            default:
+                break;
+        }
     }
 }

@@ -8,6 +8,7 @@ import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +18,9 @@ import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -40,12 +44,19 @@ class OwnSecurityControllerTest {
     @Mock
     private PasswordRecoveryService passwordRecoveryService;
 
+    String email;
+
     @BeforeEach
     void setUp() {
+        email = "test@mail.com";
+
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(ownSecurityController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .build();
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(email, "password");
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @Test
@@ -153,5 +164,62 @@ class OwnSecurityControllerTest {
             .andExpect(status().isOk());
 
         verify(passwordRecoveryService).updatePasswordUsingToken(form);
+    }
+
+    @Test
+    @SneakyThrows
+    void setPassword() {
+        String content = """
+            {
+              "password": "String123=",
+              "confirmPassword": "String123="
+            }\
+            """;
+
+        mockMvc.perform(post(LINK + "/set-password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isCreated());
+
+        SetPasswordDto dto = ModelUtils.getObjectMapper().readValue(content, SetPasswordDto.class);
+        verify(ownSecurityService).setPassword(dto, email);
+    }
+
+    @Test
+    @SneakyThrows
+    void hasPassword() {
+        mockMvc.perform(get(LINK + "/password-status"))
+            .andExpect(status().isOk());
+
+        verify(ownSecurityService).hasPassword(email);
+    }
+
+    @Test
+    void updatePasswordTest() throws Exception {
+        String content = """
+            {
+              "confirmPassword": "String123=",
+              "password": "String124="
+            }\
+            """;
+
+        mockMvc.perform(put(LINK + "/changePassword")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+
+        UpdatePasswordDto dto =
+            ModelUtils.getObjectMapper().readValue(content, UpdatePasswordDto.class);
+
+        verify(ownSecurityService).updateCurrentPassword(dto, email);
+    }
+
+    @Test
+    @SneakyThrows
+    void deleteUser() {
+        mockMvc.perform(delete(LINK + "/user"))
+            .andExpect(status().isOk());
+
+        verify(ownSecurityService).deleteUserByEmail(email);
     }
 }
