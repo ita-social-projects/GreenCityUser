@@ -5,11 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.GeneralEmailMessage;
-import greencity.message.SendChangePlaceStatusEmailMessage;
-import greencity.message.SendHabitNotification;
-import greencity.message.SendReportEmailMessage;
-import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.*;
 import greencity.service.EmailService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +22,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.time.LocalDateTime;
 
 @ExtendWith(MockitoExtension.class)
 class EmailControllerTest {
@@ -183,6 +181,28 @@ class EmailControllerTest {
             .build();
         String content = objectMapper.writeValueAsString(message);
         mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/habitAssign/notification")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void sendUserTaggedInCommentNotification() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        UserTaggedInCommentMessage message = UserTaggedInCommentMessage.builder()
+            .receiverEmail("receiver@example.com")
+            .receiverName("receiver")
+            .eventName("event")
+            .commentText("test")
+            .taggerName("tagger")
+            .commentedEventId(1L)
+            .language("en")
+            .creationDate(LocalDateTime.now())
+            .build();
+        String content = objectMapper.writeValueAsString(message);
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/taggedUserInComment/notification")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
