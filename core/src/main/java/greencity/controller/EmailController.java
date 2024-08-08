@@ -3,11 +3,7 @@ package greencity.controller;
 import greencity.constant.HttpStatuses;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.GeneralEmailMessage;
-import greencity.message.SendChangePlaceStatusEmailMessage;
-import greencity.message.SendHabitNotification;
-import greencity.message.SendReportEmailMessage;
-import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.*;
 import greencity.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -128,6 +124,25 @@ public class EmailController {
     public ResponseEntity<Void> sendHabitAssignNotification(
         @RequestBody @Valid HabitAssignNotificationMessage message) {
         emailService.sendHabitAssignNotificationEmail(message);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Sends email notification to tagged user.
+     *
+     * @param message {@link HabitAssignNotificationMessage} - object with all
+     *                necessary data for sending notification via email.
+     */
+    @Operation(summary = "Send habit assign email notification")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/taggedUserInComment/notification")
+    public ResponseEntity<Void> sendTaggedUserInCommentNotification(
+        @RequestBody @Valid UserTaggedInCommentMessage message) {
+        emailService.sendTaggedUserInCommentNotificationEmail(message);
         return ResponseEntity.ok().build();
     }
 }
