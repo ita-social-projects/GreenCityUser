@@ -8,7 +8,6 @@ import static greencity.constant.ErrorMessage.REFRESH_TOKEN_NOT_VALID;
 import static greencity.constant.ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID;
 import static greencity.constant.ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL;
 import static greencity.constant.ErrorMessage.USER_NOT_FOUND_BY_EMAIL;
-
 import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import static greencity.constant.ValidationConstants.USER_CREATED;
