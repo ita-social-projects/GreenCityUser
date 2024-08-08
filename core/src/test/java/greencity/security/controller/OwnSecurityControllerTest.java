@@ -10,23 +10,22 @@ import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
-import java.security.Principal;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -47,12 +46,19 @@ class OwnSecurityControllerTest {
     @Mock
     private PasswordRecoveryService passwordRecoveryService;
 
+    String email;
+
     @BeforeEach
     void setUp() {
+        email = "test@mail.com";
+
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(ownSecurityController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .build();
+
+        Authentication auth = new UsernamePasswordAuthenticationToken(email, "password");
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @Test
@@ -162,11 +168,36 @@ class OwnSecurityControllerTest {
         verify(passwordRecoveryService).updatePasswordUsingToken(form);
     }
 
-    // @Test
-    void updatePasswordTest() throws Exception {
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("test@mail.com");
+    @Test
+    @SneakyThrows
+    void setPassword() {
+        String content = """
+            {
+              "password": "String123=",
+              "confirmPassword": "String123="
+            }\
+            """;
 
+        mockMvc.perform(post(LINK + "/set-password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isCreated());
+
+        SetPasswordDto dto = ModelUtils.getObjectMapper().readValue(content, SetPasswordDto.class);
+        verify(ownSecurityService).setPassword(dto, email);
+    }
+
+    @Test
+    @SneakyThrows
+    void hasPassword() {
+        mockMvc.perform(get(LINK + "/password-status"))
+            .andExpect(status().isOk());
+
+        verify(ownSecurityService).hasPassword(email);
+    }
+
+    @Test
+    void updatePasswordTest() throws Exception {
         String content = """
             {
               "confirmPassword": "String123=",
@@ -175,7 +206,6 @@ class OwnSecurityControllerTest {
             """;
 
         mockMvc.perform(put(LINK + "/changePassword")
-            .principal(principal)
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
@@ -183,43 +213,15 @@ class OwnSecurityControllerTest {
         UpdatePasswordDto dto =
             ModelUtils.getObjectMapper().readValue(content, UpdatePasswordDto.class);
 
-        verify(ownSecurityService).updateCurrentPassword(dto, "test@mail.com");
+        verify(ownSecurityService).updateCurrentPassword(dto, email);
     }
 
-    // @Test
+    @Test
     @SneakyThrows
-    void hasPassword() {
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("test@mail.com");
-
-        mockMvc.perform(get(LINK + "/password-status")
-            .principal(principal))
+    void deleteUser() {
+        mockMvc.perform(delete(LINK + "/user"))
             .andExpect(status().isOk());
 
-        verify(ownSecurityService).hasPassword("test@mail.com");
-    }
-
-    // @Test
-    @SneakyThrows
-    void setPassword() {
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("test@mail.com");
-
-        String content = """
-            {
-              "password": "String123=",
-              "confirmPassword": "String123="
-            }\
-            """;
-
-        SetPasswordDto dto = ModelUtils.getObjectMapper().readValue(content, SetPasswordDto.class);
-
-        mockMvc.perform(post(LINK + "/set-password")
-            .principal(principal)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(content))
-            .andExpect(status().isCreated());
-
-        verify(ownSecurityService).setPassword(dto, "test@mail.com");
+        verify(ownSecurityService).deleteUserByEmail(email);
     }
 }

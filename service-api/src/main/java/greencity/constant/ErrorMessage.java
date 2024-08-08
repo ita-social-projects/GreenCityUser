@@ -39,6 +39,7 @@ public final class ErrorMessage {
     public static final String LINK_IS_NO_ACTIVE = "This link is no longer active";
     public static final String USER_BLOCKED = "User is blocked";
     public static final String USER_CREATED = "User is not activated";
+    public static final String USER_DELETED = "User deleted";
     public static final String USER_DOES_NOT_LOGIN = "User has not login in the system by this email: ";
     public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
     public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
