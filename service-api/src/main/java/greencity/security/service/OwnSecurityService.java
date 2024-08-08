@@ -86,7 +86,8 @@ public interface OwnSecurityService {
     void setPassword(SetPasswordDto dto, String email);
 
     /**
-     * Method to delete (deactivate) a user by email, setting their status to DELETED.
+     * Method to delete (deactivate) a user by email, setting their status to
+     * DELETED.
      *
      * @param email {@link String} email of the user to be deleted.
      */

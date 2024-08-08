@@ -407,12 +407,12 @@ class OwnSecurityServiceImplTest {
     @Test
     void signInDeletedUserTest() {
         UserVO user = UserVO.builder()
-                .email("test@gmail.com")
-                .id(1L)
-                .userStatus(UserStatus.DELETED)
-                .ownSecurity(OwnSecurityVO.builder().password("password").build())
-                .role(Role.ROLE_USER)
-                .build();
+            .email("test@gmail.com")
+            .id(1L)
+            .userStatus(UserStatus.DELETED)
+            .ownSecurity(OwnSecurityVO.builder().password("password").build())
+            .role(Role.ROLE_USER)
+            .build();
 
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
@@ -603,10 +603,10 @@ class OwnSecurityServiceImplTest {
     @Test
     void deleteUserByEmailTest() {
         User deactivatedUser = User.builder()
-                .id(1L)
-                .email("test@somemail.com")
-                .userStatus(UserStatus.ACTIVATED)
-                .build();
+            .id(1L)
+            .email("test@somemail.com")
+            .userStatus(UserStatus.ACTIVATED)
+            .build();
         Optional<User> optionalUser = Optional.of(deactivatedUser);
 
         when(userRepo.findByEmail(deactivatedUser.getEmail())).thenReturn(optionalUser);
@@ -630,10 +630,10 @@ class OwnSecurityServiceImplTest {
     @Test
     void deleteUserByEmailNotVerifiedUserTest() {
         User notVerifiedUser = User.builder()
-                .id(1L)
-                .email("test@somemail.com")
-                .userStatus(UserStatus.DEACTIVATED)
-                .build();
+            .id(1L)
+            .email("test@somemail.com")
+            .userStatus(UserStatus.DEACTIVATED)
+            .build();
         Optional<User> optionalUser = Optional.of(notVerifiedUser);
 
         when(userRepo.findByEmail(notVerifiedUser.getEmail())).thenReturn(optionalUser);
