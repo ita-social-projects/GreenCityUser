@@ -482,8 +482,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * DEACTIVATED, BLOCKED, CREATED, or DELETED.
      *
      * @param status - the status of the User
-     * @throws BadUserStatusException if the user status is
-     * DEACTIVATED, BLOCKED, CREATED, or DELETED.
+     * @throws BadUserStatusException if the user status is DEACTIVATED, BLOCKED,
+     *                                CREATED, or DELETED.
      */
     private void handleUserStatus(UserStatus status) {
         switch (status) {

@@ -405,12 +405,12 @@ class OwnSecurityServiceImplTest {
     @Test
     void signInDeletedUserTest() {
         UserVO user = UserVO.builder()
-                .email("test@gmail.com")
-                .id(1L)
-                .userStatus(UserStatus.DELETED)
-                .ownSecurity(OwnSecurityVO.builder().password("password").build())
-                .role(Role.ROLE_USER)
-                .build();
+            .email("test@gmail.com")
+            .id(1L)
+            .userStatus(UserStatus.DELETED)
+            .ownSecurity(OwnSecurityVO.builder().password("password").build())
+            .role(Role.ROLE_USER)
+            .build();
 
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
