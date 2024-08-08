@@ -18,6 +18,7 @@ public final class EmailConstants {
     public static final String ACTIVATION = "Your account was activated";
     public static final String VIOLATION_EMAIL = "Violation email";
     public static final String HABIT_ASSIGN_FRIEND_REQUEST = "habit.friend.request";
+    public static final String USER_TAGGED_IN_COMMENT_REQUEST = "user.tagged.request";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
@@ -40,6 +41,7 @@ public final class EmailConstants {
     public static final String IS_UBS = "isUbs";
     public static final String SENDER_NAME = "senderName";
     public static final String HABIT_NAME = "habitName";
+    public static final String EVENT_NAME = "eventName";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
@@ -54,6 +56,7 @@ public final class EmailConstants {
     public static final String ACTIVATION_PAGE = "user-activation-page";
     public static final String USER_VIOLATION_PAGE = "user-violation-mail";
     public static final String HABIT_ASSIGN_FRIEND_REQUEST_PAGE = "habit-assign-friend-request";
+    public static final String USER_TAGGED_IN_COMMENT_PAGE = "user-tagged-in-comment-email-page";
 
     private EmailConstants() {
     }
