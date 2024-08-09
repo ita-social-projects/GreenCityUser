@@ -5,12 +5,9 @@ import greencity.exception.exceptions.InvalidURLException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UrlValidator {
     /**
      * Method that checks if received URL is valid (string could be parsed as a URI

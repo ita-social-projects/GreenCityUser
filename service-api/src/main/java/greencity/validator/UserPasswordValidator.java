@@ -12,7 +12,7 @@ import org.passay.RuleResult;
 import org.passay.WhitespaceRule;
 
 public class UserPasswordValidator implements ConstraintValidator<PasswordValidation, String> {
-    private PasswordValidator validator;
+    private final PasswordValidator validator;
 
     /**
      * Default constructor that init PasswordValidator.
@@ -25,11 +25,6 @@ public class UserPasswordValidator implements ConstraintValidator<PasswordValida
             new CharacterRule(EnglishCharacterData.Digit, 1),
             new CharacterRule(EnglishCharacterData.Special, 1),
             new WhitespaceRule());
-    }
-
-    @Override
-    public void initialize(PasswordValidation constraintAnnotation) {
-        // Initializes the validator in preparation for #isValid calls
     }
 
     @Override

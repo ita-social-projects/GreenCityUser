@@ -24,8 +24,4 @@ public interface VerifyEmailService {
      * @return {@code boolean}
      */
     boolean isNotExpired(LocalDateTime emailExpiredDate);
-
-    /**
-     * Deletes email verification tokens that are expired.
-     */
 }

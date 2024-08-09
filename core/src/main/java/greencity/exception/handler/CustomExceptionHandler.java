@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -51,11 +51,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
  *
  * @author Marian Milian
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestControllerAdvice
 @Slf4j
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
-    private ErrorAttributes errorAttributes;
+    private final ErrorAttributes errorAttributes;
 
     /**
      * Method intercept exception {@link ConstraintViolationException}.
@@ -307,7 +307,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         List<ValidationExceptionDto> collect =
             ex.getBindingResult().getFieldErrors().stream()
                 .map(ValidationExceptionDto::new)
-                .collect(Collectors.toList());
+                .toList();
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(collect);
     }

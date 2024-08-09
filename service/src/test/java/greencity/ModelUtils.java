@@ -1,49 +1,22 @@
 package greencity;
 
-import com.google.maps.model.AddressComponent;
-import com.google.maps.model.AddressComponentType;
-import com.google.maps.model.GeocodingResult;
-import com.google.maps.model.Geometry;
-import com.google.maps.model.LatLng;
+import com.google.maps.model.*;
 import greencity.constant.AppConstant;
 import greencity.dto.CoordinatesDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
-import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.position.PositionDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.EcoNewsAuthorDto;
-import greencity.dto.user.UserAdminRegistrationDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.dto.user.UserInfo;
-import greencity.dto.user.UserLocationDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserVO;
+import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.entity.Achievement;
-import greencity.entity.AchievementCategory;
-import greencity.entity.Authority;
-import greencity.entity.Language;
-import greencity.entity.OwnSecurity;
-import greencity.entity.Position;
-import greencity.entity.RestorePasswordEmail;
-import greencity.entity.SocialNetwork;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserLocation;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -51,7 +24,6 @@ import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +69,7 @@ public class ModelUtils {
             .dateOfRegistration(LocalDateTime.now())
             .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
                 "Львівська", "Ukraine", "Україна", 20.000000,
-                20.000000, new ArrayList<User>()))
+                20.000000, new ArrayList<>()))
             .language(new Language(1L, "en", null))
             .build();
     }
@@ -373,26 +345,6 @@ public class ModelUtils {
 
     public static UserAchievement getUserAchievement() {
         return new UserAchievement(1L, getUser(), getAchievement(), false);
-    }
-
-    public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
-        return EcoNewsAuthorDto.builder()
-            .id(1L)
-            .name("taras")
-            .build();
-    }
-
-    public static AddEcoNewsDtoResponse getAddEcoNewsDtoResponse() {
-        return AddEcoNewsDtoResponse.builder()
-            .id(1L)
-            .title("title")
-            .text("texttexttexttext")
-            .ecoNewsAuthorDto(getEcoNewsAuthorDto())
-            .creationDate(ZonedDateTime.now())
-            .imagePath("/imagePath")
-            .source("source")
-            .tags(Collections.singletonList("tag"))
-            .build();
     }
 
     public static UserViolationMailDto getUserViolationMailDto() {

@@ -8,8 +8,6 @@ import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
-import greencity.enums.AchievementCategoryType;
-import greencity.enums.AchievementType;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,12 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -34,28 +27,13 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class RestClient {
     private final RestTemplate restTemplate;
+    private final HttpServletRequest httpServletRequest;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
-    private final HttpServletRequest httpServletRequest;
     @Value("${greencitychat.server.address}")
     private String greenCityChatServerAddress;
     @Value("${greencityubs.server.address}")
     private String greenCityUbsServerAddress;
-
-    /**
-     * Method for sending request for achievement calculation.
-     */
-    public ResponseEntity<Object> calculateAchievement(Long id, AchievementType setter,
-        AchievementCategoryType socialNetwork, int size) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + id
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + setter
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + socialNetwork
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + size,
-            HttpMethod.POST, entity, Object.class);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
 
     /**
      * Method for finding all custom shopping list items.
@@ -72,21 +50,6 @@ public class RestClient {
         CustomShoppingListItemResponseDto[] responseDtos = exchange.getBody();
         assert responseDtos != null;
         return Arrays.asList(responseDtos);
-    }
-
-    /**
-     * Method for convert image to multipart image.
-     *
-     * @param profilePicturePath link to image
-     * @return MultipartFile
-     * @author Orest Mamchuk
-     */
-    public MultipartFile convertToMultipartImage(String profilePicturePath) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.FILES_CONVERT + RestTemplateLinks.IMAGE
-            + profilePicturePath,
-            HttpMethod.POST, entity, MultipartFile.class).getBody();
     }
 
     /**
@@ -257,7 +220,6 @@ public class RestClient {
      *
      * @param userId of {@link UserVO}
      * @return {@link Long} count of organized and attended by user events.
-     *
      * @author Olena Sotnik
      */
     public Long findAmountOfEventsOrganizedAndAttendedByUser(Long userId) {

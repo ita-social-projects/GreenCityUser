@@ -8,8 +8,6 @@ public class EmailConstants {
     // subjects
     public static final String GC_CONTRIBUTORS = "GreenCity contributors";
     public static final String NEW_PLACES = "New places";
-    public static final String NEWS = "Eco news from GreenCity";
-    public static final String EVENT_COMMENT = "You have a new comment on your event";
     public static final String CREATED_NEWS = "You created news on GreenCity ";
     public static final String VERIFY_EMAIL = "verify.email";
     public static final String RESTORED_PASSWORD = "restored.password";

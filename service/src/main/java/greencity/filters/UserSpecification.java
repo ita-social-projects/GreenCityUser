@@ -6,11 +6,11 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserSpecification implements CustomSpecification<User> {
-    private transient List<SearchCriteria> searchCriteriaList;
+    private final transient List<SearchCriteria> searchCriteriaList;
 
     @Override
     public Predicate toPredicate(Root<User> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder criteriaBuilder) {

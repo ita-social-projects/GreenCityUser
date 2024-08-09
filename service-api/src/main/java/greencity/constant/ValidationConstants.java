@@ -1,6 +1,9 @@
 package greencity.constant;
 
-public final class ValidationConstants {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ValidationConstants {
     public static final String INVALID_EMAIL = "{greenCity.validation.invalid.email}";
     public static final String USERNAME_MESSAGE =
         """
@@ -28,7 +31,4 @@ public final class ValidationConstants {
             {1,30}\
             (?<![ЭэЁёъЪЫы])$\
             """;
-
-    private ValidationConstants() {
-    }
 }
