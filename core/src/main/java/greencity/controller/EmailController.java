@@ -130,10 +130,10 @@ public class EmailController {
     /**
      * Sends email notification to tagged user.
      *
-     * @param message {@link HabitAssignNotificationMessage} - object with all
+     * @param message {@link UserTaggedInCommentMessage} - object with all
      *                necessary data for sending notification via email.
      */
-    @Operation(summary = "Send habit assign email notification")
+    @Operation(summary = "Send email notification to tagged user")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
