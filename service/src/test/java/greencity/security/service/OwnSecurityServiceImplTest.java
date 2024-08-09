@@ -53,10 +53,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -110,7 +114,6 @@ class OwnSecurityServiceImplTest {
 
     @BeforeEach
     public void init() {
-        initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo);
 
@@ -635,9 +638,7 @@ class OwnSecurityServiceImplTest {
         Optional<User> optionalUser = Optional.of(notVerifiedUser);
 
         when(userRepo.findByEmail(notVerifiedUser.getEmail())).thenReturn(optionalUser);
-        assertThrows(EmailNotVerified.class, () -> {
-            ownSecurityService.deleteUserByEmail(notVerifiedUser.getEmail());
-        });
+        assertThrows(EmailNotVerified.class, () -> ownSecurityService.deleteUserByEmail(notVerifiedUser.getEmail()));
 
         verify(userRepo, times(1)).findByEmail(notVerifiedUser.getEmail());
     }

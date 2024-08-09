@@ -1,10 +1,12 @@
 package greencity.security.controller;
 
 import greencity.ModelUtils;
-import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
-import greencity.security.dto.ownsecurity.OwnRestoreDto;
-import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.OwnSignInDto;
+import greencity.security.dto.ownsecurity.OwnRestoreDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UpdatePasswordDto;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
