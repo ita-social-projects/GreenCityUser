@@ -1,12 +1,13 @@
 package greencity.constant;
 
-public final class EmailConstants {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class EmailConstants {
     public static final String EMAIL_CONTENT_TYPE = "text/html; charset=utf-8";
     // subjects
     public static final String GC_CONTRIBUTORS = "GreenCity contributors";
     public static final String NEW_PLACES = "New places";
-    public static final String NEWS = "Eco news from GreenCity";
-    public static final String EVENT_COMMENT = "You have a new comment on your event";
     public static final String CREATED_NEWS = "You created news on GreenCity ";
     public static final String VERIFY_EMAIL = "verify.email";
     public static final String RESTORED_PASSWORD = "restored.password";
@@ -21,9 +22,6 @@ public final class EmailConstants {
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
-    public static final String AUTHOR_NAME = "authorName";
-    public static final String COMMENT_BODY = "commentBody";
-    public static final String COMMENT_TIME = "commentTime";
     public static final String VERIFY_ADDRESS = "verifyAddress";
     public static final String RESTORE_PASS = "restorePassword";
     public static final String APPROVE_REGISTRATION = "approveRegistration";
@@ -48,13 +46,9 @@ public final class EmailConstants {
     public static final String USER_APPROVAL_EMAIL_PAGE = "user-approval-email-page";
     public static final String CHANGE_PLACE_STATUS_EMAIL_PAGE = "change-place-status-email-page";
     public static final String NEWS_RECEIVE_EMAIL_PAGE = "news-receive-email-page";
-    public static final String NEW_EVENT_COMMENT_EMAIL_PAGE = "new-event-comment-email-page";
     public static final String NEW_PLACES_REPORT_EMAIL_PAGE = "new-places-report-email-page";
     public static final String REASONS_OF_DEACTIVATION_PAGE = "user-reasons-of-deactivation-page";
     public static final String ACTIVATION_PAGE = "user-activation-page";
     public static final String USER_VIOLATION_PAGE = "user-violation-mail";
     public static final String HABIT_ASSIGN_FRIEND_REQUEST_PAGE = "habit-assign-friend-request";
-
-    private EmailConstants() {
-    }
 }

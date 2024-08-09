@@ -6,41 +6,18 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
-import greencity.entity.AchievementCategory;
-import greencity.entity.Authority;
-import greencity.entity.Language;
-import greencity.entity.OwnSecurity;
-import greencity.entity.Position;
-import greencity.entity.RestorePasswordEmail;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRefreshTokenException;
-import greencity.exception.exceptions.BadUserStatusException;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.PasswordsDoNotMatchesException;
-import greencity.exception.exceptions.UserAlreadyHasPasswordException;
-import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.UserBlockedException;
-import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.*;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
-import greencity.security.dto.ownsecurity.OwnSignInDto;
-import greencity.security.dto.ownsecurity.OwnSignUpDto;
-import greencity.security.dto.ownsecurity.SetPasswordDto;
-import greencity.security.dto.ownsecurity.UpdatePasswordDto;
+import greencity.security.dto.ownsecurity.*;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
@@ -56,10 +33,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -71,45 +48,59 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class OwnSecurityServiceImpl implements OwnSecurityService {
+    private static final String VALID_PW_CHARS =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final OwnSecurityRepo ownSecurityRepo;
     private final PositionRepo positionRepo;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTool jwtTool;
-    private final Integer expirationTime;
     private final RestorePasswordEmailRepo restorePasswordEmailRepo;
     private final ModelMapper modelMapper;
     private final UserRepo userRepo;
-    private static final String VALID_PW_CHARS =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
+    @Value("${verifyEmailTimeHour}")
+    private Integer expirationTime;
 
-    /**
-     * Constructor.
-     */
-    @Autowired
-    public OwnSecurityServiceImpl(OwnSecurityRepo ownSecurityRepo,
-        PositionRepo positionRepo,
-        UserService userService,
-        PasswordEncoder passwordEncoder,
-        JwtTool jwtTool,
-        @Value("${verifyEmailTimeHour}") Integer expirationTime,
-        RestorePasswordEmailRepo restorePasswordEmailRepo,
-        ModelMapper modelMapper,
-        UserRepo userRepo, EmailService emailService, AuthorityRepo authorityRepo) {
-        this.ownSecurityRepo = ownSecurityRepo;
-        this.positionRepo = positionRepo;
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTool = jwtTool;
-        this.expirationTime = expirationTime;
-        this.restorePasswordEmailRepo = restorePasswordEmailRepo;
-        this.modelMapper = modelMapper;
-        this.userRepo = userRepo;
-        this.emailService = emailService;
-        this.authorityRepo = authorityRepo;
+    static List<UserAchievement> getUserAchievements(User user, AchievementService achievementService) {
+        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
+        return achievementList.stream()
+            .map(a -> {
+                UserAchievement userAchievement = new UserAchievement();
+                userAchievement.setAchievement(a);
+                userAchievement.setUser(user);
+                return userAchievement;
+            })
+            .toList();
+    }
+
+    static List<UserAction> getUserActions(User user, AchievementService achievementService) {
+        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
+        return achievementList.stream()
+            .map(a -> {
+                UserAction userAction = new UserAction();
+                userAction.setAchievementCategory(a.getAchievementCategory());
+                userAction.setUser(user);
+                return userAction;
+            })
+            .toList();
+    }
+
+    static List<Achievement> buildAchievementList(List<AchievementVO> achievementVOList) {
+        List<Achievement> achievements = new ArrayList<>();
+        for (AchievementVO achievementVO : achievementVOList) {
+            achievements.add(Achievement.builder()
+                .id(achievementVO.getId())
+                .achievementCategory(AchievementCategory.builder()
+                    .id(achievementVO.getAchievementCategory().getId())
+                    .name(achievementVO.getAchievementCategory().getName())
+                    .build())
+                .build());
+        }
+        return achievements;
     }
 
     /**
@@ -198,7 +189,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setShowShoppingList(true);
         List<String> positionNames = employeeSignUpDto.getPositions().stream()
             .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
-            .collect(Collectors.toList());
+            .toList();
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
         employee.setAuthorities(list);
 
@@ -216,44 +207,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         }
 
         return new SuccessSignUpDto(employee.getId(), employee.getName(), employee.getEmail(), true);
-    }
-
-    static List<UserAchievement> getUserAchievements(User user, AchievementService achievementService) {
-        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
-        return achievementList.stream()
-            .map(a -> {
-                UserAchievement userAchievement = new UserAchievement();
-                userAchievement.setAchievement(a);
-                userAchievement.setUser(user);
-                return userAchievement;
-            })
-            .collect(Collectors.toList());
-    }
-
-    static List<UserAction> getUserActions(User user, AchievementService achievementService) {
-        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
-        return achievementList.stream()
-            .map(a -> {
-                UserAction userAction = new UserAction();
-                userAction.setAchievementCategory(a.getAchievementCategory());
-                userAction.setUser(user);
-                return userAction;
-            })
-            .collect(Collectors.toList());
-    }
-
-    static List<Achievement> buildAchievementList(List<AchievementVO> achievementVOList) {
-        List<Achievement> achievements = new ArrayList<>();
-        for (AchievementVO achievementVO : achievementVOList) {
-            achievements.add(Achievement.builder()
-                .id(achievementVO.getId())
-                .achievementCategory(AchievementCategory.builder()
-                    .id(achievementVO.getAchievementCategory().getId())
-                    .name(achievementVO.getAchievementCategory().getName())
-                    .build())
-                .build());
-        }
-        return achievements;
     }
 
     private LocalDateTime calculateExpirationDateTime() {

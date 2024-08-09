@@ -2,25 +2,14 @@ package greencity.security.controller;
 
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
-import static greencity.constant.ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN;
-import static greencity.constant.ErrorMessage.PASSWORD_DOES_NOT_MATCH;
-import static greencity.constant.ErrorMessage.REFRESH_TOKEN_NOT_VALID;
-import static greencity.constant.ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID;
-import static greencity.constant.ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL;
-import static greencity.constant.ErrorMessage.USER_NOT_FOUND_BY_EMAIL;
+import static greencity.constant.ErrorMessage.*;
 import greencity.constant.HttpStatuses;
 import static greencity.constant.ValidationConstants.USER_CREATED;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
-import greencity.security.dto.ownsecurity.OwnRestoreDto;
-import greencity.security.dto.ownsecurity.OwnSignInDto;
-import greencity.security.dto.ownsecurity.OwnSignUpDto;
-import greencity.security.dto.ownsecurity.PasswordStatusDto;
-import greencity.security.dto.ownsecurity.SetPasswordDto;
-import greencity.security.dto.ownsecurity.UpdatePasswordDto;
+import greencity.security.dto.ownsecurity.*;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
@@ -35,21 +24,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Locale;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller that provides our sign-up and sign-in logic.
@@ -61,27 +43,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/ownSecurity")
 @Validated
 @Slf4j
+@RequiredArgsConstructor
 public class OwnSecurityController {
     private final OwnSecurityService service;
     private final VerifyEmailService verifyEmailService;
     private final PasswordRecoveryService passwordRecoveryService;
-
-    /**
-     * Constructor.
-     *
-     * @param service            - {@link OwnSecurityService} - service for security
-     *                           logic.
-     * @param verifyEmailService {@link VerifyEmailService} - service for email
-     *                           verification.
-     */
-    @Autowired
-    public OwnSecurityController(OwnSecurityService service,
-        VerifyEmailService verifyEmailService,
-        PasswordRecoveryService passwordRecoveryService) {
-        this.service = service;
-        this.verifyEmailService = verifyEmailService;
-        this.passwordRecoveryService = passwordRecoveryService;
-    }
 
     /**
      * Method for sign-up by our security logic.

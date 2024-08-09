@@ -1,12 +1,8 @@
 package greencity.dto.user;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.Builder;
-import lombok.NonNull;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,6 +11,6 @@ import lombok.NonNull;
 @Builder
 public class DeactivateUserRequestDto {
     @NotBlank
-    @NonNull
+    @NotNull
     private String reason;
 }

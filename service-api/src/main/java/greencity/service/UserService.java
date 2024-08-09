@@ -81,9 +81,9 @@ public interface UserService {
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described
-     * in {@link User} under {@link NamedNativeQuery} annotation. Spring Data JPA
-     * can run a named native query that follows the naming convention
-     * {entityClass.repositoryMethodName}.
+     * in {@link User} under {@link jakarta.persistence.NamedNativeQuery}
+     * annotation. Spring Data JPA can run a named native query that follows the
+     * naming convention {entityClass.repositoryMethodName}.
      *
      * @return {@link List} of {@link RegistrationStatisticsDtoResponse}
      **/
@@ -112,13 +112,6 @@ public interface UserService {
      * @return {@link UserVO}
      */
     UserVOAchievement findUserForAchievement(Long id);
-
-    /**
-     * Method that allow you to delete {@link UserVO} by ID.
-     *
-     * @param id a value of {@link Long}
-     */
-    void deleteById(Long id);
 
     /**
      * Method that allow you to find {@link UserVO} by email.
@@ -217,13 +210,6 @@ public interface UserService {
     EmailNotification getEmailNotificationsStatuses(String email);
 
     /**
-     * Update last visit of user.
-     *
-     * @return {@link UserVO}.
-     */
-    UserVO updateLastVisit(UserVO user);
-
-    /**
      * Find users by filter.
      *
      * @param filterUserDto contains objects whose values determine the filter
@@ -290,13 +276,6 @@ public interface UserService {
     long getActivatedUsersAmount();
 
     /**
-     * Get profile picture path {@link String}.
-     *
-     * @return profile picture path {@link String}
-     */
-    String getProfilePicturePathByUserId(Long id);
-
-    /**
      * Update user profile picture {@link UserVO}.
      *
      * @param image  {@link MultipartFile}
@@ -321,15 +300,6 @@ public interface UserService {
      * @author Marian Datsko
      */
     String saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
-
-    /**
-     * Updates last activity time for a given user.
-     *
-     * @param userId               - {@link UserVO}'s id
-     * @param userLastActivityTime - new {@link UserVO}'s last activity time
-     * @author Yurii Zhurakovskyi
-     */
-    void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime);
 
     /**
      * The method checks by id if a {@link UserVO} is online.
@@ -387,15 +357,6 @@ public interface UserService {
      * @author Vasyl Zhovnir
      */
     UserActivationDto setActivatedStatus(Long id);
-
-    /**
-     * Method that allow you to find {@link UserVO} by ID and token.
-     *
-     * @param userId - {@link UserVO}'s id
-     * @param token  - {@link UserVO}'s token
-     * @return {@link Optional} of {@link UserVO}
-     */
-    Optional<UserVO> findByIdAndToken(Long userId, String token);
 
     /**
      * Method for getting UserVO by search query.

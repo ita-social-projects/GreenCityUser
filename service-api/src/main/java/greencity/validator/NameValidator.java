@@ -29,7 +29,6 @@ public class NameValidator implements ConstraintValidator<ValidName, String> {
                 .addConstraintViolation();
             return false;
         }
-
         return true;
     }
 }

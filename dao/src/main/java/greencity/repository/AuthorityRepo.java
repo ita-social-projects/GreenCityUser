@@ -20,14 +20,6 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
     Set<String> getAuthoritiesByEmployeeId(@Param(value = "userId") Long employeeId);
 
     /**
-     * Method that find {@link Authority} by name.
-     *
-     * @param name {@link String} values
-     * @return {@link Authority}
-     */
-    Optional<Authority> findByName(String name);
-
-    /**
      * Method that return list of authorities.
      *
      * @param name - list of positions name.

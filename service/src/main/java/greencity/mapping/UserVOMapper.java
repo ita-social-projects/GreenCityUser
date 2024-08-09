@@ -13,7 +13,6 @@ import greencity.entity.User;
 import greencity.entity.UserLocation;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +43,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                     .id(user1.getId())
                     .name(user1.getName())
                     .build())
-                .collect(Collectors.toList()) : null)
+                .toList() : null)
             .refreshTokenKey(user.getRefreshTokenKey())
             .ownSecurity(user.getOwnSecurity() != null ? OwnSecurityVO.builder()
                 .id(user.getOwnSecurity().getId())
@@ -72,7 +71,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                         .id(userAchievement.getAchievement().getId())
                         .build())
                     .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
+                .toList() : new ArrayList<>())
             .userActions(user.getUserActions() != null ? user.getUserActions()
                 .stream().map(userAction -> UserActionVO.builder()
                     .id(userAction.getId())
@@ -84,7 +83,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                         .id(userAction.getUser().getId())
                         .build())
                     .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
+                .toList() : new ArrayList<>())
             .languageVO(LanguageVO.builder()
                 .id(user.getLanguage().getId())
                 .code(user.getLanguage().getCode())

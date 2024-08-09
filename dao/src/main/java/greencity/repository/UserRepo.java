@@ -100,14 +100,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     long countAllByUserStatus(UserStatus userStatus);
 
     /**
-     * Get profile picture path {@link String}.
-     *
-     * @return profile picture path {@link String}
-     */
-    @Query("SELECT profilePicturePath FROM User WHERE id=:id")
-    Optional<String> getProfilePicturePathByUserId(Long id);
-
-    /**
      * Get all user friends{@link User}.
      *
      * @return list of {@link User}.
@@ -143,18 +135,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         ORDER BY users.rating DESC LIMIT 6;\
         """)
     List<User> getSixFriendsWithTheHighestRating(Long userId);
-
-    /**
-     * Updates last activity time for a given user.
-     *
-     * @param userId               - {@link User}'s id
-     * @param userLastActivityTime - new {@link User}'s last activity time
-     * @author Yurii Zhurakovskyi
-     */
-    @Modifying
-    @Transactional
-    @Query(value = "UPDATE User SET lastActivityTime=:userLastActivityTime WHERE id=:userId")
-    void updateUserLastActivityTime(Long userId, LocalDateTime userLastActivityTime);
 
     /**
      * Find the last activity time by {@link User}'s id.
@@ -207,20 +187,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> searchBy(Pageable paging, String query);
 
     /**
-     * Delete from the database users that have status 'CREATED' and have not
-     * activated the account within 24 hours.
-     *
-     * @return number of deleted rows
-     * @author Vasyl Zhovnir
-     **/
-    @Modifying
-    @Query(nativeQuery = true, value = """
-        DELETE FROM users u WHERE u.user_status = 3 \
-        AND u.date_of_registration + interval '1 day' <= CURRENT_TIMESTAMP\
-        """)
-    int scheduleDeleteCreatedUsers();
-
-    /**
      * Find and return all registration months. Runs an SQL Query which is described
      * in {@link User} under {@link NamedNativeQuery} annotation. Spring Data JPA
      * can run a named native query that follows the naming convention
@@ -268,32 +234,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
          LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%'))\
         """)
     Page<User> findAllUsersByName(String name, Pageable page, Long userId);
-
-    /**
-     * Method that returns count of mutual friends.
-     */
-    @Query(nativeQuery = true, value = """
-        SELECT count(*) \
-         FROM (SELECT U2.USER_ID, COUNT(*) AS MUTUAL_COUNT\
-         FROM users_friends U1
-        LEFT JOIN users_friends U2 on U1.friend_id = U2.friend_id
-        left join users on users.id = u2.user_id
-        WHERE U1.user_id =:id GROUP BY U2.user_id Having u2.user_id not in (:id)
-        ORDER BY MUTUAL_COUNT DESC) u2 JOIN users u1 on u2.user_id = u1.id
-        """)
-    int countOfMutualFriends(Long id);
-
-    /**
-     * Method, that return status from table user_friends.
-     *
-     * @param userId   - Id of current user
-     * @param friendId - friend Id
-     * @return status
-     * @author Bohdan Melnyk
-     */
-    @Query(nativeQuery = true,
-        value = "SELECT  FROM users_friends WHERE user_id = :userId AND friend_id = :friendId")
-    Integer getStatusUser(Long userId, Long friendId);
 
     /**
      * Method that checks if the email user exists.

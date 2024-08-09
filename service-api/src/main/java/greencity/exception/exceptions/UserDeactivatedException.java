@@ -1,5 +1,6 @@
 package greencity.exception.exceptions;
 
+import lombok.experimental.StandardException;
 import org.springframework.security.core.AuthenticationException;
 
 /**
@@ -9,11 +10,6 @@ import org.springframework.security.core.AuthenticationException;
  * @author Nazar Stasyuk
  * @version 1.0
  */
+@StandardException
 public class UserDeactivatedException extends AuthenticationException {
-    /**
-     * Constructor.
-     */
-    public UserDeactivatedException(String message) {
-        super(message);
-    }
 }

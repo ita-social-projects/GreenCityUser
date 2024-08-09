@@ -3,9 +3,7 @@ package greencity.service;
 import greencity.constant.EmailConstants;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
-import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
@@ -16,12 +14,8 @@ import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -52,7 +46,7 @@ public class EmailServiceImpl implements EmailService {
     private final String senderEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
-    private static final Locale UA_LOCALE = new Locale("uk", "UA");
+    private static final Locale UA_LOCALE = Locale.of("uk", "UA");
 
     /**
      * Constructor.
@@ -107,36 +101,13 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendNewNewsForSubscriber(List<NewsSubscriberResponseDto> subscribers,
-        AddEcoNewsDtoResponse newsDto) {
-        Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.ECO_NEWS_LINK, ecoNewsLink);
-        model.put(EmailConstants.NEWS_RESULT, newsDto);
-        for (NewsSubscriberResponseDto dto : subscribers) {
-            try {
-                model.put(EmailConstants.UNSUBSCRIBE_LINK, serverLink + "/newsSubscriber/unsubscribe?email="
-                    + URLEncoder.encode(dto.getEmail(), StandardCharsets.UTF_8.toString())
-                    + "&unsubscribeToken=" + dto.getUnsubscribeToken());
-            } catch (UnsupportedEncodingException e) {
-                log.error(e.getMessage());
-            }
-            String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
-            sendEmail(dto.getEmail(), EmailConstants.NEWS, template);
-        }
-    }
-
-    @Override
     public void sendCreatedNewsForAuthor(EcoNewsForSendEmailDto newDto) {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.ECO_NEWS_LINK, ecoNewsLink);
         model.put(EmailConstants.NEWS_RESULT, newDto);
-        try {
-            model.put(EmailConstants.UNSUBSCRIBE_LINK, serverLink + "/newSubscriber/unsubscribe?email="
-                + URLEncoder.encode(newDto.getAuthor().getEmail(), StandardCharsets.UTF_8.toString())
-                + "&unsubscribeToken=" + newDto.getUnsubscribeToken());
-        } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage());
-        }
+        model.put(EmailConstants.UNSUBSCRIBE_LINK, serverLink + "/newSubscriber/unsubscribe?email="
+            + URLEncoder.encode(newDto.getAuthor().getEmail(), StandardCharsets.UTF_8)
+            + "&unsubscribeToken=" + newDto.getUnsubscribeToken());
         String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
         sendEmail(newDto.getAuthor().getEmail(), EmailConstants.CREATED_NEWS, template);
     }

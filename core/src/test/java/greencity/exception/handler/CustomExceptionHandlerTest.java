@@ -76,7 +76,6 @@ class CustomExceptionHandlerTest {
     void handleWrongPasswordException() {
         WrongPasswordException actual = new WrongPasswordException("password");
         ValidationExceptionDto validationDto = new ValidationExceptionDto(actual.getMessage(), "password");
-        ValidationExceptionDto validationDtoField = new ValidationExceptionDto(fieldError);
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
         ResponseEntity<Object> body = status.body(validationDto);
         assertEquals(customExceptionHandler.handleWrongPasswordException(actual), body);
