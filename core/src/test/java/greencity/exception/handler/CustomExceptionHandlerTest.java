@@ -14,6 +14,7 @@ import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.UserDeactivationException;
+import greencity.exception.exceptions.Base64DecodedException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +76,6 @@ class CustomExceptionHandlerTest {
     void handleWrongPasswordException() {
         WrongPasswordException actual = new WrongPasswordException("password");
         ValidationExceptionDto validationDto = new ValidationExceptionDto(actual.getMessage(), "password");
-        ValidationExceptionDto validationDtoField = new ValidationExceptionDto(fieldError);
         ResponseEntity.BodyBuilder status = ResponseEntity.status(HttpStatus.BAD_REQUEST);
         ResponseEntity<Object> body = status.body(validationDto);
         assertEquals(customExceptionHandler.handleWrongPasswordException(actual), body);
@@ -294,5 +294,15 @@ class CustomExceptionHandlerTest {
             any(ErrorAttributeOptions.class))).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleUserDeactivationException(actual, webRequest),
             ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse));
+    }
+
+    @Test
+    void handleBase64DecodedExceptionTest() {
+        Base64DecodedException actual = new Base64DecodedException("Some string");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleBase64DecodedException(actual, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
     }
 }

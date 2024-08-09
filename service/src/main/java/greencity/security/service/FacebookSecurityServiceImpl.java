@@ -13,9 +13,9 @@ import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
@@ -29,32 +29,17 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FacebookSecurityServiceImpl implements FacebookSecurityService {
+    private final UserService userService;
+    private final JwtTool jwtTool;
+    private final ModelMapper modelMapper;
     @Value("${address}")
     private String address;
     @Value("${spring.social.facebook.app-id}")
     private String facebookAppId;
     @Value("${spring.social.facebook.app-secret}")
     private String facebookAppSecret;
-
-    private final UserService userService;
-    private final JwtTool jwtTool;
-    private final ModelMapper modelMapper;
-
-    /**
-     * Constructor.
-     *
-     * @param userService {@link UserService} - service of {@link User} logic.
-     * @param jwtTool     {@link JwtTool} - tool for jwt logic.
-     */
-    @Autowired
-    public FacebookSecurityServiceImpl(UserService userService,
-        JwtTool jwtTool,
-        ModelMapper modelMapper) {
-        this.userService = userService;
-        this.jwtTool = jwtTool;
-        this.modelMapper = modelMapper;
-    }
 
     /**
      * {@inheritDoc}
@@ -103,11 +88,10 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             if (user == null) {
                 user = modelMapper.map(createNewUser(email, name), UserVO.class);
                 log.info("Facebook sign-up and sign-in user - {}", user.getEmail());
-                return getSuccessSignInDto(user);
             } else {
                 log.info("Facebook sign-in exist user - {}", user.getEmail());
-                return getSuccessSignInDto(user);
             }
+            return getSuccessSignInDto(user);
         } else {
             throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN);
         }

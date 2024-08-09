@@ -16,6 +16,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import java.util.Arrays;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,7 @@ import org.springframework.web.cors.CorsConfiguration;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalAuthentication
+@RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTool jwtTool;
     private final UserService userService;
@@ -55,18 +57,6 @@ public class SecurityConfig {
 
     @Value("${spring.messaging.stomp.websocket.allowed-origins}")
     private String[] allowedOrigins;
-
-    /**
-     * Constructor.
-     */
-
-    @Autowired
-    public SecurityConfig(JwtTool jwtTool, UserService userService,
-        AuthenticationConfiguration authenticationConfiguration) {
-        this.jwtTool = jwtTool;
-        this.userService = userService;
-        this.authenticationConfiguration = authenticationConfiguration;
-    }
 
     /**
      * Bean {@link PasswordEncoder} that uses in coding password.

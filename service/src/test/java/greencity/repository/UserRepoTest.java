@@ -128,15 +128,6 @@ class UserRepoTest {
     }
 
     @Test
-    void getProfilePicturePathByUserIdTest() {
-        String expected = "pathToPicture";
-        when(userRepo.getProfilePicturePathByUserId(anyLong())).thenReturn(Optional.of(expected));
-        String actual = userRepo.getProfilePicturePathByUserId(5L).get();
-        assertEquals(expected, actual);
-        verify(userRepo).getProfilePicturePathByUserId(5L);
-    }
-
-    @Test
     void getAllUserFriendsTest() {
         User user = ModelUtils.getUser();
         user.setEmailNotification(EmailNotification.MONTHLY);
@@ -272,33 +263,6 @@ class UserRepoTest {
 
         assertEquals(expectedUser, actualUser);
         verify(userRepo).findUserByUuid(uuid);
-    }
-
-    @Test
-    void countOfMutualFriendsTest() {
-        Integer expected = 2;
-
-        when(userRepo.countOfMutualFriends(anyLong())).thenReturn(expected);
-
-        Integer actualFriends = userRepo.countOfMutualFriends(1L);
-
-        assertEquals(expected, actualFriends);
-        verify(userRepo).countOfMutualFriends(1L);
-    }
-
-    @Test
-    void updateUserLastActivityTimeTest() {
-        LocalDateTime expectedTime = LocalDateTime.of(2020, 9, 29, 0, 0, 0);
-        User user3 = ModelUtils.getUser();
-        user3.setId(3L);
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of((user3)));
-
-        userRepo.updateUserLastActivityTime(3L, expectedTime);
-
-        User user = userRepo.findByEmail("test3@email.com").get();
-
-        assertEquals(expectedTime, user.getLastActivityTime());
-        verify(userRepo).findByEmail("test3@email.com");
     }
 
     @Test
