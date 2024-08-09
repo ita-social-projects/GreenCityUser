@@ -128,7 +128,7 @@ public class EmailController {
     }
 
     /**
-     * Sends email notification to tagged user.
+     * Sends email notification to tagged user in comment.
      *
      * @param message {@link UserTaggedInCommentMessage} - object with all necessary
      *                data for sending notification via email.
