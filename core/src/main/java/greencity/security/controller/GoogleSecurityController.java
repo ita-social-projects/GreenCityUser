@@ -14,7 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Locale;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,18 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/googleSecurity")
 @Validated
+@RequiredArgsConstructor
 public class GoogleSecurityController {
     private final GoogleSecurityService googleSecurityService;
-
-    /**
-     * Constructor.
-     *
-     * @param googleSecurityService {@link GoogleSecurityService}
-     */
-    @Autowired
-    public GoogleSecurityController(GoogleSecurityService googleSecurityService) {
-        this.googleSecurityService = googleSecurityService;
-    }
 
     /**
      * Method that provide authenticate with Google token.

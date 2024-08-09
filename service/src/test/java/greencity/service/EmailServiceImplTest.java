@@ -3,9 +3,7 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
-import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
@@ -48,7 +46,7 @@ class EmailServiceImplTest {
     private ITemplateEngine templateEngine;
     @Mock
     private MessageSource messageSource;
-    private static final Locale UA_LOCALE = new Locale("uk", "UA");
+    private static final Locale UA_LOCALE = Locale.of("uk", "UA");
 
     @BeforeEach
     public void setup() {
@@ -95,15 +93,6 @@ class EmailServiceImplTest {
         placeAuthorDto.setEmail("test@gmail.com");
         dto.setAuthor(placeAuthorDto);
         service.sendCreatedNewsForAuthor(dto);
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendNewNewsForSubscriber() {
-        List<NewsSubscriberResponseDto> newsSubscriberResponseDtos =
-            Collections.singletonList(new NewsSubscriberResponseDto("test@gmail.com", "someUnsubscribeToken"));
-        AddEcoNewsDtoResponse addEcoNewsDtoResponse = ModelUtils.getAddEcoNewsDtoResponse();
-        service.sendNewNewsForSubscriber(newsSubscriberResponseDtos, addEcoNewsDtoResponse);
         verify(javaMailSender).createMimeMessage();
     }
 

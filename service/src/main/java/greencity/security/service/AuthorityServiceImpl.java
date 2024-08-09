@@ -16,7 +16,6 @@ import greencity.repository.UserRepo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -61,7 +60,7 @@ public class AuthorityServiceImpl implements AuthorityService {
             () -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail()));
 
         List<String> positionNames = dto.getPositions().stream()
-            .map(PositionDto::getName).collect(Collectors.toList());
+            .map(PositionDto::getName).toList();
 
         List<Position> positions = positionRepo.findPositionsByNames(positionNames);
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);

@@ -19,6 +19,8 @@ import greencity.service.EmailService;
 import jakarta.persistence.NoResultException;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     private final OwnSecurityRepo ownSecurityRepo;
     private final PasswordEncoder passwordEncoder;
@@ -45,34 +48,6 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     private final EmailService emailService;
     @Value("${verifyEmailTimeHour}")
     private Integer tokenExpirationTimeInHours;
-
-    /**
-     * Constructor with all essentials beans for password recovery functionality.
-     *
-     * @param ownSecurityRepo           - security repository.
-     * @param passwordEncoder           - encodes password.
-     * @param restorePasswordEmailRepo  {@link RestorePasswordEmailRepo} - Used for
-     *                                  storing recovery tokens
-     * @param applicationEventPublisher {@link ApplicationEventPublisher} - Used for
-     *                                  publishing events, such as email sending or
-     *                                  password update
-     * @param jwtTool                   {@link JwtTool} - Used for recovery token
-     */
-    public PasswordRecoveryServiceImpl(
-        OwnSecurityRepo ownSecurityRepo, PasswordEncoder passwordEncoder,
-        RestorePasswordEmailRepo restorePasswordEmailRepo,
-        UserRepo userRepo,
-        ApplicationEventPublisher applicationEventPublisher,
-        EmailService emailService,
-        JwtTool jwtTool) {
-        this.ownSecurityRepo = ownSecurityRepo;
-        this.passwordEncoder = passwordEncoder;
-        this.restorePasswordEmailRepo = restorePasswordEmailRepo;
-        this.userRepo = userRepo;
-        this.applicationEventPublisher = applicationEventPublisher;
-        this.emailService = emailService;
-        this.jwtTool = jwtTool;
-    }
 
     /**
      * {@inheritDoc}
@@ -112,11 +87,11 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
                 new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
             user.setRestorePasswordEmail(null);
             restorePasswordEmailRepo.delete(restorePasswordEmail);
-            log.info("User with email " + restorePasswordEmail.getUser().getEmail()
-                + " has successfully restored the password using token " + form.getToken());
+            log.info("User with email {} has successfully restored the password using token {}",
+                restorePasswordEmail.getUser().getEmail(), form.getToken());
         } else {
-            log.info("Password restoration token of user with email " + restorePasswordEmail.getUser().getEmail()
-                + " has been expired. Token: " + form.getToken());
+            log.info("Password restoration token of user with email {} has been expired. Token: {}",
+                restorePasswordEmail.getUser().getEmail(), form.getToken());
             throw new UserActivationEmailTokenExpiredException(ErrorMessage.LINK_IS_NO_ACTIVE);
         }
         if (userStatus == UserStatus.CREATED) {
@@ -175,11 +150,10 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
      * Interval is set by @Scheduled annotation. Access modifier is set to
      * package-private since this method should be invoked by Spring Framework only.
      */
-    // every 86400000 milliseconds == every 24 hours
-    @Scheduled(fixedRate = 86400000)
+    @Scheduled(fixedRate = 24, timeUnit = TimeUnit.HOURS)
     void deleteAllExpiredPasswordResetTokens() {
         int rows = restorePasswordEmailRepo.deleteAllExpiredPasswordResetTokens();
-        log.info(rows + " password reset tokens were deleted.");
+        log.info("{} password reset tokens were deleted.", rows);
     }
 
     private void updatePassword(String pass, Long id) {

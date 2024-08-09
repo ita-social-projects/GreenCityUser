@@ -134,9 +134,9 @@ public class JwtTool {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             isValid = true;
         } catch (Exception e) {
-            log.info("Given token is not valid: " + e.getMessage());
+            log.info("Given token is not valid: {}", e.getMessage());
             log.error("Exception:", e);
-            log.info("token " + token + "token key " + tokenKey);
+            log.info("token {}token key {}", token, tokenKey);
         }
         return isValid;
     }
@@ -181,9 +181,9 @@ public class JwtTool {
      */
     public String generateTokenKeyWithCodedDate() {
         Date date = new Date();
-        Long dateLong = date.getTime();
+        long dateLong = date.getTime();
         dateLong += 86400000L;
-        String input = dateLong + "." + UUID.randomUUID().toString();
+        String input = dateLong + "." + UUID.randomUUID();
         return Base64.getEncoder().encodeToString(input.getBytes());
     }
 }

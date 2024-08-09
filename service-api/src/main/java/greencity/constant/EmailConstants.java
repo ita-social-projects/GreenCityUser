@@ -1,12 +1,13 @@
 package greencity.constant;
 
-public final class EmailConstants {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class EmailConstants {
     public static final String EMAIL_CONTENT_TYPE = "text/html; charset=utf-8";
     // subjects
     public static final String GC_CONTRIBUTORS = "GreenCity contributors";
     public static final String NEW_PLACES = "New places";
-    public static final String NEWS = "Eco news from GreenCity";
-    public static final String EVENT_COMMENT = "You have a new comment on your event";
     public static final String CREATED_NEWS = "You created news on GreenCity ";
     public static final String VERIFY_EMAIL = "verify.email";
     public static final String RESTORED_PASSWORD = "restored.password";
@@ -57,7 +58,4 @@ public final class EmailConstants {
     public static final String USER_VIOLATION_PAGE = "user-violation-mail";
     public static final String HABIT_ASSIGN_FRIEND_REQUEST_PAGE = "habit-assign-friend-request";
     public static final String USER_TAGGED_IN_COMMENT_PAGE = "user-tagged-in-comment-email-page";
-
-    private EmailConstants() {
-    }
 }

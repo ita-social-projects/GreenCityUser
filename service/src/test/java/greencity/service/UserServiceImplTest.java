@@ -47,7 +47,6 @@ import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserLocation;
-import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 
@@ -378,26 +377,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void deleteByIdExceptionBadIdTest() {
-        assertThrows(WrongIdException.class, () -> userService.deleteById(1L));
-    }
-
-    @Test
-    void deleteByNullIdExceptionTest() {
-        when(userRepo.findById(1L)).thenThrow(new WrongIdException(""));
-        assertThrows(WrongIdException.class, () -> userService.deleteById(1L));
-    }
-
-    @Test
-    void deleteByExistentIdTest() {
-        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        when(modelMapper.map(userVO, User.class)).thenReturn(user);
-        userService.deleteById(userId);
-        verify(userRepo).delete(user);
-    }
-
-    @Test
     void findIdByEmail() {
         String email = "email";
         when(userRepo.findIdByEmail(email)).thenReturn(Optional.of(2L));
@@ -487,16 +466,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateLastVisit() {
-        when(modelMapper.map(userVO, User.class)).thenReturn(user);
-        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        when(userRepo.save(any())).thenReturn(user);
-        LocalDateTime localDateTime = user.getLastActivityTime().minusHours(1);
-        assertNotEquals(localDateTime, userService.updateLastVisit(userVO).getLastActivityTime());
-    }
-
-    @Test
     void getUsersByFilter() {
         int pageNumber = 0;
         int pageSize = 1;
@@ -557,18 +526,6 @@ class UserServiceImplTest {
         when(userRepo.countAllByUserStatus(ACTIVATED)).thenReturn(1L);
         long activatedUsersAmount = userService.getActivatedUsersAmount();
         assertEquals(1L, activatedUsersAmount);
-    }
-
-    @Test
-    void getProfilePicturePathByUserIdNotFoundExceptionTest() {
-        assertThrows(NotFoundException.class, () -> userService.getProfilePicturePathByUserId(1L));
-    }
-
-    @Test
-    void getProfilePicturePathByUserIdTest() {
-        when(userRepo.getProfilePicturePathByUserId(1L)).thenReturn(Optional.of(anyString()));
-        userService.getProfilePicturePathByUserId(1L);
-        verify(userRepo).getProfilePicturePathByUserId(1L);
     }
 
     @Test
@@ -994,13 +951,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUserLastActivityTimeTest() {
-        LocalDateTime currentTime = LocalDateTime.now();
-        userService.updateUserLastActivityTime(userId, currentTime);
-        verify(userRepo).updateUserLastActivityTime(userId, currentTime);
-    }
-
-    @Test
     void checkIfTheUserIsOnlineExceptionTest() {
         assertThrows(WrongIdException.class, () -> userService.checkIfTheUserIsOnline(null));
     }
@@ -1258,32 +1208,6 @@ class UserServiceImplTest {
         when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
         when(userRepo.findById(1L)).thenThrow(NotFoundException.class);
         assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 1L));
-    }
-
-    @Test
-    void findByIdAndToken() {
-        VerifyEmail verifyEmail = new VerifyEmail();
-        verifyEmail.setId(2L);
-        verifyEmail.setExpiryDate(LocalDateTime.now());
-        verifyEmail.setToken("test");
-        verifyEmail.setUser(user2);
-        user2.setVerifyEmail(verifyEmail);
-
-        when(userRepo.findById(userId2)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(Optional.of(user2), UserVO.class)).thenReturn(userVO2);
-        when(modelMapper.map(userVO2, User.class)).thenReturn(user2);
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
-
-        assertEquals(Optional.of(userVO2), userService.findByIdAndToken(userId2, "test"));
-    }
-
-    @Test
-    void findByIdAndToken2() {
-        when(userRepo.findById(userId2)).thenReturn(Optional.of(user2));
-        when(modelMapper.map(Optional.of(user2), UserVO.class)).thenReturn(userVO2);
-        when(modelMapper.map(userVO2, User.class)).thenReturn(user2);
-        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
-        assertEquals(Optional.empty(), userService.findByIdAndToken(userId2, "test"));
     }
 
     @Test

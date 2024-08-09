@@ -13,7 +13,6 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 @Builder
-
 public class FriendsChatDto {
     private Long chatId;
     private Boolean chatExists;

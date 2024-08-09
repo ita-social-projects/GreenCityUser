@@ -1,6 +1,9 @@
 package greencity.constant;
 
-public final class AppConstant {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class AppConstant {
     public static final String REGISTRATION_EMAIL_FIELD_NAME = "email";
     public static final String GOOGLE_PICTURE = "picture";
     public static final String ADMIN = "ADMIN";
@@ -25,10 +28,5 @@ public final class AppConstant {
     public static final String DEFAULT_LANGUAGE_CODE = "en";
     public static final String PASSWORD = "password";
     public static final String USER_STATUS = "user_status";
-    public static final String EMPLOYEE_ADMIN = "Адмін";
-    public static final String EMPLOYEE_SUPER_ADMIN = "Супер адмін";
     public static final String GOOGLE_API = "Google API";
-
-    private AppConstant() {
-    }
 }

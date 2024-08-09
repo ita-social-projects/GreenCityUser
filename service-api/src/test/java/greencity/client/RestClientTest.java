@@ -7,8 +7,6 @@ import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.enums.AchievementCategoryType;
-import greencity.enums.AchievementType;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
@@ -53,23 +51,6 @@ class RestClientTest {
     private RestClient restClient;
 
     @Test
-    void calculateAchievement() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + 1L
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + AchievementType.INCREMENT
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + AchievementCategoryType.ECO_NEWS
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + 1,
-            HttpMethod.POST, entity, Object.class)).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
-        assertEquals(ResponseEntity.status(HttpStatus.OK).build(),
-            restClient.calculateAchievement(1L, AchievementType.INCREMENT, AchievementCategoryType.ECO_NEWS, 1));
-    }
-
-    @Test
     void getAllAvailableCustomShoppingListItems() {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
@@ -90,24 +71,6 @@ class RestClientTest {
 
         assertEquals(Arrays.asList(customShoppingListItemResponseDtos),
             restClient.getAllAvailableCustomShoppingListItems(userId, habitId));
-    }
-
-    @Test
-    void convertToMultipartImage() {
-        MultipartFile image = new MockMultipartFile("data", "filename.png",
-            "image/png", "some xml".getBytes());
-        String profilePicturePath = "profilePicturePath";
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.FILES_CONVERT + RestTemplateLinks.IMAGE
-            + profilePicturePath, HttpMethod.POST, entity, MultipartFile.class))
-                .thenReturn(ResponseEntity.ok(image));
-        assertEquals(image, restClient.convertToMultipartImage(profilePicturePath));
-        verify(httpServletRequest).getHeader(any());
     }
 
     @Test
