@@ -173,7 +173,6 @@ class GoogleSecurityServiceImplTest {
 
         verify(modelMapper).map(any(), eq(UserVO.class));
         verify(userRepo).save(any());
-        verify(achievementService, times(2)).findAll();
     }
 
     @Test

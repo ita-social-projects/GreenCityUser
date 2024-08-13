@@ -11,8 +11,6 @@ import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -21,14 +19,11 @@ import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
-import static greencity.security.service.OwnSecurityServiceImpl.getUserAchievements;
-import static greencity.security.service.OwnSecurityServiceImpl.getUserActions;
 import greencity.service.AchievementService;
 import greencity.service.UserService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -148,21 +143,11 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private User saveNewUser(User newUser) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
-            newUser.setUserAchievements(createUserAchievements(newUser));
-            newUser.setUserActions(createUserActions(newUser));
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
             return newUser;
         });
-    }
-
-    private List<UserAchievement> createUserAchievements(User user) {
-        return getUserAchievements(user, achievementService);
-    }
-
-    private List<UserAction> createUserActions(User user) {
-        return getUserActions(user, achievementService);
     }
 
     private SuccessSignInDto getSuccessSignInDto(UserVO user) {
