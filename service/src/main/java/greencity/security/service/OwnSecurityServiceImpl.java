@@ -2,7 +2,6 @@ package greencity.security.service;
 
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
-import greencity.dto.achievement.AchievementVO;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -21,13 +20,11 @@ import greencity.security.dto.ownsecurity.*;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
-import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -64,44 +61,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final AuthorityRepo authorityRepo;
     @Value("${verifyEmailTimeHour}")
     private Integer expirationTime;
-
-    static List<UserAchievement> getUserAchievements(User user, AchievementService achievementService) {
-        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
-        return achievementList.stream()
-            .map(a -> {
-                UserAchievement userAchievement = new UserAchievement();
-                userAchievement.setAchievement(a);
-                userAchievement.setUser(user);
-                return userAchievement;
-            })
-            .toList();
-    }
-
-    static List<UserAction> getUserActions(User user, AchievementService achievementService) {
-        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
-        return achievementList.stream()
-            .map(a -> {
-                UserAction userAction = new UserAction();
-                userAction.setAchievementCategory(a.getAchievementCategory());
-                userAction.setUser(user);
-                return userAction;
-            })
-            .toList();
-    }
-
-    static List<Achievement> buildAchievementList(List<AchievementVO> achievementVOList) {
-        List<Achievement> achievements = new ArrayList<>();
-        for (AchievementVO achievementVO : achievementVOList) {
-            achievements.add(Achievement.builder()
-                .id(achievementVO.getId())
-                .achievementCategory(AchievementCategory.builder()
-                    .id(achievementVO.getAchievementCategory().getId())
-                    .name(achievementVO.getAchievementCategory().getName())
-                    .build())
-                .build());
-        }
-        return achievements;
-    }
 
     /**
      * {@inheritDoc}
