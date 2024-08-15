@@ -110,8 +110,9 @@ public class RestClient {
      */
     public Long findAmountOfPublishedNews(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class)
+        return restTemplate.exchange(
+            greenCityServerAddress + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.AUTHOR_ID + userId,
+            HttpMethod.GET, entity, Long.class)
             .getBody();
     }
 

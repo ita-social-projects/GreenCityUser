@@ -146,8 +146,9 @@ class RestClientTest {
         Long publishedNews = 5L;
         Long userId = 1L;
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class))
+        when(restTemplate.exchange(
+            greenCityServerAddress + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.AUTHOR_ID + userId,
+            HttpMethod.GET, entity, Long.class))
                 .thenReturn(ResponseEntity.ok(publishedNews));
         assertEquals(publishedNews, restClient.findAmountOfPublishedNews(userId));
     }
