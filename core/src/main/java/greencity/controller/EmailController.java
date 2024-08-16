@@ -9,14 +9,18 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/email")
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class EmailController {
     private final EmailService emailService;
 
@@ -120,6 +124,25 @@ public class EmailController {
     public ResponseEntity<Void> sendHabitAssignNotification(
         @RequestBody @Valid HabitAssignNotificationMessage message) {
         emailService.sendHabitAssignNotificationEmail(message);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Sends email notification to tagged user in comment.
+     *
+     * @param message {@link UserTaggedInCommentMessage} - object with all necessary
+     *                data for sending notification via email.
+     */
+    @Operation(summary = "Send email notification to tagged user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/taggedUserInComment/notification")
+    public ResponseEntity<Void> sendTaggedUserInCommentNotification(
+        @RequestBody @Valid UserTaggedInCommentMessage message) {
+        emailService.sendTaggedUserInCommentNotificationEmail(message);
         return ResponseEntity.ok().build();
     }
 }
