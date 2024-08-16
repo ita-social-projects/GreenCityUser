@@ -13,6 +13,7 @@ import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.UserTaggedInCommentMessage;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,8 @@ import org.mockito.Mock;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -217,6 +220,26 @@ class EmailServiceImplTest {
     void sendEmailNotificationToNullEmailTest() {
         GeneralEmailMessage emailMessage = new GeneralEmailMessage(null, "testSubject", "testMessage");
         assertThrows(WrongEmailException.class, () -> service.sendEmailNotification(emailMessage));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"ua", "en"})
+    void sendUserTaggedInCommentNotificationTest(String language) {
+        UserTaggedInCommentMessage message = UserTaggedInCommentMessage.builder()
+            .receiverEmail("receiver@example.com")
+            .receiverName("receiver")
+            .eventName("event")
+            .commentText("test")
+            .taggerName("tagger")
+            .commentedEventId(1L)
+            .language(language)
+            .creationDate(LocalDateTime.now())
+            .build();
+        when(messageSource.getMessage(EmailConstants.USER_TAGGED_IN_COMMENT_REQUEST, null, getLocale(language)))
+            .thenReturn("user tagged in comment request");
+        service.sendTaggedUserInCommentNotificationEmail(message);
+        verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.USER_TAGGED_IN_COMMENT_REQUEST, null, getLocale(language));
     }
 
     @ParameterizedTest
