@@ -340,7 +340,7 @@ public class EmailServiceImpl implements EmailService {
             null, getLocale(language)) + " " + message.getElementName(), template);
     }
 
-    public void sendUserReceivedCommentNotificationEmail(UserReceivedCommentMessage message){
+    public void sendUserReceivedCommentNotificationEmail(UserReceivedCommentMessage message) {
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();
         validateLanguage(language);
@@ -354,10 +354,10 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.COMMENT_BODY, message.getCommentText());
         String template = createEmailTemplate(model, EmailConstants.USER_RECEIVED_COMMENT_PAGE);
         sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REQUEST,
-                null, getLocale(language))  + " " + message.getElementName(), template);
+            null, getLocale(language)) + " " + message.getElementName(), template);
     }
 
-    public void sendUserReceivedCommentReplyNotificationEmail(UserReceivedCommentReplyMessage message){
+    public void sendUserReceivedCommentReplyNotificationEmail(UserReceivedCommentReplyMessage message) {
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();
         validateLanguage(language);
@@ -373,8 +373,10 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.PARENT_COMMENT_BODY, message.getParentCommentText());
         model.put(EmailConstants.PARENT_COMMENT_TIME, message.getParentCommentCreationDate());
         String template = createEmailTemplate(model, EmailConstants.USER_RECEIVED_COMMENT_REPLY_PAGE);
-        sendEmail(message.getReceiverEmail(),message.getAuthorName() + " " + messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REPLY_REQUEST,
-                null, getLocale(language)) + " " + message.getElementName(), template);
+        sendEmail(message.getReceiverEmail(),
+            message.getAuthorName() + " " + messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REPLY_REQUEST,
+                null, getLocale(language)) + " " + message.getElementName(),
+            template);
     }
 
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,

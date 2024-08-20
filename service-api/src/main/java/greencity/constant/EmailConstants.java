@@ -64,5 +64,4 @@ public class EmailConstants {
     public static final String USER_TAGGED_IN_COMMENT_PAGE = "user-tagged-in-comment-email-page";
     public static final String USER_RECEIVED_COMMENT_PAGE = "user-received-comment-email-page";
     public static final String USER_RECEIVED_COMMENT_REPLY_PAGE = "user-received-comment-reply-email-page";
-
 }
