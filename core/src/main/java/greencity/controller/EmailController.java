@@ -145,4 +145,18 @@ public class EmailController {
         emailService.sendTaggedUserInCommentNotificationEmail(message);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/userReceivedComment/notification")
+    public ResponseEntity<Void> sendUserReceivedCommentNotification(
+            @RequestBody @Valid UserReceivedCommentMessage message) {
+        emailService.sendUserReceivedCommentNotificationEmail(message);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/userReceivedCommentReply/notification")
+    public ResponseEntity<Void> sendUserReceivedCommentReplyNotification(
+            @RequestBody @Valid UserReceivedCommentReplyMessage message) {
+        emailService.sendUserReceivedCommentReplyNotificationEmail(message);
+        return ResponseEntity.ok().build();
+    }
 }
