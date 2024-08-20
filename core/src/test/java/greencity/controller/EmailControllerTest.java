@@ -194,15 +194,65 @@ class EmailControllerTest {
         UserTaggedInCommentMessage message = UserTaggedInCommentMessage.builder()
             .receiverEmail("receiver@example.com")
             .receiverName("receiver")
-            .eventName("event")
+            .elementName("event")
             .commentText("test")
             .taggerName("tagger")
-            .commentedEventId(1L)
+            .commentedElementId(1L)
             .language("en")
+            .baseLink("testLink")
             .creationDate(LocalDateTime.now())
             .build();
         String content = objectMapper.writeValueAsString(message);
         mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/taggedUserInComment/notification")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void sendUserReceivedCommentNotification() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        UserReceivedCommentMessage message = UserReceivedCommentMessage.builder()
+            .receiverEmail("receiver@example.com")
+            .receiverName("receiver")
+            .elementName("event")
+            .commentText("test")
+            .authorName("test")
+            .commentedElementId(1L)
+            .language("en")
+            .baseLink("testLink")
+            .creationDate(LocalDateTime.now())
+            .build();
+        String content = objectMapper.writeValueAsString(message);
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/userReceivedComment/notification")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void sendUserReceivedCommentReplyNotification() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        UserReceivedCommentReplyMessage message = UserReceivedCommentReplyMessage.builder()
+            .receiverEmail("receiver@example.com")
+            .receiverName("receiver")
+            .elementName("event")
+            .commentText("test")
+            .authorName("test")
+            .baseLink("testLink")
+            .commentedElementId(1L)
+            .language("en")
+            .parentCommentAuthorName("parent")
+            .parentCommentText("parentText")
+            .parentCommentCreationDate(LocalDateTime.now())
+            .creationDate(LocalDateTime.now())
+            .build();
+        String content = objectMapper.writeValueAsString(message);
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/userReceivedCommentReply/notification")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
