@@ -50,4 +50,3 @@ public class UserReceivedCommentReplyMessage implements Serializable {
     @NotEmpty(message = "Base link cannot be null")
     private String baseLink;
 }
-
