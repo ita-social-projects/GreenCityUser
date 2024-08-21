@@ -2,13 +2,18 @@ package greencity.message;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @Getter
 public class UserReceivedCommentReplyMessage extends CommentMessage implements Serializable {
     @NotEmpty(message = "Author name cannot be empty")
@@ -22,17 +27,4 @@ public class UserReceivedCommentReplyMessage extends CommentMessage implements S
 
     @NotNull(message = "Parent comment creation date cannot be null")
     private LocalDateTime parentCommentCreationDate;
-
-    @Builder
-    public UserReceivedCommentReplyMessage(String receiverName, String receiverEmail, String language,
-        String elementName, String commentText, LocalDateTime creationDate,
-        Long commentedElementId, String baseLink, String authorName, String parentCommentText,
-        String parentCommentAuthorName, LocalDateTime parentCommentCreationDate) {
-        super(receiverName, receiverEmail, language, elementName, commentText, creationDate, commentedElementId,
-            baseLink);
-        this.authorName = authorName;
-        this.parentCommentText = parentCommentText;
-        this.parentCommentAuthorName = parentCommentAuthorName;
-        this.parentCommentCreationDate = parentCommentCreationDate;
-    }
 }
