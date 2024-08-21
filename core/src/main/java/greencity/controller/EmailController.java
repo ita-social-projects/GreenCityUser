@@ -146,6 +146,19 @@ public class EmailController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Sends email notification to user that received comment.
+     *
+     * @param message {@link UserReceivedCommentMessage} - object with all necessary
+     *                data for sending notification via email.
+     * @author Dmytro Dmytruk
+     */
+    @Operation(summary = "Send email notification user that received comment")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
     @PostMapping("/userReceivedComment/notification")
     public ResponseEntity<Void> sendUserReceivedCommentNotification(
         @RequestBody @Valid UserReceivedCommentMessage message) {
@@ -153,6 +166,19 @@ public class EmailController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Sends email notification to user that received comment reply.
+     *
+     * @param message {@link UserReceivedCommentReplyMessage} - object with all
+     *                necessary data for sending notification via email.
+     * @author Dmytro Dmytruk
+     */
+    @Operation(summary = "Send email notification user that received comment reply")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
     @PostMapping("/userReceivedCommentReply/notification")
     public ResponseEntity<Void> sendUserReceivedCommentReplyNotification(
         @RequestBody @Valid UserReceivedCommentReplyMessage message) {
