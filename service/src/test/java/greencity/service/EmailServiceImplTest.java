@@ -13,6 +13,8 @@ import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.UserReceivedCommentMessage;
+import greencity.message.UserReceivedCommentReplyMessage;
 import greencity.message.UserTaggedInCommentMessage;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -228,10 +230,10 @@ class EmailServiceImplTest {
         UserTaggedInCommentMessage message = UserTaggedInCommentMessage.builder()
             .receiverEmail("receiver@example.com")
             .receiverName("receiver")
-            .eventName("event")
+            .elementName("event")
             .commentText("test")
             .taggerName("tagger")
-            .commentedEventId(1L)
+            .commentedElementId(1L)
             .language(language)
             .creationDate(LocalDateTime.now())
             .build();
@@ -240,6 +242,49 @@ class EmailServiceImplTest {
         service.sendTaggedUserInCommentNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
         verify(messageSource).getMessage(EmailConstants.USER_TAGGED_IN_COMMENT_REQUEST, null, getLocale(language));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"ua", "en"})
+    void sendUserReceivedCommentNotificationTest(String language) {
+        UserReceivedCommentMessage message = UserReceivedCommentMessage.builder()
+            .receiverEmail("receiver@example.com")
+            .receiverName("receiver")
+            .elementName("event")
+            .commentText("test")
+            .authorName("author")
+            .commentedElementId(1L)
+            .language(language)
+            .creationDate(LocalDateTime.now())
+            .build();
+        when(messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REQUEST, null, getLocale(language)))
+            .thenReturn("user received comment request");
+        service.sendUserReceivedCommentNotificationEmail(message);
+        verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.USER_RECEIVED_COMMENT_REQUEST, null, getLocale(language));
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"ua", "en"})
+    void sendUserReceivedCommentReplyNotificationTest(String language) {
+        UserReceivedCommentReplyMessage message = UserReceivedCommentReplyMessage.builder()
+            .receiverEmail("receiver@example.com")
+            .receiverName("receiver")
+            .elementName("event")
+            .commentText("test")
+            .authorName("author")
+            .commentedElementId(1L)
+            .language(language)
+            .creationDate(LocalDateTime.now())
+            .parentCommentCreationDate(LocalDateTime.now())
+            .parentCommentText("test")
+            .parentCommentAuthorName("parentAuthor")
+            .build();
+        when(messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REPLY_REQUEST, null, getLocale(language)))
+            .thenReturn("user received comment request");
+        service.sendUserReceivedCommentReplyNotificationEmail(message);
+        verify(javaMailSender).createMimeMessage();
+        verify(messageSource).getMessage(EmailConstants.USER_RECEIVED_COMMENT_REPLY_REQUEST, null, getLocale(language));
     }
 
     @ParameterizedTest
