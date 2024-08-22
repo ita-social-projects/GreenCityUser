@@ -202,7 +202,10 @@ public class SecurityConfig {
                     "/email/addEcoNews",
                     "/email/changePlaceStatus",
                     "/email/general/notification",
-                    "/email/habitAssign/notification")
+                    "/email/habitAssign/notification",
+                    "/email/taggedUserInComment/notification",
+                    "/email/userReceivedComment/notification",
+                    "/email/userReceivedCommentReply/notification")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",

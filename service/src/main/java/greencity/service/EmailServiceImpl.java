@@ -12,6 +12,8 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.UserReceivedCommentMessage;
+import greencity.message.UserReceivedCommentReplyMessage;
 import greencity.message.UserTaggedInCommentMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
@@ -325,18 +327,56 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();
         validateLanguage(language);
-        String baseLink = clientLink + "/#/events/" + message.getCommentedEventId();
-        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
         model.put(EmailConstants.USER_NAME, message.getReceiverName());
         model.put(EmailConstants.AUTHOR_NAME, message.getTaggerName());
         model.put(EmailConstants.LANGUAGE, language);
         model.put(EmailConstants.IS_UBS, false);
-        model.put(EmailConstants.EVENT_NAME, message.getEventName());
+        model.put(EmailConstants.ELEMENT_NAME, message.getElementName());
         model.put(EmailConstants.COMMENT_TIME, message.getCreationDate());
         model.put(EmailConstants.COMMENT_BODY, message.getCommentText());
         String template = createEmailTemplate(model, EmailConstants.USER_TAGGED_IN_COMMENT_PAGE);
         sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.USER_TAGGED_IN_COMMENT_REQUEST,
-            null, getLocale(language)), template);
+            null, getLocale(language)) + " " + message.getElementName(), template);
+    }
+
+    public void sendUserReceivedCommentNotificationEmail(UserReceivedCommentMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        String language = message.getLanguage();
+        validateLanguage(language);
+        model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
+        model.put(EmailConstants.USER_NAME, message.getReceiverName());
+        model.put(EmailConstants.AUTHOR_NAME, message.getAuthorName());
+        model.put(EmailConstants.LANGUAGE, language);
+        model.put(EmailConstants.IS_UBS, false);
+        model.put(EmailConstants.ELEMENT_NAME, message.getElementName());
+        model.put(EmailConstants.COMMENT_TIME, message.getCreationDate());
+        model.put(EmailConstants.COMMENT_BODY, message.getCommentText());
+        String template = createEmailTemplate(model, EmailConstants.USER_RECEIVED_COMMENT_PAGE);
+        sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REQUEST,
+            null, getLocale(language)) + " " + message.getElementName(), template);
+    }
+
+    public void sendUserReceivedCommentReplyNotificationEmail(UserReceivedCommentReplyMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        String language = message.getLanguage();
+        validateLanguage(language);
+        model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
+        model.put(EmailConstants.USER_NAME, message.getReceiverName());
+        model.put(EmailConstants.ELEMENT_NAME, message.getElementName());
+        model.put(EmailConstants.AUTHOR_NAME, message.getAuthorName());
+        model.put(EmailConstants.LANGUAGE, language);
+        model.put(EmailConstants.IS_UBS, false);
+        model.put(EmailConstants.COMMENT_TIME, message.getCreationDate());
+        model.put(EmailConstants.COMMENT_BODY, message.getCommentText());
+        model.put(EmailConstants.PARENT_COMMENT_AUTHOR_NAME, message.getParentCommentAuthorName());
+        model.put(EmailConstants.PARENT_COMMENT_BODY, message.getParentCommentText());
+        model.put(EmailConstants.PARENT_COMMENT_TIME, message.getParentCommentCreationDate());
+        String template = createEmailTemplate(model, EmailConstants.USER_RECEIVED_COMMENT_REPLY_PAGE);
+        sendEmail(message.getReceiverEmail(),
+            message.getAuthorName() + " " + messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REPLY_REQUEST,
+                null, getLocale(language)) + " " + message.getElementName(),
+            template);
     }
 
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,
