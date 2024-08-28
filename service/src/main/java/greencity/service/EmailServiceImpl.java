@@ -1,5 +1,6 @@
 package greencity.service;
 
+import com.sun.mail.imap.protocol.BODY;
 import greencity.constant.EmailConstants;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
@@ -12,6 +13,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.ScheduledEmailMessage;
 import greencity.message.UserReceivedCommentMessage;
 import greencity.message.UserReceivedCommentReplyMessage;
 import greencity.message.UserTaggedInCommentMessage;
@@ -340,43 +342,20 @@ public class EmailServiceImpl implements EmailService {
             null, getLocale(language)) + " " + message.getElementName(), template);
     }
 
-    public void sendUserReceivedCommentNotificationEmail(UserReceivedCommentMessage message) {
-        Map<String, Object> model = new HashMap<>();
-        String language = message.getLanguage();
-        validateLanguage(language);
-        model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
-        model.put(EmailConstants.USER_NAME, message.getReceiverName());
-        model.put(EmailConstants.AUTHOR_NAME, message.getAuthorName());
-        model.put(EmailConstants.LANGUAGE, language);
-        model.put(EmailConstants.IS_UBS, false);
-        model.put(EmailConstants.ELEMENT_NAME, message.getElementName());
-        model.put(EmailConstants.COMMENT_TIME, message.getCreationDate());
-        model.put(EmailConstants.COMMENT_BODY, message.getCommentText());
-        String template = createEmailTemplate(model, EmailConstants.USER_RECEIVED_COMMENT_PAGE);
-        sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REQUEST,
-            null, getLocale(language)) + " " + message.getElementName(), template);
-    }
 
-    public void sendUserReceivedCommentReplyNotificationEmail(UserReceivedCommentReplyMessage message) {
+
+    public void sendScheduledNotificationEmail(ScheduledEmailMessage message){
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();
         validateLanguage(language);
         model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
-        model.put(EmailConstants.USER_NAME, message.getReceiverName());
-        model.put(EmailConstants.ELEMENT_NAME, message.getElementName());
-        model.put(EmailConstants.AUTHOR_NAME, message.getAuthorName());
+        model.put(EmailConstants.USER_NAME, message.getUsername());
         model.put(EmailConstants.LANGUAGE, language);
         model.put(EmailConstants.IS_UBS, false);
-        model.put(EmailConstants.COMMENT_TIME, message.getCreationDate());
-        model.put(EmailConstants.COMMENT_BODY, message.getCommentText());
-        model.put(EmailConstants.PARENT_COMMENT_AUTHOR_NAME, message.getParentCommentAuthorName());
-        model.put(EmailConstants.PARENT_COMMENT_BODY, message.getParentCommentText());
-        model.put(EmailConstants.PARENT_COMMENT_TIME, message.getParentCommentCreationDate());
-        String template = createEmailTemplate(model, EmailConstants.USER_RECEIVED_COMMENT_REPLY_PAGE);
-        sendEmail(message.getReceiverEmail(),
-            message.getAuthorName() + " " + messageSource.getMessage(EmailConstants.USER_RECEIVED_COMMENT_REPLY_REQUEST,
-                null, getLocale(language)) + " " + message.getElementName(),
-            template);
+        model.put(EmailConstants.TITLE, message.getSubject());
+        model.put(EmailConstants.BODY, message.getBody());
+        String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
+        sendEmail(message.getEmail(), message.getSubject(), template);
     }
 
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,
