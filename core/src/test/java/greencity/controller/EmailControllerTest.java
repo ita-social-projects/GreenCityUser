@@ -221,13 +221,13 @@ class EmailControllerTest {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-                .body("test body")
-                .username("test user")
-                .email("test@gmail.com")
-                .subject("test subject")
-                .baseLink("test link")
-                .language("en")
-                .build();
+            .body("test body")
+            .username("test user")
+            .email("test@gmail.com")
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
         String content = objectMapper.writeValueAsString(message);
         mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/scheduled/notification")
             .contentType(MediaType.APPLICATION_JSON)

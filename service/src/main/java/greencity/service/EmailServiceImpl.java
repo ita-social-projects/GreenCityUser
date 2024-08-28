@@ -1,6 +1,5 @@
 package greencity.service;
 
-import com.sun.mail.imap.protocol.BODY;
 import greencity.constant.EmailConstants;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
@@ -14,8 +13,6 @@ import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
-import greencity.message.UserReceivedCommentMessage;
-import greencity.message.UserReceivedCommentReplyMessage;
 import greencity.message.UserTaggedInCommentMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
@@ -342,9 +339,7 @@ public class EmailServiceImpl implements EmailService {
             null, getLocale(language)) + " " + message.getElementName(), template);
     }
 
-
-
-    public void sendScheduledNotificationEmail(ScheduledEmailMessage message){
+    public void sendScheduledNotificationEmail(ScheduledEmailMessage message) {
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();
         validateLanguage(language);

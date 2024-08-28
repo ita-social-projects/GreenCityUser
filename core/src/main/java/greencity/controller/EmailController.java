@@ -149,19 +149,19 @@ public class EmailController {
     /**
      * Sends scheduled email notification to user.
      *
-     * @param message {@link ScheduledEmailMessage} - object with all
-     *                necessary data for sending notification via email.
+     * @param message {@link ScheduledEmailMessage} - object with all necessary data
+     *                for sending notification via email.
      * @author Dmytro Dmytruk
      */
     @Operation(summary = "Send scheduled email notification to user")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PostMapping("/scheduled/notification")
     public ResponseEntity<Void> sendScheduledNotification(
-            @RequestBody @Valid ScheduledEmailMessage message){
+        @RequestBody @Valid ScheduledEmailMessage message) {
         emailService.sendScheduledNotificationEmail(message);
         return ResponseEntity.ok().build();
     }

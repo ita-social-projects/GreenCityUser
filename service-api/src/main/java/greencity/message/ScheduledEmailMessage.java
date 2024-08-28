@@ -25,4 +25,3 @@ public class ScheduledEmailMessage implements Serializable {
     @NotEmpty(message = "Language cannot be empty")
     private String language;
 }
-

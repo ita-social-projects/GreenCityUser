@@ -248,13 +248,13 @@ class EmailServiceImplTest {
     @Test
     void sendScheduledNotificationEmailTest() {
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-                .body("test body")
-                .username("test user")
-                .email("test@gmail.com")
-                .subject("test subject")
-                .baseLink("test link")
-                .language("en")
-                .build();
+            .body("test body")
+            .username("test user")
+            .email("test@gmail.com")
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
         service.sendScheduledNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
     }
