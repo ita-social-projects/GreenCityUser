@@ -64,10 +64,7 @@ import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.UserDeactivationException;
 import greencity.filters.UserSpecification;
-import greencity.repository.LanguageRepo;
-import greencity.repository.UserDeactivationRepo;
-import greencity.repository.UserLocationRepo;
-import greencity.repository.UserRepo;
+import greencity.repository.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -137,6 +134,9 @@ class UserServiceImplTest {
 
     @Mock
     UserLocationRepo userLocationRepo;
+
+    @Mock
+    UserNotificationPreferenceRepo userNotificationPreferenceRepo;
 
     @Mock
     private SimpMessagingTemplate messagingTemplate;

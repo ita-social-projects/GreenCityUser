@@ -37,12 +37,7 @@ import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UserLocationDto;
-import greencity.entity.Language;
-import greencity.entity.SocialNetwork;
-import greencity.entity.SocialNetworkImage;
-import greencity.entity.User;
-import greencity.entity.UserDeactivationReason;
-import greencity.entity.UserLocation;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -61,17 +56,15 @@ import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
+import greencity.repository.UserNotificationPreferenceRepo;
 import greencity.repository.options.UserFilter;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -99,6 +92,7 @@ public class UserServiceImpl implements UserService {
     private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
     private final GoogleApiService googleApiService;
+    private final UserNotificationPreferenceRepo userNotificationPreferenceRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
@@ -595,7 +589,18 @@ public class UserServiceImpl implements UserService {
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-
+        userNotificationPreferenceRepository.deleteAllByUserId(user.getId());
+        Set<UserNotificationPreference> newPreferences = new HashSet<>();
+        if (Objects.nonNull(userProfileDtoRequest.getEmailPreferences())) {
+            newPreferences = userProfileDtoRequest.getEmailPreferences().stream()
+                .map(type -> {
+                    UserNotificationPreference preference = new UserNotificationPreference();
+                    preference.setUser(user);
+                    preference.setEmailPreference(type);
+                    return preference;
+                }).collect(Collectors.toSet());
+        }
+        user.setNotificationPreferences(newPreferences);
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }

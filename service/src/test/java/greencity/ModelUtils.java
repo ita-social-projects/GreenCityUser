@@ -18,6 +18,7 @@ import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.*;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
@@ -27,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class ModelUtils {
     public static final User TEST_USER = createUser();
@@ -321,6 +323,7 @@ public class ModelUtils {
             .showLocation(true)
             .showEcoPlace(true)
             .showShoppingList(true)
+            .emailPreferences(Set.of(EmailPreference.LIKES, EmailPreference.COMMENTS))
             .build();
     }
 
