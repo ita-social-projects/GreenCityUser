@@ -48,6 +48,8 @@ public class EmailConstants {
     public static final String SENDER_NAME = "senderName";
     public static final String HABIT_NAME = "habitName";
     public static final String ELEMENT_NAME = "elementName";
+    public static final String TITLE = "title";
+    public static final String BODY = "body";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
@@ -64,4 +66,5 @@ public class EmailConstants {
     public static final String USER_TAGGED_IN_COMMENT_PAGE = "user-tagged-in-comment-email-page";
     public static final String USER_RECEIVED_COMMENT_PAGE = "user-received-comment-email-page";
     public static final String USER_RECEIVED_COMMENT_REPLY_PAGE = "user-received-comment-reply-email-page";
+    public static final String SCHEDULED_NOTIFICATION_PAGE = "scheduled-notification-email-page";
 }
