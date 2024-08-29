@@ -17,6 +17,7 @@ import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,7 @@ import org.springframework.web.cors.CorsConfiguration;
 @EnableWebSecurity
 @EnableGlobalAuthentication
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
     private final JwtTool jwtTool;
     private final UserService userService;
@@ -82,6 +84,7 @@ public class SecurityConfig {
                     "X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
             config.setAllowCredentials(true);
             config.setMaxAge(3600L);
+            log.info("AllowedOrigin for CORS configuration : {}", config.getAllowedOriginPatterns());
             return config;
         })).csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
@@ -118,7 +121,8 @@ public class SecurityConfig {
                     "/socket/**",
                     "/user/findAllByEmailNotification",
                     "/user/checkByUuid",
-                    "/user/get-user-rating")
+                    "/user/get-user-rating",
+                    "/test")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST,
                     "/ownSecurity/signUp",
