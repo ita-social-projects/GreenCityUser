@@ -746,8 +746,8 @@ public class UserServiceImpl implements UserService {
         Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
         Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
         Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
-        Long amountOfOrganizedAndAttendedEventsByUserId = restClient
-            .findAmountOfEventsOrganizedAndAttendedByUser(userId);
+        Long amountOfOrganizedAndAttendedEventsByUserId =
+            restClient.findAmountOfEventsAttendedByUser(userId) + restClient.findAmountOfEventsOrganizedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)

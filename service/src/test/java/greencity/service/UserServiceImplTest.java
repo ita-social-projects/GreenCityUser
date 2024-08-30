@@ -546,7 +546,9 @@ class UserServiceImplTest {
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
         when(restClient.findAmountOfHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
-        when(restClient.findAmountOfEventsOrganizedAndAttendedByUser(TestConst.SIMPLE_LONG_NUMBER))
+        when(restClient.findAmountOfEventsAttendedByUser(TestConst.SIMPLE_LONG_NUMBER))
+            .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
+        when(restClient.findAmountOfEventsOrganizedByUser(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
 
         assertEquals(ModelUtils.USER_PROFILE_STATISTICS_DTO,
@@ -557,7 +559,8 @@ class UserServiceImplTest {
         verify(restClient, times(2)).findAmountOfPublishedNews(anyLong());
         verify(restClient, times(2)).findAmountOfAcquiredHabits(anyLong());
         verify(restClient, times(2)).findAmountOfHabitsInProgress(anyLong());
-        verify(restClient, times(2)).findAmountOfEventsOrganizedAndAttendedByUser(anyLong());
+        verify(restClient, times(2)).findAmountOfEventsAttendedByUser(anyLong());
+        verify(restClient, times(2)).findAmountOfEventsOrganizedByUser(anyLong());
     }
 
     @Test
@@ -974,7 +977,6 @@ class UserServiceImplTest {
         ReflectionTestUtils.setField(userService, "timeAfterLastActivity", 300000);
         LocalDateTime localDateTime = LocalDateTime.of(
             2015, Month.JULY, 29, 19, 30, 40);
-        Timestamp userLastActivityTime = Timestamp.valueOf(localDateTime);
         User user = ModelUtils.getUser();
 
         when(userRepo.findById(anyLong())).thenReturn(Optional.of(user));
