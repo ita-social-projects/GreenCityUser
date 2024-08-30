@@ -49,7 +49,6 @@ import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserLocation;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
-
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.Role.ROLE_ADMIN;
 import static greencity.enums.Role.ROLE_MODERATOR;
@@ -70,7 +69,6 @@ import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
