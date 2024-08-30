@@ -975,8 +975,6 @@ class UserServiceImplTest {
     @Test
     void checkIfTheUserIsOnlineEqualsFalseTest() {
         ReflectionTestUtils.setField(userService, "timeAfterLastActivity", 300000);
-        LocalDateTime localDateTime = LocalDateTime.of(
-            2015, Month.JULY, 29, 19, 30, 40);
         User user = ModelUtils.getUser();
 
         when(userRepo.findById(anyLong())).thenReturn(Optional.of(user));
