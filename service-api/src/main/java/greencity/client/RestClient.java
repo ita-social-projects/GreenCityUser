@@ -48,7 +48,6 @@ public class RestClient {
             + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
             CustomShoppingListItemResponseDto[].class);
         CustomShoppingListItemResponseDto[] responseDtos = exchange.getBody();
-        assert responseDtos != null;
         return Arrays.asList(responseDtos);
     }
 
@@ -139,11 +138,8 @@ public class RestClient {
      */
     public FriendsChatDto chatBetweenTwo(Long firstUserId, Long secondUserId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        FriendsChatDto body =
-            restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/" + firstUserId + "/" + secondUserId,
-                HttpMethod.GET, entity, FriendsChatDto.class).getBody();
-        assert body != null;
-        return body;
+        return restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/" + firstUserId + "/" + secondUserId,
+            HttpMethod.GET, entity, FriendsChatDto.class).getBody();
     }
 
     /**
@@ -167,9 +163,8 @@ public class RestClient {
      */
     public List<String> getAllLanguageCodes() {
         String[] restTemplateForObject = restTemplate.getForObject(greenCityServerAddress
-            + RestTemplateLinks.LANGUAGE, String[].class);
-        assert restTemplateForObject != null;
-        return Arrays.asList(restTemplateForObject);
+            + RestTemplateLinks.LANGUAGES + RestTemplateLinks.CODES, String[].class);
+        return List.of(restTemplateForObject);
     }
 
     /**

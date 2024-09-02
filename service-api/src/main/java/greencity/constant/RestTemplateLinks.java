@@ -8,7 +8,8 @@ public class RestTemplateLinks {
     public static final String FILES_IMAGE = "/files/image";
     public static final String SOCIAL_NETWORKS_IMAGE = "/social-networks/image";
     public static final String SOCIAL_NETWORKS = "/social-networks";
-    public static final String LANGUAGE = "/language";
+    public static final String LANGUAGES = "/languages";
+    public static final String CODES = "/codes";
     public static final String ECONEWS_COUNT = "/econews/count";
     public static final String HABIT_STATISTIC_ACQUIRED_COUNT = "/habit/statistic/acquired/count";
     public static final String HABIT_STATISTIC_IN_PROGRESS_COUNT = "/habit/statistic/in-progress/count";
