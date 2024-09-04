@@ -5,7 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.*;
+import greencity.message.GeneralEmailMessage;
+import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.ScheduledEmailMessage;
+import greencity.message.SendChangePlaceStatusEmailMessage;
+import greencity.message.SendHabitNotification;
+import greencity.message.SendReportEmailMessage;
+import greencity.message.UserTaggedInCommentMessage;
 import greencity.service.EmailService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -211,51 +217,21 @@ class EmailControllerTest {
 
     @Test
     @SneakyThrows
-    void sendUserReceivedCommentNotification() {
+    void sendUserReceivedScheduledNotification() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        UserReceivedCommentMessage message = UserReceivedCommentMessage.builder()
-            .receiverEmail("receiver@example.com")
-            .receiverName("receiver")
-            .elementName("event")
-            .commentText("test")
-            .authorName("test")
-            .commentedElementId(1L)
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test body")
+            .username("test user")
+            .email("test@gmail.com")
+            .subject("test subject")
+            .baseLink("test link")
             .language("en")
-            .baseLink("testLink")
-            .creationDate(LocalDateTime.now())
             .build();
         String content = objectMapper.writeValueAsString(message);
-        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/userReceivedComment/notification")
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/scheduled/notification")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
     }
-
-    @Test
-    @SneakyThrows
-    void sendUserReceivedCommentReplyNotification() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        UserReceivedCommentReplyMessage message = UserReceivedCommentReplyMessage.builder()
-            .receiverEmail("receiver@example.com")
-            .receiverName("receiver")
-            .elementName("event")
-            .commentText("test")
-            .authorName("test")
-            .baseLink("testLink")
-            .commentedElementId(1L)
-            .language("en")
-            .parentCommentAuthorName("parent")
-            .parentCommentText("parentText")
-            .parentCommentCreationDate(LocalDateTime.now())
-            .creationDate(LocalDateTime.now())
-            .build();
-        String content = objectMapper.writeValueAsString(message);
-        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/userReceivedCommentReply/notification")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(content))
-            .andExpect(status().isOk());
-    }
-
 }
