@@ -9,8 +9,7 @@ import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
-import greencity.message.UserReceivedCommentMessage;
-import greencity.message.UserReceivedCommentReplyMessage;
+import greencity.message.ScheduledEmailMessage;
 import greencity.message.UserTaggedInCommentMessage;
 import java.util.List;
 import java.util.Map;
@@ -173,20 +172,11 @@ public interface EmailService {
     void sendTaggedUserInCommentNotificationEmail(UserTaggedInCommentMessage message);
 
     /**
-     * Sends an email notification user that received a comment
-     * {@link UserReceivedCommentMessage}.
+     * Sends an email notification user that received scheduled message
+     * {@link ScheduledEmailMessage}.
      *
-     * @param message {@link UserReceivedCommentMessage}
+     * @param message {@link ScheduledEmailMessage}
      * @author Dmytro Dmytruk
      */
-    void sendUserReceivedCommentNotificationEmail(UserReceivedCommentMessage message);
-
-    /**
-     * Sends an email notification user that received reply to the comment
-     * {@link UserReceivedCommentMessage}.
-     *
-     * @param message {@link UserReceivedCommentMessage}
-     * @author Dmytro Dmytruk
-     */
-    void sendUserReceivedCommentReplyNotificationEmail(UserReceivedCommentReplyMessage message);
+    void sendScheduledNotificationEmail(ScheduledEmailMessage message);
 }
