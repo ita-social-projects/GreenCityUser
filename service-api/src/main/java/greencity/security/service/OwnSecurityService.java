@@ -53,14 +53,6 @@ public interface OwnSecurityService {
     AccessRefreshTokensDto updateAccessTokens(String refreshToken);
 
     /**
-     * Method for updating password.
-     *
-     * @param pass {@link String}
-     * @param id   {@link Long}
-     */
-    void updatePassword(String pass, Long id);
-
-    /**
      * Method for updating current password.
      *
      * @param updatePasswordDto {@link UpdatePasswordDto}
@@ -92,4 +84,12 @@ public interface OwnSecurityService {
      * @param email {@link String} email of user.
      */
     void setPassword(SetPasswordDto dto, String email);
+
+    /**
+     * Method to delete (deactivate) a user by email, setting their status to
+     * DELETED.
+     *
+     * @param email {@link String} email of the user to be deleted.
+     */
+    void deleteUserByEmail(String email);
 }
