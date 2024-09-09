@@ -124,7 +124,6 @@ class EmailControllerTest {
 
     @Test
     void changePlaceStatusInvalidPlaceStatus() throws Exception {
-        ObjectMapper objectMapper = new ObjectMapper();
         String content = """
             {\
             "authorEmail":"string",\
