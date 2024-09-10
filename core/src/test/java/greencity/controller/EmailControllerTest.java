@@ -19,17 +19,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class EmailControllerTest {
@@ -107,7 +108,7 @@ class EmailControllerTest {
             "authorEmail":"string",\
             "authorFirstName":"string",\
             "placeName":"string",\
-            "placeStatus":"string"\
+            "placeStatus":"approved"\
             }\
             """;
 
@@ -119,6 +120,23 @@ class EmailControllerTest {
         verify(emailService).sendChangePlaceStatusEmail(
             message.getAuthorFirstName(), message.getPlaceName(),
             message.getPlaceStatus(), message.getAuthorEmail());
+    }
+
+    @Test
+    void changePlaceStatusInvalidPlaceStatus() throws Exception {
+        String content = """
+            {\
+            "authorEmail":"string",\
+            "authorFirstName":"string",\
+            "placeName":"string",\
+            "placeStatus":"ggggggg"\
+            }\
+            """;
+
+        mockMvc.perform(post(LINK + "/changePlaceStatus")
+            .content(content)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
     }
 
     @Test

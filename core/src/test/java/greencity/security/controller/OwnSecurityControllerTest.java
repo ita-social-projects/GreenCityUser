@@ -52,7 +52,7 @@ class OwnSecurityControllerTest {
 
     @BeforeEach
     void setUp() {
-        email = "test@mail.com";
+        email = "test@example.com";
 
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(ownSecurityController)
