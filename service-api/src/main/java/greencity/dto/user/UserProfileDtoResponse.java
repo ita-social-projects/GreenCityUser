@@ -1,8 +1,10 @@
 package greencity.dto.user;
 
 import greencity.dto.socialnetwork.SocialNetworkResponseDTO;
+import greencity.entity.UserNotificationPreference;
 import greencity.enums.Role;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -27,4 +29,5 @@ public class UserProfileDtoResponse {
     private Float rating;
     private Role role;
     private UserLocationDto userLocationDto;
+    private Set<UserNotificationPreference> emailPreferences;
 }

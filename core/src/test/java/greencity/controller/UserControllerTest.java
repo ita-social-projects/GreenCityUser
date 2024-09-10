@@ -396,6 +396,47 @@ class UserControllerTest {
     }
 
     @Test
+    void saveWithEmailPreferencesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("Vovka");
+
+        String json = """
+            {
+                "name": "Vovka",
+                "userCredo": "credo",
+                "socialNetworks": [],
+                "showLocation": true,
+                "showEcoPlace": true,
+                "showShoppingList": false,
+                "coordinates": {
+                    "latitude": 20.000000,
+                    "longitude": 20.000000
+                },
+                "emailPreferences": [
+                    "LIKES",
+                    "SYSTEM"
+                ]
+            }
+            """;
+        String accessToken = "accessToken";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+
+        this.mockMvc.perform(put(userLink + "/profile")
+            .headers(headers)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .param("accessToken", "accessToken")
+            .principal(principal))
+            .andExpect(status().isOk());
+
+        ObjectMapper mapper = new ObjectMapper();
+        UserProfileDtoRequest dto = mapper.readValue(json, UserProfileDtoRequest.class);
+
+        verify(userService).saveUserProfile(dto, "Vovka");
+    }
+
+    @Test
     void searchTest() throws Exception {
         Pageable pageable = PageRequest.of(0, 20);
         UserManagementViewDto userViewDto =
