@@ -180,7 +180,8 @@ public class SecurityConfig {
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.DELETE,
                     "/user/shopping-list-items/user-shopping-list-items",
-                    "/user/shopping-list-items")
+                    "/user/shopping-list-items",
+                    "/ownSecurity/user")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     USER_LINK,
