@@ -211,17 +211,28 @@ public class RestClient {
     }
 
     /**
-     * Method for getting amount of organized and attended events by {@link UserVO}
-     * id.
+     * Method for getting amount of attended events by {@link UserVO} id.
      *
      * @param userId of {@link UserVO}
-     * @return {@link Long} count of organized and attended by user events.
-     * @author Olena Sotnik
+     * @return {@link Long} count of attended by user events.
      */
-    public Long findAmountOfEventsOrganizedAndAttendedByUser(Long userId) {
+    public Long findAmountOfEventsAttendedByUser(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT + RestTemplateLinks.USER_ID + userId,
+            + RestTemplateLinks.EVENTS_ATTENDED_COUNT_BY_USER_ID + userId,
+            HttpMethod.GET, entity, Long.class).getBody();
+    }
+
+    /**
+     * Method for getting amount of organized events by {@link UserVO} id.
+     *
+     * @param userId of {@link UserVO}
+     * @return {@link Long} count of organized by user events.
+     */
+    public Long findAmountOfEventsOrganizedByUser(Long userId) {
+        HttpEntity<String> entity = new HttpEntity<>(setHeader());
+        return restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_ORGANIZED_COUNT_BY_USER_ID + userId,
             HttpMethod.GET, entity, Long.class).getBody();
     }
 }

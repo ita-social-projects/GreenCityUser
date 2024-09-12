@@ -18,5 +18,6 @@ public class RestTemplateLinks {
     public static final String AUTHOR_ID = "?author-id=";
     public static final String URL = "?url=";
     public static final String UBS_USER_PROFILE = "/ubs/userProfile";
-    public static final String EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT = "/events/userEvents/count";
+    public static final String EVENTS_ATTENDED_COUNT_BY_USER_ID = "/events/attenders/count?user-id=";
+    public static final String EVENTS_ORGANIZED_COUNT_BY_USER_ID = "/events/organizers/count?user-id=";
 }
