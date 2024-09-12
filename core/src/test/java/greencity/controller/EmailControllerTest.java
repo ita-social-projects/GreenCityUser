@@ -5,7 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.EcoNewsForSendEmailDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.*;
+import greencity.message.GeneralEmailMessage;
+import greencity.message.HabitAssignNotificationMessage;
+import greencity.message.ScheduledEmailMessage;
+import greencity.message.SendChangePlaceStatusEmailMessage;
+import greencity.message.SendHabitNotification;
+import greencity.message.SendReportEmailMessage;
+import greencity.message.UserTaggedInCommentMessage;
 import greencity.service.EmailService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,17 +19,18 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
+
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 class EmailControllerTest {
@@ -101,7 +108,7 @@ class EmailControllerTest {
             "authorEmail":"string",\
             "authorFirstName":"string",\
             "placeName":"string",\
-            "placeStatus":"string"\
+            "placeStatus":"approved"\
             }\
             """;
 
@@ -113,6 +120,23 @@ class EmailControllerTest {
         verify(emailService).sendChangePlaceStatusEmail(
             message.getAuthorFirstName(), message.getPlaceName(),
             message.getPlaceStatus(), message.getAuthorEmail());
+    }
+
+    @Test
+    void changePlaceStatusInvalidPlaceStatus() throws Exception {
+        String content = """
+            {\
+            "authorEmail":"string",\
+            "authorFirstName":"string",\
+            "placeName":"string",\
+            "placeStatus":"ggggggg"\
+            }\
+            """;
+
+        mockMvc.perform(post(LINK + "/changePlaceStatus")
+            .content(content)
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -211,51 +235,21 @@ class EmailControllerTest {
 
     @Test
     @SneakyThrows
-    void sendUserReceivedCommentNotification() {
+    void sendUserReceivedScheduledNotification() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        UserReceivedCommentMessage message = UserReceivedCommentMessage.builder()
-            .receiverEmail("receiver@example.com")
-            .receiverName("receiver")
-            .elementName("event")
-            .commentText("test")
-            .authorName("test")
-            .commentedElementId(1L)
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test body")
+            .username("test user")
+            .email("test@gmail.com")
+            .subject("test subject")
+            .baseLink("test link")
             .language("en")
-            .baseLink("testLink")
-            .creationDate(LocalDateTime.now())
             .build();
         String content = objectMapper.writeValueAsString(message);
-        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/userReceivedComment/notification")
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/scheduled/notification")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
     }
-
-    @Test
-    @SneakyThrows
-    void sendUserReceivedCommentReplyNotification() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        UserReceivedCommentReplyMessage message = UserReceivedCommentReplyMessage.builder()
-            .receiverEmail("receiver@example.com")
-            .receiverName("receiver")
-            .elementName("event")
-            .commentText("test")
-            .authorName("test")
-            .baseLink("testLink")
-            .commentedElementId(1L)
-            .language("en")
-            .parentCommentAuthorName("parent")
-            .parentCommentText("parentText")
-            .parentCommentCreationDate(LocalDateTime.now())
-            .creationDate(LocalDateTime.now())
-            .build();
-        String content = objectMapper.writeValueAsString(message);
-        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/userReceivedCommentReply/notification")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(content))
-            .andExpect(status().isOk());
-    }
-
 }

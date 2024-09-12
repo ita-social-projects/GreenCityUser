@@ -1,7 +1,7 @@
 package greencity.client;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.IMAGE;
+import static greencity.constant.AppConstant.FILES;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
@@ -91,17 +91,17 @@ class RestClientTest {
             }
         };
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add(IMAGE, fileAsResource);
+        map.add(FILES, fileAsResource);
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.postForObject(greenCityServerAddress +
-            RestTemplateLinks.FILES_IMAGE, requestEntity,
+            RestTemplateLinks.FILES, requestEntity,
             String.class)).thenReturn(imagePath);
         assertEquals(imagePath,
             restClient.uploadImage(image));
         verify(httpServletRequest).getHeader(any());
         verify(restTemplate).postForObject(greenCityServerAddress +
-            RestTemplateLinks.FILES_IMAGE, requestEntity,
+            RestTemplateLinks.FILES, requestEntity,
             String.class);
     }
 
@@ -146,8 +146,9 @@ class RestClientTest {
         Long publishedNews = 5L;
         Long userId = 1L;
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.ECONEWS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class))
+        when(restTemplate.exchange(
+            greenCityServerAddress + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.AUTHOR_ID + userId,
+            HttpMethod.GET, entity, Long.class))
                 .thenReturn(ResponseEntity.ok(publishedNews));
         assertEquals(publishedNews, restClient.findAmountOfPublishedNews(userId));
     }
@@ -184,11 +185,11 @@ class RestClientTest {
 
     @Test
     void getAllLanguageCodes() {
-        String[] allLanguageCodes = new String[3];
+        String[] allLanguageCodes = new String[2];
         allLanguageCodes[0] = "en";
         allLanguageCodes[1] = "uk";
         when(restTemplate.getForObject(greenCityServerAddress
-            + RestTemplateLinks.LANGUAGE, String[].class)).thenReturn(allLanguageCodes);
+            + RestTemplateLinks.LANGUAGES + RestTemplateLinks.CODES, String[].class)).thenReturn(allLanguageCodes);
 
         assertEquals(Arrays.asList(allLanguageCodes), restClient.getAllLanguageCodes());
     }

@@ -1,7 +1,7 @@
 package greencity.client;
 
 import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.IMAGE;
+import static greencity.constant.AppConstant.FILES;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
@@ -48,7 +48,6 @@ public class RestClient {
             + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
             CustomShoppingListItemResponseDto[].class);
         CustomShoppingListItemResponseDto[] responseDtos = exchange.getBody();
-        assert responseDtos != null;
         return Arrays.asList(responseDtos);
     }
 
@@ -65,12 +64,12 @@ public class RestClient {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         try {
-            map.add(IMAGE, convert(image));
+            map.add(FILES, convert(image));
         } catch (IOException e) {
             log.info("File did not convert to ByteArrayResource");
         }
         return restTemplate.postForObject(greenCityServerAddress
-            + RestTemplateLinks.FILES_IMAGE, requestEntity, String.class);
+            + RestTemplateLinks.FILES, requestEntity, String.class);
     }
 
     /**
@@ -110,8 +109,9 @@ public class RestClient {
      */
     public Long findAmountOfPublishedNews(Long userId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.ECONEWS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class)
+        return restTemplate.exchange(
+            greenCityServerAddress + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.AUTHOR_ID + userId,
+            HttpMethod.GET, entity, Long.class)
             .getBody();
     }
 
@@ -139,11 +139,8 @@ public class RestClient {
      */
     public FriendsChatDto chatBetweenTwo(Long firstUserId, Long secondUserId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        FriendsChatDto body =
-            restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/" + firstUserId + "/" + secondUserId,
-                HttpMethod.GET, entity, FriendsChatDto.class).getBody();
-        assert body != null;
-        return body;
+        return restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/" + firstUserId + "/" + secondUserId,
+            HttpMethod.GET, entity, FriendsChatDto.class).getBody();
     }
 
     /**
@@ -167,9 +164,8 @@ public class RestClient {
      */
     public List<String> getAllLanguageCodes() {
         String[] restTemplateForObject = restTemplate.getForObject(greenCityServerAddress
-            + RestTemplateLinks.LANGUAGE, String[].class);
-        assert restTemplateForObject != null;
-        return Arrays.asList(restTemplateForObject);
+            + RestTemplateLinks.LANGUAGES + RestTemplateLinks.CODES, String[].class);
+        return List.of(restTemplateForObject);
     }
 
     /**

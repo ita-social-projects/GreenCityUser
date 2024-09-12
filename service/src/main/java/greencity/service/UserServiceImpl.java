@@ -13,6 +13,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAddRatingDto;
@@ -22,6 +23,7 @@ import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -33,45 +35,35 @@ import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UsersOnlineStatusRequestDto;
-import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.dto.user.UserLocationDto;
+import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserLocation;
+import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.Base64DecodedException;
 import greencity.exception.exceptions.InsufficientLocationDataException;
 import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.UserDeactivationException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
-import greencity.exception.exceptions.UserDeactivationException;
-import greencity.exception.exceptions.Base64DecodedException;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserLocationRepo;
+import greencity.repository.UserNotificationPreferenceRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -85,6 +77,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * The class provides implementation of the {@code UserService}.
@@ -99,6 +105,7 @@ public class UserServiceImpl implements UserService {
     private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
     private final GoogleApiService googleApiService;
+    private final UserNotificationPreferenceRepo userNotificationPreferenceRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
@@ -525,8 +532,7 @@ public class UserServiceImpl implements UserService {
      * @author Marian Datsko
      */
     @Override
-    public UserVO updateUserProfilePicture(MultipartFile image, String email,
-        String base64) {
+    public UserVO updateUserProfilePicture(MultipartFile image, String email, String base64) {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
@@ -595,7 +601,18 @@ public class UserServiceImpl implements UserService {
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-
+        userNotificationPreferenceRepository.deleteAllByUserId(user.getId());
+        Set<UserNotificationPreference> newPreferences = new HashSet<>();
+        if (Objects.nonNull(userProfileDtoRequest.getEmailPreferences())) {
+            newPreferences = userProfileDtoRequest.getEmailPreferences().stream()
+                .map(type -> {
+                    UserNotificationPreference preference = new UserNotificationPreference();
+                    preference.setUser(user);
+                    preference.setEmailPreference(type);
+                    return preference;
+                }).collect(Collectors.toSet());
+        }
+        user.setNotificationPreferences(newPreferences);
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
