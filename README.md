@@ -30,15 +30,15 @@ You're encouraged to contribute to our project if you've found any issues or mis
 
 Before sending any pull request, please discuss requirements/changes to be implemented using an existing issue or by creating a new one. All pull requests should be done into `dev` branch.
 
-Though there are three GitHub projects ([GreenCity](https://github.com/ita-social-projects/GreenCity) and [GreenCityUser](https://github.com/ita-social-projects/GreenCityUser) for back-end part and [GreenCityClient](https://github.com/ita-social-projects/GreenCityClient) for front-end part) all of the issues are listed in the first one - [GreenCity](https://github.com/ita-social-projects/GreenCity).
+Though there are three GitHub projects ([GreenCity](https://github.com/ita-social-projects/GreenCity) and [GreenCityUser](https://github.com/ita-social-projects/GreenCityUser) for back-end part and [GreenCityClient](https://github.com/ita-social-projects/GreenCityClient) for front-end part) all the issues are listed in the first one - [GreenCity](https://github.com/ita-social-projects/GreenCity).
 
-**NOTE: make sure that your code passes checkstyle. Otherwise your pull request will be declined**. See paragraph [Setup Checkstyle](#5-setup-checkstyle).
+**NOTE: make sure that your code passes checkstyle. Otherwise, your pull request will be declined**. See paragraph [Setup Checkstyle](#5-setup-checkstyle).
 
 ## 4. Start the project locally
 
 ### 4.1. Required to install
 
-* Java 11
+* Java 21
 * PostgreSQL 9.5 or higher
 
 ### 4.2. How to run
@@ -72,7 +72,7 @@ greencity.server.address = ${GREENCITY_SERVER_ADDRESS}
 
 ![env-vars](./docs-photos/env-example.png)
 
-3. If you did everything correctly, you should be able access swagger by this URL: http://localhost:8060/swagger-ui.html#/
+3. If you did everything correctly, you should be able to access swagger by this URL: http://localhost:8060/swagger-ui.html#/
 
 ### 4.3. How to work with swagger UI in our project
 
@@ -88,9 +88,9 @@ greencity.server.address = ${GREENCITY_SERVER_ADDRESS}
 
    ![Authentication-button-swagger](./docs-photos/authentication-swagger.png)
 
-   Insert the given token into input field. The scheme should be like this `Bearer <given_token>`. Press **Authorize** button.
+   Insert the given token into input field. The scheme should be like this `<given_token>`. Press **Authorize** button.
 
-   ![Bearer-examle](./docs-photos/auth-bearer.png)
+   ![Bearer-example](./docs-photos/auth.png)
 
 6. Now you can use swagger UI to test REST API. Some controllers require *ADMIN* role. By default, new registered users have role *USER*. To overcome this you need to update record that corresponds to your user in the local database. For example, `UPDATE users SET role = 1 WHERE id = <your_user_id>`.
 
