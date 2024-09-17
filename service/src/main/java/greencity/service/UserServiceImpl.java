@@ -601,7 +601,6 @@ public class UserServiceImpl implements UserService {
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-        userNotificationPreferenceRepository.deleteAllByUserId(user.getId());
         Set<UserNotificationPreference> newPreferences = new HashSet<>();
         if (Objects.nonNull(userProfileDtoRequest.getEmailPreferences())) {
             newPreferences = userProfileDtoRequest.getEmailPreferences().stream()
@@ -611,8 +610,10 @@ public class UserServiceImpl implements UserService {
                     preference.setEmailPreference(type);
                     return preference;
                 }).collect(Collectors.toSet());
+            Set<UserNotificationPreference> currentPreferences = user.getNotificationPreferences();
+            currentPreferences.clear();
+            currentPreferences.addAll(newPreferences);
         }
-        user.setNotificationPreferences(newPreferences);
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
