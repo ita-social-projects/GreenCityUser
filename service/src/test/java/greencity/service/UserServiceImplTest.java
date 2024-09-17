@@ -84,12 +84,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
@@ -616,6 +611,7 @@ class UserServiceImplTest {
     void saveUserProfileTest() {
         var request = ModelUtils.getUserProfileDtoRequest();
         var user = ModelUtils.getUserWithSocialNetworks();
+        user.setNotificationPreferences(new HashSet<>());
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
         when(googleApiService.getLocationByCoordinates(
