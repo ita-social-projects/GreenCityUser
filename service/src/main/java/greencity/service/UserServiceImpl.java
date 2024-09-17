@@ -601,9 +601,8 @@ public class UserServiceImpl implements UserService {
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-        Set<UserNotificationPreference> newPreferences = new HashSet<>();
         if (Objects.nonNull(userProfileDtoRequest.getEmailPreferences())) {
-            newPreferences = userProfileDtoRequest.getEmailPreferences().stream()
+            Set<UserNotificationPreference> newPreferences = userProfileDtoRequest.getEmailPreferences().stream()
                 .map(type -> {
                     UserNotificationPreference preference = new UserNotificationPreference();
                     preference.setUser(user);
