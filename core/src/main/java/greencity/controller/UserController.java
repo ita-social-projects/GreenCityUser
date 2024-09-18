@@ -820,24 +820,6 @@ public class UserController {
     }
 
     /**
-     * Method that allow you to save new {@link UserVO}.
-     *
-     * @param userVO for save User
-     * @author Orest Mamchuk
-     */
-    @Operation(summary = "Save User")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
-    })
-    @PostMapping()
-    public ResponseEntity<UserVO> saveUser(@RequestBody @CurrentUser UserVO userVO) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.save(userVO));
-    }
-
-    /**
      * Method that allow to search users by several values.
      *
      * @param pageable    {@link Pageable}
