@@ -83,7 +83,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -601,18 +600,18 @@ public class UserServiceImpl implements UserService {
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-        userNotificationPreferenceRepository.deleteAllByUserId(user.getId());
-        Set<UserNotificationPreference> newPreferences = new HashSet<>();
         if (Objects.nonNull(userProfileDtoRequest.getEmailPreferences())) {
-            newPreferences = userProfileDtoRequest.getEmailPreferences().stream()
+            Set<UserNotificationPreference> newPreferences = userProfileDtoRequest.getEmailPreferences().stream()
                 .map(type -> {
                     UserNotificationPreference preference = new UserNotificationPreference();
                     preference.setUser(user);
                     preference.setEmailPreference(type);
                     return preference;
                 }).collect(Collectors.toSet());
+            Set<UserNotificationPreference> currentPreferences = user.getNotificationPreferences();
+            currentPreferences.clear();
+            currentPreferences.addAll(newPreferences);
         }
-        user.setNotificationPreferences(newPreferences);
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
