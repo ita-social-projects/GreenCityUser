@@ -1,7 +1,6 @@
 package greencity.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import greencity.entity.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import greencity.enums.EmailPreference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +15,9 @@ import lombok.Setter;
 @Builder
 public class UserNotificationPreferenceDto {
     private Long id;
-    @JsonIgnore
-    private User user;
+
+    @JsonBackReference
+    private UserVO userVO;
+
     private EmailPreference emailPreference;
 }
