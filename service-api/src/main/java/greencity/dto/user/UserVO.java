@@ -1,5 +1,6 @@
 package greencity.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
@@ -73,4 +74,7 @@ public class UserVO {
     private LanguageVO languageVO;
 
     private UserLocationDto userLocationDto;
+
+    @JsonManagedReference
+    private UserNotificationPreferenceDto userNotificationPreferenceDto;
 }
