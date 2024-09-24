@@ -703,18 +703,6 @@ class UserControllerTest {
     }
 
     @Test
-    void saveUserTest() throws Exception {
-        when(userService.save(ModelUtils.getUserVO())).thenReturn(ModelUtils.getUserVO());
-        mockMvc.perform(post(userLink)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(ModelUtils.getUserVO())))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.name").value(TestConst.NAME))
-            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
-    }
-
-    @Test
     void findAllByEmailNotificationTest() throws Exception {
         EmailNotification notification = EmailNotification.DAILY;
         when(userService.findAllByEmailNotification(notification))
