@@ -92,6 +92,10 @@ class EmailServiceImplTest {
     void sendInterestingEcoNewsTest() {
         InterestingEcoNewsDto dto = new InterestingEcoNewsDto();
         dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", "ua", UUID.randomUUID())));
+
+        when(messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null, getLocale("ua")))
+            .thenReturn("Interesting Eco News");
+
         service.sendInterestingEcoNews(dto);
         verify(javaMailSender).createMimeMessage();
     }
