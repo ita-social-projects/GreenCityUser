@@ -6,7 +6,7 @@ import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.place.PlaceNotificationDto;
-import greencity.dto.user.SubscribersDto;
+import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
@@ -91,7 +91,7 @@ class EmailServiceImplTest {
     @Test
     void sendInterestingEcoNewsTest() {
         InterestingEcoNewsDto dto = new InterestingEcoNewsDto();
-        dto.setSubscribers(List.of(new SubscribersDto("Ilia", "test@gmail.com", "123")));
+        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", UUID.randomUUID())));
         service.sendInterestingEcoNews(dto);
         verify(javaMailSender).createMimeMessage();
     }

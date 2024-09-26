@@ -6,7 +6,7 @@ import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
-import greencity.dto.user.SubscribersDto;
+import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
@@ -107,7 +107,7 @@ public class EmailServiceImpl implements EmailService {
         sharedModel.put(EmailConstants.ECO_NEWS_LIST, interestingEcoNews.getEcoNewsList());
         sharedModel.put(EmailConstants.CLIENT_LINK, clientLink);
 
-        for (SubscribersDto subscriber : interestingEcoNews.getSubscribers()) {
+        for (SubscriberDto subscriber : interestingEcoNews.getSubscribers()) {
             Map<String, Object> model = new HashMap<>(sharedModel);
             //TODO change later
             model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
