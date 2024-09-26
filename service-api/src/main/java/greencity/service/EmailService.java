@@ -1,7 +1,7 @@
 package greencity.service;
 
 import greencity.dto.category.CategoryDto;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
@@ -20,11 +20,11 @@ import java.util.Map;
 
 public interface EmailService {
     /**
-     * Method for sending notification to {@link User}'s who subscribed for updates
+     * Method for sending notification to users who subscribed for updates
      * about added new places.
      *
      * @param subscribers          list of users for receiving email.
-     * @param categoriesWithPlaces map with {@link Category} and {@link Place}`s
+     * @param categoriesWithPlaces map with {@link CategoryDto} and {@link PlaceNotificationDto}`s
      *                             which were created.
      * @param notification         type of notification.
      */
@@ -33,11 +33,11 @@ public interface EmailService {
         String notification);
 
     /**
-     * Method for sending created news for author.
+     * Method for sending interesting news for subscribers.
      *
-     * @param newDto - includes all information about ecoNews and author.
+     * @param interestingEcoNews - includes all information about ecoNews and subscribers.
      */
-    void sendCreatedNewsForAuthor(EcoNewsForSendEmailDto newDto);
+    void sendInterestingEcoNews(InterestingEcoNewsDto interestingEcoNews);
 
     /**
      * Method for sending simple notification to {@code User} about change status.

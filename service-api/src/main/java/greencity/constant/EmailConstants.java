@@ -4,11 +4,10 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class EmailConstants {
-    public static final String EMAIL_CONTENT_TYPE = "text/html; charset=utf-8";
     // subjects
     public static final String GC_CONTRIBUTORS = "GreenCity contributors";
     public static final String NEW_PLACES = "New places";
-    public static final String CREATED_NEWS = "You created news on GreenCity ";
+    public static final String INTERESTING_ECO_NEWS = "Interesting Eco News";
     public static final String VERIFY_EMAIL = "verify.email";
     public static final String RESTORED_PASSWORD = "restored.password";
     public static final String CONFIRM_RESTORING_PASS = "confirm.restoring.pass";
@@ -26,11 +25,8 @@ public class EmailConstants {
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
     public static final String AUTHOR_NAME = "authorName";
-    public static final String PARENT_COMMENT_AUTHOR_NAME = "parentCommentAuthorName";
     public static final String COMMENT_BODY = "commentBody";
-    public static final String PARENT_COMMENT_BODY = "parentCommentBody";
     public static final String COMMENT_TIME = "commentTime";
-    public static final String PARENT_COMMENT_TIME = "parentCommentTime";
     public static final String VERIFY_ADDRESS = "verifyAddress";
     public static final String RESTORE_PASS = "restorePassword";
     public static final String APPROVE_REGISTRATION = "approveRegistration";
@@ -38,9 +34,8 @@ public class EmailConstants {
     public static final String STATUS = "status";
     public static final String RESULT = "result";
     public static final String REPORT_TYPE = "reportType";
-    public static final String ECO_NEWS_LINK = "ecoNewsLink";
     public static final String UNSUBSCRIBE_LINK = "unsubscribeLink";
-    public static final String NEWS_RESULT = "news";
+    public static final String ECO_NEWS_LIST = "ecoNewsList";
     public static final String REASON = "reason";
     public static final String DESCRIPTION = "description";
     public static final String LANGUAGE = "language";
@@ -57,14 +52,12 @@ public class EmailConstants {
     public static final String SUCCESS_RESTORED_PASSWORD_PAGE = "success-restored-password-page";
     public static final String USER_APPROVAL_EMAIL_PAGE = "user-approval-email-page";
     public static final String CHANGE_PLACE_STATUS_EMAIL_PAGE = "change-place-status-email-page";
-    public static final String NEWS_RECEIVE_EMAIL_PAGE = "news-receive-email-page";
     public static final String NEW_PLACES_REPORT_EMAIL_PAGE = "new-places-report-email-page";
     public static final String REASONS_OF_DEACTIVATION_PAGE = "user-reasons-of-deactivation-page";
     public static final String ACTIVATION_PAGE = "user-activation-page";
     public static final String USER_VIOLATION_PAGE = "user-violation-mail";
     public static final String HABIT_ASSIGN_FRIEND_REQUEST_PAGE = "habit-assign-friend-request";
     public static final String USER_TAGGED_IN_COMMENT_PAGE = "user-tagged-in-comment-email-page";
-    public static final String USER_RECEIVED_COMMENT_PAGE = "user-received-comment-email-page";
-    public static final String USER_RECEIVED_COMMENT_REPLY_PAGE = "user-received-comment-reply-email-page";
     public static final String SCHEDULED_NOTIFICATION_PAGE = "scheduled-notification-email-page";
+    public static final String RECEIVE_INTERESTING_NEWS_EMAIL_PAGE = "receive-interesting-news-email-page";
 }

@@ -199,7 +199,7 @@ public class SecurityConfig {
                     "/ownSecurity/register",
                     "/email/sendReport",
                     "/email/sendHabitNotification",
-                    "/email/addEcoNews",
+                    "/email/sendInterestingEcoNews",
                     "/email/changePlaceStatus",
                     "/email/general/notification",
                     "/email/habitAssign/notification",

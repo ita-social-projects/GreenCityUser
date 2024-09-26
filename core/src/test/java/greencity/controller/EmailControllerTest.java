@@ -1,9 +1,8 @@
 package greencity.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
@@ -52,26 +51,34 @@ class EmailControllerTest {
     }
 
     @Test
-    void addEcoNews() throws Exception {
+    void sendInterestingEcoNews() throws Exception {
         String content =
             """
-                {"unsubscribeToken":"string",\
-                "creationDate":"2021-02-05T15:10:22.434Z",\
-                "imagePath":"string",\
-                "source":"string",\
-                "author":{"id":0,"name":"string","email":"test.email@gmail.com" },\
-                "title":"string",\
-                "text":"string"}\
+                {
+                    "ecoNewsList": [
+                        {
+                            "ecoNewsId": 1,
+                            "imagePath": "https://google.com",
+                            "title": "Title",
+                            "text": "Text"
+                        }
+                    ],
+                    "subscribers": [
+                        {
+                            "name": "Ilia",
+                            "email": "email@gmail.com",
+                            "unsubscribeToken": "123"
+                        }
+                    ]
+                }
                 """;
 
-        mockPerform(content, "/addEcoNews");
+        mockPerform(content, "/sendInterestingEcoNews");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.registerModule(new JavaTimeModule());
-        EcoNewsForSendEmailDto message = objectMapper.readValue(content, EcoNewsForSendEmailDto.class);
+        InterestingEcoNewsDto message = objectMapper.readValue(content, InterestingEcoNewsDto.class);
 
-        verify(emailService).sendCreatedNewsForAuthor(message);
+        verify(emailService).sendInterestingEcoNews(message);
     }
 
     @Test
