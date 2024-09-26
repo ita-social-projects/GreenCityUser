@@ -109,11 +109,13 @@ public class EmailServiceImpl implements EmailService {
 
         for (SubscriberDto subscriber : interestingEcoNews.getSubscribers()) {
             Map<String, Object> model = new HashMap<>(sharedModel);
-            //TODO change later
+            // TODO change later
             model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
             model.put(EmailConstants.USER_NAME, subscriber.getName());
+            model.put(EmailConstants.LANGUAGE, subscriber.getLanguage());
             String template = createEmailTemplate(model, EmailConstants.RECEIVE_INTERESTING_NEWS_EMAIL_PAGE);
-            sendEmail(subscriber.getEmail(), EmailConstants.INTERESTING_ECO_NEWS, template);
+            sendEmail(subscriber.getEmail(), messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null,
+                getLocale(subscriber.getLanguage())), template);
         }
     }
 

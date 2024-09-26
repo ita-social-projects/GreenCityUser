@@ -20,12 +20,13 @@ import java.util.Map;
 
 public interface EmailService {
     /**
-     * Method for sending notification to users who subscribed for updates
-     * about added new places.
+     * Method for sending notification to users who subscribed for updates about
+     * added new places.
      *
      * @param subscribers          list of users for receiving email.
-     * @param categoriesWithPlaces map with {@link CategoryDto} and {@link PlaceNotificationDto}`s
-     *                             which were created.
+     * @param categoriesWithPlaces map with {@link CategoryDto} and
+     *                             {@link PlaceNotificationDto}`s which were
+     *                             created.
      * @param notification         type of notification.
      */
     void sendAddedNewPlacesReportEmail(List<PlaceAuthorDto> subscribers,
@@ -35,7 +36,8 @@ public interface EmailService {
     /**
      * Method for sending interesting news for subscribers.
      *
-     * @param interestingEcoNews - includes all information about ecoNews and subscribers.
+     * @param interestingEcoNews - includes all information about ecoNews and
+     *                           subscribers.
      */
     void sendInterestingEcoNews(InterestingEcoNewsDto interestingEcoNews);
 

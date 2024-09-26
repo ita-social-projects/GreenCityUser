@@ -91,7 +91,7 @@ class EmailServiceImplTest {
     @Test
     void sendInterestingEcoNewsTest() {
         InterestingEcoNewsDto dto = new InterestingEcoNewsDto();
-        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", UUID.randomUUID())));
+        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", "ua", UUID.randomUUID())));
         service.sendInterestingEcoNews(dto);
         verify(javaMailSender).createMimeMessage();
     }

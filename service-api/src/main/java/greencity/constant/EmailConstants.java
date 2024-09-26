@@ -7,7 +7,7 @@ public class EmailConstants {
     // subjects
     public static final String GC_CONTRIBUTORS = "GreenCity contributors";
     public static final String NEW_PLACES = "New places";
-    public static final String INTERESTING_ECO_NEWS = "Interesting Eco News";
+    public static final String INTERESTING_ECO_NEWS = "interesting.news.subject";
     public static final String VERIFY_EMAIL = "verify.email";
     public static final String RESTORED_PASSWORD = "restored.password";
     public static final String CONFIRM_RESTORING_PASS = "confirm.restoring.pass";

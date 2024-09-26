@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html th:lang="${language}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Interesting news</title>
+    <title th:text="#{interesting.news.subject}"></title>
     <style>
         body {
             margin: 0;
@@ -131,8 +131,8 @@
 
     <div class="content">
         <p class="top-text">
-            <b th:text="'Hi ' + ${name} + ','"></b><br/>
-            <span th:text="'Here are ' + ${ecoNewsList.size()} + ' of the most interesting eco news that our authors wrote this week.'"></span>
+            <b th:text="#{interesting.news.hello(${name})}"></b><br/>
+            <span th:text="#{interesting.news.main.text}"></span>
         </p>
 
         <div class="article" th:each="ecoNews : ${ecoNewsList}" th:object="${ecoNews}">
@@ -141,16 +141,15 @@
             </a>
             <h3 th:text="*{title}"></h3>
             <p th:text="*{text}"></p>
-            <div class="vertical-center"><a th:href="${clientLink} + '/#/news/' + *{ecoNewsId}" class="read-more" target="_blank">READ MORE</a>
+            <div class="vertical-center"><a th:text="#{read.more}" th:href="${clientLink} + '/#/news/' + *{ecoNewsId}" class="read-more" target="_blank"></a>
             </div>
         </div>
 
-        <p class="bottom-text">Sincerely yours, GreenCity's team.</p>
+        <p class="bottom-text" th:text="#{interesting.news.sincerely.yours}"></p>
     </div>
 
     <div class="footer">
-        <p>You received this email because you subscribed for receiving interesting eco news via e-mail.
-            If you didn't request this action you can <a th:href="${unsubscribeLink}" target="_blank">unsubscribe</a>.</p>
+        <p><span th:text="#{unsubscribe.text}"></span><a th:text="#{unsubscribe}" th:href="${unsubscribeLink}" target="_blank"></a>.</p>
     </div>
 </div>
 </body>
