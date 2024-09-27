@@ -670,4 +670,12 @@ public class ModelUtils {
 
         return geocodingResult;
     }
+
+    public static PlaceAuthorDto getPlaceAuthorDto() {
+        return PlaceAuthorDto.builder()
+            .id(1L)
+            .email("testEmail@gmail.com")
+            .name("testName")
+            .build();
+    }
 }
