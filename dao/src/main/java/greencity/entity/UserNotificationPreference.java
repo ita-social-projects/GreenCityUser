@@ -1,6 +1,7 @@
 package greencity.entity;
 
 import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
@@ -39,4 +40,8 @@ public class UserNotificationPreference {
     @Enumerated(EnumType.STRING)
     @Column(name = "email_preference")
     private EmailPreference emailPreference;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "periodicity")
+    private EmailPreferencePeriodicity emailPreferencePeriodicity;
 }
