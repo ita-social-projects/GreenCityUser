@@ -1,7 +1,7 @@
 package greencity.controller;
 
 import greencity.constant.HttpStatuses;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.*;
 import greencity.service.EmailService;
@@ -10,12 +10,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,15 +23,14 @@ public class EmailController {
     private final EmailService emailService;
 
     /**
-     * Method for sending news for users who subscribed for updates.
+     * Method for sending interesting news for subscribers.
      *
      * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
      */
-    @PostMapping("/addEcoNews")
-    public ResponseEntity<Object> addEcoNews(@RequestBody EcoNewsForSendEmailDto message) {
-        emailService.sendCreatedNewsForAuthor(message);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @PostMapping("/sendInterestingEcoNews")
+    public ResponseEntity<Object> sendInterestingEcoNews(@RequestBody InterestingEcoNewsDto message) {
+        emailService.sendInterestingEcoNews(message);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -47,7 +44,7 @@ public class EmailController {
     public ResponseEntity<Object> sendReport(@RequestBody SendReportEmailMessage message) {
         emailService.sendAddedNewPlacesReportEmail(message.getSubscribers(), message.getCategoriesDtoWithPlacesDtoMap(),
             message.getEmailNotification());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -64,7 +61,7 @@ public class EmailController {
     public ResponseEntity<Object> changePlaceStatus(@RequestBody @Valid SendChangePlaceStatusEmailMessage message) {
         emailService.sendChangePlaceStatusEmail(message.getAuthorFirstName(), message.getPlaceName(),
             message.getPlaceStatus(), message.getAuthorEmail());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -77,7 +74,7 @@ public class EmailController {
     @PostMapping("/sendHabitNotification")
     public ResponseEntity<Object> sendHabitNotification(@RequestBody SendHabitNotification sendHabitNotification) {
         emailService.sendHabitNotification(sendHabitNotification.getName(), sendHabitNotification.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -90,7 +87,7 @@ public class EmailController {
     @PostMapping("/sendUserViolation")
     public ResponseEntity<Object> sendUserViolation(@RequestBody UserViolationMailDto dto) {
         emailService.sendUserViolationEmail(dto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -106,10 +103,9 @@ public class EmailController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
     })
     @PostMapping("/general/notification")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Object> sendEmailNotification(@RequestBody GeneralEmailMessage notification) {
         emailService.sendEmailNotification(notification);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
