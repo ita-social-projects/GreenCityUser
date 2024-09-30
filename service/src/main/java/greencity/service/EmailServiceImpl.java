@@ -296,19 +296,19 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendHabitAssignNotificationEmail(HabitAssignNotificationMessage message) {
         Map<String, Object> model = new HashMap<>();
-        String baseLink = clientLink + "/#/profile";
         String language = message.getLanguage();
         validateLanguage(language);
-        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, message.getReceiverName());
         model.put(EmailConstants.VERIFY_ADDRESS, serverLink + "/habit/assign/confirm/" + message.getHabitAssignId());
         model.put(EmailConstants.LANGUAGE, language);
-        model.put(EmailConstants.IS_UBS, false);
         model.put(EmailConstants.SENDER_NAME, message.getSenderName());
-        model.put(EmailConstants.HABIT_NAME, message.getHabitName());
+        // TODO change later
+        model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
+
         String template = createEmailTemplate(model, EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST_PAGE);
-        sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST,
-            null, getLocale(language)), template);
+        sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST, null,
+            getLocale(language)), template);
     }
 
     /**

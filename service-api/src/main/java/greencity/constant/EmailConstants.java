@@ -39,7 +39,6 @@ public class EmailConstants {
     public static final String LANGUAGE = "language";
     public static final String IS_UBS = "isUbs";
     public static final String SENDER_NAME = "senderName";
-    public static final String HABIT_NAME = "habitName";
     public static final String ELEMENT_NAME = "elementName";
     public static final String TITLE = "title";
     public static final String BODY = "body";
