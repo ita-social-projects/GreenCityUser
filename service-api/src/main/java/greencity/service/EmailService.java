@@ -10,6 +10,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
+import greencity.message.ChangePlaceStatusDto;
 import greencity.message.UserTaggedInCommentMessage;
 import java.util.List;
 import java.util.Map;
@@ -36,7 +37,7 @@ public interface EmailService {
     /**
      * Method for sending interesting news for subscribers.
      *
-     * @param interestingEcoNews - includes all information about ecoNews and
+     * @param interestingEcoNews includes all information about ecoNews and
      *                           subscribers.
      */
     void sendInterestingEcoNews(InterestingEcoNewsDto interestingEcoNews);
@@ -44,16 +45,12 @@ public interface EmailService {
     /**
      * Method for sending simple notification to {@code User} about change status.
      *
-     * @param authorFirstName place author's first name.
-     * @param placeName       name of a place.
-     * @param placeStatus     updated status of a place.
-     * @param authorEmail     author's email.
+     * @param changePlaceStatus dto with all information.
      */
-    void sendChangePlaceStatusEmail(String authorFirstName, String placeName,
-        String placeStatus, String authorEmail);
+    void sendChangePlaceStatusEmail(ChangePlaceStatusDto changePlaceStatus);
 
     /**
-     * Method for sending verification email to {@link User}.
+     * Method for sending verification email to {@code User}.
      *
      * @param userId    user id.
      * @param userName  name current user.

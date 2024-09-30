@@ -11,6 +11,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.message.ChangePlaceStatusDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
@@ -71,17 +72,20 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendChangePlaceStatusEmail(String authorName, String placeName,
-        String placeStatus, String authorEmail) {
-        log.info(LogMessage.IN_SEND_CHANGE_PLACE_STATUS_EMAIL, placeName);
+    public void sendChangePlaceStatusEmail(ChangePlaceStatusDto changePlaceStatus) {
+        log.info(LogMessage.IN_SEND_CHANGE_PLACE_STATUS_EMAIL, changePlaceStatus.getPlaceName());
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
-        model.put(EmailConstants.USER_NAME, authorName);
-        model.put(EmailConstants.PLACE_NAME, placeName);
-        model.put(EmailConstants.STATUS, placeStatus);
+        model.put(EmailConstants.LANGUAGE, changePlaceStatus.getAuthorLanguage());
+        model.put(EmailConstants.USER_NAME, changePlaceStatus.getAuthorFirstName());
+        model.put(EmailConstants.PLACE_NAME, changePlaceStatus.getPlaceName());
+        model.put(EmailConstants.STATUS, changePlaceStatus.getPlaceStatus().name());
+        // TODO change later
+        model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
 
         String template = createEmailTemplate(model, EmailConstants.CHANGE_PLACE_STATUS_EMAIL_PAGE);
-        sendEmail(authorEmail, EmailConstants.GC_CONTRIBUTORS, template);
+        sendEmail(changePlaceStatus.getAuthorEmail(), messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
+            getLocale(changePlaceStatus.getAuthorLanguage())), template);
     }
 
     @Override

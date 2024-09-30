@@ -7,7 +7,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
-import greencity.message.SendChangePlaceStatusEmailMessage;
+import greencity.message.ChangePlaceStatusDto;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.message.UserTaggedInCommentMessage;
@@ -122,12 +122,9 @@ class EmailControllerTest {
 
         mockPerform(content, "/changePlaceStatus");
 
-        SendChangePlaceStatusEmailMessage message =
-            new ObjectMapper().readValue(content, SendChangePlaceStatusEmailMessage.class);
+        ChangePlaceStatusDto message = new ObjectMapper().readValue(content, ChangePlaceStatusDto.class);
 
-        verify(emailService).sendChangePlaceStatusEmail(
-            message.getAuthorFirstName(), message.getPlaceName(),
-            message.getPlaceStatus(), message.getAuthorEmail());
+        verify(emailService).sendChangePlaceStatusEmail(message);
     }
 
     @Test

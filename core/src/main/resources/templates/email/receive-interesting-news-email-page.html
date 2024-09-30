@@ -29,6 +29,7 @@
 
         .header-image {
             width: 200px;
+            vertical-align: bottom;
         }
 
         .content {
@@ -38,18 +39,20 @@
         }
 
         .top-text {
-            line-height: 1.6;
-            margin-top: 4px;
-            margin-bottom: 30px;
+            margin-top: 0;
+        }
+
+        .main-text {
+            line-height: 1.4;
         }
 
         .bottom-text {
-            margin-top: 0;
-            margin-bottom: 4px;
+            margin-bottom: 0;
         }
 
         .article {
-            margin-bottom: 30px;
+            margin-top: 26px;
+            margin-bottom: 26px;
             padding: 26px;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
@@ -131,8 +134,11 @@
 
     <div class="content">
         <p class="top-text">
-            <b th:text="#{interesting.news.hello(${name})}"></b><br/>
-            <span th:text="#{interesting.news.main.text}"></span>
+            <b th:text="#{hi.user(${name})}">Hi Ilia,</b>
+        </p>
+
+        <p class="main-text">
+            <span th:text="#{interesting.news.main.text}">Це найкращі новини, які створили наші автори цього тижня.</span>
         </p>
 
         <div class="article" th:each="ecoNews : ${ecoNewsList}" th:object="${ecoNews}">
@@ -145,11 +151,14 @@
             </div>
         </div>
 
-        <p class="bottom-text" th:text="#{interesting.news.sincerely.yours}"></p>
+        <p class="bottom-text" th:text="#{sincerely.yours}">Sincerely yours, GreenCity's team.</p>
     </div>
 
     <div class="footer">
-        <p><span th:text="#{unsubscribe.text}"></span><a th:text="#{unsubscribe}" th:href="${unsubscribeLink}" target="_blank"></a>.</p>
+        <p>
+            <span th:text="#{unsubscribe.text}"></span>
+            <a th:text="#{unsubscribe}" th:href="${unsubscribeLink}" target="_blank"></a>.
+        </p>
     </div>
 </div>
 </body>

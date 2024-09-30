@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class EmailConstants {
     // subjects
-    public static final String GC_CONTRIBUTORS = "GreenCity contributors";
+    public static final String CHANGE_PLACE_STATUS = "change.place.status.subject";
     public static final String NEW_PLACES = "New places";
     public static final String INTERESTING_ECO_NEWS = "interesting.news.subject";
     public static final String VERIFY_EMAIL = "verify.email";
@@ -19,8 +19,6 @@ public class EmailConstants {
     public static final String VIOLATION_EMAIL = "Violation email";
     public static final String HABIT_ASSIGN_FRIEND_REQUEST = "habit.friend.request";
     public static final String USER_TAGGED_IN_COMMENT_REQUEST = "user.tagged.request";
-    public static final String USER_RECEIVED_COMMENT_REQUEST = "user.received.comment.request";
-    public static final String USER_RECEIVED_COMMENT_REPLY_REQUEST = "user.received.comment.reply.request";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";

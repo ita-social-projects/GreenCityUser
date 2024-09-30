@@ -10,8 +10,10 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.WrongEmailException;
+import greencity.message.ChangePlaceStatusDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
@@ -66,11 +68,13 @@ class EmailServiceImplTest {
 
     @Test
     void sendChangePlaceStatusEmailTest() {
-        String authorFirstName = "test author first name";
-        String placeName = "test place name";
-        String placeStatus = "test place status";
-        String authorEmail = "useremail@gmail.com";
-        service.sendChangePlaceStatusEmail(authorFirstName, placeName, placeStatus, authorEmail);
+        ChangePlaceStatusDto changePlaceStatusDto = ChangePlaceStatusDto.builder()
+            .placeStatus(PlaceStatus.APPROVED)
+            .authorEmail("useremail@gmail.com")
+            .placeName("test place name")
+            .authorFirstName("test author first name")
+            .build();
+        service.sendChangePlaceStatusEmail(changePlaceStatusDto);
         verify(javaMailSender).createMimeMessage();
     }
 

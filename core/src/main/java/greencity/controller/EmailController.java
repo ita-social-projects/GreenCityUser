@@ -51,16 +51,14 @@ public class EmailController {
      * Method for sending simple notification to {@code User} about status change.
      *
      * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
      */
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
     })
     @PostMapping("/changePlaceStatus")
-    public ResponseEntity<Object> changePlaceStatus(@RequestBody @Valid SendChangePlaceStatusEmailMessage message) {
-        emailService.sendChangePlaceStatusEmail(message.getAuthorFirstName(), message.getPlaceName(),
-            message.getPlaceStatus(), message.getAuthorEmail());
+    public ResponseEntity<Object> changePlaceStatus(@RequestBody @Valid ChangePlaceStatusDto message) {
+        emailService.sendChangePlaceStatusEmail(message);
         return ResponseEntity.ok().build();
     }
 
