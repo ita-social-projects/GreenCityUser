@@ -116,7 +116,7 @@ public class JwtTool {
         try {
             jsonNode = objectMapper.readTree(payload);
         } catch (Exception e) {
-            throw new RuntimeException("Error parsing JSON payload", e);
+            throw new IllegalArgumentException("Error parsing JSON payload", e);
         }
         return jsonNode.path("sub").asText();
     }
