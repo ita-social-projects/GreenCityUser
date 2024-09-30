@@ -131,8 +131,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     /**
      * {@inheritDoc}
-     *
-     * @return {@link SuccessSignUpDto}
      */
     public SuccessSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto, String language) {
         String password = generatePassword();
@@ -149,18 +147,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         List<String> positionNames = employeeSignUpDto.getPositions().stream()
             .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
             .toList();
-        List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
-        employee.setAuthorities(list);
-
-        List<Position> positions = positionRepo.findPositionsByNames(positionNames);
-        employee.setPositions(positions);
+        employee.setAuthorities(authorityRepo.findAuthoritiesByPositions(positionNames));
+        employee.setPositions(positionRepo.findPositionsByNames(positionNames));
 
         try {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());
             emailService.sendCreateNewPasswordForEmployee(savedUser.getId(), savedUser.getFirstName(),
-                employee.getEmail(),
-                savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
+                employee.getEmail(), savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }

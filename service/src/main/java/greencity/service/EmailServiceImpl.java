@@ -316,15 +316,12 @@ public class EmailServiceImpl implements EmailService {
      */
     @Override
     public void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail,
-        String token,
-        String language, boolean isUbs) {
+        String token, String language, boolean isUbs) {
         Map<String, Object> model =
             buildModelMapForPasswordRestore(employeeId, employeeFistName, token, language, isUbs);
         String template = createEmailTemplate(model, EmailConstants.CRETE_PASSWORD_PAGE);
         String emailSubject = isUbs ? EmailConstants.CONFIRM_CREATING_PASS_UBS : EmailConstants.CONFIRM_CREATING_PASS;
-        sendEmail(employeeEmail,
-            messageSource.getMessage(emailSubject, null, getLocale(language)),
-            template);
+        sendEmail(employeeEmail, messageSource.getMessage(emailSubject, null, getLocale(language)), template);
     }
 
     /**
@@ -365,11 +362,10 @@ public class EmailServiceImpl implements EmailService {
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,
         boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
-        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.CLIENT_LINK, clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity"));
         model.put(EmailConstants.USER_NAME, name);
-        model.put(EmailConstants.RESTORE_PASS, baseLink + "/auth/restore?" + "token=" + token
-            + PARAM_USER_ID + userId);
+        model.put(EmailConstants.RESTORE_PASS, clientLink + "/#" + (isUbs ? "/ubs" : "") + "/auth/restore?"
+            + "token=" + token + PARAM_USER_ID + userId);
         validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
