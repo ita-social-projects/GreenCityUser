@@ -13,7 +13,6 @@ class SearchCriteriaTest {
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.initMocks(this);
         searchCriteria = new SearchCriteria("test", "test", "test");
     }
 
