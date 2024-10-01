@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -132,6 +133,17 @@ class JwtToolTest {
             .getExpiration();
         jwtTool.isTokenValid(accessToken, jwtTool.getAccessTokenKey());
         assertEquals(expectedExpiration, actualExpiration);
+    }
+
+    @Test
+    void getEmailOutOfAccessTokenThrowsExceptionOnInvalidTokenTest() {
+        String invalidToken = "eyJhbGciOiJIUzI1NiJ9.invalid_payload.signature";
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            jwtTool.getEmailOutOfAccessToken(invalidToken);
+        });
+
+        assertEquals("Error parsing JSON payload", exception.getMessage());
     }
 
     @Test

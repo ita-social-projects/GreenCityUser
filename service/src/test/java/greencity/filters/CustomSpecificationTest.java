@@ -3,7 +3,6 @@ package greencity.filters;
 import greencity.dto.user.UserManagementViewDto;
 import greencity.entity.User;
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
@@ -15,15 +14,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+@ExtendWith(MockitoExtension.class)
 class CustomSpecificationTest {
     @Mock
     private Root<User> root;
-    @Mock
-    private CriteriaQuery<User> criteriaQuery;
     @Mock
     private CriteriaBuilder criteriaBuilder;
     @Mock
@@ -37,7 +36,6 @@ class CustomSpecificationTest {
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.initMocks(this);
         searchCriteriaList = new ArrayList<>();
         UserManagementViewDto userViewDto = UserManagementViewDto.builder()
             .id("1")
@@ -85,7 +83,6 @@ class CustomSpecificationTest {
         when(root.get(searchCriteriaList.getFirst().getKey())).thenReturn(objectPathExpected);
         when(criteriaBuilder.equal(objectPathExpected, searchCriteriaList.getFirst().getValue()))
             .thenThrow(NumberFormatException.class);
-        when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(criteriaBuilder.disjunction()).thenReturn(expected);
         Predicate actual = userSpecification.getIdPredicate(root, criteriaBuilder, searchCriteriaList.getFirst());
         assertEquals(expected, actual);
@@ -93,7 +90,6 @@ class CustomSpecificationTest {
 
     @Test
     void getStringPredicate() {
-        when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(root.get(searchCriteriaList.get(1).getKey())).thenReturn(objectPathExpected);
         when(criteriaBuilder.like(any(), eq("%" + searchCriteriaList.get(1).getValue() + "%"))).thenReturn(expected);
         Predicate actual = userSpecification.getStringPredicate(root, criteriaBuilder, searchCriteriaList.get(1));
@@ -103,7 +99,6 @@ class CustomSpecificationTest {
 
     @Test
     void getEnumPredicate() {
-        when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(root.get(searchCriteriaList.get(5).getKey())).thenReturn(objectPathExpected);
         when(objectPathExpected.as(Integer.class)).thenReturn(as);
         when(criteriaBuilder.equal(as, searchCriteriaList.get(5).getValue())).thenReturn(expected);
