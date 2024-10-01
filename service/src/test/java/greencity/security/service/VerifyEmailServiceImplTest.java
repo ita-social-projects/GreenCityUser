@@ -110,10 +110,4 @@ class VerifyEmailServiceImplTest {
 
         assertEquals(expectedExceptionMessage, exception.getMessage());
     }
-
-    /*
-     * @Test void deleteAllUsersThatDidNotVerifyEmailTest() {
-     * verifyEmailService.deleteAllUsersThatDidNotVerifyEmail();
-     * verify(verifyEmailRepo).deleteAllUsersThatDidNotVerifyEmail(); }
-     */
 }
