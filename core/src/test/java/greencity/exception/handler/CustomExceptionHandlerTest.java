@@ -140,6 +140,16 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
+    void testHandleIllegalTokenException() {
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("test");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleIllegalArgumentException(illegalArgumentException, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
     void handleBadRequestException() {
         BadRequestException badRequestException = new BadRequestException("test");
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
