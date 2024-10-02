@@ -363,12 +363,13 @@ public class EmailServiceImpl implements EmailService {
      */
     @Override
     public void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail,
-        String token, String language, boolean isUbs) {
+        String token, boolean isUbs) {
+        String ukrainianLanguage = "ua";
         Map<String, Object> model =
-            buildModelMapForPasswordRestore(employeeId, employeeFistName, token, language, isUbs);
+            buildModelMapForPasswordRestore(employeeId, employeeFistName, token, ukrainianLanguage, isUbs);
         String template = createEmailTemplate(model, EmailConstants.CRETE_PASSWORD_PAGE);
         String emailSubject = isUbs ? EmailConstants.CONFIRM_CREATING_PASS_UBS : EmailConstants.CONFIRM_CREATING_PASS;
-        sendEmail(employeeEmail, messageSource.getMessage(emailSubject, null, getLocale(language)), template);
+        sendEmail(employeeEmail, messageSource.getMessage(emailSubject, null, getLocale(ukrainianLanguage)), template);
     }
 
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,

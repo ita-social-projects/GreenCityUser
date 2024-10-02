@@ -305,15 +305,15 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
-        "1, Test, test@gmail.com, token, en, true"})
-    void sendCreateNewPasswordForEmployee(Long id, String name, String email, String token, String language,
+    @CsvSource(value = {"1, Test, test@gmail.com, token, false",
+        "1, Test, test@gmail.com, token, true"})
+    void sendCreateNewPasswordForEmployee(Long id, String name, String email, String token,
         Boolean isUbs) {
-        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS, null, getLocale(language)))
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS, null, getLocale("ua")))
             .thenReturn("Create password for Green City");
-        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS_UBS, null, getLocale(language)))
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS_UBS, null, getLocale("ua")))
             .thenReturn("Create password for Pick Up City");
-        service.sendCreateNewPasswordForEmployee(id, name, email, token, language, isUbs);
+        service.sendCreateNewPasswordForEmployee(id, name, email, token, isUbs);
         verify(javaMailSender).createMimeMessage();
     }
 
