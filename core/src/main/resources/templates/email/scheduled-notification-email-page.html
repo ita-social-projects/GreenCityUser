@@ -1,245 +1,128 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml"
-      th:with="lang=${language}" th:lang="${lang}">
+<html th:lang="${language}">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style type="text/css">
-        /**
-         * Google webfonts. Recommended to include the .woff version for cross-client compatibility.
-         */
-        @media screen {
-            @font-face {
-                font-family: 'Source Sans Pro';
-                font-style: normal;
-                font-weight: 400;
-                src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/ODelI1aHBYDBqgeIAH2zlBM0YzuT7MdOe03otPbuUS0.woff) format('woff');
-            }
-            @font-face {
-                font-family: 'Source Sans Pro';
-                font-style: normal;
-                font-weight: 700;
-                src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/toadOcfmlt9b38dHJxOBGFkQc6VGVFSmCnC_l7QZG60.woff) format('woff');
-            }
-        }
-
-        /**
-         * Avoid browser level font resizing.
-         * 1. Windows Mobile
-         * 2. iOS / OSX
-         */
-        body,
-        table,
-        td,
-        a {
-            -ms-text-size-adjust: 100%; /* 1 */
-            -webkit-text-size-adjust: 100%; /* 2 */
-        }
-
-        /**
-         * Remove extra space added to tables and cells in Outlook.
-         */
-        table,
-        td {
-            mso-table-rspace: 0pt;
-            mso-table-lspace: 0pt;
-        }
-
-        /**
-         * Better fluid images in Internet Explorer.
-         */
-        img {
-            -ms-interpolation-mode: bicubic;
-        }
-
-        /**
-         * Remove blue links for iOS devices.
-         */
-        a[x-apple-data-detectors] {
-            font-family: inherit !important;
-            font-size: inherit !important;
-            font-weight: inherit !important;
-            line-height: inherit !important;
-            color: inherit !important;
-            text-decoration: none !important;
-        }
-
-        /**
-         * Fix centering issues in Android 4.4.
-         */
-        div[style*="margin: 16px 0;"] {
-            margin: 0 !important;
-        }
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title th:text="${title}"></title>
+    <style>
         body {
-            width: 100% !important;
-            height: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
+            margin: 0;
+            padding: 0;
+            background-color: #F5F6F6;
         }
 
-        /**
-         * Collapse table borders to avoid space between cells.
-         */
-        table {
-            border-collapse: collapse !important;
+        .email-container {
+            font-family: Lato, sans-serif;
+            font-size: 16px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #E3E6E8;
         }
 
-        .site-clr {
-            background-color: #13aa57;
+        .header {
+            text-align: center;
+            padding: 30px;
+            background-color: #13AA57;
         }
 
-        .background-clr {
-            background-color: #e9ecef;
+        .header-image {
+            height: 30px;
+            vertical-align: bottom;
         }
 
-        .background-msg-clr {
-            background-color: #ffffff;
+        .content {
+            padding: 26px;
+            text-align: left;
+            color: #333333 !important;
         }
 
-        img {
-            height: auto;
-            line-height: 100%;
+        .top-text {
+            margin-top: 0;
+            color: #333333 !important;
+        }
+
+        .main-text {
+            line-height: 1.4;
+            color: #333333 !important;
+        }
+
+        .bottom-text {
+            margin-bottom: 0;
+            color: #333333 !important;
+        }
+
+        .vertical-center {
+            text-align: center;
+        }
+
+        .notification-button {
+            display: inline-block;
+            padding: 10px 15px;
+            border-width: 2px;
+            border-style: solid;
+            background-color: transparent;
             text-decoration: none;
-            border: 0;
-            outline: none;
+            border-color: #13AA57;
+            color: #13AA57 !important;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #666666;
+            background-color: #CACFD3;
+        }
+
+        @media only screen and (max-width: 600px) {
+            body {
+                font-size: 13px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header-image {
+                height: 25px;
+            }
+
+            .footer {
+                font-size: 10px;
+            }
         }
     </style>
-
 </head>
-<body class="background-clr">
-<!-- start body -->
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <!-- start logo -->
-    <tr>
-        <td class="background-clr" align="center">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                <tr>
-                    <td class="site-clr" align="center" valign="top" style="margin-top: 20px">
-                        <a style="display: inline-block; padding: 20px 50px; font-weight:700; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 32px; color: #ffffff; text-decoration: none; border-radius: 6px;">GreenCity</a>
-                    </td>
-                </tr>
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif]-->
-        </td>
-    </tr>
-    <!-- end logo -->
+<body>
+<div class="email-container">
+    <div class="header">
+        <a th:href="${clientLink}" target="_blank">
+            <img class="header-image" src="https://csb10032000a548f571.blob.core.windows.net/allfiles/5eaa9e18-f91f-4d3a-9926-da1239317a98GreenCity-Logo-White.png" alt="GreenCityLogo">
+        </a>
+    </div>
 
-    <!-- start hero -->
-    <tr>
-        <td class="background-clr" align="center">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                <tr>
-                    <td class="background-msg-clr" align="left"
-                        style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;color: #000000; border-top: 3px solid #d4dadf;">
-                        <p th:text="#{hello} + ${name} + ','"
-                           style="margin: 0; font-size: 18px; font-weight: 700; letter-spacing: -1px; line-height: 12px;"></p>
-                    </td>
-                </tr>
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif]-->
-        </td>
-    </tr>
+    <div class="content">
+        <p class="top-text">
+            <b th:text="#{hi.user(${name})}"></b>
+        </p>
 
-    <tr>
-        <td align="center" bgcolor="#e9ecef">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                <!-- start copy -->
-                <tr>
-                    <td class="background-msg-clr" align="left"
-                        style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                        <div style="color: #000000">
-                            <span th:text="${title}" style="margin: 0; line-height: 5vh; display: inline-block; color: #000000; vertical-align: middle;">qewqewqew</span>
-                            <p th:utext="${body}">ererwerwerwewr</p>
+        <p class="main-text">
+            <span th:text="${body}"></span>
+        </p>
 
-                        </div>
-                        <p style="margin: 0;">
-                            <a style="display: inline-block;
-                                        padding: 10px 20px;
-                                        margin-top: 20px;
-                                        font-size: 16px;
-                                        color: #fff;
-                                        background-color: #14a958;
-                                        text-decoration: none;
-                                        border-radius: 10px;"
-                               th:href="${clientLink}">Go to notification</a>
-                        </p>
-                    </td>
-                </tr>
-                <tr>
-                    <td class="background-msg-clr" align="left"
-                        style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; color: #000000; border-bottom: 3px solid #d4dadf">
-                        <p style="margin: 0;">Sincerely yours, GreenCity's team</p>
-                    </td>
-                </tr>
-                <!-- end copy -->
+        <div class="vertical-center"><a th:text="#{notifications.button}" th:href="${clientLink}" class="notification-button" target="_blank"></a></div>
 
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif]-->
-        </td>
-    </tr>
+        <p class="bottom-text" th:text="#{sincerely.yours}"></p>
+    </div>
 
-
-    <tr>
-        <td class="background-clr" align="center" style="padding: 24px;">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-
-                <!-- start permission -->
-                <tr>
-                    <td class="background-clr" align="center"
-                        style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                        <p style="margin: 0;">
-                            You received this email because you subscribed for notifications via e-mail.
-                            If you didn't request this action you can safely delete this email.
-                        </p>
-                    </td>
-                </tr>
-                <!-- end permission -->
-
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif]-->
-        </td>
-    </tr>
-    <!-- end footer -->
-
-</table>
-<!-- end body -->
+    <div class="footer">
+        <p>
+            <span th:text="#{unsubscribe.text}"></span>
+            <a th:text="#{unsubscribe}" th:href="${unsubscribeLink}" target="_blank"></a>.
+        </p>
+    </div>
+</div>
 </body>
 </html>

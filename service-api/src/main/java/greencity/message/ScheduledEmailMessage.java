@@ -5,13 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ScheduledEmailMessage implements Serializable {
+public class ScheduledEmailMessage {
     @NotEmpty(message = "Username cannot be empty")
     private String username;
     @NotEmpty(message = "Email cannot be empty")

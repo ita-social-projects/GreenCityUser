@@ -351,9 +351,11 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
         model.put(EmailConstants.USER_NAME, message.getUsername());
         model.put(EmailConstants.LANGUAGE, language);
-        model.put(EmailConstants.IS_UBS, false);
         model.put(EmailConstants.TITLE, message.getSubject());
         model.put(EmailConstants.BODY, message.getBody());
+        // TODO change later
+        model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
+
         String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
         sendEmail(message.getEmail(), message.getSubject(), template);
     }
