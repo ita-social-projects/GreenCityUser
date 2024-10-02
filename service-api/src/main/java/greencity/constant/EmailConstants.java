@@ -15,7 +15,7 @@ public class EmailConstants {
     public static final String CONFIRM_CREATING_PASS_UBS = "creating.new.passwordUbs";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
     public static final String DEACTIVATION = "Your account was deactivated";
-    public static final String ACTIVATION = "Your account was activated";
+    public static final String ACTIVATION = "user.activation.subject";
     public static final String VIOLATION_EMAIL = "Violation email";
     public static final String HABIT_ASSIGN_FRIEND_REQUEST = "habit.friend.request";
     public static final String USER_TAGGED_IN_COMMENT_REQUEST = "user.tagged.request";

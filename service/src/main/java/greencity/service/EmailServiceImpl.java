@@ -241,8 +241,10 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userActivationDto.getName());
         validateLanguage(userActivationDto.getLang());
+        model.put(EmailConstants.LANGUAGE, userActivationDto.getLang());
         String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
-        sendEmail(userActivationDto.getEmail(), EmailConstants.ACTIVATION, template);
+        sendEmail(userActivationDto.getEmail(), messageSource.getMessage(EmailConstants.ACTIVATION, null,
+            getLocale(userActivationDto.getLang())), template);
     }
 
     @Override
@@ -251,8 +253,8 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getName());
         model.put(EmailConstants.DESCRIPTION, dto.getViolationDescription());
-        model.put(EmailConstants.LANGUAGE, dto.getLanguage());
         validateLanguage(dto.getLanguage());
+        model.put(EmailConstants.LANGUAGE, dto.getLanguage());
         String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
         sendEmail(dto.getEmail(), EmailConstants.VIOLATION_EMAIL, template);
     }
