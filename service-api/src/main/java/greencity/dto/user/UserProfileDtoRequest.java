@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import greencity.annotations.ValidName;
 import greencity.annotations.ValidSocialNetworkLinks;
 import greencity.dto.CoordinatesDto;
-import greencity.enums.EmailPreference;
 import greencity.validator.BooleanValueDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

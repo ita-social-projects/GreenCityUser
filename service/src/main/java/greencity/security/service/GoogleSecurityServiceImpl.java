@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
@@ -133,25 +132,25 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
 
     private User createNewUser(String email, String userName, String profilePicture, String language) {
         User user = User.builder()
-                .email(email)
-                .name(userName)
-                .role(Role.ROLE_USER)
-                .dateOfRegistration(LocalDateTime.now())
-                .lastActivityTime(LocalDateTime.now())
-                .userStatus(UserStatus.ACTIVATED)
-                .emailNotification(EmailNotification.DISABLED)
-                .refreshTokenKey(jwtTool.generateTokenKey())
-                .profilePicturePath(profilePicture)
-                .rating(DEFAULT_RATING)
-                .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
-                .build();
+            .email(email)
+            .name(userName)
+            .role(Role.ROLE_USER)
+            .dateOfRegistration(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
+            .userStatus(UserStatus.ACTIVATED)
+            .emailNotification(EmailNotification.DISABLED)
+            .refreshTokenKey(jwtTool.generateTokenKey())
+            .profilePicturePath(profilePicture)
+            .rating(DEFAULT_RATING)
+            .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
+            .build();
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
-                .map(emailPreference -> UserNotificationPreference.builder()
-                        .user(user)
-                        .emailPreference(emailPreference)
-                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
-                        .build())
-                .collect(Collectors.toSet());
+            .map(emailPreference -> UserNotificationPreference.builder()
+                .user(user)
+                .emailPreference(emailPreference)
+                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                .build())
+            .collect(Collectors.toSet());
         user.setNotificationPreferences(userNotificationPreferences);
         return user;
     }

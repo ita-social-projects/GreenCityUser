@@ -374,7 +374,8 @@ public class UserServiceImpl implements UserService {
     public UserStatusDto updateStatus(Long id, UserStatus userStatus, String email) {
         checkUpdatableUser(id, email);
         accessForUpdateUserStatus(id, email);
-        User user = userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        User user =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
         user.setUserStatus(userStatus);
         return modelMapper.map(userRepo.save(user), UserStatusDto.class);
     }
@@ -611,30 +612,29 @@ public class UserServiceImpl implements UserService {
             Set<UserNotificationPreference> userPreferences = user.getNotificationPreferences();
             Set<UserNotificationPreferenceDto> newPreferences = userProfileDtoRequest.getEmailPreferences();
             Set<EmailPreference> existingPreferences = userPreferences.stream()
-                    .map(UserNotificationPreference::getEmailPreference
-                    ).collect(Collectors.toSet());
+                .map(UserNotificationPreference::getEmailPreference).collect(Collectors.toSet());
             Set<UserNotificationPreference> preferencesToAdd = newPreferences.stream()
-                    .filter(preferenceDto -> !existingPreferences.contains(preferenceDto.getEmailPreference()))
-                    .map(preferenceDto -> UserNotificationPreference.builder()
-                            .emailPreference(preferenceDto.getEmailPreference())
-                            .periodicity(preferenceDto.getPeriodicity())
-                            .user(user)
-                            .build())
-                    .collect(Collectors.toSet());
+                .filter(preferenceDto -> !existingPreferences.contains(preferenceDto.getEmailPreference()))
+                .map(preferenceDto -> UserNotificationPreference.builder()
+                    .emailPreference(preferenceDto.getEmailPreference())
+                    .periodicity(preferenceDto.getPeriodicity())
+                    .user(user)
+                    .build())
+                .collect(Collectors.toSet());
 
             Set<UserNotificationPreference> preferences = userPreferences
-                    .stream()
-                    .map(preference -> {
-                for (UserNotificationPreferenceDto preferenceDto : newPreferences) {
-                    if (preferenceDto.getEmailPreference().equals(preference.getEmailPreference())) {
-                        preference.setPeriodicity(preferenceDto.getPeriodicity());
-                        break;
+                .stream()
+                .map(preference -> {
+                    for (UserNotificationPreferenceDto preferenceDto : newPreferences) {
+                        if (preferenceDto.getEmailPreference().equals(preference.getEmailPreference())) {
+                            preference.setPeriodicity(preferenceDto.getPeriodicity());
+                            break;
+                        }
                     }
-                }
-                return preference;
-            })
-                    .filter(preference -> !preference.getPeriodicity().equals(EmailPreferencePeriodicity.NEVER))
-                    .collect(Collectors.toSet());
+                    return preference;
+                })
+                .filter(preference -> !preference.getPeriodicity().equals(EmailPreferencePeriodicity.NEVER))
+                .collect(Collectors.toSet());
             preferences.addAll(preferencesToAdd);
 
             userPreferences.clear();
