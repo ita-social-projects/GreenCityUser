@@ -149,15 +149,13 @@ public class EmailServiceImpl implements EmailService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Vasyl Zhovnir
      */
     @Override
     public void sendApprovalEmail(Long userId, String name, String email, String token) {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, name);
-        model.put(EmailConstants.APPROVE_REGISTRATION, clientLink + "#/auth/restore?" + "token=" + token
+        model.put(EmailConstants.APPROVE_REGISTRATION, clientLink + "/#/auth/restore?" + "token=" + token
             + PARAM_USER_ID + userId);
         String template = createEmailTemplate(model, EmailConstants.USER_APPROVAL_EMAIL_PAGE);
         sendEmail(email, EmailConstants.APPROVE_REGISTRATION_SUBJECT, template);
