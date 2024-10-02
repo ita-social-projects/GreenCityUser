@@ -59,7 +59,6 @@ import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserLocationRepo;
-import greencity.repository.UserNotificationPreferenceRepo;
 import greencity.repository.UserRepo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -137,9 +136,6 @@ class UserServiceImplTest {
 
     @Mock
     UserLocationRepo userLocationRepo;
-
-    @Mock
-    UserNotificationPreferenceRepo userNotificationPreferenceRepo;
 
     @Mock
     private SimpMessagingTemplate messagingTemplate;
@@ -1133,8 +1129,7 @@ class UserServiceImplTest {
         assertNotNull(result);
         assertEquals(foundUser.getEmail(), result.getEmail());
         assertEquals(foundUser.getName(), result.getName());
-        assertEquals(1, result.getDeactivationReasons().size());
-        assertEquals(reason, result.getDeactivationReasons().getFirst());
+        assertEquals(reason, result.getDeactivationReason());
         assertEquals(foundUser.getLanguage().getCode(), result.getLang());
     }
 

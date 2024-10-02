@@ -168,9 +168,8 @@ class EmailServiceImplTest {
 
     @Test
     void sendReasonOfDeactivation() {
-        List<String> test = List.of("test", "test");
         UserDeactivationReasonDto test1 = UserDeactivationReasonDto.builder()
-            .deactivationReasons(test)
+            .deactivationReason("test")
             .lang("en")
             .email("test@ukr.net")
             .name("test")
