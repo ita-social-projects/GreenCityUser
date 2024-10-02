@@ -260,15 +260,14 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
-        model.put(EmailConstants.CLIENT_LINK, baseLink);
+        model.put(EmailConstants.CLIENT_LINK, clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity"));
         model.put(EmailConstants.USER_NAME, userName);
         validateLanguage(language);
         model.put(EmailConstants.LANGUAGE, language);
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
-        sendEmail(email, messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(language)),
-            template);
+        sendEmail(email, messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null,
+            getLocale(language)), template);
     }
 
     /**
