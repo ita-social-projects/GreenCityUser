@@ -43,6 +43,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -413,8 +415,14 @@ class UserControllerTest {
                     "longitude": 20.000000
                 },
                 "emailPreferences": [
-                    "LIKES",
-                    "SYSTEM"
+                    {
+                        "emailPreference": "SYSTEM",
+                        "periodicity": "DAILY"
+                    },
+                    {
+                        "emailPreference": "LIKES",
+                        "periodicity": "NEVER"
+                    }
                 ]
             }
             """;
