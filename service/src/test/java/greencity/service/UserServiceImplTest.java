@@ -40,7 +40,10 @@ import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserLocation;
+import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.Role.ROLE_ADMIN;
@@ -91,6 +94,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
@@ -612,7 +616,16 @@ class UserServiceImplTest {
     void saveUserProfileTest() {
         var request = ModelUtils.getUserProfileDtoRequest();
         var user = ModelUtils.getUserWithSocialNetworks();
-        user.setNotificationPreferences(new HashSet<>());
+        Set<UserNotificationPreference> preferences = new HashSet<>();
+        preferences.add(UserNotificationPreference.builder()
+            .emailPreference(EmailPreference.SYSTEM)
+            .periodicity(EmailPreferencePeriodicity.DAILY)
+            .build());
+        preferences.add(UserNotificationPreference.builder()
+            .emailPreference(EmailPreference.LIKES)
+            .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+            .build());
+        user.setNotificationPreferences(preferences);
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);
         when(googleApiService.getLocationByCoordinates(
