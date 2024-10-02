@@ -18,7 +18,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -40,7 +39,6 @@ class UserSpecificationTest {
 
     @BeforeEach
     void init() {
-        MockitoAnnotations.initMocks(this);
         searchCriteriaList = new ArrayList<>();
         UserManagementViewDto userViewDto = UserManagementViewDto.builder()
             .id("1")

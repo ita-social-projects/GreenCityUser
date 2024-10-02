@@ -602,16 +602,17 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void deleteUserByEmailNotVerifiedUserTest() {
-        User notVerifiedUser = User.builder()
+        User newNotVerifiedUser = User.builder()
             .id(1L)
             .email("test@somemail.com")
             .userStatus(UserStatus.DEACTIVATED)
             .build();
-        Optional<User> optionalUser = Optional.of(notVerifiedUser);
+        Optional<User> optionalUser = Optional.of(newNotVerifiedUser);
+        String email = newNotVerifiedUser.getEmail();
 
-        when(userRepo.findByEmail(notVerifiedUser.getEmail())).thenReturn(optionalUser);
-        assertThrows(EmailNotVerified.class, () -> ownSecurityService.deleteUserByEmail(notVerifiedUser.getEmail()));
+        when(userRepo.findByEmail(newNotVerifiedUser.getEmail())).thenReturn(optionalUser);
+        assertThrows(EmailNotVerified.class, () -> ownSecurityService.deleteUserByEmail(email));
 
-        verify(userRepo, times(1)).findByEmail(notVerifiedUser.getEmail());
+        verify(userRepo, times(1)).findByEmail(newNotVerifiedUser.getEmail());
     }
 }

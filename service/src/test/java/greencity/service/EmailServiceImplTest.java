@@ -1,11 +1,12 @@
 package greencity.service;
 
 import greencity.ModelUtils;
+import static greencity.ModelUtils.getPlaceAuthorDto;
 import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.place.PlaceNotificationDto;
-import greencity.dto.user.PlaceAuthorDto;
+import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
@@ -19,9 +20,13 @@ import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
@@ -36,11 +41,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
+import org.thymeleaf.context.Context;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class EmailServiceImplTest {
     private EmailService service;
-    private PlaceAuthorDto placeAuthorDto;
     @Mock
     private JavaMailSender javaMailSender;
     @Mock
@@ -51,16 +57,11 @@ class EmailServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        initMocks(this);
         service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
-            "http://localhost:4200", "http://localhost:4200", "http://localhost:8080",
+            "http://localhost:4200", "http://localhost:8080",
             "test@email.com", messageSource);
-        placeAuthorDto = PlaceAuthorDto.builder()
-            .id(1L)
-            .email("testEmail@gmail.com")
-            .name("testName")
-            .build();
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
+        when(templateEngine.process(any(String.class), any(Context.class))).thenReturn("<html></html>");
     }
 
     @Test
@@ -83,17 +84,19 @@ class EmailServiceImplTest {
         Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlacesTest = new HashMap<>();
         categoriesWithPlacesTest.put(testCategory, Arrays.asList(testPlace1, testPlace2));
         service.sendAddedNewPlacesReportEmail(
-            Collections.singletonList(placeAuthorDto), categoriesWithPlacesTest, "DAILY");
+            Collections.singletonList(getPlaceAuthorDto()), categoriesWithPlacesTest, "DAILY");
         verify(javaMailSender).createMimeMessage();
     }
 
     @Test
-    void sendCreatedNewsForAuthorTest() {
-        EcoNewsForSendEmailDto dto = new EcoNewsForSendEmailDto();
-        PlaceAuthorDto placeAuthorDto = new PlaceAuthorDto();
-        placeAuthorDto.setEmail("test@gmail.com");
-        dto.setAuthor(placeAuthorDto);
-        service.sendCreatedNewsForAuthor(dto);
+    void sendInterestingEcoNewsTest() {
+        InterestingEcoNewsDto dto = new InterestingEcoNewsDto();
+        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", "ua", UUID.randomUUID())));
+
+        when(messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null, getLocale("ua")))
+            .thenReturn("Interesting Eco News");
+
+        service.sendInterestingEcoNews(dto);
         verify(javaMailSender).createMimeMessage();
     }
 

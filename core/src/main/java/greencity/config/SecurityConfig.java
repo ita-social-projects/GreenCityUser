@@ -70,6 +70,7 @@ public class SecurityConfig {
      *
      * @param http {@link HttpSecurity}
      */
+    @SuppressWarnings("java:S4502")
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
@@ -199,7 +200,7 @@ public class SecurityConfig {
                     "/ownSecurity/register",
                     "/email/sendReport",
                     "/email/sendHabitNotification",
-                    "/email/addEcoNews",
+                    "/email/sendInterestingEcoNews",
                     "/email/changePlaceStatus",
                     "/email/general/notification",
                     "/email/habitAssign/notification",
