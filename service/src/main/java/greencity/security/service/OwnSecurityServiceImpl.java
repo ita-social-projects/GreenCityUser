@@ -82,7 +82,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 .map(emailPreference -> UserNotificationPreference.builder()
                         .user(user)
                         .emailPreference(emailPreference)
-                        .emailPreferencePeriodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
                         .build())
                 .collect(Collectors.toSet());
         user.setNotificationPreferences(userNotificationPreferences);

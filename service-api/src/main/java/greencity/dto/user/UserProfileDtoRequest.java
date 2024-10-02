@@ -49,5 +49,5 @@ public class UserProfileDtoRequest {
 
     private CoordinatesDto coordinates;
 
-    private Set<EmailPreference> emailPreferences;
+    private Set<UserNotificationPreferenceDto> emailPreferences;
 }
