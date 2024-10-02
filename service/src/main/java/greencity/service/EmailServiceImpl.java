@@ -7,7 +7,6 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.message.ChangePlaceStatusDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
@@ -15,7 +14,6 @@ import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
 import greencity.message.UserTaggedInCommentMessage;
 import greencity.validator.EmailAddressValidator;
-import greencity.validator.LanguageValidationUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.HashMap;
@@ -139,7 +137,6 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.VERIFY_ADDRESS, baseLink + "?token=" + token + PARAM_USER_ID + id);
-        validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.VERIFY_EMAIL_PAGE);
@@ -176,17 +173,6 @@ public class EmailServiceImpl implements EmailService {
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
         sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null,
             getLocale(language)), template);
-    }
-
-    /**
-     * This method validates language.
-     *
-     * @param language language which will be used for sending letter.
-     */
-    private void validateLanguage(String language) {
-        if (!LanguageValidationUtils.isValid(language)) {
-            throw new LanguageNotSupportedException("Invalid language");
-        }
     }
 
     private String createEmailTemplate(Map<String, Object> vars, String templateName) {
@@ -228,7 +214,6 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userDeactivationDto.getName());
         model.put(EmailConstants.REASON, userDeactivationDto.getDeactivationReason());
-        validateLanguage(userDeactivationDto.getLang());
         String template = createEmailTemplate(model, EmailConstants.REASONS_OF_DEACTIVATION_PAGE);
         sendEmail(userDeactivationDto.getEmail(), EmailConstants.DEACTIVATION, template);
     }
@@ -238,7 +223,6 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userActivationDto.getName());
-        validateLanguage(userActivationDto.getLang());
         model.put(EmailConstants.LANGUAGE, userActivationDto.getLang());
         String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
         sendEmail(userActivationDto.getEmail(), messageSource.getMessage(EmailConstants.ACTIVATION, null,
@@ -251,7 +235,6 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getName());
         model.put(EmailConstants.DESCRIPTION, dto.getViolationDescription());
-        validateLanguage(dto.getLanguage());
         model.put(EmailConstants.LANGUAGE, dto.getLanguage());
         String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
         sendEmail(dto.getEmail(), EmailConstants.VIOLATION_EMAIL, template);
@@ -262,7 +245,6 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity"));
         model.put(EmailConstants.USER_NAME, userName);
-        validateLanguage(language);
         model.put(EmailConstants.LANGUAGE, language);
         model.put(EmailConstants.IS_UBS, isUbs);
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
@@ -295,7 +277,6 @@ public class EmailServiceImpl implements EmailService {
     public void sendHabitAssignNotificationEmail(HabitAssignNotificationMessage message) {
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();
-        validateLanguage(language);
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, message.getReceiverName());
         model.put(EmailConstants.VERIFY_ADDRESS, serverLink + "/habit/assign/confirm/" + message.getHabitAssignId());
@@ -329,7 +310,6 @@ public class EmailServiceImpl implements EmailService {
     public void sendTaggedUserInCommentNotificationEmail(UserTaggedInCommentMessage message) {
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();
-        validateLanguage(language);
         model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
         model.put(EmailConstants.USER_NAME, message.getReceiverName());
         model.put(EmailConstants.AUTHOR_NAME, message.getTaggerName());
@@ -346,7 +326,6 @@ public class EmailServiceImpl implements EmailService {
     public void sendScheduledNotificationEmail(ScheduledEmailMessage message) {
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();
-        validateLanguage(language);
         model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
         model.put(EmailConstants.USER_NAME, message.getUsername());
         model.put(EmailConstants.LANGUAGE, language);
@@ -366,7 +345,6 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.RESTORE_PASS, clientLink + "/#" + (isUbs ? "/ubs" : "") + "/auth/restore?"
             + "token=" + token + PARAM_USER_ID + userId);
-        validateLanguage(language);
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
         return model;

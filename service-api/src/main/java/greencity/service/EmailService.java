@@ -14,7 +14,6 @@ import greencity.message.UserTaggedInCommentMessage;
 /**
  * Provides the interface to manage sending emails to {@code User}.
  */
-
 public interface EmailService {
     /**
      * Method for sending notification to users who subscribed for updates about

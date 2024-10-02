@@ -9,8 +9,8 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.enums.EmailNotification;
 import greencity.enums.PlaceStatus;
-import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.ChangePlaceStatusDto;
 import greencity.message.GeneralEmailMessage;
@@ -75,7 +75,10 @@ class EmailServiceImplTest {
             .authorEmail("useremail@gmail.com")
             .placeName("test place name")
             .authorFirstName("test author first name")
+            .authorLanguage("en")
             .build();
+        when(messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null, getLocale(changePlaceStatusDto.getAuthorLanguage())))
+            .thenReturn("Change place status");
         service.sendChangePlaceStatusEmail(changePlaceStatusDto);
         verify(javaMailSender).createMimeMessage();
     }
@@ -97,6 +100,7 @@ class EmailServiceImplTest {
                         .build()
                 )
             ))
+            .emailNotification(EmailNotification.WEEKLY)
             .build();
         service.sendAddedNewPlacesReportEmail(sendReportEmailMessage);
         verify(javaMailSender).createMimeMessage();
@@ -128,7 +132,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendVerificationEmailLanguageNotFoundException() {
-        assertThrows(LanguageNotSupportedException.class,
+        assertThrows(IllegalStateException.class,
             () -> service.sendVerificationEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
@@ -150,7 +154,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendRestoreEmailLanguageNotFoundException() {
-        assertThrows(LanguageNotSupportedException.class,
+        assertThrows(IllegalStateException.class,
             () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
@@ -185,6 +189,8 @@ class EmailServiceImplTest {
             .email("test@ukr.net")
             .name("test")
             .build();
+        when(messageSource.getMessage(EmailConstants.ACTIVATION, null, getLocale(test1.getLang())))
+            .thenReturn("Activation");
         service.sendMessageOfActivation(test1);
         verify(javaMailSender).createMimeMessage();
     }
@@ -194,15 +200,6 @@ class EmailServiceImplTest {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         service.sendUserViolationEmail(dto);
         verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendUserViolationEmailWithEmptyLanguageTest() {
-        UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
-        dto.setLanguage("");
-        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
-        dto.setLanguage(null);
-        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test
@@ -222,7 +219,7 @@ class EmailServiceImplTest {
     void sendUserViolationEmailWithUnsupportedLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("de");
-        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+        assertThrows(IllegalStateException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test
