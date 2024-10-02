@@ -1,9 +1,6 @@
 package greencity.service;
 
-import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
-import greencity.dto.place.PlaceNotificationDto;
-import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
@@ -11,9 +8,8 @@ import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.ChangePlaceStatusDto;
+import greencity.message.SendReportEmailMessage;
 import greencity.message.UserTaggedInCommentMessage;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Provides the interface to manage sending emails to {@code User}.
@@ -24,15 +20,9 @@ public interface EmailService {
      * Method for sending notification to users who subscribed for updates about
      * added new places.
      *
-     * @param subscribers          list of users for receiving email.
-     * @param categoriesWithPlaces map with {@link CategoryDto} and
-     *                             {@link PlaceNotificationDto}`s which were
-     *                             created.
-     * @param notification         type of notification.
+     * @param message object with all necessary data for sending email
      */
-    void sendAddedNewPlacesReportEmail(List<PlaceAuthorDto> subscribers,
-        Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlaces,
-        String notification);
+    void sendAddedNewPlacesReportEmail(SendReportEmailMessage message);
 
     /**
      * Method for sending interesting news for subscribers.

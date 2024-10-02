@@ -1,7 +1,6 @@
 package greencity.service;
 
 import greencity.ModelUtils;
-import static greencity.ModelUtils.getPlaceAuthorDto;
 import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
@@ -17,6 +16,7 @@ import greencity.message.ChangePlaceStatusDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
+import greencity.message.SendReportEmailMessage;
 import greencity.message.UserTaggedInCommentMessage;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -36,6 +36,8 @@ import org.thymeleaf.ITemplateEngine;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.Executors;
+
+import static greencity.ModelUtils.getSubscriberDto;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -80,15 +82,23 @@ class EmailServiceImplTest {
 
     @Test
     void sendAddedNewPlacesReportEmailTest() {
-        CategoryDto testCategory = CategoryDto.builder().name("CategoryName").build();
-        PlaceNotificationDto testPlace1 =
-            PlaceNotificationDto.builder().name("PlaceName1").category(testCategory).build();
-        PlaceNotificationDto testPlace2 =
-            PlaceNotificationDto.builder().name("PlaceName2").category(testCategory).build();
-        Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlacesTest = new HashMap<>();
-        categoriesWithPlacesTest.put(testCategory, Arrays.asList(testPlace1, testPlace2));
-        service.sendAddedNewPlacesReportEmail(
-            Collections.singletonList(getPlaceAuthorDto()), categoriesWithPlacesTest, "DAILY");
+        SendReportEmailMessage sendReportEmailMessage = SendReportEmailMessage.builder()
+            .subscribers(List.of(getSubscriberDto()))
+            .categoriesDtoWithPlacesDtoMap(Map.of(
+                CategoryDto.builder()
+                    .name("Cycling routes")
+                    .build(),
+                List.of(
+                    PlaceNotificationDto.builder()
+                        .name("Central Park")
+                        .category(CategoryDto.builder()
+                            .name("Hotels")
+                            .build())
+                        .build()
+                )
+            ))
+            .build();
+        service.sendAddedNewPlacesReportEmail(sendReportEmailMessage);
         verify(javaMailSender).createMimeMessage();
     }
 

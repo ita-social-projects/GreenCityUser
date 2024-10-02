@@ -96,17 +96,14 @@ class EmailControllerTest {
             "additionalProp3":[{"category":{"name":"string","parentCategoryId":0},\
             "name":"string"}]},\
             "emailNotification":"string",\
-            "subscribers":[{"email":"string","id":0,"name":"string"}]}\
+            "subscribers":[{"email":"string","name":"string","language":"en"}]}\
             """;
 
         mockPerform(content, "/sendReport");
 
-        SendReportEmailMessage message =
-            new ObjectMapper().readValue(content, SendReportEmailMessage.class);
+        SendReportEmailMessage message = new ObjectMapper().readValue(content, SendReportEmailMessage.class);
 
-        verify(emailService).sendAddedNewPlacesReportEmail(
-            message.getSubscribers(), message.getCategoriesDtoWithPlacesDtoMap(),
-            message.getEmailNotification());
+        verify(emailService).sendAddedNewPlacesReportEmail(message);
     }
 
     @Test

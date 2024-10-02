@@ -38,12 +38,10 @@ public class EmailController {
      * added new places.
      *
      * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
      */
     @PostMapping("/sendReport")
     public ResponseEntity<Object> sendReport(@RequestBody SendReportEmailMessage message) {
-        emailService.sendAddedNewPlacesReportEmail(message.getSubscribers(), message.getCategoriesDtoWithPlacesDtoMap(),
-            message.getEmailNotification());
+        emailService.sendAddedNewPlacesReportEmail(message);
         return ResponseEntity.ok().build();
     }
 

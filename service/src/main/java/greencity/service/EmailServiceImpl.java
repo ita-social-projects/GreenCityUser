@@ -2,10 +2,7 @@ package greencity.service;
 
 import greencity.constant.EmailConstants;
 import greencity.constant.LogMessage;
-import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
-import greencity.dto.place.PlaceNotificationDto;
-import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
@@ -15,13 +12,13 @@ import greencity.message.ChangePlaceStatusDto;
 import greencity.message.GeneralEmailMessage;
 import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
+import greencity.message.SendReportEmailMessage;
 import greencity.message.UserTaggedInCommentMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -89,17 +86,20 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendAddedNewPlacesReportEmail(List<PlaceAuthorDto> subscribers,
-        Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlaces,
-        String notification) {
-        log.info(LogMessage.IN_SEND_ADDED_NEW_PLACES_REPORT_EMAIL, null, null, notification);
-        Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
-        model.put(EmailConstants.RESULT, categoriesWithPlaces);
-        model.put(EmailConstants.REPORT_TYPE, notification);
+    public void sendAddedNewPlacesReportEmail(SendReportEmailMessage message) {
+        log.info(LogMessage.IN_SEND_ADDED_NEW_PLACES_REPORT_EMAIL, message.getSubscribers(),
+            message.getCategoriesDtoWithPlacesDtoMap(), message.getEmailNotification());
+        Map<String, Object> sharedModel = new HashMap<>();
+        sharedModel.put(EmailConstants.CLIENT_LINK, clientLink);
+        sharedModel.put(EmailConstants.RESULT, message.getCategoriesDtoWithPlacesDtoMap());
+        sharedModel.put(EmailConstants.REPORT_TYPE, message.getEmailNotification().name());
 
-        for (PlaceAuthorDto user : subscribers) {
+        for (SubscriberDto user : message.getSubscribers()) {
+            Map<String, Object> model = new HashMap<>(sharedModel);
+            // TODO change later
+            sharedModel.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
             model.put(EmailConstants.USER_NAME, user.getName());
+            model.put(EmailConstants.LANGUAGE, user.getLanguage());
             String template = createEmailTemplate(model, EmailConstants.NEW_PLACES_REPORT_EMAIL_PAGE);
             sendEmail(user.getEmail(), EmailConstants.NEW_PLACES, template);
         }
