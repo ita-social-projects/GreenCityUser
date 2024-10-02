@@ -174,11 +174,10 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language,
         boolean isUbs) {
-        Map<String, Object> model =
-            buildModelMapForPasswordRestore(userId, userName, token, language, isUbs);
+        Map<String, Object> model = buildModelMapForPasswordRestore(userId, userName, token, language, isUbs);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
-        sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)),
-            template);
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null,
+            getLocale(language)), template);
     }
 
     /**
