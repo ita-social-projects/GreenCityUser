@@ -77,8 +77,9 @@ class EmailServiceImplTest {
             .authorFirstName("test author first name")
             .authorLanguage("en")
             .build();
-        when(messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null, getLocale(changePlaceStatusDto.getAuthorLanguage())))
-            .thenReturn("Change place status");
+        when(messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
+            getLocale(changePlaceStatusDto.getAuthorLanguage())))
+                .thenReturn("Change place status");
         service.sendChangePlaceStatusEmail(changePlaceStatusDto);
         verify(javaMailSender).createMimeMessage();
     }
@@ -97,9 +98,7 @@ class EmailServiceImplTest {
                         .category(CategoryDto.builder()
                             .name("Hotels")
                             .build())
-                        .build()
-                )
-            ))
+                        .build())))
             .emailNotification(EmailNotification.WEEKLY)
             .build();
         service.sendAddedNewPlacesReportEmail(sendReportEmailMessage);
