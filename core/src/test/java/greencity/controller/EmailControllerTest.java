@@ -52,27 +52,26 @@ class EmailControllerTest {
 
     @Test
     void sendInterestingEcoNews() throws Exception {
-        String content =
-            """
-                {
-                    "ecoNewsList": [
-                        {
-                            "ecoNewsId": 1,
-                            "imagePath": "https://google.com",
-                            "title": "Title",
-                            "text": "Text"
-                        }
-                    ],
-                    "subscribers": [
-                        {
-                            "name": "Ilia",
-                            "email": "email@gmail.com",
-                            "language": "ua",
-                            "unsubscribeToken": "d1d3a8b9-2488-48b5-9c7a-3d0b2896063b"
-                        }
-                    ]
-                }
-                """;
+        String content = """
+            {
+                "ecoNewsList": [
+                    {
+                        "ecoNewsId": 1,
+                        "imagePath": "https://google.com",
+                        "title": "Title",
+                        "text": "Text"
+                    }
+                ],
+                "subscribers": [
+                    {
+                        "name": "Ilia",
+                        "email": "email@gmail.com",
+                        "language": "ua",
+                        "unsubscribeToken": "d1d3a8b9-2488-48b5-9c7a-3d0b2896063b"
+                    }
+                ]
+            }
+            """;
 
         mockPerform(content, "/sendInterestingEcoNews");
 
@@ -85,18 +84,36 @@ class EmailControllerTest {
     @Test
     void sendReport() throws Exception {
         String content = """
-            {\
-            "categoriesDtoWithPlacesDtoMap":\
-            {"additionalProp1":\
-            [{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}],\
-            "additionalProp2":\
-            [{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}],\
-            "additionalProp3":[{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}]},\
-            "emailNotification":"string",\
-            "subscribers":[{"email":"string","name":"string","language":"en"}]}\
+            {
+                "categoriesDtoWithPlacesDtoMap": {
+                    "additionalProp1": [
+                        {
+                            "category": {
+                                "name": "string",
+                                "parentCategoryId": 0
+                            },
+                            "name": "string"
+                        }
+                    ],
+                    "additionalProp2": [
+                        {
+                            "category": {
+                                "name": "string",
+                                "parentCategoryId": 0
+                            },
+                            "name": "string"
+                        }
+                    ]
+                },
+                "emailNotification": "WEEKLY",
+                "subscribers": [
+                    {
+                        "email": "string",
+                        "name": "string",
+                        "language": "en"
+                    }
+                ]
+            }
             """;
 
         mockPerform(content, "/sendReport");
@@ -113,7 +130,8 @@ class EmailControllerTest {
             "authorEmail":"string",\
             "authorFirstName":"string",\
             "placeName":"string",\
-            "placeStatus":"approved"\
+            "placeStatus":"APPROVED",\
+            "authorLanguage":"en"\
             }\
             """;
 
@@ -206,7 +224,7 @@ class EmailControllerTest {
             .senderName("TEST")
             .build();
         String content = objectMapper.writeValueAsString(message);
-        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/habitAssign/notification")
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/sendHabitAssignNotification")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
