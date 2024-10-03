@@ -213,40 +213,6 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendEmailNotificationTest() {
-        assertDoesNotThrow(() -> service
-            .sendEmailNotification(new GeneralEmailMessage("test@gmail.com", "testSubject", "testMessage")));
-        await().atMost(5, SECONDS)
-            .untilAsserted(() -> javaMailSender.send(any(MimeMessage.class)));
-    }
-
-    @Test
-    void sendEmailNotificationToNullEmailTest() {
-        GeneralEmailMessage emailMessage = new GeneralEmailMessage(null, "testSubject", "testMessage");
-        assertThrows(WrongEmailException.class, () -> service.sendEmailNotification(emailMessage));
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"ua", "en"})
-    void sendUserTaggedInCommentNotificationTest(String language) {
-        UserTaggedInCommentMessage message = UserTaggedInCommentMessage.builder()
-            .receiverEmail("receiver@example.com")
-            .receiverName("receiver")
-            .elementName("event")
-            .commentText("test")
-            .taggerName("tagger")
-            .commentedElementId(1L)
-            .language(language)
-            .creationDate(LocalDateTime.now())
-            .build();
-        when(messageSource.getMessage(EmailConstants.USER_TAGGED_IN_COMMENT_REQUEST, null, getLocale(language)))
-            .thenReturn("user tagged in comment request");
-        service.sendTaggedUserInCommentNotificationEmail(message);
-        verify(javaMailSender).createMimeMessage();
-        verify(messageSource).getMessage(EmailConstants.USER_TAGGED_IN_COMMENT_REQUEST, null, getLocale(language));
-    }
-
-    @Test
     void sendScheduledNotificationEmailTest() {
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
             .body("test body")
@@ -258,25 +224,6 @@ class EmailServiceImplTest {
             .build();
         service.sendScheduledNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"ua", "en"})
-    void sendHabitAssignNotificationEmail(String language) {
-        HabitAssignNotificationMessage message = HabitAssignNotificationMessage.builder()
-            .language(language)
-            .habitAssignId(100L)
-            .habitName("TEST")
-            .receiverEmail("test@gmail.com")
-            .receiverName("TEST")
-            .senderName("TEST")
-            .build();
-        when(messageSource.getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST, null, getLocale(language)))
-            .thenReturn("Habit friend request");
-
-        service.sendHabitAssignNotificationEmail(message);
-        verify(javaMailSender).createMimeMessage();
-        verify(messageSource).getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST, null, getLocale(language));
     }
 
     @ParameterizedTest

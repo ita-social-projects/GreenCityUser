@@ -91,62 +91,6 @@ public class EmailController {
     }
 
     /**
-     * Sends notification to user on email.
-     *
-     * @param notification {@link GeneralEmailMessage} - object with all necessary
-     *                     data for sending notification via email.
-     * @author Yurii Midianyi
-     */
-    @Operation(summary = "Send general email notification")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-    })
-    @PostMapping("/general/notification")
-    public ResponseEntity<Object> sendEmailNotification(@RequestBody GeneralEmailMessage notification) {
-        emailService.sendEmailNotification(notification);
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Sends habit assign email notification.
-     *
-     * @param message {@link HabitAssignNotificationMessage} - object with all
-     *                necessary data for sending notification via email.
-     */
-    @Operation(summary = "Send habit assign email notification")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
-    })
-    @PostMapping("/habitAssign/notification")
-    public ResponseEntity<Void> sendHabitAssignNotification(
-        @RequestBody @Valid HabitAssignNotificationMessage message) {
-        emailService.sendHabitAssignNotificationEmail(message);
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Sends email notification to tagged user in comment.
-     *
-     * @param message {@link UserTaggedInCommentMessage} - object with all necessary
-     *                data for sending notification via email.
-     */
-    @Operation(summary = "Send email notification to tagged user")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
-    })
-    @PostMapping("/taggedUserInComment/notification")
-    public ResponseEntity<Void> sendTaggedUserInCommentNotification(
-        @RequestBody @Valid UserTaggedInCommentMessage message) {
-        emailService.sendTaggedUserInCommentNotificationEmail(message);
-        return ResponseEntity.ok().build();
-    }
-
-    /**
      * Sends scheduled email notification to user.
      *
      * @param message {@link ScheduledEmailMessage} - object with all necessary data

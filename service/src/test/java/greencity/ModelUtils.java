@@ -19,6 +19,7 @@ import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.*;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
@@ -323,7 +324,23 @@ public class ModelUtils {
             .showLocation(true)
             .showEcoPlace(true)
             .showShoppingList(true)
-            .emailPreferences(Set.of(EmailPreference.LIKES, EmailPreference.COMMENTS))
+                .emailPreferences(Set.of(
+                        UserNotificationPreferenceDto.builder()
+                                .emailPreference(EmailPreference.SYSTEM)
+                                .periodicity(EmailPreferencePeriodicity.IMMEDIATELY)
+                                .build(),
+                        UserNotificationPreferenceDto.builder()
+                                .emailPreference(EmailPreference.COMMENTS)
+                                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                                .build(),
+                        UserNotificationPreferenceDto.builder()
+                                .emailPreference(EmailPreference.LIKES)
+                                .periodicity(EmailPreferencePeriodicity.NEVER)
+                                .build(),
+                        UserNotificationPreferenceDto.builder()
+                                .emailPreference(EmailPreference.INVITES)
+                                .periodicity(EmailPreferencePeriodicity.MONTHLY)
+                                .build()))
             .build();
     }
 

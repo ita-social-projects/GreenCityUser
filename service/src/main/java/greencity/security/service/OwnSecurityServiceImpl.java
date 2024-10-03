@@ -7,6 +7,8 @@ import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.*;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
@@ -25,8 +27,10 @@ import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -74,6 +78,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setOwnSecurity(createOwnSecurity(dto, user));
         user.setVerifyEmail(createVerifyEmail(user, jwtTool.generateTokenKey()));
         user.setUuid(UUID.randomUUID().toString());
+        Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
+                .map(emailPreference -> UserNotificationPreference.builder()
+                        .user(user)
+                        .emailPreference(emailPreference)
+                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                        .build())
+                .collect(Collectors.toSet());
+        user.setNotificationPreferences(userNotificationPreferences);
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
