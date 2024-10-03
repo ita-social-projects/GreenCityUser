@@ -170,6 +170,8 @@ class EmailServiceImplTest {
             .email("test@ukr.net")
             .name("test")
             .build();
+        when(messageSource.getMessage(EmailConstants.DEACTIVATION, null, getLocale(test1.getLang())))
+            .thenReturn("Deactivation");
         service.sendReasonOfDeactivation(test1);
         verify(javaMailSender).createMimeMessage();
     }
@@ -190,6 +192,8 @@ class EmailServiceImplTest {
     @Test
     void sendUserViolationEmailTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
+        when(messageSource.getMessage(EmailConstants.VIOLATION_EMAIL, null, getLocale(dto.getLanguage())))
+            .thenReturn("Violation email");
         service.sendUserViolationEmail(dto);
         verify(javaMailSender).createMimeMessage();
     }
