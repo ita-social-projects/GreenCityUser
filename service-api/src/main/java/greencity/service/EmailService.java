@@ -96,7 +96,6 @@ public interface EmailService {
      * 
      * @param dto {@link UserViolationMailDto}-includes all information about
      *            Violation.
-     * @author Zakhar Veremchuk.
      */
     void sendUserViolationEmail(UserViolationMailDto dto);
 
@@ -105,8 +104,6 @@ public interface EmailService {
      *
      * @param email    letter is sent to this email.
      * @param language language which will be used in letter.
-     *
-     * @author Pavlo Hural.
      */
     void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
 
@@ -122,8 +119,6 @@ public interface EmailService {
      * @param language         {@link String} language code used for email
      *                         notification
      * @param token            {@link String} token for password save(restoration)
-     *
-     * @author Olena Sotnik
      */
     void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail, String token,
         String language, boolean isUbs);
@@ -133,7 +128,6 @@ public interface EmailService {
      * {@link ScheduledEmailMessage}.
      *
      * @param message {@link ScheduledEmailMessage}
-     * @author Dmytro Dmytruk
      */
     void sendScheduledNotificationEmail(ScheduledEmailMessage message);
 }

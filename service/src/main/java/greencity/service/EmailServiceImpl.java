@@ -60,6 +60,9 @@ public class EmailServiceImpl implements EmailService {
         this.messageSource = messageSource;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendChangePlaceStatusEmail(ChangePlaceStatusDto changePlaceStatus) {
         log.info(LogMessage.IN_SEND_CHANGE_PLACE_STATUS_EMAIL, changePlaceStatus.getPlaceName());
@@ -77,6 +80,9 @@ public class EmailServiceImpl implements EmailService {
             getLocale(changePlaceStatus.getAuthorLanguage())), template);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendAddedNewPlacesReportEmail(SendReportEmailMessage message) {
         log.info(LogMessage.IN_SEND_ADDED_NEW_PLACES_REPORT_EMAIL, message.getSubscribers(),
@@ -151,12 +157,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     /**
-     * Sends password recovery email using separated user parameters.
-     *
-     * @param userId    the user id is used for recovery link building.
-     * @param userName  username is used in email model constants.
-     * @param userEmail user email which will be used for sending recovery letter.
-     * @param token     password recovery token.
+     * {@inheritDoc}
      */
     @Override
     public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language,
@@ -193,6 +194,9 @@ public class EmailServiceImpl implements EmailService {
         executor.execute(() -> javaMailSender.send(mimeMessage));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendHabitNotification(String name, String email) {
         String subject = "Notification about not marked habits";
@@ -200,6 +204,9 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(email, subject, content);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendReasonOfDeactivation(UserDeactivationReasonDto userDeactivationDto) {
         Map<String, Object> model = new HashMap<>();
@@ -212,6 +219,9 @@ public class EmailServiceImpl implements EmailService {
             getLocale(userDeactivationDto.getLang())), template);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendMessageOfActivation(UserActivationDto userActivationDto) {
         Map<String, Object> model = new HashMap<>();
@@ -223,6 +233,9 @@ public class EmailServiceImpl implements EmailService {
             getLocale(userActivationDto.getLang())), template);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendUserViolationEmail(UserViolationMailDto dto) {
         Map<String, Object> model = new HashMap<>();
@@ -235,6 +248,9 @@ public class EmailServiceImpl implements EmailService {
             getLocale(dto.getLanguage())), template);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
@@ -268,6 +284,10 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(employeeEmail, messageSource.getMessage(emailSubject, null, getLocale(language)), template);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void sendScheduledNotificationEmail(ScheduledEmailMessage message) {
         Map<String, Object> model = new HashMap<>();
         String language = message.getLanguage();

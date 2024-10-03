@@ -65,7 +65,6 @@ public class EmailController {
      *
      * @param sendHabitNotification - object with all necessary data for sending
      *                              email
-     * @author Taras Kavkalo
      */
     @PostMapping("/sendHabitNotification")
     public ResponseEntity<Object> sendHabitNotification(@RequestBody SendHabitNotification sendHabitNotification) {
@@ -78,7 +77,6 @@ public class EmailController {
      *
      * @param dto {@link UserViolationMailDto} - object with all necessary data for
      *            sending email.
-     * @author Zakhar Veremchuk
      */
     @PostMapping("/sendUserViolation")
     public ResponseEntity<Object> sendUserViolation(@RequestBody UserViolationMailDto dto) {
@@ -91,7 +89,6 @@ public class EmailController {
      *
      * @param message {@link ScheduledEmailMessage} - object with all necessary data
      *                for sending notification via email.
-     * @author Dmytro Dmytruk
      */
     @Operation(summary = "Send scheduled email notification to user")
     @ApiResponses(value = {
