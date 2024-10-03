@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
  *
  * @author Volodymyr Mladonov
  */
+@SuppressWarnings("java:S1118")
 public class EmailAddressValidator {
     public static final Pattern REGEX_PATTERN = Pattern.compile(AppConstant.VALIDATION_EMAIL_REGEXP);
 

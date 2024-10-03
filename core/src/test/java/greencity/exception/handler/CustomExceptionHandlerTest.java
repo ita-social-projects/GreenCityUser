@@ -140,6 +140,16 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
+    void testHandleIllegalTokenException() {
+        IllegalArgumentException illegalArgumentException = new IllegalArgumentException("test");
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleIllegalArgumentException(illegalArgumentException, webRequest),
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
+    }
+
+    @Test
     void handleBadRequestException() {
         BadRequestException badRequestException = new BadRequestException("test");
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
@@ -190,24 +200,10 @@ class CustomExceptionHandlerTest {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
     }
 
-    /*
-     * @Test void handleMethodArgumentNotValid() { HttpStatus httpStatus =
-     * HttpStatus.BAD_REQUEST; FieldError fieldError = new FieldError("G", "field",
-     * "default"); ValidationExceptionDto validationExceptionDto = new
-     * ValidationExceptionDto(fieldError);
-     * when(notValidException.getBindingResult()).thenReturn(bindingResult);
-     * when(bindingResult.getFieldErrors()).thenReturn(Collections.singletonList(
-     * fieldError)); assertEquals(
-     * customExceptionHandler.handleMethodArgumentNotValid(notValidException,
-     * headers, httpStatus, webRequest),
-     * ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonList(
-     * validationExceptionDto))); }
-     */
-
     @Test
     void handleMethodArgumentNotValid() {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-        FieldError fieldError = new FieldError("G", "field", "default");
+        fieldError = new FieldError("G", "field", "default");
         ValidationExceptionDto validationExceptionDto = new ValidationExceptionDto(fieldError);
 
         final BindingResult bindingResult = mock(BindingResult.class);

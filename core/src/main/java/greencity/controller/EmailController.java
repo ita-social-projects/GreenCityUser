@@ -25,15 +25,14 @@ public class EmailController {
     private final EmailService emailService;
 
     /**
-     * Method for sending news for users who subscribed for updates.
+     * Method for sending interesting news for subscribers.
      *
      * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
      */
-    @PostMapping("/addEcoNews")
-    public ResponseEntity<Object> addEcoNews(@RequestBody EcoNewsForSendEmailDto message) {
-        emailService.sendCreatedNewsForAuthor(message);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @PostMapping("/sendInterestingEcoNews")
+    public ResponseEntity<Object> sendInterestingEcoNews(@RequestBody InterestingEcoNewsDto message) {
+        emailService.sendInterestingEcoNews(message);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -47,7 +46,7 @@ public class EmailController {
     public ResponseEntity<Object> sendReport(@RequestBody SendReportEmailMessage message) {
         emailService.sendAddedNewPlacesReportEmail(message.getSubscribers(), message.getCategoriesDtoWithPlacesDtoMap(),
             message.getEmailNotification());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -64,7 +63,7 @@ public class EmailController {
     public ResponseEntity<Object> changePlaceStatus(@RequestBody @Valid SendChangePlaceStatusEmailMessage message) {
         emailService.sendChangePlaceStatusEmail(message.getAuthorFirstName(), message.getPlaceName(),
             message.getPlaceStatus(), message.getAuthorEmail());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -77,7 +76,7 @@ public class EmailController {
     @PostMapping("/sendHabitNotification")
     public ResponseEntity<Object> sendHabitNotification(@RequestBody SendHabitNotification sendHabitNotification) {
         emailService.sendHabitNotification(sendHabitNotification.getName(), sendHabitNotification.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -90,7 +89,7 @@ public class EmailController {
     @PostMapping("/sendUserViolation")
     public ResponseEntity<Object> sendUserViolation(@RequestBody UserViolationMailDto dto) {
         emailService.sendUserViolationEmail(dto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**

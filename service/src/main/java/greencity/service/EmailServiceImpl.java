@@ -3,9 +3,10 @@ package greencity.service;
 import greencity.constant.EmailConstants;
 import greencity.constant.LogMessage;
 import greencity.dto.category.CategoryDto;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.PlaceAuthorDto;
+import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
@@ -15,11 +16,13 @@ import greencity.message.ScheduledEmailMessage;
 import greencity.message.UserTaggedInCommentMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.concurrent.Executor;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -30,7 +33,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
-import java.util.*;
 
 /**
  * {@inheritDoc}
@@ -42,7 +44,6 @@ public class EmailServiceImpl implements EmailService {
     private final ITemplateEngine templateEngine;
     private final Executor executor;
     private final String clientLink;
-    private final String ecoNewsLink;
     private final String serverLink;
     private final String senderEmailAddress;
     private final MessageSource messageSource;
@@ -57,14 +58,12 @@ public class EmailServiceImpl implements EmailService {
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
-        @Value("${econews.address}") String ecoNewsLink,
         @Value("${address}") String serverLink,
         @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
         this.clientLink = clientLink;
-        this.ecoNewsLink = ecoNewsLink;
         this.serverLink = serverLink;
         this.senderEmailAddress = senderEmailAddress;
         this.messageSource = messageSource;
@@ -101,16 +100,25 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void sendCreatedNewsForAuthor(EcoNewsForSendEmailDto newDto) {
-        Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.ECO_NEWS_LINK, ecoNewsLink);
-        model.put(EmailConstants.NEWS_RESULT, newDto);
-        model.put(EmailConstants.UNSUBSCRIBE_LINK, serverLink + "/newSubscriber/unsubscribe?email="
-            + URLEncoder.encode(newDto.getAuthor().getEmail(), StandardCharsets.UTF_8)
-            + "&unsubscribeToken=" + newDto.getUnsubscribeToken());
-        String template = createEmailTemplate(model, EmailConstants.NEWS_RECEIVE_EMAIL_PAGE);
-        sendEmail(newDto.getAuthor().getEmail(), EmailConstants.CREATED_NEWS, template);
+    public void sendInterestingEcoNews(InterestingEcoNewsDto interestingEcoNews) {
+        Map<String, Object> sharedModel = new HashMap<>();
+        sharedModel.put(EmailConstants.ECO_NEWS_LIST, interestingEcoNews.getEcoNewsList());
+        sharedModel.put(EmailConstants.CLIENT_LINK, clientLink);
+
+        for (SubscriberDto subscriber : interestingEcoNews.getSubscribers()) {
+            Map<String, Object> model = new HashMap<>(sharedModel);
+            // TODO change later
+            model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
+            model.put(EmailConstants.USER_NAME, subscriber.getName());
+            model.put(EmailConstants.LANGUAGE, subscriber.getLanguage());
+            String template = createEmailTemplate(model, EmailConstants.RECEIVE_INTERESTING_NEWS_EMAIL_PAGE);
+            sendEmail(subscriber.getEmail(), messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null,
+                getLocale(subscriber.getLanguage())), template);
+        }
     }
 
     /**
@@ -193,12 +201,12 @@ public class EmailServiceImpl implements EmailService {
         EmailAddressValidator.validate(receiverEmail);
         log.info(LogMessage.IN_SEND_EMAIL, receiverEmail, subject);
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
         try {
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
             mimeMessageHelper.setFrom(senderEmailAddress);
             mimeMessageHelper.setTo(receiverEmail);
             mimeMessageHelper.setSubject(subject);
-            mimeMessage.setContent(content, EmailConstants.EMAIL_CONTENT_TYPE);
+            mimeMessageHelper.setText(content, true);
         } catch (MessagingException e) {
             log.error(e.getMessage());
         }

@@ -9,6 +9,7 @@ import java.util.Locale;
  *
  * @author Volodymyr Mladonov
  */
+@SuppressWarnings("java:S1118")
 public class LanguageValidationUtils {
     private static final List<String> SUPPORTED_LANGUAGES = List.of("en", "ua");
 

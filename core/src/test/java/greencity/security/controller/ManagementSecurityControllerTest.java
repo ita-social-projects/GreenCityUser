@@ -70,7 +70,6 @@ class ManagementSecurityControllerTest {
 
     @Test
     void loginPageInvalidDto() throws Exception {
-        OwnSignInDto dto = new OwnSignInDto("", "");
         mockMvc.perform(post(LINK + "/login"))
             .andExpect(view().name("core/management_login"));
     }
