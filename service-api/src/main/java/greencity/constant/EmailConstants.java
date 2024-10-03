@@ -16,7 +16,7 @@ public class EmailConstants {
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
     public static final String DEACTIVATION = "user.deactivation.subject";
     public static final String ACTIVATION = "user.activation.subject";
-    public static final String VIOLATION_EMAIL = "Violation email";
+    public static final String VIOLATION_EMAIL = "user.violation.subject";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";

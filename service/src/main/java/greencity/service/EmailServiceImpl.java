@@ -233,7 +233,8 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.DESCRIPTION, dto.getViolationDescription());
         model.put(EmailConstants.LANGUAGE, dto.getLanguage());
         String template = createEmailTemplate(model, EmailConstants.USER_VIOLATION_PAGE);
-        sendEmail(dto.getEmail(), EmailConstants.VIOLATION_EMAIL, template);
+        sendEmail(dto.getEmail(), messageSource.getMessage(EmailConstants.VIOLATION_EMAIL, null,
+            getLocale(dto.getLanguage())), template);
     }
 
     @Override
