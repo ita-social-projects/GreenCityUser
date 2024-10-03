@@ -42,7 +42,6 @@ public class EmailServiceImpl implements EmailService {
     private final ITemplateEngine templateEngine;
     private final Executor executor;
     private final String clientLink;
-    private final String serverLink;
     private final String senderEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
@@ -56,13 +55,11 @@ public class EmailServiceImpl implements EmailService {
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
-        @Value("${address}") String serverLink,
         @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
         this.clientLink = clientLink;
-        this.serverLink = serverLink;
         this.senderEmailAddress = senderEmailAddress;
         this.messageSource = messageSource;
     }
