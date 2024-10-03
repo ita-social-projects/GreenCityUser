@@ -80,6 +80,25 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Method intercept exception {@link IllegalArgumentException}.
+     *
+     * @param ex      the IllegalArgumentException that was thrown
+     * @param request the WebRequest that triggered the exception
+     * @return a ResponseEntity containing the {@link ExceptionResponse} with
+     *         details about the error and a 400 Bad Request HTTP status
+     * @author Roman Kasarab
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public final ResponseEntity<Object> handleIllegalArgumentException(
+        IllegalArgumentException ex,
+        WebRequest request) {
+        log.info(ex.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        exceptionResponse.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
      * Method intercept exception {@link BadRequestException}.
      *
      * @param ex      Exception witch should be intercepted.

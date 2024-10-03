@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import org.springframework.stereotype.Service;
 
 @Service
+@SuppressWarnings("java:S1118")
 public class UrlValidator {
     /**
      * Method that checks if received URL is valid (string could be parsed as a URI
