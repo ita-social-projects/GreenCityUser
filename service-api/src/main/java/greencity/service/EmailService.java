@@ -169,12 +169,10 @@ public interface EmailService {
      *                         constants
      * @param employeeEmail    {@link String} user email which will be used for
      *                         sending recovery letter
-     * @param language         {@link String} language code used for email
-     *                         notification
      * @param token            {@link String} token for password save(restoration)
      *
      * @author Olena Sotnik
      */
     void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail, String token,
-        String language, boolean isUbs);
+        boolean isUbs);
 }

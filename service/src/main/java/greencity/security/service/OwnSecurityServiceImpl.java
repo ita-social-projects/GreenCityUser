@@ -203,9 +203,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
         try {
             User savedUser = userRepo.save(employee);
-            handlePostSaveActions(language, dto, employee, savedUser);
-            emailService.sendCreateNewPasswordForEmployee(employee.getId(), employee.getFirstName(),
-                employee.getEmail(), employee.getRestorePasswordEmail().getToken(), language, dto.isUbs());
+            handlePostSaveActions(dto, employee, savedUser);
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
@@ -240,16 +238,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setPositions(positions);
     }
 
-    private void handlePostSaveActions(String language, OwnSignUpDto dto, User employee, User savedUser) {
+    private void handlePostSaveActions(OwnSignUpDto dto, User employee, User savedUser) {
         employee.setId(savedUser.getId());
         if (!validateOnlyDriverPosition(employee) && employee.getRestorePasswordEmail() != null) {
-            emailService.sendRestoreEmail(
-                savedUser.getId(),
-                savedUser.getFirstName(),
-                employee.getEmail(),
-                savedUser.getRestorePasswordEmail().getToken(),
-                language,
-                dto.isUbs());
+            emailService.sendCreateNewPasswordForEmployee(employee.getId(), employee.getFirstName(),
+                employee.getEmail(), employee.getRestorePasswordEmail().getToken(), dto.isUbs());
         }
     }
 
