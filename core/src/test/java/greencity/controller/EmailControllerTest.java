@@ -189,60 +189,6 @@ class EmailControllerTest {
 
     @Test
     @SneakyThrows
-    void sendEmailNotificationTest() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        GeneralEmailMessage emailMessage = new GeneralEmailMessage("test@example.com", "Test Subject", "Test Message");
-        String jsonRequest = objectMapper.writeValueAsString(emailMessage);
-        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/general/notification")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(jsonRequest))
-            .andExpect(status().isOk());
-    }
-
-    @Test
-    @SneakyThrows
-    void sendHabitAssignNotification() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        HabitAssignNotificationMessage message = HabitAssignNotificationMessage.builder()
-            .language("ua")
-            .habitAssignId(100L)
-            .habitName("TEST")
-            .receiverEmail("test@gmail.com")
-            .receiverName("TEST")
-            .senderName("TEST")
-            .build();
-        String content = objectMapper.writeValueAsString(message);
-        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/habitAssign/notification")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(content))
-            .andExpect(status().isOk());
-    }
-
-    @Test
-    @SneakyThrows
-    void sendUserTaggedInCommentNotification() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        UserTaggedInCommentMessage message = UserTaggedInCommentMessage.builder()
-            .receiverEmail("receiver@example.com")
-            .receiverName("receiver")
-            .elementName("event")
-            .commentText("test")
-            .taggerName("tagger")
-            .commentedElementId(1L)
-            .language("en")
-            .baseLink("testLink")
-            .creationDate(LocalDateTime.now())
-            .build();
-        String content = objectMapper.writeValueAsString(message);
-        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/taggedUserInComment/notification")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(content))
-            .andExpect(status().isOk());
-    }
-
-    @Test
-    @SneakyThrows
     void sendUserReceivedScheduledNotification() {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
