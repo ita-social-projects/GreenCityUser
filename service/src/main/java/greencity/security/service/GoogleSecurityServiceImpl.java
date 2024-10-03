@@ -11,7 +11,10 @@ import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
+import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.IdTokenExpiredException;
@@ -24,7 +27,10 @@ import greencity.service.UserService;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
@@ -125,7 +131,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     }
 
     private User createNewUser(String email, String userName, String profilePicture, String language) {
-        return User.builder()
+        User user = User.builder()
             .email(email)
             .name(userName)
             .role(Role.ROLE_USER)
@@ -138,6 +144,15 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .rating(DEFAULT_RATING)
             .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
+        Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
+            .map(emailPreference -> UserNotificationPreference.builder()
+                .user(user)
+                .emailPreference(emailPreference)
+                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                .build())
+            .collect(Collectors.toSet());
+        user.setNotificationPreferences(userNotificationPreferences);
+        return user;
     }
 
     private User saveNewUser(User newUser) {

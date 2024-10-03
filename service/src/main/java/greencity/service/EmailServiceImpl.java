@@ -11,10 +11,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.exception.exceptions.LanguageNotSupportedException;
-import greencity.message.GeneralEmailMessage;
-import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
-import greencity.message.UserTaggedInCommentMessage;
 import greencity.validator.EmailAddressValidator;
 import greencity.validator.LanguageValidationUtils;
 import jakarta.mail.MessagingException;
@@ -45,7 +42,6 @@ public class EmailServiceImpl implements EmailService {
     private final ITemplateEngine templateEngine;
     private final Executor executor;
     private final String clientLink;
-    private final String serverLink;
     private final String senderEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
@@ -59,13 +55,11 @@ public class EmailServiceImpl implements EmailService {
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
-        @Value("${address}") String serverLink,
         @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
         this.clientLink = clientLink;
-        this.serverLink = serverLink;
         this.senderEmailAddress = senderEmailAddress;
         this.messageSource = messageSource;
     }
@@ -268,43 +262,12 @@ public class EmailServiceImpl implements EmailService {
             template);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @author Yurii Midianyi
-     */
-    @Override
-    public void sendEmailNotification(GeneralEmailMessage notification) {
-        sendEmail(notification.getEmail(), notification.getSubject(), notification.getMessage());
-    }
-
     private static Locale getLocale(String language) {
         return switch (language) {
             case "ua" -> UA_LOCALE;
             case "en" -> Locale.ENGLISH;
             default -> throw new IllegalStateException("Unexpected value: " + language);
         };
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void sendHabitAssignNotificationEmail(HabitAssignNotificationMessage message) {
-        Map<String, Object> model = new HashMap<>();
-        String baseLink = clientLink + "/#/profile";
-        String language = message.getLanguage();
-        validateLanguage(language);
-        model.put(EmailConstants.CLIENT_LINK, baseLink);
-        model.put(EmailConstants.USER_NAME, message.getReceiverName());
-        model.put(EmailConstants.VERIFY_ADDRESS, serverLink + "/habit/assign/confirm/" + message.getHabitAssignId());
-        model.put(EmailConstants.LANGUAGE, language);
-        model.put(EmailConstants.IS_UBS, false);
-        model.put(EmailConstants.SENDER_NAME, message.getSenderName());
-        model.put(EmailConstants.HABIT_NAME, message.getHabitName());
-        String template = createEmailTemplate(model, EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST_PAGE);
-        sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.HABIT_ASSIGN_FRIEND_REQUEST,
-            null, getLocale(language)), template);
     }
 
     /**
@@ -321,27 +284,6 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(employeeEmail,
             messageSource.getMessage(emailSubject, null, getLocale(language)),
             template);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void sendTaggedUserInCommentNotificationEmail(UserTaggedInCommentMessage message) {
-        Map<String, Object> model = new HashMap<>();
-        String language = message.getLanguage();
-        validateLanguage(language);
-        model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
-        model.put(EmailConstants.USER_NAME, message.getReceiverName());
-        model.put(EmailConstants.AUTHOR_NAME, message.getTaggerName());
-        model.put(EmailConstants.LANGUAGE, language);
-        model.put(EmailConstants.IS_UBS, false);
-        model.put(EmailConstants.ELEMENT_NAME, message.getElementName());
-        model.put(EmailConstants.COMMENT_TIME, message.getCreationDate());
-        model.put(EmailConstants.COMMENT_BODY, message.getCommentText());
-        String template = createEmailTemplate(model, EmailConstants.USER_TAGGED_IN_COMMENT_PAGE);
-        sendEmail(message.getReceiverEmail(), messageSource.getMessage(EmailConstants.USER_TAGGED_IN_COMMENT_REQUEST,
-            null, getLocale(language)) + " " + message.getElementName(), template);
     }
 
     public void sendScheduledNotificationEmail(ScheduledEmailMessage message) {

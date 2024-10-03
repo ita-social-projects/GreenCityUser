@@ -28,6 +28,7 @@ import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.dto.user.UserProfileStatisticsDto;
@@ -45,6 +46,8 @@ import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserLocation;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRequestException;
@@ -85,7 +88,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -372,10 +374,10 @@ public class UserServiceImpl implements UserService {
     public UserStatusDto updateStatus(Long id, UserStatus userStatus, String email) {
         checkUpdatableUser(id, email);
         accessForUpdateUserStatus(id, email);
-        UserVO userVO = findById(id);
-        userVO.setUserStatus(userStatus);
-        User map = modelMapper.map(userVO, User.class);
-        return modelMapper.map(userRepo.save(map), UserStatusDto.class);
+        User user =
+            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        user.setUserStatus(userStatus);
+        return modelMapper.map(userRepo.save(user), UserStatusDto.class);
     }
 
     /**
@@ -600,20 +602,44 @@ public class UserServiceImpl implements UserService {
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
         user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
-        if (Objects.nonNull(userProfileDtoRequest.getEmailPreferences())) {
-            Set<UserNotificationPreference> newPreferences = userProfileDtoRequest.getEmailPreferences().stream()
-                .map(type -> {
-                    UserNotificationPreference preference = new UserNotificationPreference();
-                    preference.setUser(user);
-                    preference.setEmailPreference(type);
-                    return preference;
-                }).collect(Collectors.toSet());
-            Set<UserNotificationPreference> currentPreferences = user.getNotificationPreferences();
-            currentPreferences.clear();
-            currentPreferences.addAll(newPreferences);
-        }
+        setNotificationPreferencesForUser(user, userProfileDtoRequest);
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
+    }
+
+    private void setNotificationPreferencesForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        if (userProfileDtoRequest.getEmailPreferences() != null) {
+            Set<UserNotificationPreference> userPreferences = user.getNotificationPreferences();
+            Set<UserNotificationPreferenceDto> newPreferences = userProfileDtoRequest.getEmailPreferences();
+            Set<EmailPreference> existingPreferences = userPreferences.stream()
+                .map(UserNotificationPreference::getEmailPreference).collect(Collectors.toSet());
+            Set<UserNotificationPreference> preferencesToAdd = newPreferences.stream()
+                .filter(preferenceDto -> !existingPreferences.contains(preferenceDto.getEmailPreference()))
+                .map(preferenceDto -> UserNotificationPreference.builder()
+                    .emailPreference(preferenceDto.getEmailPreference())
+                    .periodicity(preferenceDto.getPeriodicity())
+                    .user(user)
+                    .build())
+                .collect(Collectors.toSet());
+
+            Set<UserNotificationPreference> preferences = userPreferences
+                .stream()
+                .map(preference -> {
+                    for (UserNotificationPreferenceDto preferenceDto : newPreferences) {
+                        if (preferenceDto.getEmailPreference().equals(preference.getEmailPreference())) {
+                            preference.setPeriodicity(preferenceDto.getPeriodicity());
+                            break;
+                        }
+                    }
+                    return preference;
+                })
+                .filter(preference -> !preference.getPeriodicity().equals(EmailPreferencePeriodicity.NEVER))
+                .collect(Collectors.toSet());
+            preferences.addAll(preferencesToAdd);
+
+            userPreferences.clear();
+            userPreferences.addAll(preferences);
+        }
     }
 
     private void setLocationForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {

@@ -413,8 +413,14 @@ class UserControllerTest {
                     "longitude": 20.000000
                 },
                 "emailPreferences": [
-                    "LIKES",
-                    "SYSTEM"
+                    {
+                        "emailPreference": "SYSTEM",
+                         "periodicity": "DAILY"
+                    },
+                    {
+                         "emailPreference": "LIKES",
+                         "periodicity": "NEVER"
+                    }
                 ]
             }
             """;
