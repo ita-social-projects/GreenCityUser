@@ -4,12 +4,9 @@ import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.GeneralEmailMessage;
-import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.ChangePlaceStatusDto;
 import greencity.message.SendReportEmailMessage;
-import greencity.message.UserTaggedInCommentMessage;
 
 /**
  * Provides the interface to manage sending emails to {@code User}.
@@ -114,25 +111,6 @@ public interface EmailService {
     void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
 
     /**
-     * Method for sending general email notifications.
-     *
-     * @param notification {@link GeneralEmailMessage}
-     * @author Yurii Midianyi
-     */
-    void sendEmailNotification(GeneralEmailMessage notification);
-
-    /**
-     * Sends an email notification based on the given
-     * {@link HabitAssignNotificationMessage}.
-     *
-     * @param message {@link HabitAssignNotificationMessage} represents the
-     *                information needed for the email notification. This includes
-     *                details such as recipient, subject, and content of the email.
-     * @author Kizeov Dmytro
-     */
-    void sendHabitAssignNotificationEmail(HabitAssignNotificationMessage message);
-
-    /**
      * Sends email message to create new password for employee after signUp.
      *
      * @param employeeId       {@link Long} the user id is used for recovery link
@@ -149,15 +127,6 @@ public interface EmailService {
      */
     void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail, String token,
         String language, boolean isUbs);
-
-    /**
-     * Sends an email notification to tagged in comment user
-     * {@link UserTaggedInCommentMessage}.
-     *
-     * @param message {@link UserTaggedInCommentMessage}
-     * @author Dmytro Dmytruk
-     */
-    void sendTaggedUserInCommentNotificationEmail(UserTaggedInCommentMessage message);
 
     /**
      * Sends an email notification user that received scheduled message

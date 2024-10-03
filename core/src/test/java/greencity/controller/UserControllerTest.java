@@ -56,7 +56,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
@@ -84,9 +83,7 @@ class UserControllerTest {
     private AuthorityService authorityService;
     @Mock
     private PositionService positionService;
-    private ObjectMapper objectMapper;
-    @Mock
-    private SimpMessagingTemplate messagingTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() {
@@ -95,7 +92,6 @@ class UserControllerTest {
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver(),
                 new UserArgumentResolver(userService))
             .build();
-        objectMapper = new ObjectMapper();
     }
 
     @Test
@@ -107,7 +103,7 @@ class UserControllerTest {
             {
               "id": 0,
               "userStatus": "BLOCKED"
-            }\
+            }
             """;
 
         mockMvc.perform(patch(userLink + "/status")
@@ -413,8 +409,14 @@ class UserControllerTest {
                     "longitude": 20.000000
                 },
                 "emailPreferences": [
-                    "LIKES",
-                    "SYSTEM"
+                    {
+                        "emailPreference": "SYSTEM",
+                         "periodicity": "DAILY"
+                    },
+                    {
+                         "emailPreference": "LIKES",
+                         "periodicity": "NEVER"
+                    }
                 ]
             }
             """;
