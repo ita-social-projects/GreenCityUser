@@ -208,8 +208,10 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, userDeactivationDto.getName());
         model.put(EmailConstants.REASON, userDeactivationDto.getDeactivationReason());
+        model.put(EmailConstants.LANGUAGE, userDeactivationDto.getLang());
         String template = createEmailTemplate(model, EmailConstants.REASONS_OF_DEACTIVATION_PAGE);
-        sendEmail(userDeactivationDto.getEmail(), EmailConstants.DEACTIVATION, template);
+        sendEmail(userDeactivationDto.getEmail(), messageSource.getMessage(EmailConstants.DEACTIVATION, null,
+            getLocale(userDeactivationDto.getLang())), template);
     }
 
     @Override
