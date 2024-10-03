@@ -31,7 +31,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpResponse;
@@ -146,12 +145,12 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
-                .map(emailPreference -> UserNotificationPreference.builder()
-                        .user(user)
-                        .emailPreference(emailPreference)
-                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
-                        .build())
-                .collect(Collectors.toSet());
+            .map(emailPreference -> UserNotificationPreference.builder()
+                .user(user)
+                .emailPreference(emailPreference)
+                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                .build())
+            .collect(Collectors.toSet());
         user.setNotificationPreferences(userNotificationPreferences);
         return user;
     }

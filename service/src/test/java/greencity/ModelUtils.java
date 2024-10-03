@@ -324,23 +324,23 @@ public class ModelUtils {
             .showLocation(true)
             .showEcoPlace(true)
             .showShoppingList(true)
-                .emailPreferences(Set.of(
-                        UserNotificationPreferenceDto.builder()
-                                .emailPreference(EmailPreference.SYSTEM)
-                                .periodicity(EmailPreferencePeriodicity.IMMEDIATELY)
-                                .build(),
-                        UserNotificationPreferenceDto.builder()
-                                .emailPreference(EmailPreference.COMMENTS)
-                                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
-                                .build(),
-                        UserNotificationPreferenceDto.builder()
-                                .emailPreference(EmailPreference.LIKES)
-                                .periodicity(EmailPreferencePeriodicity.NEVER)
-                                .build(),
-                        UserNotificationPreferenceDto.builder()
-                                .emailPreference(EmailPreference.INVITES)
-                                .periodicity(EmailPreferencePeriodicity.MONTHLY)
-                                .build()))
+            .emailPreferences(Set.of(
+                UserNotificationPreferenceDto.builder()
+                    .emailPreference(EmailPreference.SYSTEM)
+                    .periodicity(EmailPreferencePeriodicity.IMMEDIATELY)
+                    .build(),
+                UserNotificationPreferenceDto.builder()
+                    .emailPreference(EmailPreference.COMMENTS)
+                    .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                    .build(),
+                UserNotificationPreferenceDto.builder()
+                    .emailPreference(EmailPreference.LIKES)
+                    .periodicity(EmailPreferencePeriodicity.NEVER)
+                    .build(),
+                UserNotificationPreferenceDto.builder()
+                    .emailPreference(EmailPreference.INVITES)
+                    .periodicity(EmailPreferencePeriodicity.MONTHLY)
+                    .build()))
             .build();
     }
 

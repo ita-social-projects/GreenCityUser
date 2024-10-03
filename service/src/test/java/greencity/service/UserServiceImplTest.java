@@ -609,13 +609,13 @@ class UserServiceImplTest {
         var myUser = ModelUtils.getUserWithSocialNetworks();
         Set<UserNotificationPreference> preferences = new HashSet<>();
         preferences.add(UserNotificationPreference.builder()
-                .emailPreference(EmailPreference.SYSTEM)
-                .periodicity(EmailPreferencePeriodicity.DAILY)
-                .build());
+            .emailPreference(EmailPreference.SYSTEM)
+            .periodicity(EmailPreferencePeriodicity.DAILY)
+            .build());
         preferences.add(UserNotificationPreference.builder()
-                .emailPreference(EmailPreference.LIKES)
-                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
-                .build());
+            .emailPreference(EmailPreference.LIKES)
+            .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+            .build());
         myUser.setNotificationPreferences(preferences);
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(myUser));
         when(userRepo.save(myUser)).thenReturn(myUser);

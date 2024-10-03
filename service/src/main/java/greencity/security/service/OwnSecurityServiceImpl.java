@@ -79,12 +79,12 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setVerifyEmail(createVerifyEmail(user, jwtTool.generateTokenKey()));
         user.setUuid(UUID.randomUUID().toString());
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
-                .map(emailPreference -> UserNotificationPreference.builder()
-                        .user(user)
-                        .emailPreference(emailPreference)
-                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
-                        .build())
-                .collect(Collectors.toSet());
+            .map(emailPreference -> UserNotificationPreference.builder()
+                .user(user)
+                .emailPreference(emailPreference)
+                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                .build())
+            .collect(Collectors.toSet());
         user.setNotificationPreferences(userNotificationPreferences);
         try {
             User savedUser = userRepo.save(user);
