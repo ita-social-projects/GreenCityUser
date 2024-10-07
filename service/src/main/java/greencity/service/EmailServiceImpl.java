@@ -359,7 +359,6 @@ public class EmailServiceImpl implements EmailService {
 
     /**
      * {@inheritDoc}
-     *
      */
     @Override
     public void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail,
