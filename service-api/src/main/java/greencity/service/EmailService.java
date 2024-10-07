@@ -18,7 +18,6 @@ import java.util.Map;
 /**
  * Provides the interface to manage sending emails to {@code User}.
  */
-
 public interface EmailService {
     /**
      * Method for sending notification to {@link User}'s who subscribed for updates
