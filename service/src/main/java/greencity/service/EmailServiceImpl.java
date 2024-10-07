@@ -131,7 +131,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendVerificationEmail(Long id, String name, String email, String token, String language,
         boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity"));
+        model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.VERIFY_ADDRESS, clientLink + "/#" + (isUbs ? "/ubs" : "") + "?token=" + token
             + PARAM_USER_ID + id);
@@ -254,7 +254,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity"));
+        model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
         model.put(EmailConstants.USER_NAME, userName);
         model.put(EmailConstants.LANGUAGE, language);
         model.put(EmailConstants.IS_UBS, isUbs);
@@ -306,12 +306,16 @@ public class EmailServiceImpl implements EmailService {
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,
         boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity"));
+        model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.RESTORE_PASS, clientLink + "/#" + (isUbs ? "/ubs" : "") + "/auth/restore?"
             + "token=" + token + PARAM_USER_ID + userId);
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
         return model;
+    }
+
+    private String getClientLinkByIsUbs(boolean isUbs) {
+        return clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity");
     }
 }
