@@ -1137,8 +1137,7 @@ class UserServiceImplTest {
         assertNotNull(result);
         assertEquals(foundUser.getEmail(), result.getEmail());
         assertEquals(foundUser.getName(), result.getName());
-        assertEquals(1, result.getDeactivationReasons().size());
-        assertEquals(reason, result.getDeactivationReasons().getFirst());
+        assertEquals(reason, result.getDeactivationReason());
         assertEquals(foundUser.getLanguage().getCode(), result.getLang());
     }
 

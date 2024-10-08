@@ -1,266 +1,153 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml"
-      th:with="lang=${language}" th:lang="${lang}">
+<html th:lang="${language}">
 <head>
-
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title th:text="#{verify.email}"></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style type="text/css">
-        /**
-         * Google webfonts. Recommended to include the .woff version for cross-client compatibility.
-         */
-        @media screen {
-            @font-face {
-                font-family: 'Source Sans Pro';
-                font-style: normal;
-                font-weight: 400;
-                src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/ODelI1aHBYDBqgeIAH2zlBM0YzuT7MdOe03otPbuUS0.woff) format('woff');
-            }
-            @font-face {
-                font-family: 'Source Sans Pro';
-                font-style: normal;
-                font-weight: 700;
-                src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/toadOcfmlt9b38dHJxOBGFkQc6VGVFSmCnC_l7QZG60.woff) format('woff');
-            }
-        }
-
-        /**
-         * Avoid browser level font resizing.
-         * 1. Windows Mobile
-         * 2. iOS / OSX
-         */
-        body,
-        table,
-        td,
-        a {
-            -ms-text-size-adjust: 100%; /* 1 */
-            -webkit-text-size-adjust: 100%; /* 2 */
-        }
-
-        /**
-         * Remove extra space added to tables and cells in Outlook.
-         */
-        table,
-        td {
-            mso-table-rspace: 0pt;
-            mso-table-lspace: 0pt;
-        }
-
-        /**
-         * Better fluid images in Internet Explorer.
-         */
-        img {
-            -ms-interpolation-mode: bicubic;
-        }
-
-        /**
-         * Remove blue links for iOS devices.
-         */
-        a[x-apple-data-detectors] {
-            font-family: inherit !important;
-            font-size: inherit !important;
-            font-weight: inherit !important;
-            line-height: inherit !important;
-            color: inherit !important;
-            text-decoration: none !important;
-        }
-
-        /**
-         * Fix centering issues in Android 4.4.
-         */
-        div[style*="margin: 16px 0;"] {
-            margin: 0 !important;
-        }
-
+    <style>
         body {
-            width: 100% !important;
-            height: 100% !important;
-            padding: 0 !important;
-            margin: 0 !important;
+            margin: 0;
+            padding: 0;
+            background-color: #F5F6F6;
         }
 
-        /**
-         * Collapse table borders to avoid space between cells.
-         */
-        table {
-            border-collapse: collapse !important;
+        .email-container {
+            font-family: Lato, sans-serif;
+            font-size: 16px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #E3E6E8;
         }
 
-        a {
-            color: #13aa57;
+        .color-green-city {
+            background-color: #13AA57;
+            border-color: #13AA57;
+            color: #13AA57 !important;
         }
 
-        img {
-            height: auto;
-            line-height: 100%;
+        .color-ubs {
+            background-color: #87BC1E;
+            border-color: #87BC1E;
+            color: #87BC1E !important;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .header-ubs {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header-image {
+            height: 30px;
+            vertical-align: bottom;
+        }
+
+        .header-image-ubs {
+            height: 80px;
+            vertical-align: bottom;
+        }
+
+        .content {
+            padding: 26px;
+            text-align: left;
+            color: #333333 !important;
+        }
+
+        .top-text {
+            margin-top: 0;
+            color: #333333 !important;
+        }
+
+        .main-text {
+            line-height: 1.4;
+            color: #333333 !important;
+        }
+
+        .bottom-text {
+            margin-bottom: 0;
+            color: #333333 !important;
+        }
+
+        .vertical-center {
+            text-align: center;
+        }
+
+        .verify-email {
+            display: inline-block;
+            padding: 10px 15px;
+            border-width: 2px;
+            border-style: solid;
+            background-color: transparent;
             text-decoration: none;
-            border: 0;
-            outline: none;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #666666;
+            background-color: #CACFD3;
+        }
+
+        @media only screen and (max-width: 600px) {
+            body {
+                font-size: 13px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header-ubs {
+                padding: 10px;
+            }
+
+            .header-image {
+                height: 25px;
+            }
+
+            .header-image-ubs {
+                height: 60px;
+            }
+
+            .footer {
+                font-size: 10px;
+            }
         }
     </style>
-
 </head>
-<body style="background-color: #e9ecef;">
+<body>
+<div class="email-container">
+    <div th:classappend="${isUbs} ? 'header-ubs color-ubs' : 'header color-green-city'">
+        <a th:href="${clientLink}" target="_blank">
+            <img th:classappend="${isUbs} ? 'header-image-ubs' : 'header-image'" th:src="${isUbs} ? 'https://csb10032000a548f571.blob.core.windows.net/allfiles/76e03102-a814-45bf-9544-b1971dab4ccc%D0%9B%D0%BE%D0%B3%D0%BE_%D0%BA%D0%BE%D0%BB%D0%BE.png' : 'https://csb10032000a548f571.blob.core.windows.net/allfiles/5eaa9e18-f91f-4d3a-9926-da1239317a98GreenCity-Logo-White.png'" alt="Logo">
+        </a>
+    </div>
 
+    <div class="content">
+        <p class="top-text">
+            <b th:text="#{hi.user(${name})}"></b>
+        </p>
 
-<!-- start body -->
-<table border="0" cellpadding="0" cellspacing="0" width="100%"
-       th:with="headerTextColor = ${isUbs} ? '#1d2830': '#ffffff',
-                backgroundColor = ${isUbs} ? '#afd85a' : '#13aa57'">
+        <p class="main-text">
+            <span th:text="${isUbs} ? #{thanksUbs} : #{thanks}"></span><br/>
+            <span th:text="#{text.verify}"></span>
+        </p>
 
-    <!-- start logo -->
-    <tr>
-        <td align="center" bgcolor="#e9ecef">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                <tr>
-                    <td align="center" valign="top" th:bgcolor="${backgroundColor}" style="margin-top: 20px">
-                        <a th:href="${clientLink}" th:utext="${isUbs} ? 'Pick up city' : 'Green City'"
-                            style="display: inline-block; padding: 20px 50px; font-weight:700; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 32px; text-decoration: none; border-radius: 6px;"
-                            th:styleappend="'color:'+${headerTextColor}">
-                        </a>
-                    </td>
-                </tr>
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif]-->
-        </td>
-    </tr>
-    <!-- end logo -->
+        <div class="vertical-center"><a th:text="#{email}" th:href="${verifyAddress}" class="verify-email" th:classappend="${isUbs} ? 'color-ubs' : 'color-green-city'" target="_blank"></a></div>
 
-    <!-- start hero -->
-    <tr>
-        <td align="center" bgcolor="#e9ecef">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-                <tr>
-                    <td align="left" bgcolor="#ffffff"
-                        style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;">
-                        <h2 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -1px; line-height: 48px;"
-                           th:text="#{verify}"></h2>
-                    </td>
-                </tr>
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif]-->
-        </td>
-    </tr>
-    <!-- end hero -->
+        <p class="bottom-text" th:text="${isUbs} ? #{sincerely.yours.Ubs} : #{sincerely.yours.greenCity}"></p>
+    </div>
 
-    <!-- start copy block -->
-    <tr>
-        <td align="center" bgcolor="#e9ecef">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-
-                <!-- start copy -->
-                <tr>
-                    <td align="left" bgcolor="#ffffff"
-                        style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                        <p th:text="#{hello} + ${name + ','}"></p>
-                        
-                        <div style="margin: 0;" th:text="${isUbs} ? #{thanksUbs} : #{thanks}"></div>
-                        <div style="margin: 0;" th:text="#{text.verify}"></div>
-                    </td>
-                </tr>
-                <!-- end copy -->
-
-                <!-- start button -->
-                <tr>
-                    <td align="left" bgcolor="#ffffff">
-                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                            <tr>
-                                <td align="center" bgcolor="#ffffff" style="padding: 12px;">
-                                    <table border="0" cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td align="center" th:bgcolor="${backgroundColor}" style="border-radius: 6px;">
-                                                <a th:href="${verifyAddress}" target="_blank"
-                                                   style="display: inline-block; padding: 16px 36px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; text-decoration: none; border-radius: 6px;"
-                                                th:text="#{email}" th:styleappend="'color:'+${headerTextColor}"></a>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-                <!-- end button -->
-
-                <!-- start copy -->
-                <tr>
-                    <td align="left" bgcolor="#ffffff"
-                        style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
-                        <p style="margin: 0;" th:text="#{condition}"></p>
-                        <p style="margin: 0;" th:text="${verifyAddress}"><a th:href="${verifyAddress}"
-                                                                            target="_blank"></a>
-                        </p>
-                        <p style="margin: 0;"><br></p>
-                        <p style="margin: 0;" th:text="#{text.footer}"></p>
-                    </td>
-                </tr>
-                <!-- end copy -->
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif]-->
-        </td>
-    </tr>
-    <!-- end copy block -->
-
-    <!-- start footer -->
-    <tr>
-        <td align="center" bgcolor="#e9ecef" style="padding: 24px;">
-            <!--[if (gte mso 9)|(IE)]>
-            <table align="center" border="0" cellpadding="0" cellspacing="0" width="600">
-                <tr>
-                    <td align="center" valign="top" width="600">
-            <![endif]-->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-
-                <!-- start permission -->
-                <tr>
-                    <td align="center" bgcolor="#e9ecef"
-                        style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;">
-                        <p style="margin: 0;" th:text="#{advice.registration}"> "> </p>
-                    </td>
-                </tr>
-                <!-- end permission -->
-
-            </table>
-            <!--[if (gte mso 9)|(IE)]>
-            </td>
-            </tr>
-            </table>
-            <![endif]-->
-        </td>
-    </tr>
-    <!-- end footer -->
-
-</table>
-<!-- end body -->
-
+    <div class="footer">
+        <p><span th:text="#{advice.registration}"></span></p>
+    </div>
+</div>
 </body>
 </html>

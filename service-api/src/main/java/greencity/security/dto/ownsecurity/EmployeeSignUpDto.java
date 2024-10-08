@@ -18,14 +18,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeSignUpDto {
-    @Pattern(
-        regexp = ValidationConstants.USERNAME_REGEXP,
-        message = ValidationConstants.USERNAME_MESSAGE)
+    @Pattern(regexp = ValidationConstants.USERNAME_REGEXP, message = ValidationConstants.USERNAME_MESSAGE)
     private String name;
     @NotBlank
-    @Email(
-        regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$",
-        message = ValidationConstants.INVALID_EMAIL)
+    @Email(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$", message = ValidationConstants.INVALID_EMAIL)
     private String email;
     private String uuid;
     private List<PositionDto> positions;

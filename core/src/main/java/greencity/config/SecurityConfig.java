@@ -203,7 +203,7 @@ public class SecurityConfig {
                     "/email/sendInterestingEcoNews",
                     "/email/changePlaceStatus",
                     "/email/general/notification",
-                    "/email/habitAssign/notification",
+                    "/email/sendHabitAssignNotification",
                     "/email/taggedUserInComment/notification",
                     "/email/userReceivedComment/notification",
                     "/email/userReceivedCommentReply/notification")
