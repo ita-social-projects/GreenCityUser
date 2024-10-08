@@ -54,4 +54,6 @@ public class ErrorMessage {
     public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER =
         "You do not have permission to deactivate this user";
     public static final String BASE64_DECODE_MESSAGE = "Can't decode from base64 format";
+    public static final String BRUTEFORCE_PROTECTION_MESSAGE =
+        "User account is blocked due to too many failed login attempts";
 }

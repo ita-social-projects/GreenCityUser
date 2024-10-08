@@ -38,6 +38,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -76,6 +77,12 @@ class OwnSecurityServiceImplTest {
     @Mock
     AuthorityRepo authorityRepo;
 
+    @Mock
+    LoginAttemptService loginAttemptService;
+
+    @Mock
+    ApplicationEventPublisher eventPublisher;
+
     private OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -87,7 +94,8 @@ class OwnSecurityServiceImplTest {
     @BeforeEach
     public void init() {
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
-            jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo);
+            jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo,
+            loginAttemptService, eventPublisher);
 
         ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
 
@@ -614,5 +622,13 @@ class OwnSecurityServiceImplTest {
         assertThrows(EmailNotVerified.class, () -> ownSecurityService.deleteUserByEmail(email));
 
         verify(userRepo, times(1)).findByEmail(newNotVerifiedUser.getEmail());
+    }
+
+    @Test
+    void singInBlockedUser() {
+        when(loginAttemptService.isBlocked()).thenReturn(true);
+
+        assertThrows(UserBlockedException.class,
+            () -> ownSecurityService.signIn(ownSignInDto));
     }
 }

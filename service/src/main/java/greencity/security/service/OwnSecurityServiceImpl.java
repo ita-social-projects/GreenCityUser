@@ -39,7 +39,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +67,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final UserRepo userRepo;
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
+    private final LoginAttemptService loginAttemptService;
+    private final ApplicationEventPublisher eventPublisher;
     @Value("${verifyEmailTimeHour}")
     private Integer expirationTime;
 
@@ -189,12 +195,19 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
     public SuccessSignInDto signIn(final OwnSignInDto dto) {
+        if (loginAttemptService.isBlocked()) {
+            log.error("Brute force protection, email is blocked - {}", dto.getEmail());
+            throw new UserBlockedException(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE);
+        }
         UserVO user = userService.findByEmail(dto.getEmail());
         if (user == null) {
+            publishFailureEvent(dto.getEmail(), dto.getPassword(), ErrorMessage.USER_NOT_FOUND_BY_EMAIL);
             throw new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail());
         }
         if (!isPasswordCorrect(dto, user)) {
+            publishFailureEvent(dto.getEmail(), dto.getPassword(), ErrorMessage.BAD_PASSWORD);
             throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
         }
         if (user.getVerifyEmail() != null) {
@@ -206,6 +219,15 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), true);
+    }
+
+    private void publishFailureEvent(String email, String password, String errorMessage) {
+        UsernamePasswordAuthenticationToken auth =
+            new UsernamePasswordAuthenticationToken(email, password);
+        eventPublisher
+            .publishEvent(
+                new AuthenticationFailureBadCredentialsEvent(auth,
+                    new BadCredentialsException(errorMessage)));
     }
 
     private boolean isPasswordCorrect(OwnSignInDto signInDto, UserVO user) {

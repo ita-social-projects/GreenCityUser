@@ -13,6 +13,7 @@
         <jjwt.version>0.12.3</jjwt.version>
         <passay.version>1.6.0</passay.version>
         <apache.commons.version>4.4</apache.commons.version>
+        <guava.version>32.0.0-jre</guava.version>
     </properties>
 
     <artifactId>service-api</artifactId>
@@ -155,6 +156,11 @@
             <artifactId>swagger-annotations-jakarta</artifactId>
             <version>2.2.19</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
         </dependency>
     </dependencies>
 
