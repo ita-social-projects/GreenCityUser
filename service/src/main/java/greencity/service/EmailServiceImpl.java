@@ -72,8 +72,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.USER_NAME, changePlaceStatus.getAuthorFirstName());
         model.put(EmailConstants.PLACE_NAME, changePlaceStatus.getPlaceName());
         model.put(EmailConstants.STATUS, changePlaceStatus.getPlaceStatus().name());
-        // TODO change later
-        model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
+        model.put(EmailConstants.PROFILE_LINK, getProfileLink());
 
         String template = createEmailTemplate(model, EmailConstants.CHANGE_PLACE_STATUS_EMAIL_PAGE);
         sendEmail(changePlaceStatus.getAuthorEmail(), messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
@@ -94,8 +93,7 @@ public class EmailServiceImpl implements EmailService {
 
         for (SubscriberDto user : message.getSubscribers()) {
             Map<String, Object> model = new HashMap<>(sharedModel);
-            // TODO change later
-            sharedModel.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
+            sharedModel.put(EmailConstants.PROFILE_LINK, getProfileLink());
             model.put(EmailConstants.USER_NAME, user.getName());
             model.put(EmailConstants.LANGUAGE, user.getLanguage());
             String template = createEmailTemplate(model, EmailConstants.NEW_PLACES_REPORT_EMAIL_PAGE);
@@ -296,8 +294,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.LANGUAGE, language);
         model.put(EmailConstants.TITLE, message.getSubject());
         model.put(EmailConstants.BODY, message.getBody());
-        // TODO change later
-        model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
+        model.put(EmailConstants.PROFILE_LINK, getProfileLink());
 
         String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
         sendEmail(message.getEmail(), message.getSubject(), template);
@@ -317,5 +314,9 @@ public class EmailServiceImpl implements EmailService {
 
     private String getClientLinkByIsUbs(boolean isUbs) {
         return clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity");
+    }
+
+    private String getProfileLink() {
+        return clientLink + "/#/profile";
     }
 }
