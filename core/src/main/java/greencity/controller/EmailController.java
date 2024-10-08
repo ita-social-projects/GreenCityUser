@@ -38,12 +38,10 @@ public class EmailController {
      * added new places.
      *
      * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
      */
     @PostMapping("/sendReport")
     public ResponseEntity<Object> sendReport(@RequestBody SendReportEmailMessage message) {
-        emailService.sendAddedNewPlacesReportEmail(message.getSubscribers(), message.getCategoriesDtoWithPlacesDtoMap(),
-            message.getEmailNotification());
+        emailService.sendAddedNewPlacesReportEmail(message);
         return ResponseEntity.ok().build();
     }
 
@@ -51,16 +49,14 @@ public class EmailController {
      * Method for sending simple notification to {@code User} about status change.
      *
      * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
      */
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
     })
     @PostMapping("/changePlaceStatus")
-    public ResponseEntity<Object> changePlaceStatus(@RequestBody @Valid SendChangePlaceStatusEmailMessage message) {
-        emailService.sendChangePlaceStatusEmail(message.getAuthorFirstName(), message.getPlaceName(),
-            message.getPlaceStatus(), message.getAuthorEmail());
+    public ResponseEntity<Object> changePlaceStatus(@RequestBody @Valid ChangePlaceStatusDto message) {
+        emailService.sendChangePlaceStatusEmail(message);
         return ResponseEntity.ok().build();
     }
 
@@ -69,7 +65,6 @@ public class EmailController {
      *
      * @param sendHabitNotification - object with all necessary data for sending
      *                              email
-     * @author Taras Kavkalo
      */
     @PostMapping("/sendHabitNotification")
     public ResponseEntity<Object> sendHabitNotification(@RequestBody SendHabitNotification sendHabitNotification) {
@@ -82,7 +77,6 @@ public class EmailController {
      *
      * @param dto {@link UserViolationMailDto} - object with all necessary data for
      *            sending email.
-     * @author Zakhar Veremchuk
      */
     @PostMapping("/sendUserViolation")
     public ResponseEntity<Object> sendUserViolation(@RequestBody UserViolationMailDto dto) {
@@ -95,7 +89,6 @@ public class EmailController {
      *
      * @param message {@link ScheduledEmailMessage} - object with all necessary data
      *                for sending notification via email.
-     * @author Dmytro Dmytruk
      */
     @Operation(summary = "Send scheduled email notification to user")
     @ApiResponses(value = {

@@ -64,7 +64,6 @@ import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserLocationRepo;
-import greencity.repository.UserNotificationPreferenceRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -106,7 +105,6 @@ public class UserServiceImpl implements UserService {
     private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
     private final GoogleApiService googleApiService;
-    private final UserNotificationPreferenceRepo userNotificationPreferenceRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
@@ -923,7 +921,7 @@ public class UserServiceImpl implements UserService {
         return UserDeactivationReasonDto.builder()
             .email(foundUser.getEmail())
             .name(foundUser.getName())
-            .deactivationReasons(List.of(reason))
+            .deactivationReason(reason)
             .lang(foundUser.getLanguage().getCode())
             .build();
     }

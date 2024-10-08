@@ -28,28 +28,34 @@
         }
 
         .header-image {
-            width: 200px;
+            height: 30px;
+            vertical-align: bottom;
         }
 
         .content {
             padding: 26px;
             text-align: left;
-            color: #333333;
+            color: #333333 !important;
         }
 
         .top-text {
-            line-height: 1.6;
-            margin-top: 4px;
-            margin-bottom: 30px;
+            margin-top: 0;
+            color: #333333 !important;
+        }
+
+        .main-text {
+            line-height: 1.4;
+            color: #333333 !important;
         }
 
         .bottom-text {
-            margin-top: 0;
-            margin-bottom: 4px;
+            margin-bottom: 0;
+            color: #333333 !important;
         }
 
         .article {
-            margin-bottom: 30px;
+            margin-top: 26px;
+            margin-bottom: 26px;
             padding: 26px;
             background-color: #f9f9f9;
             border: 1px solid #ddd;
@@ -103,8 +109,8 @@
                 padding: 20px;
             }
 
-            .header img {
-                max-width: 150px;
+            .header-image {
+                height: 25px;
             }
 
             .article h3 {
@@ -131,7 +137,10 @@
 
     <div class="content">
         <p class="top-text">
-            <b th:text="${name == null} ? #{hi} : #{interesting.news.hello(${name})}"></b><br/>
+            <b th:text="${name == null} ? #{hi} : #{hi.user(${name})}"></b>
+        </p>
+
+        <p class="main-text">
             <span th:text="#{interesting.news.main.text}"></span>
         </p>
 
@@ -141,15 +150,17 @@
             </a>
             <h3 th:text="*{title}"></h3>
             <p th:text="*{text}"></p>
-            <div class="vertical-center"><a th:text="#{read.more}" th:href="${clientLink} + '/#/news/' + *{ecoNewsId}" class="read-more" target="_blank"></a>
-            </div>
+            <div class="vertical-center"><a th:text="#{read.more}" th:href="${clientLink} + '/#/news/' + *{ecoNewsId}" class="read-more" target="_blank"></a></div>
         </div>
 
-        <p class="bottom-text" th:text="#{interesting.news.sincerely.yours}"></p>
+        <p class="bottom-text" th:text="#{sincerely.yours.greenCity}"></p>
     </div>
 
     <div class="footer">
-        <p><span th:text="#{unsubscribe.text}"></span><a th:text="#{unsubscribe}" th:href="${unsubscribeLink}" target="_blank"></a>.</p>
+        <p>
+            <span th:text="#{unsubscribe.text}"></span>
+            <a th:text="#{unsubscribe}" th:href="${unsubscribeLink}" target="_blank"></a>.
+        </p>
     </div>
 </div>
 </body>

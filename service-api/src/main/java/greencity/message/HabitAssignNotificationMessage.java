@@ -3,19 +3,16 @@ package greencity.message;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serializable;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@Data
 @Builder
-@ToString
-public class HabitAssignNotificationMessage implements Serializable {
+public class HabitAssignNotificationMessage {
     @NotEmpty(message = "Sender name cannot be empty")
     private String senderName;
 
