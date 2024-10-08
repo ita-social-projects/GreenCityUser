@@ -131,7 +131,7 @@
 
     <div class="content">
         <p class="top-text">
-            <b th:text="#{interesting.news.hello(${name})}"></b><br/>
+            <b th:text="${name == null} ? #{hi} : #{interesting.news.hello(${name})}"></b><br/>
             <span th:text="#{interesting.news.main.text}"></span>
         </p>
 
