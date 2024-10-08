@@ -688,11 +688,11 @@ public class ModelUtils {
         return geocodingResult;
     }
 
-    public static PlaceAuthorDto getPlaceAuthorDto() {
-        return PlaceAuthorDto.builder()
-            .id(1L)
+    public static SubscriberDto getSubscriberDto() {
+        return SubscriberDto.builder()
             .email("testEmail@gmail.com")
             .name("testName")
+            .language("en")
             .build();
     }
 }

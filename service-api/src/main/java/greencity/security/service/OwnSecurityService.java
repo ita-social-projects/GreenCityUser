@@ -32,7 +32,6 @@ public interface OwnSecurityService {
      *
      * @param dto a value of {@link EmployeeSignUpDto}
      * @return {@link SuccessSignUpDto}
-     * @author Inna Yashna
      */
     SuccessSignUpDto signUpEmployee(EmployeeSignUpDto dto, String language);
 

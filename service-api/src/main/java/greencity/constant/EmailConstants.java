@@ -5,7 +5,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class EmailConstants {
     // subjects
-    public static final String GC_CONTRIBUTORS = "GreenCity contributors";
+    public static final String CHANGE_PLACE_STATUS = "change.place.status.subject";
     public static final String NEW_PLACES = "New places";
     public static final String INTERESTING_ECO_NEWS = "interesting.news.subject";
     public static final String VERIFY_EMAIL = "verify.email";
@@ -14,19 +14,12 @@ public class EmailConstants {
     public static final String CONFIRM_CREATING_PASS = "creating.new.password";
     public static final String CONFIRM_CREATING_PASS_UBS = "creating.new.passwordUbs";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
-    public static final String DEACTIVATION = "Your account was deactivated";
-    public static final String ACTIVATION = "Your account was activated";
-    public static final String VIOLATION_EMAIL = "Violation email";
-    public static final String HABIT_ASSIGN_FRIEND_REQUEST = "habit.friend.request";
-    public static final String USER_TAGGED_IN_COMMENT_REQUEST = "user.tagged.request";
-    public static final String USER_RECEIVED_COMMENT_REQUEST = "user.received.comment.request";
-    public static final String USER_RECEIVED_COMMENT_REPLY_REQUEST = "user.received.comment.reply.request";
+    public static final String DEACTIVATION = "user.deactivation.subject";
+    public static final String ACTIVATION = "user.activation.subject";
+    public static final String VIOLATION_EMAIL = "user.violation.subject";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
-    public static final String AUTHOR_NAME = "authorName";
-    public static final String COMMENT_BODY = "commentBody";
-    public static final String COMMENT_TIME = "commentTime";
     public static final String VERIFY_ADDRESS = "verifyAddress";
     public static final String RESTORE_PASS = "restorePassword";
     public static final String APPROVE_REGISTRATION = "approveRegistration";
@@ -40,9 +33,6 @@ public class EmailConstants {
     public static final String DESCRIPTION = "description";
     public static final String LANGUAGE = "language";
     public static final String IS_UBS = "isUbs";
-    public static final String SENDER_NAME = "senderName";
-    public static final String HABIT_NAME = "habitName";
-    public static final String ELEMENT_NAME = "elementName";
     public static final String TITLE = "title";
     public static final String BODY = "body";
     // templates
@@ -56,8 +46,6 @@ public class EmailConstants {
     public static final String REASONS_OF_DEACTIVATION_PAGE = "user-reasons-of-deactivation-page";
     public static final String ACTIVATION_PAGE = "user-activation-page";
     public static final String USER_VIOLATION_PAGE = "user-violation-mail";
-    public static final String HABIT_ASSIGN_FRIEND_REQUEST_PAGE = "habit-assign-friend-request";
-    public static final String USER_TAGGED_IN_COMMENT_PAGE = "user-tagged-in-comment-email-page";
     public static final String SCHEDULED_NOTIFICATION_PAGE = "scheduled-notification-email-page";
     public static final String RECEIVE_INTERESTING_NEWS_EMAIL_PAGE = "receive-interesting-news-email-page";
 }

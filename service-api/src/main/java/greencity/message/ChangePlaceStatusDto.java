@@ -1,26 +1,29 @@
 package greencity.message;
 
-import java.io.Serializable;
+import greencity.annotations.ValidPlaceStatus;
+import greencity.enums.PlaceStatus;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-@Getter
-@ToString
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public final class SendChangePlaceStatusEmailMessage implements Serializable {
+public class ChangePlaceStatusDto {
     @NotEmpty(message = "Author's first name cannot be empty")
     private String authorFirstName;
+
+    @NotEmpty(message = "Author's language cannot be empty")
+    private String authorLanguage;
 
     @NotEmpty(message = "Place name cannot be empty")
     private String placeName;
 
-    @Pattern(regexp = "^(approved|declined)$", message = "Place status must be 'approved' or 'declined'")
-    private String placeStatus;
+    @ValidPlaceStatus
+    private PlaceStatus placeStatus;
 
     @NotEmpty(message = "Author's email cannot be empty")
     private String authorEmail;

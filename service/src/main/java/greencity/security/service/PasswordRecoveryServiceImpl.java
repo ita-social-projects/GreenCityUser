@@ -55,8 +55,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     @Transactional
     @Override
     public void sendPasswordRecoveryEmailTo(String email, boolean isUbs) {
-        User user = userRepo
-            .findByEmail(email)
+        User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         RestorePasswordEmail restorePasswordEmail = user.getRestorePasswordEmail();
         if (restorePasswordEmail != null) {
@@ -71,8 +70,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     @Transactional
     @Override
     public void updatePasswordUsingToken(OwnRestoreDto form) {
-        RestorePasswordEmail restorePasswordEmail = restorePasswordEmailRepo
-            .findByToken(form.getToken())
+        RestorePasswordEmail restorePasswordEmail = restorePasswordEmailRepo.findByToken(form.getToken())
             .orElseThrow(() -> new NotFoundException(ErrorMessage.LINK_IS_NO_ACTIVE));
         if (!form.getPassword().equals(form.getConfirmPassword())) {
             throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
@@ -119,7 +117,8 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             user.getFirstName(),
             user.getEmail(),
             token,
-            user.getLanguage().getCode(), isUbs);
+            user.getLanguage().getCode(),
+            isUbs);
     }
 
     /**
