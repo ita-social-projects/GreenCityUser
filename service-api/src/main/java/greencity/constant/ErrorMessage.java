@@ -44,6 +44,8 @@ public final class ErrorMessage {
     public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
     public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
     public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
+    public static final String EXPIRED_GOOGLE_ID_TOKEN = "Expired Google id token";
+    public static final String TRANSACTION_FAILED = "Transaction failed";
 
     private ErrorMessage() {
     }
