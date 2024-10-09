@@ -203,11 +203,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         }
         UserVO user = userService.findByEmail(dto.getEmail());
         if (user == null) {
-            publishFailureEvent(dto.getEmail(), dto.getPassword(), ErrorMessage.USER_NOT_FOUND_BY_EMAIL);
+            publishFailureEvent(dto.getEmail(), ErrorMessage.USER_NOT_FOUND_BY_EMAIL);
             throw new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail());
         }
         if (!isPasswordCorrect(dto, user)) {
-            publishFailureEvent(dto.getEmail(), dto.getPassword(), ErrorMessage.BAD_PASSWORD);
+            publishFailureEvent(dto.getEmail(), ErrorMessage.BAD_PASSWORD);
             throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
         }
         if (user.getVerifyEmail() != null) {
@@ -221,9 +221,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), true);
     }
 
-    private void publishFailureEvent(String email, String password, String errorMessage) {
+    private void publishFailureEvent(String email, String errorMessage) {
         UsernamePasswordAuthenticationToken auth =
-            new UsernamePasswordAuthenticationToken(email, password);
+            new UsernamePasswordAuthenticationToken(email, null);
         eventPublisher
             .publishEvent(
                 new AuthenticationFailureBadCredentialsEvent(auth,

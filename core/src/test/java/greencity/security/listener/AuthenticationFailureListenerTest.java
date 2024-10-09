@@ -1,5 +1,6 @@
 package greencity.security.listener;
 
+import greencity.constant.AppConstant;
 import greencity.security.service.LoginAttemptService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,7 +34,7 @@ class AuthenticationFailureListenerTest {
     @Test
     void testOnApplicationEventWithXForwardedForHeader() {
         String xfHeader = "192.168.1.1";
-        when(request.getHeader("X-Forwarded-For")).thenReturn(xfHeader);
+        when(request.getHeader(AppConstant.XFF_HEADER)).thenReturn(xfHeader);
         when(request.getRemoteAddr()).thenReturn("192.168.0.1");
 
         UsernamePasswordAuthenticationToken authentication =
@@ -48,7 +50,7 @@ class AuthenticationFailureListenerTest {
 
     @Test
     void testOnApplicationEventWithoutXForwardedForHeader() {
-        when(request.getHeader("X-Forwarded-For")).thenReturn(null);
+        when(request.getHeader(AppConstant.XFF_HEADER)).thenReturn(null);
         when(request.getRemoteAddr()).thenReturn("192.168.0.1");
 
         UsernamePasswordAuthenticationToken authentication =
@@ -65,7 +67,7 @@ class AuthenticationFailureListenerTest {
     @Test
     void testOnApplicationEventWithMultipleIPsInXForwardedForHeader() {
         String xfHeader = "203.0.113.195, 198.51.100.101";
-        when(request.getHeader("X-Forwarded-For")).thenReturn(xfHeader);
+        when(request.getHeader(AppConstant.XFF_HEADER)).thenReturn(xfHeader);
         when(request.getRemoteAddr()).thenReturn("203.0.113.195");
 
         UsernamePasswordAuthenticationToken authentication =
