@@ -27,6 +27,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
+import static greencity.enums.SubscriptionType.ECO_NEWS;
 
 /**
  * {@inheritDoc}
@@ -41,7 +42,6 @@ public class EmailServiceImpl implements EmailService {
     private final String senderEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
-    private static final Locale UA_LOCALE = Locale.of("uk", "UA");
 
     /**
      * Constructor.
@@ -114,8 +114,8 @@ public class EmailServiceImpl implements EmailService {
 
         for (SubscriberDto subscriber : interestingEcoNews.getSubscribers()) {
             Map<String, Object> model = new HashMap<>(sharedModel);
-            // TODO change later
-            model.put(EmailConstants.UNSUBSCRIBE_LINK, "https://example.com");
+            model.put(EmailConstants.UNSUBSCRIBE_LINK, clientLink + "/#/unsubscribe"
+                + "?token=" + subscriber.getUnsubscribeToken() + "&type=" + ECO_NEWS);
             model.put(EmailConstants.USER_NAME, subscriber.getName());
             model.put(EmailConstants.LANGUAGE, subscriber.getLanguage());
             String template = createEmailTemplate(model, EmailConstants.RECEIVE_INTERESTING_NEWS_EMAIL_PAGE);
@@ -264,11 +264,13 @@ public class EmailServiceImpl implements EmailService {
     }
 
     private static Locale getLocale(String language) {
-        return switch (language) {
-            case "ua" -> UA_LOCALE;
-            case "en" -> Locale.ENGLISH;
-            default -> throw new IllegalStateException("Unexpected value: " + language);
-        };
+        if (language == null || language.equals("en")) {
+            return Locale.ENGLISH;
+        } else if (language.equals("ua")) {
+            return Locale.of("uk", "UA");
+        } else {
+            throw new IllegalStateException("Unexpected value: " + language);
+        }
     }
 
     /**

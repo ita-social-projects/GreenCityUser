@@ -137,7 +137,7 @@
 
     <div class="content">
         <p class="top-text">
-            <b th:text="#{hi.user(${name})}"></b>
+            <b th:text="${name == null} ? #{hi} : #{hi.user(${name})}"></b>
         </p>
 
         <p class="main-text">
