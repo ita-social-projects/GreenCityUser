@@ -28,6 +28,7 @@ public class EmailConstants {
     public static final String RESULT = "result";
     public static final String REPORT_TYPE = "reportType";
     public static final String UNSUBSCRIBE_LINK = "unsubscribeLink";
+    public static final String PROFILE_LINK = "profileLink";
     public static final String ECO_NEWS_LIST = "ecoNewsList";
     public static final String REASON = "reason";
     public static final String DESCRIPTION = "description";
