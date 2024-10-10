@@ -9,7 +9,7 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.ChangePlaceStatusDto;
@@ -92,7 +92,7 @@ class EmailServiceImplTest {
                             .name("Hotels")
                             .build())
                         .build())))
-            .emailNotification(EmailNotification.WEEKLY)
+            .emailPreferencePeriodicity(EmailPreferencePeriodicity.WEEKLY)
             .build();
         service.sendAddedNewPlacesReportEmail(sendReportEmailMessage);
         verify(javaMailSender).createMimeMessage();
