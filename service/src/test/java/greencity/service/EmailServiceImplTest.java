@@ -10,9 +10,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.enums.EmailPreferencePeriodicity;
-import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.WrongEmailException;
-import greencity.message.ChangePlaceStatusDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
 import jakarta.mail.Session;
@@ -59,22 +57,6 @@ class EmailServiceImplTest {
             "test@email.com", messageSource);
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
         when(templateEngine.process(any(String.class), any(Context.class))).thenReturn("<html></html>");
-    }
-
-    @Test
-    void sendChangePlaceStatusEmailTest() {
-        ChangePlaceStatusDto changePlaceStatusDto = ChangePlaceStatusDto.builder()
-            .placeStatus(PlaceStatus.APPROVED)
-            .authorEmail("useremail@gmail.com")
-            .placeName("test place name")
-            .authorFirstName("test author first name")
-            .authorLanguage("en")
-            .build();
-        when(messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
-            getLocale(changePlaceStatusDto.getAuthorLanguage())))
-                .thenReturn("Change place status");
-        service.sendChangePlaceStatusEmail(changePlaceStatusDto);
-        verify(javaMailSender).createMimeMessage();
     }
 
     @Test

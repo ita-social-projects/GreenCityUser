@@ -5,7 +5,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.ScheduledEmailMessage;
-import greencity.message.ChangePlaceStatusDto;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
@@ -116,25 +115,6 @@ class EmailControllerTest {
         SendReportEmailMessage message = new ObjectMapper().readValue(content, SendReportEmailMessage.class);
 
         verify(emailService).sendAddedNewPlacesReportEmail(message);
-    }
-
-    @Test
-    void changePlaceStatus() throws Exception {
-        String content = """
-            {\
-            "authorEmail":"string",\
-            "authorFirstName":"string",\
-            "placeName":"string",\
-            "placeStatus":"APPROVED",\
-            "authorLanguage":"en"\
-            }\
-            """;
-
-        mockPerform(content, "/changePlaceStatus");
-
-        ChangePlaceStatusDto message = new ObjectMapper().readValue(content, ChangePlaceStatusDto.class);
-
-        verify(emailService).sendChangePlaceStatusEmail(message);
     }
 
     @Test
