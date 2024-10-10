@@ -26,7 +26,7 @@ public class UbsProfileCreationDto {
     @Email(regexp = ValidationConstants.EMAIL_REGEXP, message = ValidationConstants.INVALID_EMAIL)
     private String email;
     @Size(min = 1, max = 30, message = "name must have no less than 1 and no more than 30 symbols")
-    @Pattern(regexp = "^(?!\\.)(?!.*\\.$)(?!.*?\\.\\.)(?!.*?\\-\\-)(?!.*?\\'\\')[-'ʼ ґҐіІєЄїЇА-Яа-я+\\w.]{1,30}$",
+    @Pattern(regexp = ValidationConstants.USERNAME_REGEXP,
         message = "name must contain only \"ЁёІіЇїҐґЄєА-Яа-яA-Za-z-'0-9 .\", dot can only be in the center of the name")
     private String name;
 }
