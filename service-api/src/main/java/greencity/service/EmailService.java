@@ -5,7 +5,6 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.ScheduledEmailMessage;
-import greencity.message.ChangePlaceStatusDto;
 import greencity.message.SendReportEmailMessage;
 
 /**
@@ -27,13 +26,6 @@ public interface EmailService {
      *                           subscribers.
      */
     void sendInterestingEcoNews(InterestingEcoNewsDto interestingEcoNews);
-
-    /**
-     * Method for sending simple notification to {@code User} about change status.
-     *
-     * @param changePlaceStatus dto with all information.
-     */
-    void sendChangePlaceStatusEmail(ChangePlaceStatusDto changePlaceStatus);
 
     /**
      * Method for sending verification email to {@code User}.

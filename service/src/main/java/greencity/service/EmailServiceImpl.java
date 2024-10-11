@@ -7,7 +7,6 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.ChangePlaceStatusDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
 import greencity.validator.EmailAddressValidator;
@@ -64,32 +63,13 @@ public class EmailServiceImpl implements EmailService {
      * {@inheritDoc}
      */
     @Override
-    public void sendChangePlaceStatusEmail(ChangePlaceStatusDto changePlaceStatus) {
-        log.info(LogMessage.IN_SEND_CHANGE_PLACE_STATUS_EMAIL, changePlaceStatus.getPlaceName());
-        Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
-        model.put(EmailConstants.LANGUAGE, changePlaceStatus.getAuthorLanguage());
-        model.put(EmailConstants.USER_NAME, changePlaceStatus.getAuthorFirstName());
-        model.put(EmailConstants.PLACE_NAME, changePlaceStatus.getPlaceName());
-        model.put(EmailConstants.STATUS, changePlaceStatus.getPlaceStatus().name());
-        model.put(EmailConstants.PROFILE_LINK, getProfileLink());
-
-        String template = createEmailTemplate(model, EmailConstants.CHANGE_PLACE_STATUS_EMAIL_PAGE);
-        sendEmail(changePlaceStatus.getAuthorEmail(), messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
-            getLocale(changePlaceStatus.getAuthorLanguage())), template);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void sendAddedNewPlacesReportEmail(SendReportEmailMessage message) {
         log.info(LogMessage.IN_SEND_ADDED_NEW_PLACES_REPORT_EMAIL, message.getSubscribers(),
-            message.getCategoriesDtoWithPlacesDtoMap(), message.getEmailNotification());
+            message.getCategoriesDtoWithPlacesDtoMap(), message.getPeriodicity());
         Map<String, Object> sharedModel = new HashMap<>();
         sharedModel.put(EmailConstants.CLIENT_LINK, clientLink);
         sharedModel.put(EmailConstants.RESULT, message.getCategoriesDtoWithPlacesDtoMap());
-        sharedModel.put(EmailConstants.REPORT_TYPE, message.getEmailNotification().name());
+        sharedModel.put(EmailConstants.REPORT_TYPE, message.getPeriodicity().name());
 
         for (SubscriberDto user : message.getSubscribers()) {
             Map<String, Object> model = new HashMap<>(sharedModel);
