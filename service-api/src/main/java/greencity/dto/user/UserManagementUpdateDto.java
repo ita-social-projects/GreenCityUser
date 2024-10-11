@@ -24,7 +24,7 @@ public class UserManagementUpdateDto {
         message = ValidationConstants.USERNAME_MESSAGE)
     private String name;
 
-    @Email(message = ValidationConstants.INVALID_EMAIL)
+    @Email(regexp = ValidationConstants.EMAIL_REGEXP, message = ValidationConstants.INVALID_EMAIL)
     @NotBlank
     private String email;
 
