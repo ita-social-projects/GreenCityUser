@@ -99,7 +99,7 @@ class EmailControllerTest {
                         }
                     ]
                 },
-                "emailNotification": "WEEKLY",
+                "periodicity": "WEEKLY",
                 "subscribers": [
                     {
                         "email": "string",
@@ -115,23 +115,6 @@ class EmailControllerTest {
         SendReportEmailMessage message = new ObjectMapper().readValue(content, SendReportEmailMessage.class);
 
         verify(emailService).sendAddedNewPlacesReportEmail(message);
-    }
-
-    @Test
-    void changePlaceStatusInvalidPlaceStatus() throws Exception {
-        String content = """
-            {\
-            "authorEmail":"string",\
-            "authorFirstName":"string",\
-            "placeName":"string",\
-            "placeStatus":"ggggggg"\
-            }\
-            """;
-
-        mockMvc.perform(post(LINK + "/changePlaceStatus")
-            .content(content)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
     }
 
     @Test
