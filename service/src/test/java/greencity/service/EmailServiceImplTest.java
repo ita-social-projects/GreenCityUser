@@ -74,7 +74,7 @@ class EmailServiceImplTest {
                             .name("Hotels")
                             .build())
                         .build())))
-            .emailPreferencePeriodicity(EmailPreferencePeriodicity.WEEKLY)
+            .periodicity(EmailPreferencePeriodicity.WEEKLY)
             .build();
         service.sendAddedNewPlacesReportEmail(sendReportEmailMessage);
         verify(javaMailSender).createMimeMessage();

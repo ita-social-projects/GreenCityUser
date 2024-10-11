@@ -65,11 +65,11 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendAddedNewPlacesReportEmail(SendReportEmailMessage message) {
         log.info(LogMessage.IN_SEND_ADDED_NEW_PLACES_REPORT_EMAIL, message.getSubscribers(),
-            message.getCategoriesDtoWithPlacesDtoMap(), message.getEmailPreferencePeriodicity());
+            message.getCategoriesDtoWithPlacesDtoMap(), message.getPeriodicity());
         Map<String, Object> sharedModel = new HashMap<>();
         sharedModel.put(EmailConstants.CLIENT_LINK, clientLink);
         sharedModel.put(EmailConstants.RESULT, message.getCategoriesDtoWithPlacesDtoMap());
-        sharedModel.put(EmailConstants.REPORT_TYPE, message.getEmailPreferencePeriodicity().name());
+        sharedModel.put(EmailConstants.REPORT_TYPE, message.getPeriodicity().name());
 
         for (SubscriberDto user : message.getSubscribers()) {
             Map<String, Object> model = new HashMap<>(sharedModel);

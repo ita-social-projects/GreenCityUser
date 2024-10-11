@@ -18,5 +18,5 @@ import lombok.NoArgsConstructor;
 public class SendReportEmailMessage {
     private List<SubscriberDto> subscribers;
     private Map<CategoryDto, List<PlaceNotificationDto>> categoriesDtoWithPlacesDtoMap;
-    private EmailPreferencePeriodicity emailPreferencePeriodicity;
+    private EmailPreferencePeriodicity periodicity;
 }
