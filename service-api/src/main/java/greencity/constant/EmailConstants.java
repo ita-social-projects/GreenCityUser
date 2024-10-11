@@ -5,7 +5,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class EmailConstants {
     // subjects
-    public static final String CHANGE_PLACE_STATUS = "change.place.status.subject";
     public static final String NEW_PLACES = "New places";
     public static final String INTERESTING_ECO_NEWS = "interesting.news.subject";
     public static final String VERIFY_EMAIL = "verify.email";
@@ -23,8 +22,6 @@ public class EmailConstants {
     public static final String VERIFY_ADDRESS = "verifyAddress";
     public static final String RESTORE_PASS = "restorePassword";
     public static final String APPROVE_REGISTRATION = "approveRegistration";
-    public static final String PLACE_NAME = "placeName";
-    public static final String STATUS = "status";
     public static final String RESULT = "result";
     public static final String REPORT_TYPE = "reportType";
     public static final String UNSUBSCRIBE_LINK = "unsubscribeLink";
@@ -42,7 +39,6 @@ public class EmailConstants {
     public static final String CRETE_PASSWORD_PAGE = "create-employee-password-page";
     public static final String SUCCESS_RESTORED_PASSWORD_PAGE = "success-restored-password-page";
     public static final String USER_APPROVAL_EMAIL_PAGE = "user-approval-email-page";
-    public static final String CHANGE_PLACE_STATUS_EMAIL_PAGE = "change-place-status-email-page";
     public static final String NEW_PLACES_REPORT_EMAIL_PAGE = "new-places-report-email-page";
     public static final String REASONS_OF_DEACTIVATION_PAGE = "user-reasons-of-deactivation-page";
     public static final String ACTIVATION_PAGE = "user-activation-page";

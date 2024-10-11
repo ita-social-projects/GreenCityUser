@@ -610,7 +610,8 @@ public class UserServiceImpl implements UserService {
             Set<UserNotificationPreference> userPreferences = user.getNotificationPreferences();
             Set<UserNotificationPreferenceDto> newPreferences = userProfileDtoRequest.getEmailPreferences();
             Set<EmailPreference> existingPreferences = userPreferences.stream()
-                .map(UserNotificationPreference::getEmailPreference).collect(Collectors.toSet());
+                .map(UserNotificationPreference::getEmailPreference)
+                .collect(Collectors.toSet());
             Set<UserNotificationPreference> preferencesToAdd = newPreferences.stream()
                 .filter(preferenceDto -> !existingPreferences.contains(preferenceDto.getEmailPreference()))
                 .map(preferenceDto -> UserNotificationPreference.builder()
@@ -620,8 +621,7 @@ public class UserServiceImpl implements UserService {
                     .build())
                 .collect(Collectors.toSet());
 
-            Set<UserNotificationPreference> preferences = userPreferences
-                .stream()
+            Set<UserNotificationPreference> preferences = userPreferences.stream()
                 .map(preference -> {
                     for (UserNotificationPreferenceDto preferenceDto : newPreferences) {
                         if (preferenceDto.getEmailPreference().equals(preference.getEmailPreference())) {
