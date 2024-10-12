@@ -11,6 +11,7 @@ import static greencity.constant.ErrorMessage.USER_NOT_FOUND_BY_EMAIL;
 import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import static greencity.constant.ValidationConstants.USER_CREATED;
+import greencity.constant.ValidationConstants;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.SuccessSignInDto;
@@ -171,7 +172,9 @@ public class OwnSecurityController {
         @ApiResponse(responseCode = "400", description = USER_NOT_FOUND_BY_EMAIL)
     })
     @GetMapping("/restorePassword")
-    public ResponseEntity<Object> restore(@RequestParam @Email String email,
+    public ResponseEntity<Object> restore(
+        @RequestParam @Email(regexp = ValidationConstants.EMAIL_REGEXP,
+            message = ValidationConstants.INVALID_EMAIL) String email,
         @RequestParam Optional<String> ubs) {
         boolean isUbs = ubs.isPresent();
         log.info(Locale.getDefault().toString());

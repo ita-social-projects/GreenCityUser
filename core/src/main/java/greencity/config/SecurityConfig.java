@@ -201,13 +201,7 @@ public class SecurityConfig {
                     "/ownSecurity/register",
                     "/email/sendReport",
                     "/email/sendHabitNotification",
-                    "/email/sendInterestingEcoNews",
-                    "/email/changePlaceStatus",
-                    "/email/general/notification",
-                    "/email/habitAssign/notification",
-                    "/email/taggedUserInComment/notification",
-                    "/email/userReceivedComment/notification",
-                    "/email/userReceivedCommentReply/notification")
+                    "/email/sendInterestingEcoNews")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",

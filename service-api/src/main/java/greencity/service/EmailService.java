@@ -1,56 +1,34 @@
 package greencity.service;
 
-import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
-import greencity.dto.place.PlaceNotificationDto;
-import greencity.dto.user.PlaceAuthorDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.ScheduledEmailMessage;
-import java.util.List;
-import java.util.Map;
+import greencity.message.SendReportEmailMessage;
 
 /**
  * Provides the interface to manage sending emails to {@code User}.
  */
-
 public interface EmailService {
     /**
      * Method for sending notification to users who subscribed for updates about
      * added new places.
      *
-     * @param subscribers          list of users for receiving email.
-     * @param categoriesWithPlaces map with {@link CategoryDto} and
-     *                             {@link PlaceNotificationDto}`s which were
-     *                             created.
-     * @param notification         type of notification.
+     * @param message object with all necessary data for sending email
      */
-    void sendAddedNewPlacesReportEmail(List<PlaceAuthorDto> subscribers,
-        Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlaces,
-        String notification);
+    void sendAddedNewPlacesReportEmail(SendReportEmailMessage message);
 
     /**
      * Method for sending interesting news for subscribers.
      *
-     * @param interestingEcoNews - includes all information about ecoNews and
+     * @param interestingEcoNews includes all information about ecoNews and
      *                           subscribers.
      */
     void sendInterestingEcoNews(InterestingEcoNewsDto interestingEcoNews);
 
     /**
-     * Method for sending simple notification to {@code User} about change status.
-     *
-     * @param authorFirstName place author's first name.
-     * @param placeName       name of a place.
-     * @param placeStatus     updated status of a place.
-     * @param authorEmail     author's email.
-     */
-    void sendChangePlaceStatusEmail(String authorFirstName, String placeName,
-        String placeStatus, String authorEmail);
-
-    /**
-     * Method for sending verification email to {@link User}.
+     * Method for sending verification email to {@code User}.
      *
      * @param userId    user id.
      * @param userName  name current user.
@@ -110,7 +88,6 @@ public interface EmailService {
      * 
      * @param dto {@link UserViolationMailDto}-includes all information about
      *            Violation.
-     * @author Zakhar Veremchuk.
      */
     void sendUserViolationEmail(UserViolationMailDto dto);
 
@@ -119,8 +96,6 @@ public interface EmailService {
      *
      * @param email    letter is sent to this email.
      * @param language language which will be used in letter.
-     *
-     * @author Pavlo Hural.
      */
     void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
 
@@ -136,8 +111,6 @@ public interface EmailService {
      * @param language         {@link String} language code used for email
      *                         notification
      * @param token            {@link String} token for password save(restoration)
-     *
-     * @author Olena Sotnik
      */
     void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail, String token,
         String language, boolean isUbs);
@@ -147,7 +120,6 @@ public interface EmailService {
      * {@link ScheduledEmailMessage}.
      *
      * @param message {@link ScheduledEmailMessage}
-     * @author Dmytro Dmytruk
      */
     void sendScheduledNotificationEmail(ScheduledEmailMessage message);
 

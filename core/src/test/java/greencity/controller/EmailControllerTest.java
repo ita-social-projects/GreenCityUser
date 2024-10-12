@@ -4,13 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.GeneralEmailMessage;
-import greencity.message.HabitAssignNotificationMessage;
 import greencity.message.ScheduledEmailMessage;
-import greencity.message.SendChangePlaceStatusEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
-import greencity.message.UserTaggedInCommentMessage;
 import greencity.service.EmailService;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.time.LocalDateTime;
 
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -52,27 +46,26 @@ class EmailControllerTest {
 
     @Test
     void sendInterestingEcoNews() throws Exception {
-        String content =
-            """
-                {
-                    "ecoNewsList": [
-                        {
-                            "ecoNewsId": 1,
-                            "imagePath": "https://google.com",
-                            "title": "Title",
-                            "text": "Text"
-                        }
-                    ],
-                    "subscribers": [
-                        {
-                            "name": "Ilia",
-                            "email": "email@gmail.com",
-                            "language": "ua",
-                            "unsubscribeToken": "d1d3a8b9-2488-48b5-9c7a-3d0b2896063b"
-                        }
-                    ]
-                }
-                """;
+        String content = """
+            {
+                "ecoNewsList": [
+                    {
+                        "ecoNewsId": 1,
+                        "imagePath": "https://google.com",
+                        "title": "Title",
+                        "text": "Text"
+                    }
+                ],
+                "subscribers": [
+                    {
+                        "name": "Ilia",
+                        "email": "email@gmail.com",
+                        "language": "ua",
+                        "unsubscribeToken": "d1d3a8b9-2488-48b5-9c7a-3d0b2896063b"
+                    }
+                ]
+            }
+            """;
 
         mockPerform(content, "/sendInterestingEcoNews");
 
@@ -85,66 +78,43 @@ class EmailControllerTest {
     @Test
     void sendReport() throws Exception {
         String content = """
-            {\
-            "categoriesDtoWithPlacesDtoMap":\
-            {"additionalProp1":\
-            [{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}],\
-            "additionalProp2":\
-            [{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}],\
-            "additionalProp3":[{"category":{"name":"string","parentCategoryId":0},\
-            "name":"string"}]},\
-            "emailNotification":"string",\
-            "subscribers":[{"email":"string","id":0,"name":"string"}]}\
+            {
+                "categoriesDtoWithPlacesDtoMap": {
+                    "additionalProp1": [
+                        {
+                            "category": {
+                                "name": "string",
+                                "parentCategoryId": 0
+                            },
+                            "name": "string"
+                        }
+                    ],
+                    "additionalProp2": [
+                        {
+                            "category": {
+                                "name": "string",
+                                "parentCategoryId": 0
+                            },
+                            "name": "string"
+                        }
+                    ]
+                },
+                "periodicity": "WEEKLY",
+                "subscribers": [
+                    {
+                        "email": "string",
+                        "name": "string",
+                        "language": "en"
+                    }
+                ]
+            }
             """;
 
         mockPerform(content, "/sendReport");
 
-        SendReportEmailMessage message =
-            new ObjectMapper().readValue(content, SendReportEmailMessage.class);
+        SendReportEmailMessage message = new ObjectMapper().readValue(content, SendReportEmailMessage.class);
 
-        verify(emailService).sendAddedNewPlacesReportEmail(
-            message.getSubscribers(), message.getCategoriesDtoWithPlacesDtoMap(),
-            message.getEmailNotification());
-    }
-
-    @Test
-    void changePlaceStatus() throws Exception {
-        String content = """
-            {\
-            "authorEmail":"string",\
-            "authorFirstName":"string",\
-            "placeName":"string",\
-            "placeStatus":"approved"\
-            }\
-            """;
-
-        mockPerform(content, "/changePlaceStatus");
-
-        SendChangePlaceStatusEmailMessage message =
-            new ObjectMapper().readValue(content, SendChangePlaceStatusEmailMessage.class);
-
-        verify(emailService).sendChangePlaceStatusEmail(
-            message.getAuthorFirstName(), message.getPlaceName(),
-            message.getPlaceStatus(), message.getAuthorEmail());
-    }
-
-    @Test
-    void changePlaceStatusInvalidPlaceStatus() throws Exception {
-        String content = """
-            {\
-            "authorEmail":"string",\
-            "authorFirstName":"string",\
-            "placeName":"string",\
-            "placeStatus":"ggggggg"\
-            }\
-            """;
-
-        mockMvc.perform(post(LINK + "/changePlaceStatus")
-            .content(content)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
+        verify(emailService).sendAddedNewPlacesReportEmail(message);
     }
 
     @Test

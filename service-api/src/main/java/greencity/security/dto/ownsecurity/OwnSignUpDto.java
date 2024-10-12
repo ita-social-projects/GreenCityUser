@@ -27,7 +27,7 @@ public class OwnSignUpDto {
 
     @NotBlank
     @Email(
-        regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$",
+        regexp = ValidationConstants.EMAIL_REGEXP,
         message = ValidationConstants.INVALID_EMAIL)
     private String email;
 
