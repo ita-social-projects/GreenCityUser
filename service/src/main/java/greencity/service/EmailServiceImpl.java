@@ -300,6 +300,26 @@ public class EmailServiceImpl implements EmailService {
         sendEmail(message.getEmail(), message.getSubject(), template);
     }
 
+    @Override
+    public void sendBlockAccountNotificationWithUnblockAndRestorePasswordEmail(Long userId, String userFistName,
+        String userEmail, String token, String language, boolean isUbs) {
+        Map<String, Object> modelForRestorePassword =
+            buildModelMapForPasswordRestore(userId, userFistName, token, language, isUbs);
+
+        buildModelForRestorePasswordAndUnblockAccount(modelForRestorePassword, token, isUbs);
+
+        String template = createEmailTemplate(modelForRestorePassword, EmailConstants.BLOCKED_USER_PAGE);
+
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.BLOCKED_USER, null, getLocale(language)),
+            template);
+    }
+
+    private void buildModelForRestorePasswordAndUnblockAccount(Map<String, Object> modelMap,
+        String token, boolean isUbs) {
+        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
+        modelMap.put(EmailConstants.UNLOCK_USER_LINK, baseLink + "/ownSecurity/unblock?" + "token=" + token);
+    }
+
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,
         boolean isUbs) {
         Map<String, Object> model = new HashMap<>();

@@ -1,10 +1,7 @@
 package greencity.security.service;
 
 import com.google.common.cache.LoadingCache;
-import greencity.constant.AppConstant;
-import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
@@ -25,9 +22,9 @@ import static org.mockito.Mockito.when;
 
 class LoginAttemptServiceImplTest {
     @Mock
-    private LoadingCache<String, Integer> attemptsCache;
+    private LoadingCache<String, Integer> attemptsByCaptchaCache;
     @Mock
-    private HttpServletRequest request;
+    private LoadingCache<String, Integer> attemptsByWrongPasswordCache;
     private LoginAttemptServiceImpl loginAttemptService;
 
     @BeforeEach
@@ -35,28 +32,35 @@ class LoginAttemptServiceImplTest {
         MockitoAnnotations.openMocks(this);
 
         ConcurrentMap<String, Integer> mockMap = Mockito.mock(ConcurrentMap.class);
-        when(attemptsCache.asMap()).thenReturn(mockMap);
+        when(attemptsByCaptchaCache.asMap()).thenReturn(mockMap);
+        when(attemptsByWrongPasswordCache.asMap()).thenReturn(mockMap);
 
-        loginAttemptService = new LoginAttemptServiceImpl(request, 1);
+        loginAttemptService = new LoginAttemptServiceImpl(1, 15);
 
-        Field attemptsCacheField = LoginAttemptServiceImpl.class.getDeclaredField("attemptsCache");
-        attemptsCacheField.setAccessible(true);
-        attemptsCacheField.set(loginAttemptService, attemptsCache);
+        Field attemptsByCaptchaCache = LoginAttemptServiceImpl.class
+            .getDeclaredField("attemptsByCaptchaCache");
+        attemptsByCaptchaCache.setAccessible(true);
+        attemptsByCaptchaCache.set(this.loginAttemptService, this.attemptsByCaptchaCache);
+
+        Field attemptsByWrongPasswordCache = LoginAttemptServiceImpl.class
+            .getDeclaredField("attemptsByWrongPasswordCache");
+        attemptsByWrongPasswordCache.setAccessible(true);
+        attemptsByWrongPasswordCache.set(this.loginAttemptService, this.attemptsByWrongPasswordCache);
 
         Field maxAttemptField = LoginAttemptServiceImpl.class.getDeclaredField("maxAttempt");
         maxAttemptField.setAccessible(true);
-        maxAttemptField.set(loginAttemptService, 5);
+        maxAttemptField.set(this.loginAttemptService, 5);
     }
 
     @Test
-    void testLoginFailed() throws ExecutionException {
-        when(attemptsCache.get(anyString())).thenReturn(0);
+    void testLoginFailedByCaptcha() throws ExecutionException {
+        when(attemptsByCaptchaCache.get(anyString())).thenReturn(0);
 
-        loginAttemptService.loginFailed("testKey");
+        loginAttemptService.loginFailedByCaptcha("testKey");
 
         ArgumentCaptor<BiFunction<Integer, Integer, Integer>> captor = ArgumentCaptor.forClass(BiFunction.class);
 
-        verify(attemptsCache.asMap(), Mockito.times(1)).merge(eq("testKey"), eq(1), captor.capture());
+        verify(attemptsByCaptchaCache.asMap(), Mockito.times(1)).merge(eq("testKey"), eq(1), captor.capture());
 
         BiFunction<Integer, Integer, Integer> capturedFunction = captor.getValue();
         Integer result = capturedFunction.apply(0, 1);
@@ -64,51 +68,26 @@ class LoginAttemptServiceImplTest {
     }
 
     @Test
-    void testIsBlockedNotBlocked() throws ExecutionException {
-        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
-        when(attemptsCache.get(anyString())).thenReturn(1);
+    void testIsBlockedNotBlockedByCaptcha() throws ExecutionException {
+        when(attemptsByCaptchaCache.get(anyString())).thenReturn(1);
 
-        assertFalse(loginAttemptService.isBlocked());
+        assertFalse(loginAttemptService.isBlockedByCaptcha(anyString()));
     }
 
     @Test
-    void testIsBlockedAreBlocked() throws ExecutionException {
-        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
-        when(attemptsCache.get(anyString())).thenReturn(5);
+    void testIsBlockedAreBlockedByCaptcha() throws ExecutionException {
+        when(attemptsByCaptchaCache.get(anyString())).thenReturn(5);
 
-        assertTrue(loginAttemptService.isBlocked());
+        assertTrue(loginAttemptService.isBlockedByCaptcha(anyString()));
     }
 
     @Test
-    void testGetClientIPDirectly() throws Exception {
-        when(request.getHeader(AppConstant.XFF_HEADER)).thenReturn("192.168.1.1, 10.0.0.1");
+    void testIsBlockedByCaptchaExecutionException() throws ExecutionException {
+        when(attemptsByCaptchaCache.get(anyString()))
+            .thenThrow(new ExecutionException(new Throwable("Cache error")));
 
-        Method method = LoginAttemptServiceImpl.class.getDeclaredMethod("getClientIP");
-        method.setAccessible(true);
-        String clientIP = (String) method.invoke(loginAttemptService);
+        assertFalse(loginAttemptService.isBlockedByCaptcha("test@test.com"));
 
-        assertEquals("192.168.1.1", clientIP);
-    }
-
-    @Test
-    void testGetClientIPFallbackToRemoteAddr() throws Exception {
-        when(request.getHeader(AppConstant.XFF_HEADER)).thenReturn(null);
-        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
-
-        Method method = LoginAttemptServiceImpl.class.getDeclaredMethod("getClientIP");
-        method.setAccessible(true);
-        String clientIP = (String) method.invoke(loginAttemptService);
-
-        assertEquals("127.0.0.1", clientIP);
-    }
-
-    @Test
-    void testIsBlockedExecutionException() throws ExecutionException {
-        when(request.getRemoteAddr()).thenReturn("127.0.0.1");
-        when(attemptsCache.get(anyString())).thenThrow(new ExecutionException(new Throwable("Cache error")));
-
-        assertFalse(loginAttemptService.isBlocked());
-
-        verify(attemptsCache).get("127.0.0.1");
+        verify(attemptsByCaptchaCache).get("test@test.com");
     }
 }

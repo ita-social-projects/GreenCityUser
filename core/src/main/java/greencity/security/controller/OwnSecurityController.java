@@ -295,4 +295,22 @@ public class OwnSecurityController {
         service.deleteUserByEmail(email);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Unblocks user account by provided token.
+     *
+     * @param token {@link String} token for unblocking user account.
+     * @return {@link ResponseEntity} with 200 status if unblocking is successful.
+     */
+    @Operation(summary = "Unblock user account")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = ErrorMessage.USER_NOT_FOUND_BY_EMAIL)
+    })
+    @GetMapping("/unblock")
+    public ResponseEntity<Object> unblockAccount(@RequestParam("token") String token) {
+        service.unblockAccount(token);
+        return ResponseEntity.ok().build();
+    }
 }

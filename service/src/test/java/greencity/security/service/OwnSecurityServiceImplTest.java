@@ -2,9 +2,12 @@ package greencity.security.service;
 
 import greencity.ModelUtils;
 import greencity.TestConst;
+import greencity.client.CloudFlareClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
+import greencity.dto.security.CloudFlareRequest;
+import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -38,7 +41,6 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -81,7 +83,7 @@ class OwnSecurityServiceImplTest {
     LoginAttemptService loginAttemptService;
 
     @Mock
-    ApplicationEventPublisher eventPublisher;
+    CloudFlareClient cloudFlareClient;
 
     private OwnSecurityService ownSecurityService;
 
@@ -95,7 +97,7 @@ class OwnSecurityServiceImplTest {
     public void init() {
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo,
-            loginAttemptService, eventPublisher);
+            loginAttemptService, cloudFlareClient);
 
         ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
 
@@ -283,6 +285,11 @@ class OwnSecurityServiceImplTest {
     @Test
     void signIn() {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
+
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("new-access-token");
         when(jwtTool.createRefreshToken(any(UserVO.class))).thenReturn("new-refresh-token");
@@ -293,6 +300,9 @@ class OwnSecurityServiceImplTest {
         verify(passwordEncoder, times(1)).matches(anyString(), anyString());
         verify(jwtTool, times(1)).createAccessToken(anyString(), any(Role.class));
         verify(jwtTool, times(1)).createRefreshToken(any(UserVO.class));
+        verify(loginAttemptService, times(1)).isBlockedByCaptcha(anyString());
+        verify(loginAttemptService, times(1)).isBlockedByWrongPassword(anyString());
+        verify(cloudFlareClient, times(1)).getCloudFlareResponse(any(CloudFlareRequest.class));
     }
 
     @Test
@@ -301,6 +311,11 @@ class OwnSecurityServiceImplTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("new-access-token");
         when(jwtTool.createRefreshToken(any(UserVO.class))).thenReturn("new-refresh-token");
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
+
         assertThrows(EmailNotVerified.class,
             () -> ownSecurityService.signIn(ownSignInDto));
     }
@@ -321,6 +336,11 @@ class OwnSecurityServiceImplTest {
             .role(Role.ROLE_USER)
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
+
         assertThrows(WrongPasswordException.class, () -> ownSecurityService.signIn(ownSignInDto));
     }
 
@@ -626,7 +646,19 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void singInBlockedUser() {
-        when(loginAttemptService.isBlocked()).thenReturn(true);
+        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
+        when(userRepo.findByEmail(anyString()))
+            .thenReturn(Optional.ofNullable(User.builder()
+                .id(1L)
+                .email("test@somemail.com")
+                .name("Test")
+                .language(Language.builder()
+                    .id(1L)
+                    .code("en")
+                    .build())
+                .userStatus(UserStatus.ACTIVATED)
+                .build()));
 
         assertThrows(UserBlockedException.class,
             () -> ownSecurityService.signIn(ownSignInDto));

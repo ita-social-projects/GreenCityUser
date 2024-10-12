@@ -92,4 +92,11 @@ public interface OwnSecurityService {
      * @param email {@link String} email of the user to be deleted.
      */
     void deleteUserByEmail(String email);
+
+    /**
+     * Unblocks user account by provided token.
+     *
+     * @param token {@link String} token for unblocking user account.
+     */
+    void unblockAccount(String token);
 }

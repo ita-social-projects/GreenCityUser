@@ -110,6 +110,7 @@ public class SecurityConfig {
                     "/ownSecurity/verifyEmail",
                     "/ownSecurity/updateAccessToken",
                     "/ownSecurity/restorePassword",
+                    "/ownSecurity/unblock",
                     "/googleSecurity",
                     "/facebookSecurity/generateFacebookAuthorizeURL",
                     "/facebookSecurity/facebook", "/user/emailNotifications",

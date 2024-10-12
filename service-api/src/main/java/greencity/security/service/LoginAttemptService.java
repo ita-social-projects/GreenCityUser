@@ -8,16 +8,35 @@ package greencity.security.service;
  */
 public interface LoginAttemptService {
     /**
-     * This method is called when login failed.
+     * Method to increment the amount of wrong captcha for the given {@code email}.
+     * This method is called when a user provides wrong captcha.
      *
-     * @param key identifies user, usually IP address.
+     * @param email identifies the user.
+     *
      */
-    void loginFailed(String key);
+    void loginFailedByCaptcha(String email);
 
     /**
-     * Checks if user is blocked.
+     * Method to check if user is blocked by wrong captcha.
      *
+     * @param email identifies user, usually email.
      * @return true if user is blocked, false otherwise.
      */
-    boolean isBlocked();
+    boolean isBlockedByCaptcha(String email);
+
+    /**
+     * Method to increment the amount of wrong password for the given {@code email}.
+     * This method is called when a user provides wrong password.
+     *
+     * @param email identifies the user.
+     */
+    void loginFailedByWrongPassword(String email);
+
+    /**
+     * Method to check if user is blocked by wrong password.
+     *
+     * @param email identifies user, usually email.
+     * @return true if user is blocked, false otherwise.
+     */
+    boolean isBlockedByWrongPassword(String email);
 }
