@@ -125,7 +125,7 @@ public interface EmailService {
 
     /**
      * Sends an email notification user that his account has been blocked and
-     * includes link for unblocking and restoring password.
+     * includes link for unblocking.
      *
      * @param userId       the user id is used for recovery link building
      * @param userFistName user first name is used in email model constants
@@ -135,7 +135,7 @@ public interface EmailService {
      * @param isUbs        {@code true} if user is from UBS, {@code false} if user
      *                     is from admin panel
      */
-    void sendBlockAccountNotificationWithUnblockAndRestorePasswordEmail(
+    void sendBlockAccountNotificationWithUnblockLinkEmail(
         Long userId, String userFistName, String userEmail, String token, String language,
         boolean isUbs);
 }

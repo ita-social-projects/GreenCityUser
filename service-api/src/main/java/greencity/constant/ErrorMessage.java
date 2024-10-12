@@ -55,7 +55,7 @@ public class ErrorMessage {
         "You do not have permission to deactivate this user";
     public static final String BASE64_DECODE_MESSAGE = "Can't decode from base64 format";
     public static final String BRUTEFORCE_PROTECTION_MESSAGE =
-        "User account is blocked due to too many failed login attempts. Try again in %s hour(s)";
+        "User account is blocked due to too many failed login attempts.";
     public static final String COULD_NOT_RETRIEVE_CHECKOUT_RESPONSE = "Could not retrieve checkout response";
     public static final String WRONG_CAPTCHA = "Wrong captcha";
     public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS =

@@ -70,8 +70,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final CloudFlareClient cloudFlareClient;
     @Value("${verifyEmailTimeHour}")
     private Integer expirationTime;
-    @Value("${bruteForceSettings.blockTimeInHours}")
-    private String blockTimeInHours;
     @Value("${bruteForceSettings.blockTimeInMinutes}")
     private String blockTimeInMinutes;
     @Value("${cloud-flare.secret-key}")
@@ -314,11 +312,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         userRepo.save(user);
         log.info("User with email {} is blocked", user.getEmail());
 
-        emailService.sendBlockAccountNotificationWithUnblockAndRestorePasswordEmail(
+        emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
             user.getId(), user.getName(), user.getEmail(),
             jwtTool.generateTokenKeyWithCodedDate(), getLanguageFromUser(user), false);
 
-        throw new UserBlockedException(String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE, blockTimeInHours));
+        throw new UserBlockedException(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE);
     }
 
     /**

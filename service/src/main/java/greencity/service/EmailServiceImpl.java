@@ -283,12 +283,9 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendBlockAccountNotificationWithUnblockAndRestorePasswordEmail(Long userId, String userFistName,
+    public void sendBlockAccountNotificationWithUnblockLinkEmail(Long userId, String userFistName,
         String userEmail, String token, String language, boolean isUbs) {
-        Map<String, Object> modelForRestorePassword =
-            buildModelMapForPasswordRestore(userId, userFistName, token, language, isUbs);
-
-        buildModelForRestorePasswordAndUnblockAccount(modelForRestorePassword, token, isUbs);
+        Map<String, Object> modelForRestorePassword = buildModelForUnblockAccount(userFistName, token, language, isUbs);
 
         String template = createEmailTemplate(modelForRestorePassword, EmailConstants.BLOCKED_USER_PAGE);
 
@@ -296,10 +293,14 @@ public class EmailServiceImpl implements EmailService {
             template);
     }
 
-    private void buildModelForRestorePasswordAndUnblockAccount(Map<String, Object> modelMap,
-        String token, boolean isUbs) {
-        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
-        modelMap.put(EmailConstants.UNLOCK_USER_LINK, baseLink + "/ownSecurity/unblock?" + "token=" + token);
+    private Map<String, Object> buildModelForUnblockAccount(String name, String token, String language, boolean isUbs) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
+        model.put(EmailConstants.USER_NAME, name);
+        model.put(EmailConstants.IS_UBS, isUbs);
+        model.put(EmailConstants.LANGUAGE, language);
+        model.put(EmailConstants.UNLOCK_USER_LINK, "/ownSecurity/unblock?" + "token=" + token);
+        return model;
     }
 
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,
