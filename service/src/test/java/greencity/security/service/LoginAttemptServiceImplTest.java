@@ -56,11 +56,28 @@ class LoginAttemptServiceImplTest {
     void testLoginFailedByCaptcha() throws ExecutionException {
         when(attemptsByCaptchaCache.get(anyString())).thenReturn(0);
 
-        loginAttemptService.loginFailedByCaptcha("testKey");
+        loginAttemptService.loginFailedByCaptcha("test@mail.com");
 
         ArgumentCaptor<BiFunction<Integer, Integer, Integer>> captor = ArgumentCaptor.forClass(BiFunction.class);
 
-        verify(attemptsByCaptchaCache.asMap(), Mockito.times(1)).merge(eq("testKey"), eq(1), captor.capture());
+        verify(attemptsByCaptchaCache.asMap(), Mockito.times(1)).merge(eq("test@mail.com"),
+            eq(1), captor.capture());
+
+        BiFunction<Integer, Integer, Integer> capturedFunction = captor.getValue();
+        Integer result = capturedFunction.apply(0, 1);
+        assertEquals(1, result);
+    }
+
+    @Test
+    void testLoginFailedByPassword() throws ExecutionException {
+        when(attemptsByWrongPasswordCache.get(anyString())).thenReturn(0);
+
+        loginAttemptService.loginFailedByWrongPassword("test@mail.com");
+
+        ArgumentCaptor<BiFunction<Integer, Integer, Integer>> captor = ArgumentCaptor.forClass(BiFunction.class);
+
+        verify(attemptsByWrongPasswordCache.asMap(), Mockito.times(1)).merge(eq("test@mail.com"),
+            eq(1), captor.capture());
 
         BiFunction<Integer, Integer, Integer> capturedFunction = captor.getValue();
         Integer result = capturedFunction.apply(0, 1);
@@ -89,5 +106,29 @@ class LoginAttemptServiceImplTest {
         assertFalse(loginAttemptService.isBlockedByCaptcha("test@test.com"));
 
         verify(attemptsByCaptchaCache).get("test@test.com");
+    }
+
+    @Test
+    void testIsBlockedNotBlockedByPassword() throws ExecutionException {
+        when(attemptsByWrongPasswordCache.get(anyString())).thenReturn(1);
+
+        assertFalse(loginAttemptService.isBlockedByWrongPassword(anyString()));
+    }
+
+    @Test
+    void testIsBlockedAreBlockedByPassword() throws ExecutionException {
+        when(attemptsByWrongPasswordCache.get(anyString())).thenReturn(5);
+
+        assertTrue(loginAttemptService.isBlockedByWrongPassword(anyString()));
+    }
+
+    @Test
+    void testIsBlockedByPasswordExecutionException() throws ExecutionException {
+        when(attemptsByWrongPasswordCache.get(anyString()))
+            .thenThrow(new ExecutionException(new Throwable("Cache error")));
+
+        assertFalse(loginAttemptService.isBlockedByWrongPassword("test@test.com"));
+
+        verify(attemptsByWrongPasswordCache).get("test@test.com");
     }
 }
