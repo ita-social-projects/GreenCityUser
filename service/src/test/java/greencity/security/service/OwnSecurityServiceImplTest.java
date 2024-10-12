@@ -92,6 +92,7 @@ class OwnSecurityServiceImplTest {
     private UserVO notVerifiedUser;
     private UpdatePasswordDto updatePasswordDto;
     private UserManagementDto userManagementDto;
+    private User user;
 
     @BeforeEach
     public void init() {
@@ -129,6 +130,16 @@ class OwnSecurityServiceImplTest {
             .email(TestConst.EMAIL)
             .role(Role.ROLE_USER)
             .userStatus(UserStatus.BLOCKED)
+            .build();
+        user = User.builder()
+            .id(1L)
+            .email("test@somemail.com")
+            .name("Test")
+            .language(Language.builder()
+                .id(1L)
+                .code("en")
+                .build())
+            .userStatus(UserStatus.ACTIVATED)
             .build();
     }
 
@@ -649,18 +660,54 @@ class OwnSecurityServiceImplTest {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
         when(userRepo.findByEmail(anyString()))
-            .thenReturn(Optional.ofNullable(User.builder()
-                .id(1L)
-                .email("test@somemail.com")
-                .name("Test")
-                .language(Language.builder()
-                    .id(1L)
-                    .code("en")
-                    .build())
-                .userStatus(UserStatus.ACTIVATED)
-                .build()));
+            .thenReturn(Optional.ofNullable(user));
 
         assertThrows(UserBlockedException.class,
             () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void singInBlockedUserByPassword() {
+        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(true);
+        when(userRepo.findByEmail(anyString()))
+            .thenReturn(Optional.ofNullable(user));
+
+        assertThrows(WrongPasswordException.class,
+            () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void throwExceptionWhenCaptchaIsNotValid() {
+        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(userRepo.findByEmail(anyString()))
+            .thenReturn(Optional.ofNullable(user));
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(false, null, null, null));
+
+        assertThrows(WrongCaptchaException.class,
+            () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void unblockUserTest() {
+        when(jwtTool.getEmailOutOfAccessToken(anyString())).thenReturn("test@mail.com");
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+
+        ownSecurityService.unblockAccount("test@mail.com");
+
+        verify(jwtTool, times(1)).getEmailOutOfAccessToken(anyString());
+        verify(userRepo, times(1)).findByEmail(anyString());
+        verify(userRepo, times(1)).save(user);
+    }
+
+    @Test
+    void unblockUserWithInvalidToken() {
+        when(jwtTool.getEmailOutOfAccessToken(anyString())).thenThrow(IllegalArgumentException.class);
+
+        assertThrows(BadRequestException.class, () -> ownSecurityService.unblockAccount("test@mail.com"));
     }
 }

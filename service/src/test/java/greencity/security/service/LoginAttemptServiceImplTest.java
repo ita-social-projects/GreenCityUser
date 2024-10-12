@@ -37,15 +37,15 @@ class LoginAttemptServiceImplTest {
 
         loginAttemptService = new LoginAttemptServiceImpl(1, 15);
 
-        Field attemptsByCaptchaCache = LoginAttemptServiceImpl.class
+        Field byCaptchaCache = LoginAttemptServiceImpl.class
             .getDeclaredField("attemptsByCaptchaCache");
-        attemptsByCaptchaCache.setAccessible(true);
-        attemptsByCaptchaCache.set(this.loginAttemptService, this.attemptsByCaptchaCache);
+        byCaptchaCache.setAccessible(true);
+        byCaptchaCache.set(this.loginAttemptService, this.attemptsByCaptchaCache);
 
-        Field attemptsByWrongPasswordCache = LoginAttemptServiceImpl.class
+        Field byWrongPasswordCache = LoginAttemptServiceImpl.class
             .getDeclaredField("attemptsByWrongPasswordCache");
-        attemptsByWrongPasswordCache.setAccessible(true);
-        attemptsByWrongPasswordCache.set(this.loginAttemptService, this.attemptsByWrongPasswordCache);
+        byWrongPasswordCache.setAccessible(true);
+        byWrongPasswordCache.set(this.loginAttemptService, this.attemptsByWrongPasswordCache);
 
         Field maxAttemptField = LoginAttemptServiceImpl.class.getDeclaredField("maxAttempt");
         maxAttemptField.setAccessible(true);
