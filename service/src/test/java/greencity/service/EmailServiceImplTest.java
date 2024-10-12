@@ -227,6 +227,20 @@ class EmailServiceImplTest {
         verify(javaMailSender).createMimeMessage();
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
+        "1, Test, test@gmail.com, token, en, true"})
+    void sendBlockAccountNotificationWithUnblockAndRestorePasswordEmailTest(Long id, String name, String email,
+        String token, String language,
+        Boolean isUbs) {
+        when(messageSource.getMessage(EmailConstants.BLOCKED_USER, null, getLocale(language)))
+            .thenReturn("Your account is blocked");
+
+        service.sendBlockAccountNotificationWithUnblockAndRestorePasswordEmail(id, name, email, token, language, isUbs);
+
+        verify(javaMailSender).createMimeMessage();
+    }
+
     private static Locale getLocale(String language) {
         return switch (language) {
             case "ua" -> UA_LOCALE;
