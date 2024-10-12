@@ -58,6 +58,6 @@ public class ErrorMessage {
         "User account is blocked due to too many failed login attempts. Try again in %s hour(s)";
     public static final String COULD_NOT_RETRIEVE_CHECKOUT_RESPONSE = "Could not retrieve checkout response";
     public static final String WRONG_CAPTCHA = "Wrong captcha";
-    public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASSWORD =
+    public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS =
         "User account is blocked due to too many failed login attempts. Try again in %s minutes";
 }

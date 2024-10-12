@@ -16,6 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -225,5 +228,18 @@ class OwnSecurityControllerTest {
             .andExpect(status().isOk());
 
         verify(ownSecurityService).deleteUserByEmail(email);
+    }
+
+    @Test
+    void unblockUserTest() throws Exception {
+        String token = "token";
+
+        doNothing().when(ownSecurityService).unblockAccount(token);
+
+        mockMvc.perform(get(LINK + "/unblock")
+            .param("token", token))
+            .andExpect(status().isOk());
+
+        verify(ownSecurityService, times(1)).unblockAccount("token");
     }
 }

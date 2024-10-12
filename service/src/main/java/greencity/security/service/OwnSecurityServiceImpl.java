@@ -243,7 +243,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             log.error("Too many failed login attempts - {}, account is blocked for {} minutes", email,
                 blockTimeInMinutes);
             throw new WrongPasswordException(
-                String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASSWORD, blockTimeInMinutes));
+                String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
         }
     }
 
