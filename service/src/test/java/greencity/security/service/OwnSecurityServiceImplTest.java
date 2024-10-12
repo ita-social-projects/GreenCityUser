@@ -92,7 +92,7 @@ class OwnSecurityServiceImplTest {
     private UserVO notVerifiedUser;
     private UpdatePasswordDto updatePasswordDto;
     private UserManagementDto userManagementDto;
-    private User user;
+    private User userForBruteForceTest;
 
     @BeforeEach
     public void init() {
@@ -131,7 +131,7 @@ class OwnSecurityServiceImplTest {
             .role(Role.ROLE_USER)
             .userStatus(UserStatus.BLOCKED)
             .build();
-        user = User.builder()
+        userForBruteForceTest = User.builder()
             .id(1L)
             .email("test@somemail.com")
             .name("Test")
@@ -660,7 +660,7 @@ class OwnSecurityServiceImplTest {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
         when(userRepo.findByEmail(anyString()))
-            .thenReturn(Optional.ofNullable(user));
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
 
         assertThrows(UserBlockedException.class,
             () -> ownSecurityService.signIn(ownSignInDto));
@@ -672,7 +672,7 @@ class OwnSecurityServiceImplTest {
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(true);
         when(userRepo.findByEmail(anyString()))
-            .thenReturn(Optional.ofNullable(user));
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
 
         assertThrows(WrongPasswordException.class,
             () -> ownSecurityService.signIn(ownSignInDto));
@@ -684,7 +684,7 @@ class OwnSecurityServiceImplTest {
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
         when(userRepo.findByEmail(anyString()))
-            .thenReturn(Optional.ofNullable(user));
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
         when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
             .thenReturn(new CloudFlareResponse(false, null, null, null));
 
@@ -695,13 +695,13 @@ class OwnSecurityServiceImplTest {
     @Test
     void unblockUserTest() {
         when(jwtTool.getEmailOutOfAccessToken(anyString())).thenReturn("test@mail.com");
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(userForBruteForceTest));
 
         ownSecurityService.unblockAccount("test@mail.com");
 
         verify(jwtTool, times(1)).getEmailOutOfAccessToken(anyString());
         verify(userRepo, times(1)).findByEmail(anyString());
-        verify(userRepo, times(1)).save(user);
+        verify(userRepo, times(1)).save(userForBruteForceTest);
     }
 
     @Test
