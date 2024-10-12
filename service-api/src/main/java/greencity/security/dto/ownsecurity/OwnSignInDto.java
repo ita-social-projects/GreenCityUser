@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class OwnSignInDto {
     @NotBlank
-    @Email(message = ValidationConstants.INVALID_EMAIL)
+    @Email(regexp = ValidationConstants.EMAIL_REGEXP, message = ValidationConstants.INVALID_EMAIL)
     private String email;
 
     @NotBlank
