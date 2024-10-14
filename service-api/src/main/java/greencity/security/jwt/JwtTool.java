@@ -186,4 +186,20 @@ public class JwtTool {
         String input = dateLong + "." + UUID.randomUUID();
         return Base64.getEncoder().encodeToString(input.getBytes());
     }
+
+    /**
+     * Generates a token for unblocking user account.
+     *
+     * @param email this is user email.
+     * @return token for unblocking user account.
+     */
+    public String generateUnblockToken(String email) {
+        ClaimsBuilder claims = Jwts.claims().subject(email);
+        return Jwts.builder()
+            .claims(claims.build())
+            .signWith(Keys.hmacShaKeyFor(
+                accessTokenKey.getBytes(StandardCharsets.UTF_8)),
+                Jwts.SIG.HS256)
+            .compact();
+    }
 }
