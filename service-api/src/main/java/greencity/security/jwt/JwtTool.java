@@ -195,11 +195,17 @@ public class JwtTool {
      */
     public String generateUnblockToken(String email) {
         ClaimsBuilder claims = Jwts.claims().subject(email);
+        Date now = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        calendar.add(Calendar.MONTH, 1);
         return Jwts.builder()
             .claims(claims.build())
             .signWith(Keys.hmacShaKeyFor(
                 accessTokenKey.getBytes(StandardCharsets.UTF_8)),
                 Jwts.SIG.HS256)
+            .issuedAt(now)
+            .expiration(calendar.getTime())
             .compact();
     }
 }
