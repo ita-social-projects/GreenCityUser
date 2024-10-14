@@ -131,4 +131,14 @@ class LoginAttemptServiceImplTest {
 
         verify(attemptsByWrongPasswordCache).get("test@test.com");
     }
+
+    @Test
+    void deleteEmailFromCaches() {
+        String email = "test@mail.com";
+
+        loginAttemptService.deleteEmailFromCache(email);
+
+        verify(attemptsByCaptchaCache).invalidate(email);
+        verify(attemptsByWrongPasswordCache).invalidate(email);
+    }
 }

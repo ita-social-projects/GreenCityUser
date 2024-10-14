@@ -39,4 +39,11 @@ public interface LoginAttemptService {
      * @return true if user is blocked, false otherwise.
      */
     boolean isBlockedByWrongPassword(String email);
+
+    /**
+     * Deletes the given {@code email} from cache.
+     *
+     * @param email identifies the user.
+     */
+    void deleteEmailFromCache(String email);
 }

@@ -74,4 +74,13 @@ public class LoginAttemptServiceImpl implements LoginAttemptService {
             return false;
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void deleteEmailFromCache(String email) {
+        attemptsByCaptchaCache.invalidate(email);
+        attemptsByWrongPasswordCache.invalidate(email);
+    }
 }

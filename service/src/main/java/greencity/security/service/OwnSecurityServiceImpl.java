@@ -447,6 +447,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID);
         }
+        loginAttemptService.deleteEmailFromCache(email);
+
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         user.setUserStatus(UserStatus.ACTIVATED);
