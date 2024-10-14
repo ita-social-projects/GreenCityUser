@@ -13,6 +13,11 @@ public class EmailConstants {
     public static final String CONFIRM_CREATING_PASS = "creating.new.password";
     public static final String CONFIRM_CREATING_PASS_UBS = "creating.new.passwordUbs";
     public static final String APPROVE_REGISTRATION_SUBJECT = "Approve your registration";
+    public static final String HABIT_ASSIGN_FRIEND_REQUEST = "habit.friend.request";
+    public static final String USER_TAGGED_IN_COMMENT_REQUEST = "user.tagged.request";
+    public static final String USER_RECEIVED_COMMENT_REQUEST = "user.received.comment.request";
+    public static final String USER_RECEIVED_COMMENT_REPLY_REQUEST = "user.received.comment.reply.request";
+    public static final String BLOCKED_USER = "block.user";
     public static final String DEACTIVATION = "user.deactivation.subject";
     public static final String ACTIVATION = "user.activation.subject";
     public static final String VIOLATION_EMAIL = "user.violation.subject";
@@ -33,6 +38,7 @@ public class EmailConstants {
     public static final String IS_UBS = "isUbs";
     public static final String TITLE = "title";
     public static final String BODY = "body";
+    public static final String UNLOCK_USER_LINK = "unlockUserLink";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
@@ -45,4 +51,5 @@ public class EmailConstants {
     public static final String USER_VIOLATION_PAGE = "user-violation-mail";
     public static final String SCHEDULED_NOTIFICATION_PAGE = "scheduled-notification-email-page";
     public static final String RECEIVE_INTERESTING_NEWS_EMAIL_PAGE = "receive-interesting-news-email-page";
+    public static final String BLOCKED_USER_PAGE = "blocked-user-page";
 }

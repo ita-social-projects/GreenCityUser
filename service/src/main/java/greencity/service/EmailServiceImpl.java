@@ -34,6 +34,7 @@ import static greencity.enums.SubscriptionType.ECO_NEWS;
 @Slf4j
 @Service
 public class EmailServiceImpl implements EmailService {
+    private static final String UNBLOCK_ACCOUNT_URL = "/auth/unblock?token=";
     private final JavaMailSender javaMailSender;
     private final ITemplateEngine templateEngine;
     private final Executor executor;
@@ -280,6 +281,27 @@ public class EmailServiceImpl implements EmailService {
 
         String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
         sendEmail(message.getEmail(), message.getSubject(), template);
+    }
+
+    @Override
+    public void sendBlockAccountNotificationWithUnblockLinkEmail(Long userId, String userFistName,
+        String userEmail, String token, String language, boolean isUbs) {
+        Map<String, Object> modelForRestorePassword = buildModelForUnblockAccount(userFistName, token, language, isUbs);
+
+        String template = createEmailTemplate(modelForRestorePassword, EmailConstants.BLOCKED_USER_PAGE);
+
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.BLOCKED_USER, null, getLocale(language)),
+            template);
+    }
+
+    private Map<String, Object> buildModelForUnblockAccount(String name, String token, String language, boolean isUbs) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
+        model.put(EmailConstants.USER_NAME, name);
+        model.put(EmailConstants.IS_UBS, isUbs);
+        model.put(EmailConstants.LANGUAGE, language);
+        model.put(EmailConstants.UNLOCK_USER_LINK, getClientLinkByIsUbs(true) + UNBLOCK_ACCOUNT_URL + token);
+        return model;
     }
 
     private Map<String, Object> buildModelMapForPasswordRestore(Long userId, String name, String token, String language,

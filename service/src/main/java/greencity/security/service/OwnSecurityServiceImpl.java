@@ -1,7 +1,10 @@
 package greencity.security.service;
 
+import greencity.client.CloudFlareClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
+import greencity.dto.security.CloudFlareResponse;
+import greencity.dto.security.CloudFlareRequest;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -63,8 +66,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final UserRepo userRepo;
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
+    private final LoginAttemptService loginAttemptService;
+    private final CloudFlareClient cloudFlareClient;
     @Value("${verifyEmailTimeHour}")
     private Integer expirationTime;
+    @Value("${bruteForceSettings.blockTimeInMinutes}")
+    private String blockTimeInMinutes;
+    @Value("${cloud-flare.secret-key}")
+    private String cloudFlareSecretKey;
 
     /**
      * {@inheritDoc}
@@ -184,22 +193,154 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Override
     public SuccessSignInDto signIn(final OwnSignInDto dto) {
+        String email = dto.getEmail();
+        UserVO user = validateUser(dto);
+
+        handleUserStatus(user.getUserStatus());
+        handleBruteForceProtection(email);
+
+        verifyCaptcha(dto, email);
+
+        validatePassword(dto, user);
+
+        if (!isEmailVerified(user)) {
+            throw new EmailNotVerified("You should verify the email first, check your email box!");
+        }
+
+        return createSuccessSignInResponse(user, email);
+    }
+
+    private UserVO validateUser(final OwnSignInDto dto) {
         UserVO user = userService.findByEmail(dto.getEmail());
         if (user == null) {
             throw new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail());
         }
+        return user;
+    }
+
+    /**
+     * Checks if user is blocked by brute-force protection (captcha or wrong
+     * password). If user is blocked, logs error and blocks user by email. If user
+     * exceeded wrong password attempts, throws WrongPasswordException.
+     *
+     * @param email user email
+     */
+    private void handleBruteForceProtection(String email) {
+        if (loginAttemptService.isBlockedByCaptcha(email)) {
+            log.error("Brute force protection, user with email is blocked - {}", email);
+            blockUserByEmail(email);
+        }
+
+        if (loginAttemptService.isBlockedByWrongPassword(email)) {
+            log.error("Too many failed login attempts - {}, account is blocked for {} minutes", email,
+                blockTimeInMinutes);
+            throw new WrongPasswordException(
+                String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
+        }
+    }
+
+    /**
+     * Checks if captcha is valid. If captcha is not valid, logs error, increments
+     * wrong captcha attempts and throws WrongCaptchaException.
+     *
+     * @param dto   - {@link OwnSignInDto} that have sign-in information
+     * @param email - user email
+     */
+    private void verifyCaptcha(final OwnSignInDto dto, String email) {
+        if (!getCloudFlareResponse(dto).success()) {
+            loginAttemptService.loginFailedByCaptcha(email);
+            throw new WrongCaptchaException(ErrorMessage.WRONG_CAPTCHA);
+        }
+    }
+
+    /**
+     * Validates password for user. If password is not correct, logs error,
+     * increments wrong password attempts and throws WrongPasswordException.
+     *
+     * @param dto  - {@link OwnSignInDto} that have sign-in information
+     * @param user - user with password to be validated
+     */
+    private void validatePassword(final OwnSignInDto dto, UserVO user) {
         if (!isPasswordCorrect(dto, user)) {
+            loginAttemptService.loginFailedByWrongPassword(dto.getEmail());
             throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
         }
-        if (user.getVerifyEmail() != null) {
-            throw new EmailNotVerified("You should verify the email first, check your email box!");
-        }
+    }
 
-        handleUserStatus(user.getUserStatus());
+    /**
+     * Checks if user has verified email. User is considered verified if there is no
+     * VerifyEmail entity associated with his/her account.
+     * 
+     * @param user - user to be checked
+     * @return true if user has verified email, false otherwise
+     */
+    private boolean isEmailVerified(UserVO user) {
+        return user.getVerifyEmail() == null;
+    }
 
-        String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
+    /**
+     * Creates a {@link SuccessSignInDto} that is used to sign in user. Creates a
+     * new access token and a new refresh token and returns them in the
+     * {@link SuccessSignInDto} object.
+     *
+     * @param user  user that is being signed in
+     * @param email user's email
+     * @return {@link SuccessSignInDto} with access token, refresh token and user's
+     *         name
+     */
+    private SuccessSignInDto createSuccessSignInResponse(UserVO user, String email) {
+        String accessToken = jwtTool.createAccessToken(email, user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), true);
+    }
+
+    /**
+     * Blocks user by email. Sets user status to {@link UserStatus#BLOCKED}, saves
+     * user and logs info about blocking. Then sends email with link to unblock and
+     * restore password page and throws {@link UserBlockedException} with message
+     * that contains time for which account is blocked.
+     *
+     * @param email email of user to be blocked
+     * @throws UserBlockedException if user is blocked
+     * @throws NotFoundException    if user with given email is not found
+     */
+    private void blockUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+
+        user.setUserStatus(UserStatus.BLOCKED);
+        userRepo.save(user);
+        log.info("User with email {} is blocked", user.getEmail());
+
+        emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
+            user.getId(), user.getName(), user.getEmail(),
+            jwtTool.generateUnblockToken(email), getLanguageFromUser(user), false);
+
+        throw new UserBlockedException(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE);
+    }
+
+    /**
+     * Calls CloudFlare api to check if given captcha is valid.
+     *
+     * @param dto - {@link OwnSignInDto} that contains captcha token
+     * @return {@link CloudFlareResponse} with result of captcha validation
+     */
+    private CloudFlareResponse getCloudFlareResponse(OwnSignInDto dto) {
+        return cloudFlareClient.getCloudFlareResponse(CloudFlareRequest.builder()
+            .secret(cloudFlareSecretKey)
+            .response(dto.getCaptchaToken())
+            .build());
+    }
+
+    /**
+     * Gets user language from user object. If user language code is "1", method
+     * returns "ua", otherwise - "en".
+     *
+     * @param user user to get language from
+     * @return "ua" or "en" depending on user language code
+     */
+    private String getLanguageFromUser(User user) {
+        return user.getLanguage().getCode().equals("1") ? "ua" : "en";
     }
 
     private boolean isPasswordCorrect(OwnSignInDto signInDto, UserVO user) {
@@ -292,6 +433,25 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
         user.setUserStatus(UserStatus.DELETED);
         userRepo.save(user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public void unblockAccount(String token) {
+        String email;
+        try {
+            email = jwtTool.getEmailOutOfAccessToken(token);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID);
+        }
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        user.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(user);
+        log.info("User {} unblocked", user.getEmail());
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
