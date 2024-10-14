@@ -22,6 +22,7 @@ import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.PasswordStatusDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UnblockAccountDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
@@ -296,6 +297,24 @@ public class OwnSecurityController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         service.deleteUserByEmail(email);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Unblocks user account by provided token.
+     *
+     * @param token {@link String} token for unblocking user account.
+     * @return {@link ResponseEntity} with 200 status if unblocking is successful.
+     */
+    @Operation(summary = "Unblock user account")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = ErrorMessage.USER_NOT_FOUND_BY_EMAIL)
+    })
+    @PostMapping("/unblockAccount")
+    public ResponseEntity<Object> unblockAccount(@RequestBody UnblockAccountDto token) {
+        service.unblockAccount(token.token());
         return ResponseEntity.ok().build();
     }
 }

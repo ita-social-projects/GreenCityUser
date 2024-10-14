@@ -169,4 +169,20 @@ class JwtToolTest {
         int tokenLength = 68;
         assertEquals(tokenLength, jwtTool.generateTokenKeyWithCodedDate().length());
     }
+
+    @Test
+    void testGenerateUnblockToken() {
+        final String token = jwtTool.generateUnblockToken(expectedEmail);
+
+        SecretKey key = Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes());
+
+        String actualEmail = Jwts.parser()
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(token)
+            .getPayload()
+            .getSubject();
+
+        assertEquals(expectedEmail, actualEmail);
+    }
 }

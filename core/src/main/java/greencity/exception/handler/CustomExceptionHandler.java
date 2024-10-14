@@ -15,6 +15,8 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.PasswordsDoNotMatchesException;
 import greencity.exception.exceptions.UserAlreadyHasPasswordException;
 import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserBlockedException;
+import greencity.exception.exceptions.WrongCaptchaException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
@@ -493,6 +495,40 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(Base64DecodedException.class)
     public ResponseEntity<Object> handleBase64DecodedException(Base64DecodedException exception,
+        WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
+     * Handles exceptions of type {@link UserBlockedException}.
+     *
+     * @param exception the UserBlockedException instance
+     * @param request   the current web request
+     * @return a ResponseEntity containing the HTTP status code and error response
+     *         body
+     */
+    @ExceptionHandler(UserBlockedException.class)
+    public ResponseEntity<Object> handleUserBlockedException(UserBlockedException exception,
+        WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.LOCKED).body(exceptionResponse);
+    }
+
+    /**
+     * Handles exceptions of type {@link WrongCaptchaException}.
+     *
+     * @param exception the WrongCaptchaException instance
+     * @param request   the current web request
+     * @return a ResponseEntity containing the HTTP status code and error response
+     *         body
+     */
+    @ExceptionHandler(WrongCaptchaException.class)
+    public ResponseEntity<Object> handleWrongCaptchaException(WrongCaptchaException exception,
         WebRequest request) {
         log.error(exception.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));

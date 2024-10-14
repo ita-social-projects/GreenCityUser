@@ -1,11 +1,13 @@
 package greencity.security.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UnblockAccountDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
@@ -16,6 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -225,5 +230,19 @@ class OwnSecurityControllerTest {
             .andExpect(status().isOk());
 
         verify(ownSecurityService).deleteUserByEmail(email);
+    }
+
+    @Test
+    void unblockUserTest() throws Exception {
+        UnblockAccountDto accountDto = new UnblockAccountDto("token");
+
+        doNothing().when(ownSecurityService).unblockAccount(accountDto.token());
+
+        mockMvc.perform(post(LINK + "/unblockAccount")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(accountDto)))
+            .andExpect(status().isOk());
+
+        verify(ownSecurityService, times(1)).unblockAccount(accountDto.token());
     }
 }

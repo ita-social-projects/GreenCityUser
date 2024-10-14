@@ -122,4 +122,20 @@ public interface EmailService {
      * @param message {@link ScheduledEmailMessage}
      */
     void sendScheduledNotificationEmail(ScheduledEmailMessage message);
+
+    /**
+     * Sends an email notification user that his account has been blocked and
+     * includes link for unblocking.
+     *
+     * @param userId       the user id is used for recovery link building
+     * @param userFistName user first name is used in email model constants
+     * @param userEmail    user email which will be used for sending recovery letter
+     * @param token        token for password save(restoration)
+     * @param language     language code used for email notification
+     * @param isUbs        {@code true} if user is from UBS, {@code false} if user
+     *                     is from admin panel
+     */
+    void sendBlockAccountNotificationWithUnblockLinkEmail(
+        Long userId, String userFistName, String userEmail, String token, String language,
+        boolean isUbs);
 }
