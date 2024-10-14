@@ -22,6 +22,7 @@ import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.PasswordStatusDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UnblockAccountDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
@@ -311,9 +312,9 @@ public class OwnSecurityController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "404", description = ErrorMessage.USER_NOT_FOUND_BY_EMAIL)
     })
-    @GetMapping("/unblock")
-    public ResponseEntity<Object> unblockAccount(@RequestParam("token") String token) {
-        service.unblockAccount(token);
+    @PostMapping("/unblockAccount")
+    public ResponseEntity<Object> unblockAccount(@RequestBody UnblockAccountDto token) {
+        service.unblockAccount(token.token());
         return ResponseEntity.ok().build();
     }
 }

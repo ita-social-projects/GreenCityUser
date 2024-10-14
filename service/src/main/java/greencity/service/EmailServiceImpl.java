@@ -34,6 +34,7 @@ import static greencity.enums.SubscriptionType.ECO_NEWS;
 @Slf4j
 @Service
 public class EmailServiceImpl implements EmailService {
+    private static final String UNBLOCK_ACCOUNT_URL = "/auth/unblock?token=";
     private final JavaMailSender javaMailSender;
     private final ITemplateEngine templateEngine;
     private final Executor executor;
@@ -299,7 +300,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
-        model.put(EmailConstants.UNLOCK_USER_LINK, "/ownSecurity/unblock?" + "token=" + token);
+        model.put(EmailConstants.UNLOCK_USER_LINK, getClientLinkByIsUbs(true) + UNBLOCK_ACCOUNT_URL + token);
         return model;
     }
 

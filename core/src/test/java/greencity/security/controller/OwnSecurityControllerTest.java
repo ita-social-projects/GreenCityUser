@@ -1,11 +1,13 @@
 package greencity.security.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UnblockAccountDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
@@ -232,14 +234,15 @@ class OwnSecurityControllerTest {
 
     @Test
     void unblockUserTest() throws Exception {
-        String token = "token";
+        UnblockAccountDto accountDto = new UnblockAccountDto("token");
 
-        doNothing().when(ownSecurityService).unblockAccount(token);
+        doNothing().when(ownSecurityService).unblockAccount(accountDto.token());
 
-        mockMvc.perform(get(LINK + "/unblock")
-            .param("token", token))
+        mockMvc.perform(post(LINK + "/unblockAccount")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new ObjectMapper().writeValueAsString(accountDto)))
             .andExpect(status().isOk());
 
-        verify(ownSecurityService, times(1)).unblockAccount("token");
+        verify(ownSecurityService, times(1)).unblockAccount(accountDto.token());
     }
 }

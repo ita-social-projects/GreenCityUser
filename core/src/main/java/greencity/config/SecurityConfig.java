@@ -110,7 +110,6 @@ public class SecurityConfig {
                     "/ownSecurity/verifyEmail",
                     "/ownSecurity/updateAccessToken",
                     "/ownSecurity/restorePassword",
-                    "/ownSecurity/unblock",
                     "/googleSecurity",
                     "/facebookSecurity/generateFacebookAuthorizeURL",
                     "/facebookSecurity/facebook", "/user/emailNotifications",
@@ -125,7 +124,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST,
                     "/ownSecurity/signUp",
                     "/ownSecurity/signIn",
-                    "/ownSecurity/updatePassword")
+                    "/ownSecurity/updatePassword",
+                    "/ownSecurity/unblockAccount")
                 .permitAll()
                 .requestMatchers(HttpMethod.GET,
                     "/user/shopping-list-items/habits/{habitId}/shopping-list",

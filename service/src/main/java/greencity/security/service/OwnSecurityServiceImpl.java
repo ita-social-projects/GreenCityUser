@@ -314,7 +314,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
         emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
             user.getId(), user.getName(), user.getEmail(),
-            jwtTool.generateTokenKeyWithCodedDate(), getLanguageFromUser(user), false);
+            jwtTool.createAccessToken(email, user.getRole()), getLanguageFromUser(user), false);
 
         throw new UserBlockedException(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE);
     }
