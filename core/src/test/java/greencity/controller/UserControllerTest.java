@@ -832,7 +832,6 @@ class UserControllerTest {
     void updatePositionsAndRelatedAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
         var dto = new EmployeePositionsDto();
-        ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(dto);
         mockMvc.perform(put(userLink + "/authorities")
             .principal(principal)
