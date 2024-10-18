@@ -54,7 +54,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.security.Principal;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -196,8 +195,7 @@ public class UserController {
     })
     @GetMapping("emailNotifications")
     public ResponseEntity<List<EmailNotification>> getEmailNotifications(Principal principal) {
-        String email = principal.getName();
-        return ResponseEntity.ok().body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
+        return ResponseEntity.ok().body(List.of(userService.getEmailNotificationsStatuses(principal.getName())));
     }
 
     /**
