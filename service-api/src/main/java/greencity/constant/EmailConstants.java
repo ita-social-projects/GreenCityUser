@@ -3,7 +3,6 @@ package greencity.constant;
 public final class EmailConstants {
     public static final String EMAIL_CONTENT_TYPE = "text/html; charset=utf-8";
     // subjects
-    public static final String GC_CONTRIBUTORS = "GreenCity contributors";
     public static final String NEW_PLACES = "new.places";
     public static final String NEWS = "news.receive.title";
     public static final String EVENT_COMMENT = "You have a new comment on your event";
@@ -37,6 +36,8 @@ public final class EmailConstants {
     public static final String DESCRIPTION = "description";
     public static final String LANGUAGE = "language";
     public static final String IS_UBS = "isUbs";
+    public static final String TITLE = "title";
+    public static final String BODY = "body";
     public static final String CHANGE_PLACE_STATUS = "place.status.title";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
@@ -51,6 +52,7 @@ public final class EmailConstants {
     public static final String ACTIVATION_PAGE = "user-activation-page";
     public static final String USER_VIOLATION_PAGE = "user-violation-mail";
     public static final String CRETE_PASSWORD_PAGE = "create-employee-password-page";
+    public static final String NOTIFICATION_PAGE = "notification-page";
 
     private EmailConstants() {
     }
