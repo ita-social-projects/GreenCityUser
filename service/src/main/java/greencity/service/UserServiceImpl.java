@@ -336,6 +336,16 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
     }
 
+    private User findUserByUuid(String uuid) {
+        return userRepo.findUserByUuid(uuid)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+    }
+
+    private User findUserByEmail(String email) {
+        return userRepo.findByEmail(email)
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+    }
+
     private void checkIfUserCanUpdate(User user, String email) {
         if (email.equals(user.getEmail())) {
             throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_THEMSELVES);
@@ -368,9 +378,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public EmailNotification getEmailNotificationsStatuses(String email) {
-        User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        return user.getEmailNotification();
+        return findUserByEmail(email).getEmailNotification();
     }
 
     /**
@@ -395,10 +403,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserUpdateDto getUserUpdateDtoByEmail(String email) {
-        return modelMapper.map(
-            userRepo.findByEmail(email)
-                .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email)),
-            UserUpdateDto.class);
+        return modelMapper.map(findUserByEmail(email), UserUpdateDto.class);
     }
 
     /**
@@ -1038,11 +1043,6 @@ public class UserServiceImpl implements UserService {
         User user = findUserByUuid(uuid);
         user.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(user);
-    }
-
-    private User findUserByUuid(String uuid) {
-        return userRepo.findUserByUuid(uuid)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
     }
 
     /**
