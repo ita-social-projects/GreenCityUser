@@ -98,7 +98,6 @@ public class UserController {
      *
      * @param userStatusDto - dto with updated filed.
      * @return {@link UserStatusDto}
-     * @author Rostyslav Khasanov
      */
     @Operation(summary = "Update status of user")
     @ApiResponses(value = {
@@ -111,9 +110,8 @@ public class UserController {
     @PatchMapping("status")
     public ResponseEntity<UserStatusDto> updateStatus(
         @Valid @RequestBody UserStatusDto userStatusDto, Principal principal) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.updateStatus(
-                userStatusDto.getId(), userStatusDto.getUserStatus(), principal.getName()));
+        return ResponseEntity.ok().body(userService.updateStatus(
+            userStatusDto.getId(), userStatusDto.getUserStatus(), principal.getName()));
     }
 
     /**
@@ -123,7 +121,6 @@ public class UserController {
      * @param id   of updated user
      * @param body contains new role
      * @return {@link UserRoleDto}
-     * @author Rostyslav Khasanov
      */
     @Operation(summary = "Update role of user")
     @ApiResponses(value = {
@@ -140,9 +137,8 @@ public class UserController {
         Principal principal) {
         Role role = Role.valueOf(body.get("role"));
         UserRoleDto userRoleDto = new UserRoleDto(id, role);
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.updateRole(
-                userRoleDto.getId(), userRoleDto.getRole(), principal.getName()));
+        return ResponseEntity.ok().body(userService.updateRole(
+            userRoleDto.getId(), userRoleDto.getRole(), principal.getName()));
     }
 
     /**
@@ -152,7 +148,6 @@ public class UserController {
      *
      * @param pageable - pageable configuration.
      * @return list of {@link PageableDto}
-     * @author Rostyslav Khasanov
      */
     @Operation(summary = "Get users by page")
     @ApiResponses(value = {
@@ -165,14 +160,13 @@ public class UserController {
     @ApiPageable
     @GetMapping("all")
     public ResponseEntity<PageableDto<UserForListDto>> getAllUsers(@Parameter(hidden = true) Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findByPage(pageable));
+        return ResponseEntity.ok().body(userService.findByPage(pageable));
     }
 
     /**
      * The method which return array of user role by user id.
      *
      * @return {@link RoleDto}
-     * @author Rostyslav Khasanov
      */
     @Operation(summary = "Get user role by user id")
     @ApiResponses(value = {
@@ -184,7 +178,7 @@ public class UserController {
     })
     @GetMapping("roles")
     public ResponseEntity<RoleDto> getRoles(@RequestParam Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getRoles(id));
+        return ResponseEntity.ok().body(userService.getRoles(id));
     }
 
     /**
@@ -192,7 +186,6 @@ public class UserController {
      * user{@link EmailNotification}.
      *
      * @return {@link EmailNotification} array
-     * @author Nazar Vladyka
      */
     @Operation(summary = "Get email notifications status by authorization user")
     @ApiResponses(value = {
@@ -204,8 +197,7 @@ public class UserController {
     @GetMapping("emailNotifications")
     public ResponseEntity<List<EmailNotification>> getEmailNotifications(Principal principal) {
         String email = principal.getName();
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
+        return ResponseEntity.ok().body(Collections.singletonList(userService.getEmailNotificationsStatuses(email)));
     }
 
     /**
@@ -216,7 +208,6 @@ public class UserController {
      * @param filterUserDto dto which contains fields with filter criteria.
      * @param pageable      - pageable configuration.
      * @return {@link PageableDto}
-     * @author Rostyslav Khasanov
      */
     @Operation(summary = "Filter all user by search criteria")
     @ApiResponses(value = {
@@ -230,14 +221,13 @@ public class UserController {
     @PostMapping("filter")
     public ResponseEntity<PageableDto<UserForListDto>> getUsersByFilter(
         @Parameter(hidden = true) Pageable pageable, @RequestBody FilterUserDto filterUserDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUsersByFilter(filterUserDto, pageable));
+        return ResponseEntity.ok().body(userService.getUsersByFilter(filterUserDto, pageable));
     }
 
     /**
      * Get {@link UserVO} dto by principal (email) from access token.
      *
      * @return {@link UserUpdateDto}.
-     * @author Nazar Stasyuk
      */
     @Operation(summary = "Get User dto by principal (email) from access token")
     @ApiResponses(value = {
@@ -249,15 +239,13 @@ public class UserController {
     })
     @GetMapping
     public ResponseEntity<UserUpdateDto> getUserByPrincipal(Principal principal) {
-        String email = principal.getName();
-        return ResponseEntity.status(HttpStatus.OK).body(userService.getUserUpdateDtoByEmail(email));
+        return ResponseEntity.ok().body(userService.getUserUpdateDtoByEmail(principal.getName()));
     }
 
     /**
      * Update {@link UserVO}.
      *
      * @return {@link ResponseEntity}.
-     * @author Nazar Stasyuk
      */
     @Operation(summary = "Update User")
     @ApiResponses(value = {
@@ -268,14 +256,11 @@ public class UserController {
     })
     @PatchMapping
     public ResponseEntity<UserUpdateDto> updateUser(@Valid @RequestBody UserUpdateDto dto, Principal principal) {
-        String email = principal.getName();
-        return ResponseEntity.status(HttpStatus.OK).body(userService.update(dto, email));
+        return ResponseEntity.ok().body(userService.update(dto, principal.getName()));
     }
 
     /**
      * Update ubs employee's email {@link UserVO}.
-     *
-     * @author Inna Yashna
      */
     @Operation(summary = "Update employee's email")
     @ApiResponses(value = {
@@ -288,7 +273,7 @@ public class UserController {
     public ResponseEntity<HttpStatus> updateEmployeeEmail(@RequestParam String newEmployeeEmail,
         @RequestParam String uuid) {
         userService.updateEmployeeEmail(newEmployeeEmail, uuid);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -296,7 +281,6 @@ public class UserController {
      * user.
      *
      * @return {@link ResponseEntity}.
-     * @author Vitalii Skolozdra
      */
     @Operation(summary = "Get available custom shopping list items for current user.")
     @ApiResponses(value = {
@@ -308,15 +292,13 @@ public class UserController {
     public ResponseEntity<List<CustomShoppingListItemResponseDto>> getAvailableCustomShoppingListItems(
         @Parameter(description = "Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId,
         @PathVariable Long habitId) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.getAvailableCustomShoppingListItems(userId, habitId));
+        return ResponseEntity.ok().body(userService.getAvailableCustomShoppingListItems(userId, habitId));
     }
 
     /**
      * Counts all users by user {@link UserStatus} ACTIVATED.
      *
      * @return amount of users with {@link UserStatus} ACTIVATED.
-     * @author Shevtsiv Rostyslav
      */
     @Operation(summary = "Get all activated users amount")
     @ApiResponses(value = {
@@ -325,15 +307,13 @@ public class UserController {
     })
     @GetMapping("/activatedUsersAmount")
     public ResponseEntity<Long> getActivatedUsersAmount() {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.getActivatedUsersAmount());
+        return ResponseEntity.ok().body(userService.getActivatedUsersAmount());
     }
 
     /**
      * Update user profile picture {@link UserVO}.
      *
      * @return {@link ResponseEntity}.
-     * @author Datsko Marian
      */
     @Operation(summary = "Update user profile picture")
     @ApiResponses(value = {
@@ -347,9 +327,8 @@ public class UserController {
         @Parameter(description = "pass image as base64") @ValidBase64 @RequestPart(required = false) String base64,
         @Parameter(description = "Profile picture") @ImageValidation @RequestPart(required = false) MultipartFile image,
         Principal principal) {
-        String email = principal.getName();
-        userService.updateUserProfilePicture(image, email, base64);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        userService.updateUserProfilePicture(image, principal.getName(), base64);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -365,9 +344,8 @@ public class UserController {
     })
     @PatchMapping(path = "/deleteProfilePicture")
     public ResponseEntity<HttpStatus> deleteUserProfilePicture(Principal principal) {
-        String email = principal.getName();
-        userService.deleteUserProfilePicture(email);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        userService.deleteUserProfilePicture(principal.getName());
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -375,7 +353,6 @@ public class UserController {
      *
      * @param userProfileDtoRequest - dto for {@link UserVO} entity.
      * @return dto {@link UserProfileDtoResponse} instance.
-     * @author Marian Datsko.
      */
     @Operation(summary = "Save user profile information")
     @ApiResponses(value = {
@@ -388,15 +365,13 @@ public class UserController {
     public ResponseEntity<String> save(
         @Parameter(required = true) @RequestBody @Valid UserProfileDtoRequest userProfileDtoRequest,
         Principal principal) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.saveUserProfile(userProfileDtoRequest, principal.getName()));
+        return ResponseEntity.ok().body(userService.saveUserProfile(userProfileDtoRequest, principal.getName()));
     }
 
     /**
      * Method returns user profile information.
      *
      * @return {@link UserProfileDtoResponse}.
-     * @author Datsko Marian
      */
     @Operation(summary = "Get user profile information by id")
     @ApiResponses(value = {
@@ -408,15 +383,13 @@ public class UserController {
     @GetMapping("/{userId}/profile/")
     public ResponseEntity<UserProfileDtoResponse> getUserProfileInformation(
         @Parameter(description = "Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.getUserProfileInformation(userId));
+        return ResponseEntity.ok().body(userService.getUserProfileInformation(userId));
     }
 
     /**
      * The method checks by id if a {@link UserVO} is online.
      *
      * @return {@link ResponseEntity}.
-     * @author Zhurakovskyi Yurii
      */
     @Operation(summary = "Check by id if the user is online")
     @ApiResponses(value = {
@@ -427,15 +400,13 @@ public class UserController {
     @GetMapping("isOnline/{userId}/")
     public ResponseEntity<Boolean> checkIfTheUserIsOnline(
         @Parameter(description = "Id of the user. Cannot be empty.") @PathVariable Long userId) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.checkIfTheUserIsOnline(userId));
+        return ResponseEntity.ok().body(userService.checkIfTheUserIsOnline(userId));
     }
 
     /**
      * Method returns user profile statistics.
      *
      * @return {@link UserProfileStatisticsDto}.
-     * @author Datsko Marian
      */
     @Operation(summary = "Get user profile statistics by id")
     @ApiResponses(value = {
@@ -446,15 +417,13 @@ public class UserController {
     @GetMapping("/{userId}/profileStatistics/")
     public ResponseEntity<UserProfileStatisticsDto> getUserProfileStatistics(
         @Parameter(description = "Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId) {
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(userService.getUserProfileStatistics(userId));
+        return ResponseEntity.ok().body(userService.getUserProfileStatistics(userId));
     }
 
     /**
      * The method get {@link UserVO}s with online status for the current user-id.
      *
      * @return {@link UserAndFriendsWithOnlineStatusDto}.
-     * @author Zhurakovskyi Yurii
      */
     @MessageMapping("/userAndSixFriendsWithOnlineStatus")
     @SendTo("/topic/sixUsersOnlineStatus")
@@ -467,7 +436,6 @@ public class UserController {
      * user-id.
      *
      * @return {@link UserAndAllFriendsWithOnlineStatusDto}.
-     * @author Zhurakovskyi Yurii
      */
     @MessageMapping("/userAndAllFriendsWithOnlineStatus")
     @SendTo("/topic/userAndAllFriendsOnlineStatus")
@@ -481,7 +449,6 @@ public class UserController {
      * @param request {@link UsersOnlineStatusRequestDto} - request with current
      *                User ID and list of Users ID whose statuses need to be
      *                checked.
-     * @author Anton Bondar.
      */
     @MessageMapping("/usersOnlineStatus")
     public void checkUsersOnlineStatus(@Payload UsersOnlineStatusRequestDto request) {
@@ -492,7 +459,6 @@ public class UserController {
      * Method find user by principal.
      *
      * @return {@link ResponseEntity}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Find current user by principal")
     @ApiResponses(value = {
@@ -502,14 +468,13 @@ public class UserController {
     })
     @GetMapping("/findByEmail")
     public ResponseEntity<UserVO> findByEmail(@RequestParam String email) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findByEmail(email));
+        return ResponseEntity.ok().body(userService.findByEmail(email));
     }
 
     /**
      * Get {@link UserVO} by id.
      *
      * @return {@link UserUpdateDto}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Get User by id")
     @ApiResponses(value = {
@@ -519,14 +484,13 @@ public class UserController {
     })
     @GetMapping("/findById")
     public ResponseEntity<UserVO> findById(@RequestParam Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findById(id));
+        return ResponseEntity.ok().body(userService.findById(id));
     }
 
     /**
      * Method that allow you to find {@link UserVO} by Id.
      *
      * @return {@link UserUpdateDto}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Get User by id")
     @ApiResponses(value = {
@@ -536,14 +500,13 @@ public class UserController {
     })
     @GetMapping("/findByIdForAchievement")
     public ResponseEntity<UserVOAchievement> findUserForAchievement(@RequestParam Long id) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findUserForAchievement(id));
+        return ResponseEntity.ok().body(userService.findUserForAchievement(id));
     }
 
     /**
      * Method that allow you to find {@link UserVO} for management.
      *
      * @return {@link UserUpdateDto}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Get User for management")
     @ApiResponses(value = {
@@ -556,14 +519,13 @@ public class UserController {
     @ApiPageable
     public ResponseEntity<PageableAdvancedDto<UserManagementDto>> findUserForManagementByPage(
         @Parameter(hidden = true) Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findUserForManagementByPage(pageable));
+        return ResponseEntity.ok().body(userService.findUserForManagementByPage(pageable));
     }
 
     /**
      * Method that allow you to find {@link UserVO} by Id.
      *
      * @return {@link UserUpdateDto}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Get User by id")
     @ApiResponses(value = {
@@ -577,14 +539,13 @@ public class UserController {
     public ResponseEntity<PageableAdvancedDto<UserManagementDto>> searchBy(
         @RequestParam(required = false, name = "query") String query,
         @Parameter(hidden = true) Pageable pageable) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.searchBy(pageable, query));
+        return ResponseEntity.ok().body(userService.searchBy(pageable, query));
     }
 
     /**
      * Method that updates user data.
      *
      * @param userDto dto with updated fields.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "update via UserManagement")
     @ApiResponses(value = @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED))
@@ -600,7 +561,6 @@ public class UserController {
      * Method that allow you to find all users {@link UserVO}.
      *
      * @return {@link UserVO list}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Get all Users")
     @ApiResponses(value = {
@@ -611,7 +571,7 @@ public class UserController {
     })
     @GetMapping("/findAll")
     public ResponseEntity<List<UserVO>> findAll() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findAll());
+        return ResponseEntity.ok().body(userService.findAll());
     }
 
     /**
@@ -619,7 +579,6 @@ public class UserController {
      *
      * @param email - {@link UserVO}'s email
      * @return {@link UserVO}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by email")
     @ApiResponses(value = {
@@ -629,8 +588,7 @@ public class UserController {
     })
     @GetMapping("/findNotDeactivatedByEmail")
     public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
-        UserVO userVO = userService.findNotDeactivatedByEmail(email).orElse(null);
-        return ResponseEntity.status(HttpStatus.OK).body(userVO);
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmail(email).orElse(null));
     }
 
     /**
@@ -647,14 +605,13 @@ public class UserController {
     @GetMapping("/createUbsRecord")
     public ResponseEntity<UbsTableCreationDto> createUbsRecord(
         @Parameter(hidden = true) @CurrentUser UserVO userVO) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.createUbsRecord(userVO));
+        return ResponseEntity.ok().body(userService.createUbsRecord(userVO));
     }
 
     /**
      * Get {@link UserVO} id by email.
      *
      * @return {@link Long}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Get User id by email")
     @ApiResponses(value = {
@@ -665,7 +622,7 @@ public class UserController {
     })
     @GetMapping("/findIdByEmail")
     public ResponseEntity<Long> findIdByEmail(@RequestParam String email) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findIdByEmail(email));
+        return ResponseEntity.ok().body(userService.findIdByEmail(email));
     }
 
     /**
@@ -682,7 +639,7 @@ public class UserController {
     })
     @GetMapping("/findUuidByEmail")
     public ResponseEntity<String> findUuidByEmail(@RequestParam String email) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findUuIdByEmail(email));
+        return ResponseEntity.ok().body(userService.findUuIdByEmail(email));
     }
 
     /**
@@ -695,8 +652,6 @@ public class UserController {
      * @param request the {@link DeactivateUserRequestDto} containing deactivation
      *                information.
      * @return ResponseEntity indicating the success of the deactivation operation.
-     *
-     * @author Kizerov Dmytro
      */
     @Operation(summary = "Deactivate user indicating the reason for deactivation")
     @ApiResponses(value = {
@@ -713,7 +668,7 @@ public class UserController {
         @Valid @RequestBody DeactivateUserRequestDto request) {
         UserDeactivationReasonDto userDeactivationDto = userService.deactivateUser(uuid, request, userVO);
         emailService.sendReasonOfDeactivation(userDeactivationDto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -722,7 +677,6 @@ public class UserController {
      * @param userVO {@link UserVO} the current user that wants to get his profile
      *               language
      * @return current user language {@link String}.
-     * @author Vlad Pikhotskyi
      */
     @Operation(summary = "Get the current User language")
     @ApiResponses(value = {
@@ -732,7 +686,24 @@ public class UserController {
     })
     @GetMapping("/lang")
     public ResponseEntity<String> getUserLang(@Parameter(hidden = true) @CurrentUser UserVO userVO) {
-        return ResponseEntity.status(HttpStatus.OK).body(userVO.getLanguageVO().getCode());
+        return ResponseEntity.ok().body(userVO.getLanguageVO().getCode());
+    }
+
+    /**
+     * Method for getting user language.
+     *
+     * @param uuid uuid of user.
+     * @return user language.
+     */
+    @Operation(summary = "Get the current User language")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
+    })
+    @GetMapping("/findUserLanguageByUuid")
+    public ResponseEntity<String> findUserLanguageByUuid(@RequestParam String uuid) {
+        return ResponseEntity.ok().body(userService.findUserLanguageByUuid(uuid));
     }
 
     /**
@@ -743,7 +714,6 @@ public class UserController {
      * @param adminLang {@link String} - current administrator language.
      * @return {@link List} of {@link String} - reasons for deactivation of the
      *         current user.
-     * @author Vlad Pikhotskyi
      */
     @Operation(summary = "Get list reasons of deactivating the user")
     @ApiResponses(value = {
@@ -754,8 +724,7 @@ public class UserController {
     @GetMapping("/reasons")
     public ResponseEntity<List<String>> getReasonsOfDeactivation(
         @RequestParam("id") Long id, @RequestParam("admin") String adminLang) {
-        List<String> list = userService.getDeactivationReason(id, adminLang);
-        return ResponseEntity.status(HttpStatus.OK).body(list);
+        return ResponseEntity.ok().body(userService.getDeactivationReason(id, adminLang));
     }
 
     /**
@@ -782,7 +751,6 @@ public class UserController {
      * Method for setting {@link UserVO}'s status to ACTIVATED.
      *
      * @param id of the searched {@link UserVO}.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Activate User")
     @ApiResponses(value = {
@@ -796,7 +764,7 @@ public class UserController {
     public ResponseEntity<Object> activateUser(@RequestParam Long id) {
         UserActivationDto userActivationDto = userService.setActivatedStatus(id);
         emailService.sendMessageOfActivation(userActivationDto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -805,7 +773,6 @@ public class UserController {
      *
      * @param listId {@link List} populated with ids of {@link UserVO} to be
      *               deleted.
-     * @author Orest Mamchuk
      */
     @Operation(summary = "Deactivate all users")
     @ApiResponses(value = {
@@ -816,7 +783,7 @@ public class UserController {
     })
     @PutMapping("/deactivateAll")
     public ResponseEntity<List<Long>> deactivateAllUsers(@RequestBody List<Long> listId) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.deactivateAllUsers(listId));
+        return ResponseEntity.ok().body(userService.deactivateAllUsers(listId));
     }
 
     /**
@@ -835,8 +802,7 @@ public class UserController {
     @PostMapping("/search")
     public ResponseEntity<PageableAdvancedDto<UserManagementVO>> search(@Parameter(hidden = true) Pageable pageable,
         @RequestBody UserManagementViewDto userViewDto) {
-        PageableAdvancedDto<UserManagementVO> found = userService.search(pageable, userViewDto);
-        return ResponseEntity.status(HttpStatus.OK).body(found);
+        return ResponseEntity.ok().body(userService.search(pageable, userViewDto));
     }
 
     /**
@@ -852,7 +818,7 @@ public class UserController {
     })
     @GetMapping("/findAllByEmailNotification")
     public ResponseEntity<List<UserVO>> findAllByEmailNotification(@RequestParam EmailNotification emailNotification) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllByEmailNotification(emailNotification));
+        return ResponseEntity.ok().body(userService.findAllByEmailNotification(emailNotification));
     }
 
     /**
@@ -868,7 +834,7 @@ public class UserController {
     })
     @PostMapping("/deleteDeactivatedUsers")
     public ResponseEntity<Integer> scheduleDeleteDeactivatedUsers() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.scheduleDeleteDeactivatedUsers());
+        return ResponseEntity.ok().body(userService.scheduleDeleteDeactivatedUsers());
     }
 
     /**
@@ -883,7 +849,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)})
     @GetMapping("/findAllUsersCities")
     public ResponseEntity<UserCityDto> findAllUsersCities(@Parameter(hidden = true) @CurrentUser UserVO userVO) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllUsersCities(userVO.getId()));
+        return ResponseEntity.ok().body(userService.findAllUsersCities(userVO.getId()));
     }
 
     /**
@@ -900,7 +866,7 @@ public class UserController {
     })
     @GetMapping("/findAllRegistrationMonthsMap")
     public ResponseEntity<Map<Integer, Long>> findAllRegistrationMonthsMap() {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findAllRegistrationMonthsMap());
+        return ResponseEntity.ok().body(userService.findAllRegistrationMonthsMap());
     }
 
     /**
@@ -918,14 +884,13 @@ public class UserController {
         @Parameter(hidden = true) Pageable page,
         @RequestParam String name,
         @Parameter(hidden = true) @CurrentUser UserVO userVO) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findUserByName(name, page, userVO.getId()));
+        return ResponseEntity.ok().body(userService.findUserByName(name, page, userVO.getId()));
     }
 
     /**
      * Get {@link UbsCustomerDto} by uuid.
      *
      * @return {@link UbsCustomerDto}.
-     * @author Struk Nazar
      */
     @Operation(summary = "Get User by Uuid")
     @ApiResponses(value = {
@@ -935,7 +900,7 @@ public class UserController {
     })
     @GetMapping("/findByUuId")
     public ResponseEntity<UbsCustomerDto> findByUuId(@RequestParam String uuid) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.findByUUid(uuid));
+        return ResponseEntity.ok().body(userService.findUbsCustomerDtoByUuid(uuid));
     }
 
     /**
@@ -943,7 +908,6 @@ public class UserController {
      *
      * @param uuid {@link String} - for found user.
      * @return {@link Boolean}.
-     * @author Maksym Golik
      */
     @Operation(summary = "Check the existence of the user by uuid")
     @ApiResponses(value = {
@@ -952,15 +916,13 @@ public class UserController {
     })
     @GetMapping("/checkByUuid")
     public ResponseEntity<Boolean> checkIfUserExistsByUuId(@RequestParam String uuid) {
-        return ResponseEntity.status(HttpStatus.OK).body(userService.checkIfUserExistsByUuid(uuid));
+        return ResponseEntity.ok().body(userService.checkIfUserExistsByUuid(uuid));
     }
 
     /**
      * Method for mark user like DEACTIVATED .
      *
      * @param uuid - for found user.
-     *
-     * @author Liubomyr Bratakh.
      */
     @Operation(summary = "mark user as DEACTIVATED")
     @ApiResponses(value = {
@@ -973,15 +935,13 @@ public class UserController {
     public ResponseEntity<Object> markUserAsDeactivated(
         @RequestParam @Parameter(hidden = true) String uuid) {
         userService.markUserAsDeactivated(uuid);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
      * Method for mark user like ACTIVATED .
      *
      * @param uuid - for found user.
-     *
-     * @author Oksana Spodaryk.
      */
     @Operation(summary = "mark user as ACTIVATED")
     @ApiResponses(value = {
@@ -995,15 +955,13 @@ public class UserController {
     public ResponseEntity<Object> markUserAsActivated(
         @RequestParam @Parameter(hidden = true) String uuid) {
         userService.markUserAsActivated(uuid);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
      * Controller to get information about all employee's authorities.
      *
      * @return @return Set of {@link String}
-     *
-     * @author Inna Yashna.
      */
     @Operation(summary = "Get information about all employee's authorities")
     @ApiResponses(value = {
@@ -1016,7 +974,7 @@ public class UserController {
     @GetMapping("/get-all-authorities")
     public ResponseEntity<Object> getAllAuthorities(@RequestParam String email) {
         Set<String> authorities = authorityService.getAllEmployeesAuthorities(email);
-        return ResponseEntity.status(HttpStatus.OK).body(authorities);
+        return ResponseEntity.ok().body(authorities);
     }
 
     /**
@@ -1025,8 +983,6 @@ public class UserController {
      *
      * @param email {@link String} - employee email.
      * @return {@link PositionAuthoritiesDto}
-     *
-     * @author Anton Bondar.
      */
     @Operation(summary = """
         Get information about an employee`s positions and all possible \
@@ -1041,15 +997,13 @@ public class UserController {
     })
     @GetMapping("/get-positions-authorities")
     public ResponseEntity<PositionAuthoritiesDto> getPositionsAndRelatedAuthorities(@RequestParam String email) {
-        return ResponseEntity.status(HttpStatus.OK).body(positionService.getPositionsAndRelatedAuthorities(email));
+        return ResponseEntity.ok().body(positionService.getPositionsAndRelatedAuthorities(email));
     }
 
     /**
      * Controller edit an employee`s authorities.
      *
      * @return {@link UserEmployeeAuthorityDto}
-     *
-     * @author Nataliia Hlazova.
      */
     @Operation(summary = "Edit an employee`s authorities")
     @ApiResponses(value = {
@@ -1063,7 +1017,7 @@ public class UserController {
     @PutMapping("/edit-authorities")
     public ResponseEntity<Object> editAuthorities(@Valid @RequestBody UserEmployeeAuthorityDto dto) {
         authorityService.updateEmployeesAuthorities(dto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -1071,7 +1025,6 @@ public class UserController {
      *
      * @param dto - UpdateEmployeeAuthoritiesDto.
      * @return {@link HttpStatus} - Http status code.
-     * @author Nikita Korzh.
      */
     @Operation(summary = "Update an employee`s authorities to related positions")
     @ApiResponses(value = {
@@ -1085,14 +1038,13 @@ public class UserController {
     public ResponseEntity<HttpStatus> updateAuthoritiesToRelatedPositions(
         @Valid @RequestBody EmployeePositionsDto dto) {
         authorityService.updateAuthoritiesToRelatedPositions(dto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
      * Controller that deactivate employee by uuid.
      *
      * @param uuid - uuid of Employee.
-     * @author Nikita Korzh.
      */
     @Operation(summary = "Deactivate employee by uuid")
     @ApiResponses(value = {
@@ -1105,7 +1057,7 @@ public class UserController {
     @PutMapping("/deactivate-employee")
     public ResponseEntity<HttpStatus> deactivateEmployee(@RequestParam String uuid) {
         userService.markUserAsDeactivated(uuid);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -1115,8 +1067,6 @@ public class UserController {
      *                         information.
      * @return A ResponseEntity with HTTP status indicating the success of the
      *         update operation.
-     *
-     * @author Oksana Spodaryk.
      */
     @Operation(summary = "Update an employee's rating information.")
     @ApiResponses(value = {
@@ -1129,6 +1079,6 @@ public class UserController {
     @PutMapping("/user-rating")
     public ResponseEntity<HttpStatus> updateUserRating(@Valid @RequestBody UserAddRatingDto userAddRatingDto) {
         userService.updateUserRating(userAddRatingDto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 }

@@ -7,6 +7,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
@@ -29,7 +30,6 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
-import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -43,9 +43,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Provides the interface to manage {UserVO} entity.
- *
- * @author Nazar Stasyuk and Rostyslav && Yurii Koval
- * @version 1.0
  */
 public interface UserService {
     /**
@@ -93,7 +90,6 @@ public interface UserService {
      * Method that allow you to save new {@link UserVO}.
      *
      * @param user a value of {@link UserVO}
-     * @author Yurii Koval
      */
     UserVO save(UserVO user);
 
@@ -126,7 +122,6 @@ public interface UserService {
      *
      * @param email - {@link UserVO}'s email
      * @return {@link Optional} of found {@link UserVO}.
-     * @author Vasyl Zhovnir
      */
     Optional<UserVO> findNotDeactivatedByEmail(String email);
 
@@ -135,7 +130,6 @@ public interface UserService {
      *
      * @param email - {@link UserVO} email
      * @return {@link UserVO} id
-     * @author Zakhar Skaletskyi
      */
     Long findIdByEmail(String email);
 
@@ -153,7 +147,6 @@ public interface UserService {
      * @param id   {@link UserVO} id.
      * @param role {@link Role} for user.
      * @return {@link UserRoleDto}
-     * @author Rostyslav Khasanov
      */
     UserRoleDto updateRole(Long id, Role role, String email);
 
@@ -163,7 +156,6 @@ public interface UserService {
      * @param id         {@link UserVO} id.
      * @param userStatus {@link UserStatus} for user.
      * @return {@link UserStatusDto}
-     * @author Rostyslav Khasanov
      */
     UserStatusDto updateStatus(Long id, UserStatus userStatus, String email);
 
@@ -172,7 +164,6 @@ public interface UserService {
      *
      * @param pageable a value with pageable configuration.
      * @return a dto of {@link PageableDto}.
-     * @author Rostyslav Khasanov
      */
     PageableDto<UserForListDto> findByPage(Pageable pageable);
 
@@ -181,7 +172,6 @@ public interface UserService {
      *
      * @param pageable a value with pageable configuration.
      * @return a dto of {@link PageableAdvancedDto}.
-     * @author Vasyl Zhovnir
      */
     PageableAdvancedDto<UserManagementDto> findUserForManagementByPage(Pageable pageable);
 
@@ -190,7 +180,6 @@ public interface UserService {
      *
      * @param dto - dto {@link UserManagementDto} with updated fields for updating
      *            {@link UserVO}.
-     * @author Vasyl Zhovnir
      */
     void updateUser(Long userId, UserManagementUpdateDto dto);
 
@@ -198,7 +187,6 @@ public interface UserService {
      * The method which return array of user role by user id.
      *
      * @return {@link RoleDto}.
-     * @author Rostyslav Khasanov
      */
     RoleDto getRoles(Long id);
 
@@ -216,7 +204,6 @@ public interface UserService {
      *                      parameters of the returned list.
      * @param pageable      pageable configuration.
      * @return {@link PageableDto}.
-     * @author Rostyslav Khasanov.
      */
     PageableDto<UserForListDto> getUsersByFilter(FilterUserDto filterUserDto, Pageable pageable);
 
@@ -225,7 +212,6 @@ public interface UserService {
      *
      * @param email - email of user.
      * @return {@link UserUpdateDto}.
-     * @author Nazar Stasyuk
      */
     UserUpdateDto getUserUpdateDtoByEmail(String email);
 
@@ -235,7 +221,6 @@ public interface UserService {
      * @param dto   {@link UserUpdateDto} - dto with new {@link UserVO} params.
      * @param email {@link String} - email of user that need to update.
      * @return {@link UserVO}.
-     * @author Nazar Stasyuk
      */
     UserUpdateDto update(UserUpdateDto dto, String email);
 
@@ -244,7 +229,6 @@ public interface UserService {
      *
      * @param newEmployeeEmail {@link String} - new employee's email.
      * @param uuid             {@link String} - uuid of employee.
-     * @author Inna Yashna
      */
     void updateEmployeeEmail(String newEmployeeEmail, String uuid);
 
@@ -263,7 +247,6 @@ public interface UserService {
      *
      * @param userId id of the {@link UserVO} current user.
      * @return List of {@link CustomShoppingListItemResponseDto}
-     * @author Bogdan Kuzenko
      */
     List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId, Long habitID);
 
@@ -271,7 +254,6 @@ public interface UserService {
      * Counts all users by user {@link UserStatus} ACTIVATED.
      *
      * @return amount of users with {@link UserStatus} ACTIVATED.
-     * @author Shevtsiv Rostyslav
      */
     long getActivatedUsersAmount();
 
@@ -282,7 +264,6 @@ public interface UserService {
      * @param email  {@link String} - email of user that need to update.
      * @param base64 {@link String} - picture in base 64 format.
      * @return {@link UserVO}.
-     * @author Marian Datsko
      */
     UserVO updateUserProfilePicture(MultipartFile image, String email,
         String base64);
@@ -296,8 +277,6 @@ public interface UserService {
 
     /**
      * Save user profile information {@link UserVO}.
-     *
-     * @author Marian Datsko
      */
     String saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String name);
 
@@ -305,7 +284,6 @@ public interface UserService {
      * The method checks by id if a {@link UserVO} is online.
      *
      * @param userId - {@link UserVO}'s id
-     * @author Yurii Zhurakovskyi
      */
     boolean checkIfTheUserIsOnline(Long userId);
 
@@ -313,7 +291,6 @@ public interface UserService {
      * Method return user profile information {@link UserVO}.
      *
      * @param userId - {@link UserVO}'s id
-     * @author Marian Datsko
      */
     UserProfileDtoResponse getUserProfileInformation(Long userId);
 
@@ -321,7 +298,6 @@ public interface UserService {
      * Method return user profile statistics {@link UserVO}.
      *
      * @param userId - {@link UserVO}'s id
-     * @author Marian Datsko
      */
     UserProfileStatisticsDto getUserProfileStatistics(Long userId);
 
@@ -329,7 +305,6 @@ public interface UserService {
      * Get user and six friends with the online status {@link UserVO}.
      *
      * @param userId {@link Long}
-     * @author Yurii Zhurakovskyi
      */
     UserAndFriendsWithOnlineStatusDto getUserAndSixFriendsWithOnlineStatus(Long userId);
 
@@ -337,7 +312,6 @@ public interface UserService {
      * Get user and all friends with the online status {@link UserVO} by page.
      *
      * @param userId {@link Long}
-     * @author Yurii Zhurakovskyi
      */
     UserAndAllFriendsWithOnlineStatusDto getAllFriendsWithTheOnlineStatus(Long userId, Pageable pageable);
 
@@ -346,7 +320,6 @@ public interface UserService {
      *
      * @param listId {@link List} of {@link UserVO}s` ids to be deactivated
      * @return {@link List} of {@link UserVO}s` ids
-     * @author Vasyl Zhovnir
      */
     List<Long> deactivateAllUsers(List<Long> listId);
 
@@ -354,7 +327,6 @@ public interface UserService {
      * change {@link UserVO}'s status to ACTIVATE.
      *
      * @param id {@link UserVO}'s id
-     * @author Vasyl Zhovnir
      */
     UserActivationDto setActivatedStatus(Long id);
 
@@ -400,8 +372,6 @@ public interface UserService {
      * @param userVO  {@link UserVO} who send deactivation request.
      * @param uuid    {@link UserVO}'s uuid.
      * @param request {@link DeactivateUserRequestDto} deactivated information.
-     *
-     * @author Kizerov Dmytro
      */
     UserDeactivationReasonDto deactivateUser(String uuid, DeactivateUserRequestDto request, UserVO userVO);
 
@@ -412,7 +382,6 @@ public interface UserService {
      * @param id        {@link Long} - user's id.
      * @param adminLang {@link String} - current administrator language.
      * @return {@link List} of {@link String}.
-     * @author Vlad Pikhotskyi
      */
     List<String> getDeactivationReason(Long id, String adminLang);
 
@@ -428,28 +397,21 @@ public interface UserService {
      * Method that return UserVo by UUid.
      *
      * @return {@link UserVO}
-     * @author Struk Nazar
      */
-    UbsCustomerDto findByUUid(String uuid);
+    UbsCustomerDto findUbsCustomerDtoByUuid(String uuid);
 
     /**
      * Method that mark User Deactivated.
-     *
-     * @author Bratakh Liubomyr
      */
     void markUserAsDeactivated(String uuid);
 
     /**
      * Method that mark User Activated.
-     *
-     * @author Oksana Spodaryk
      */
     void markUserAsActivated(String uuid);
 
     /**
      * Method find user with admin authority.
-     *
-     * @author Ihor Volianskyi
      */
     UserVO findAdminById(Long id);
 
@@ -458,7 +420,6 @@ public interface UserService {
      *
      * @param uuid {@link String} - for found user.
      * @return {@link Boolean}.
-     * @author Maksym Golik
      */
     Boolean checkIfUserExistsByUuid(String uuid);
 
@@ -467,7 +428,6 @@ public interface UserService {
      *
      * @param email                - {@link UserVO}'s email.
      * @param userLastActivityTime - new {@link UserVO}'s last activity time.
-     * @author Anton Bondar.
      */
     void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime);
 
@@ -477,7 +437,14 @@ public interface UserService {
      * @param request {@link UsersOnlineStatusRequestDto} - request with current
      *                user ID and list of Users ID whose statuses need to be
      *                checked.
-     * @author Anton Bondar.
      */
     void checkUsersOnlineStatus(UsersOnlineStatusRequestDto request);
+
+    /**
+     * Method for getting user language.
+     *
+     * @param uuid user uuid.
+     * @return user language.
+     */
+    String findUserLanguageByUuid(String uuid);
 }
