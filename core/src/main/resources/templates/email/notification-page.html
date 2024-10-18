@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html th:lang="${language}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title th:text="${title}"></title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F5F6F6;
+        }
+
+        .email-container {
+            font-family: Lato, sans-serif;
+            font-size: 16px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #E3E6E8;
+        }
+
+        .color-ubs {
+            background-color: #87BC1E;
+            border-color: #87BC1E;
+            color: #87BC1E !important;
+        }
+
+        .header-ubs {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .header-image-ubs {
+            height: 80px;
+            vertical-align: bottom;
+        }
+
+        .content {
+            padding: 26px;
+            text-align: left;
+            color: #333333 !important;
+        }
+
+        .top-text {
+            margin-top: 0;
+            color: #333333 !important;
+        }
+
+        .main-text {
+            line-height: 1.4;
+            color: #333333 !important;
+        }
+
+        .bottom-text {
+            margin-bottom: 0;
+            color: #333333 !important;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #666666;
+            background-color: #CACFD3;
+        }
+
+        @media only screen and (max-width: 600px) {
+            body {
+                font-size: 13px;
+            }
+
+            .header-ubs {
+                padding: 10px;
+            }
+
+            .header-image-ubs {
+                height: 60px;
+            }
+
+            .footer {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <div class="header-ubs color-ubs">
+        <a th:href="${clientLink}" target="_blank">
+            <img class="header-image-ubs" src="https://csb10032000a548f571.blob.core.windows.net/allfiles/76e03102-a814-45bf-9544-b1971dab4ccc%D0%9B%D0%BE%D0%B3%D0%BE_%D0%BA%D0%BE%D0%BB%D0%BE.png" alt="Logo">
+        </a>
+    </div>
+
+    <div class="content">
+        <p class="top-text">
+            <b th:text="#{hi.user(${name})}"></b>
+        </p>
+
+        <p class="main-text">
+            <span th:text="${body}"></span>
+        </p>
+
+        <p class="bottom-text" th:text="#{sincerely.yours.Ubs}"></p>
+    </div>
+
+    <div class="footer">
+        <p th:text="#{advice.general.ubs}"></p>
+    </div>
+</div>
+</body>
+</html>

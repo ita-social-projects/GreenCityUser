@@ -192,7 +192,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendVerificationEmail(Long id, String name, String email, String token, String language,
         boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
-        String baseLink = clientLink + "#/" + (isUbs ? "ubs" : "");
+        String baseLink = clientLink + "/#" + (isUbs ? "/ubs" : "");
         model.put(EmailConstants.CLIENT_LINK, baseLink);
         model.put(EmailConstants.USER_NAME, name);
         model.put(EmailConstants.VERIFY_ADDRESS, baseLink + "?token=" + token + PARAM_USER_ID + id);
@@ -217,7 +217,7 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, name);
-        model.put(EmailConstants.APPROVE_REGISTRATION, clientLink + "#/auth/restore?" + "token=" + token
+        model.put(EmailConstants.APPROVE_REGISTRATION, clientLink + "/#/auth/restore?token=" + token
             + PARAM_USER_ID + userId);
         model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.USER_APPROVAL_EMAIL_PAGE);
@@ -330,11 +330,18 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendNotificationByEmail(NotificationDto notification, String email) {
-        if (userRepo.findByEmail(email).isPresent()) {
-            sendEmail(email, notification.getTitle(), notification.getBody());
-        } else {
-            throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
-        }
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink + "/#/ubs");
+        model.put(EmailConstants.USER_NAME, user.getName());
+        model.put(EmailConstants.LANGUAGE, user.getLanguage().getCode());
+        model.put(EmailConstants.TITLE, notification.getTitle());
+        model.put(EmailConstants.BODY, notification.getBody());
+
+        String template = createEmailTemplate(model, EmailConstants.NOTIFICATION_PAGE);
+        sendEmail(email, notification.getTitle(), template);
     }
 
     @Override
