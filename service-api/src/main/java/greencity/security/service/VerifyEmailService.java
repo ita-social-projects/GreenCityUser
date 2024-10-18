@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 
 /**
  * Service that does email verification.
- *
- * @author Yurii Koval
- * @version 2.0
  */
 public interface VerifyEmailService {
     /**

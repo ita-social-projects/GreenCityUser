@@ -8,7 +8,6 @@ import greencity.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -82,8 +81,7 @@ public class EmailController {
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PostMapping("/scheduled/notification")
-    public ResponseEntity<Void> sendScheduledNotification(
-        @RequestBody @Valid ScheduledEmailMessage message) {
+    public ResponseEntity<Void> sendScheduledNotification(@RequestBody ScheduledEmailMessage message) {
         emailService.sendScheduledNotificationEmail(message);
         return ResponseEntity.ok().build();
     }

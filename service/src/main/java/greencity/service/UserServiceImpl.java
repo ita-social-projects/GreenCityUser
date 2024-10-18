@@ -74,7 +74,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -125,8 +124,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserRating(UserAddRatingDto userRatingDto) {
-        var user = userRepo.findById(userRatingDto.getId())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        User user = findUserById(userRatingDto.getId());
         user.setRating(user.getRating() + userRatingDto.getRating());
         userRepo.save(user);
     }
@@ -136,9 +134,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserVO findById(Long id) {
-        User user = userRepo.findById(id)
-            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
-        return modelMapper.map(user, UserVO.class);
+        return modelMapper.map(findUserById(id), UserVO.class);
     }
 
     /**
@@ -205,7 +201,6 @@ public class UserServiceImpl implements UserService {
      *
      * @param dto  - dto {@link UserManagementDto} with updated fields.
      * @param user {@link UserVO} to be updated.
-     * @author Vasyl Zhovnir
      */
     private void updateUserFromDto(UserManagementUpdateDto dto, User user) {
         user.setName(dto.getName());
@@ -248,16 +243,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UbsTableCreationDto createUbsRecord(UserVO currentUser) {
-        User user = userRepo.findById(currentUser.getId()).orElseThrow(
-            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        String uuid = user.getUuid();
-
-        return UbsTableCreationDto.builder().uuid(uuid).build();
+        return new UbsTableCreationDto(findUserById(currentUser.getId()).getUuid());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private PageableAdvancedDto<UserManagementVO> buildPageableAdvanceDtoFromPage(Page<User> pageTags) {
         List<UserManagementVO> usersVOs = pageTags.getContent().stream()
             .map(t -> modelMapper.map(t, UserManagementVO.class))
@@ -271,18 +259,12 @@ public class UserServiceImpl implements UserService {
             pageTags.isFirst(), pageTags.isLast());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private UserSpecification buildSpecification(UserManagementViewDto userViewDto) {
         List<SearchCriteria> searchCriteriaList = buildSearchCriteriaList(userViewDto);
 
         return new UserSpecification(searchCriteriaList);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private List<SearchCriteria> buildSearchCriteriaList(UserManagementViewDto userViewDto) {
         List<SearchCriteria> searchCriteriaList = new ArrayList<>();
         setValueIfNotEmpty(searchCriteriaList, "id", userViewDto.getId());
@@ -294,9 +276,6 @@ public class UserServiceImpl implements UserService {
         return searchCriteriaList;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     private void setValueIfNotEmpty(List<SearchCriteria> searchCriteria, String key, String value) {
         if (StringUtils.hasText(value)) {
             searchCriteria.add(SearchCriteria.builder()
@@ -322,8 +301,6 @@ public class UserServiceImpl implements UserService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Zakhar Skaletskyi
      */
     @Override
     public Long findIdByEmail(String email) {
@@ -356,7 +333,17 @@ public class UserServiceImpl implements UserService {
 
     private User findUserById(Long id) {
         return userRepo.findById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+    }
+
+    private User findUserByUuid(String uuid) {
+        return userRepo.findUserByUuid(uuid)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+    }
+
+    private User findUserByEmail(String email) {
+        return userRepo.findByEmail(email)
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
     }
 
     private void checkIfUserCanUpdate(User user, String email) {
@@ -372,8 +359,7 @@ public class UserServiceImpl implements UserService {
     public UserStatusDto updateStatus(Long id, UserStatus userStatus, String email) {
         checkUpdatableUser(id, email);
         accessForUpdateUserStatus(id, email);
-        User user =
-            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        User user = findUserById(id);
         user.setUserStatus(userStatus);
         return modelMapper.map(userRepo.save(user), UserStatusDto.class);
     }
@@ -383,30 +369,22 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public RoleDto getRoles(Long id) {
-        User user = userRepo.findById(id).orElseThrow(
-            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-
-        Role role = user.getRole();
-        return RoleDto.builder()
-            .roles(new Role[] {role})
-            .build();
+        Role role = findUserById(id).getRole();
+        return new RoleDto(new Role[] {role});
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @author Nazar Vladyka
      */
     @Override
     public EmailNotification getEmailNotificationsStatuses(String email) {
-        User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        return user.getEmailNotification();
+        return findUserByEmail(email).getEmailNotification();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public PageableDto<UserForListDto> getUsersByFilter(FilterUserDto filterUserDto, Pageable pageable) {
         Page<User> users = userRepo.findAll(new UserFilter(filterUserDto), pageable);
         List<UserForListDto> userForListDtos =
@@ -425,10 +403,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserUpdateDto getUserUpdateDtoByEmail(String email) {
-        return modelMapper.map(
-            userRepo.findByEmail(email)
-                .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email)),
-            UserUpdateDto.class);
+        return modelMapper.map(findUserByEmail(email), UserUpdateDto.class);
     }
 
     /**
@@ -450,8 +425,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateEmployeeEmail(String newEmployeeEmail, String uuid) {
-        User user = userRepo.findUserByUuid(uuid).orElseThrow(
-            () -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+        User user = findUserByUuid(uuid);
         if (!user.getEmail().equals(newEmployeeEmail)) {
             if (userRepo.existsUserByEmail(newEmployeeEmail)) {
                 throw new BadRequestException("This email is already in use");
@@ -475,7 +449,6 @@ public class UserServiceImpl implements UserService {
      *
      * @param id    id of updatable user.
      * @param email email of admin/moderator.
-     * @author Rostyslav Khasanov
      */
     private void checkUpdatableUser(Long id, String email) {
         UserVO user = findByEmail(email);
@@ -490,7 +463,6 @@ public class UserServiceImpl implements UserService {
      *
      * @param id    id of updatable user.
      * @param email email of admin/moderator.
-     * @author Rostyslav Khasanov
      */
     private void accessForUpdateUserStatus(Long id, String email) {
         UserVO user = findByEmail(email);
@@ -504,8 +476,6 @@ public class UserServiceImpl implements UserService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Bogdan Kuzenko
      */
     @Transactional
     @Override
@@ -522,13 +492,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Update user profile picture {@link UserVO}.
-     *
-     * @param image  {@link MultipartFile}
-     * @param email  {@link String} - email of user that need to update.
-     * @param base64 {@link String} - picture in base 64 format.
-     * @return {@link UserVO}.
-     * @author Marian Datsko
+     * {@inheritDoc}
      */
     @Override
     public UserVO updateUserProfilePicture(MultipartFile image, String email, String base64) {
@@ -553,9 +517,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Delete user profile picture {@link UserVO}.
-     *
-     * @param email {@link String} - email of user that need to update.
+     * {@inheritDoc}
      */
     @Override
     public void deleteUserProfilePicture(String email) {
@@ -567,9 +529,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Save user profile information {@link UserVO}.
-     *
-     * @author Marian Datsko
+     * {@inheritDoc}
      */
     @Override
     public String saveUserProfile(UserProfileDtoRequest userProfileDtoRequest, String email) {
@@ -733,9 +693,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Method return user profile information {@link UserVO}.
-     *
-     * @author Marian Datsko
+     * {@inheritDoc}
      */
     @Override
     public UserProfileDtoResponse getUserProfileInformation(Long userId) {
@@ -752,11 +710,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * The method checks by id if a {@link UserVO} is online.
-     *
-     * @param userId {@link Long}
-     * @return {@link Boolean}.
-     * @author Yurii Zhurakovskyi
+     * {@inheritDoc}
      */
     @Override
     public boolean checkIfTheUserIsOnline(Long userId) {
@@ -775,11 +729,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Method return user profile statistics {@link UserVO}.
-     *
-     * @param userId - {@link UserVO}'s id
-     * @author Marian Datsko
-     * @author Olena Sotnik
+     * {@inheritDoc}
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
@@ -798,10 +748,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Get user and six friends with the online status {@link UserVO}.
-     *
-     * @param userId {@link Long}
-     * @author Yurii Zhurakovskyi
+     * {@inheritDoc}
      */
     @Override
     public UserAndFriendsWithOnlineStatusDto getUserAndSixFriendsWithOnlineStatus(Long userId) {
@@ -824,11 +771,7 @@ public class UserServiceImpl implements UserService {
     }
 
     /**
-     * Get user and all friends with the online status {@link UserVO} by page.
-     *
-     * @param userId   {@link Long}
-     * @param pageable {@link Pageable }
-     * @author Yurii Zhurakovskyi
+     * {@inheritDoc}
      */
     @Override
     public UserAndAllFriendsWithOnlineStatusDto getAllFriendsWithTheOnlineStatus(Long userId, Pageable pageable) {
@@ -857,11 +800,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDeactivationReasonDto deactivateUser(String uuid, DeactivateUserRequestDto request, UserVO userVO) {
-        User requestedUser = userRepo.findById(userVO.getId())
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userVO.getId()));
-
-        User foundUser = userRepo.findUserByUuid(uuid)
-            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+        User requestedUser = findUserById(userVO.getId());
+        User foundUser = findUserByUuid(uuid);
 
         if (requestedUser.getId().equals(foundUser.getId())) {
             if (requestedUser.getRole().equals(Role.ROLE_USER)) {
@@ -954,11 +894,13 @@ public class UserServiceImpl implements UserService {
         return result;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public UserActivationDto setActivatedStatus(Long id) {
-        User foundUser =
-            userRepo.findById(id).orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+        User foundUser = findUserById(id);
         foundUser.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(foundUser);
         return UserActivationDto.builder()
@@ -975,8 +917,7 @@ public class UserServiceImpl implements UserService {
     public void updateUserLanguage(Long userId, Long languageId) {
         Language language = languageRepo.findById(languageId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
-        User user = userRepo.findById(userId)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+        User user = findUserById(userId);
         user.setLanguage(language);
         userRepo.save(user);
     }
@@ -1076,39 +1017,43 @@ public class UserServiceImpl implements UserService {
         return recommendedFriends;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public UbsCustomerDto findByUUid(String uuid) {
-        Optional<User> optionalUser = userRepo.findUserByUuid(uuid);
-        return optionalUser.map(user -> modelMapper.map(user, UbsCustomerDto.class)).orElse(null);
+    public UbsCustomerDto findUbsCustomerDtoByUuid(String uuid) {
+        return modelMapper.map(findUserByUuid(uuid), UbsCustomerDto.class);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void markUserAsDeactivated(String uuid) {
-        User user = userRepo.findUserByUuid(uuid).orElseThrow(
-            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
+        User user = findUserByUuid(uuid);
         user.setUserStatus(UserStatus.DEACTIVATED);
         userRepo.save(user);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void markUserAsActivated(String uuid) {
-        User user = userRepo.findUserByUuid(uuid).orElseThrow(
-            () -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID));
+        User user = findUserByUuid(uuid);
         user.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(user);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public UserVO findAdminById(Long id) {
-        User user = userRepo.findById(id)
-            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-
-        boolean isAdmin = user.getRole().equals(Role.ROLE_ADMIN);
-
-        if (isAdmin) {
+        User user = findUserById(id);
+        if (user.getRole() == Role.ROLE_ADMIN) {
             return modelMapper.map(user, UserVO.class);
         }
-
         throw new LowRoleLevelException("You do not have authorities");
     }
 
@@ -1133,11 +1078,17 @@ public class UserServiceImpl implements UserService {
         return userRepo.findUserByUuid(uuid).isPresent();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime) {
         userRepo.updateUserLastActivityTimeByEmail(email, userLastActivityTime);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public void checkUsersOnlineStatus(UsersOnlineStatusRequestDto request) {
@@ -1152,5 +1103,13 @@ public class UserServiceImpl implements UserService {
 
         messagingTemplate.convertAndSend("/topic/" + request.getCurrentUserId() + "/usersOnlineStatus",
             usersWithOnlineStatus);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String findUserLanguageByUuid(String uuid) {
+        return findUserByUuid(uuid).getLanguage().getCode();
     }
 }

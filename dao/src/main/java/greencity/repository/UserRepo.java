@@ -39,7 +39,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param pageable pageable configuration.
      * @return {@link Page}
-     * @author Rostyslav Khasanov
      */
     Page<User> findAll(Pageable pageable);
 
@@ -48,7 +47,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param email - User email
      * @return User id
-     * @author Zakhar Skaletskyi
      */
     @Query("SELECT id FROM User WHERE email=:email")
     Optional<Long> findIdByEmail(String email);
@@ -67,7 +65,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param email - {@link User}'s email
      * @return found {@link User}
-     * @author Vasyl Zhovnir
      */
     @Query("FROM User WHERE email=:email AND userStatus <> 1")
     Optional<User> findNotDeactivatedByEmail(String email);
@@ -86,7 +83,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param refreshTokenKey - new refresh token key
      * @param id              - user's id
      * @return - number of updated rows
-     * @author Yurii Koval
      */
     @Modifying
     @Query(value = "UPDATE User SET refreshTokenKey=:refreshTokenKey WHERE id=:id")
@@ -116,7 +112,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param pageable pageable configuration.
      * @return {@link Page}
-     * @author Yurii Yhurakovskyi
      */
     @Query(nativeQuery = true, value = """
         SELECT * FROM users WHERE users.id IN ( \
@@ -141,7 +136,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param userId - {@link User}'s id
      * @return {@link Date}
-     * @author Yurii Zhurakovskyi
      */
     @Query(nativeQuery = true,
         value = "SELECT last_activity_time FROM users WHERE id=:userId")
@@ -152,7 +146,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * visited the site 2 years ago.
      *
      * @return number of deleted rows
-     * @author Vasyl Zhovnir
      **/
     @Modifying
     @Query(nativeQuery = true, value = """
@@ -165,7 +158,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * Set {@link User}s' statuses to 'DEACTIVATED'.
      *
      * @param ids - {@link List} of ids of {@link User} to be 'DEACTIVATED'
-     * @author Vasyl Zhovnir
      **/
     @Modifying
     @Query(value = "UPDATE User SET userStatus = 1 where id IN(:ids)")
@@ -221,9 +213,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param uuid - User uuid
      * @return User
-     * @author Nazar Struk
      */
-
     Optional<User> findUserByUuid(String uuid);
 
     /**
@@ -248,7 +238,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param email                - {@link User}'s email.
      * @param userLastActivityTime - new {@link User}'s last activity time.
-     * @author Anton Bondar.
      */
     @Modifying
     @Transactional
@@ -260,7 +249,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param usersId {@link Long} - list of users IDs.
      * @return list of {@link User}.
-     * @author Anton Bondar.
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users where users.id in (:usersId)")
     List<User> getAllUsersByUsersId(List<Long> usersId);

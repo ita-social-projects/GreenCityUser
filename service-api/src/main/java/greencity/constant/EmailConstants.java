@@ -39,6 +39,7 @@ public class EmailConstants {
     public static final String TITLE = "title";
     public static final String BODY = "body";
     public static final String UNLOCK_USER_LINK = "unlockUserLink";
+    public static final String NOTIFICATIONS_LINK = "notificationsLink";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";

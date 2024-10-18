@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * {@inheritDoc}
+ * The class provides implementation of the {@code VerifyEmailService}.
  */
 @Service
 @Slf4j
@@ -43,8 +43,7 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
 
-        VerifyEmail verifyEmail = verifyEmailRepo
-            .findByTokenAndUserId(userId, token)
+        VerifyEmail verifyEmail = verifyEmailRepo.findByTokenAndUserId(userId, token)
             .orElseThrow(() -> new BadVerifyEmailTokenException(
                 ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN));
 

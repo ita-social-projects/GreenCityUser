@@ -271,10 +271,11 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendScheduledNotificationEmail(ScheduledEmailMessage message) {
         Map<String, Object> model = new HashMap<>();
-        String language = message.getLanguage();
-        model.put(EmailConstants.CLIENT_LINK, message.getBaseLink());
+        model.put(EmailConstants.IS_UBS, message.isUbs());
+        model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(message.isUbs()));
+        model.put(EmailConstants.NOTIFICATIONS_LINK, message.getBaseLink());
         model.put(EmailConstants.USER_NAME, message.getUsername());
-        model.put(EmailConstants.LANGUAGE, language);
+        model.put(EmailConstants.LANGUAGE, message.getLanguage());
         model.put(EmailConstants.TITLE, message.getSubject());
         model.put(EmailConstants.BODY, message.getBody());
         model.put(EmailConstants.PROFILE_LINK, getProfileLink());

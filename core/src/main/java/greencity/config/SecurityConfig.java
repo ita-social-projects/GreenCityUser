@@ -173,6 +173,7 @@ public class SecurityConfig {
                     "/user/markUserAsActivated")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
+                    "/user/findUserLanguageByUuid",
                     "/user/get-all-authorities",
                     "/user/get-positions-authorities")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
