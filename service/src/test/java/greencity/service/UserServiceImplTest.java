@@ -1489,7 +1489,7 @@ class UserServiceImplTest {
         when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(new User()));
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.empty());
 
-        assertThrows(WrongIdException.class, () -> userService.deactivateUser(uuid, request, userVO));
+        assertThrows(NotFoundException.class, () -> userService.deactivateUser(uuid, request, userVO));
     }
 
     @Test
