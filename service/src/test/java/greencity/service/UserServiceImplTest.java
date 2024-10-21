@@ -82,7 +82,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -287,7 +286,7 @@ class UserServiceImplTest {
     void updateEmployeeEmailThrowsUsernameNotFoundExceptionTest() {
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.empty());
-        assertThrows(UsernameNotFoundException.class,
+        assertThrows(NotFoundException.class,
             () -> userService.updateEmployeeEmail("test@mail.com", uuid));
         verify(userRepo).findUserByUuid(uuid);
     }
@@ -1261,12 +1260,12 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findByUUidTest() {
+    void findUbsCustomerDtoByUuidTest() {
         String uuid = "444e66e8-8daa-4cb0-8269-a8d856e7dd15";
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(user1));
         when(modelMapper.map(Optional.of(user1), UbsCustomerDto.class)).thenReturn(ubsCustomerDto);
-        when(userService.findByUUid(uuid)).thenReturn(ubsCustomerDto);
-        assertEquals(ubsCustomerDto, userService.findByUUid(uuid));
+        when(userService.findUbsCustomerDtoByUuid(uuid)).thenReturn(ubsCustomerDto);
+        assertEquals(ubsCustomerDto, userService.findUbsCustomerDtoByUuid(uuid));
     }
 
     @Test
@@ -1334,7 +1333,7 @@ class UserServiceImplTest {
         when(userRepo.findById(1L)).thenReturn(Optional.empty());
         Exception thrown = assertThrows(NotFoundException.class,
             () -> userService.createUbsRecord(userVO));
-        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, thrown.getMessage());
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID + 1L, thrown.getMessage());
         verify(userRepo).findById(1L);
     }
 
@@ -1490,7 +1489,7 @@ class UserServiceImplTest {
         when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(new User()));
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.empty());
 
-        assertThrows(WrongIdException.class, () -> userService.deactivateUser(uuid, request, userVO));
+        assertThrows(NotFoundException.class, () -> userService.deactivateUser(uuid, request, userVO));
     }
 
     @Test
