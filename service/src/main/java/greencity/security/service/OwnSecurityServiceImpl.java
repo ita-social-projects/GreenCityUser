@@ -3,25 +3,46 @@ package greencity.security.service;
 import greencity.client.CloudFlareClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
-import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.security.CloudFlareRequest;
+import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.*;
+import greencity.entity.Language;
+import greencity.entity.OwnSecurity;
+import greencity.entity.RestorePasswordEmail;
+import greencity.entity.User;
+import greencity.entity.UserNotificationPreference;
+import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserBlockedException;
+import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.exception.exceptions.WrongCaptchaException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.*;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
+import greencity.security.dto.ownsecurity.OwnSignInDto;
+import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
@@ -48,7 +69,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * {@inheritDoc}
+ * The class provides implementation of the {@code OwnSecurityService}.
  */
 @Service
 @Slf4j
@@ -146,7 +167,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return VerifyEmail.builder()
             .user(user)
             .token(emailVerificationToken)
-            .expiryDate(calculateExpirationDateTime())
             .build();
     }
 
@@ -270,7 +290,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     /**
      * Checks if user has verified email. User is considered verified if there is no
      * VerifyEmail entity associated with his/her account.
-     * 
+     *
      * @param user - user to be checked
      * @return true if user has verified email, false otherwise
      */

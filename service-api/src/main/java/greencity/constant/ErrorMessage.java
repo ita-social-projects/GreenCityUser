@@ -5,7 +5,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class ErrorMessage {
     public static final String USER_NOT_FOUND_BY_ID = "The user does not exist by this id: ";
-    public static final String USER_ID_IS_NULL = "User id is null";
     public static final String USER_NOT_FOUND_BY_UUID = "The user does not exist by this uuid: ";
     public static final String USER_NOT_FOUND_BY_EMAIL = "The user does not exist by this email: ";
     public static final String USER_CANT_UPDATE_THEMSELVES = "User can't update themselves";
@@ -22,9 +21,7 @@ public class ErrorMessage {
     public static final String EXPIRED_GOOGLE_ID_TOKEN = "Google id token is not valid or expired. ";
     public static final String TRANSACTION_FAILED = "Transaction failed and rolled back due to restClient failure. ";
     public static final String BAD_FACEBOOK_TOKEN = "Bad facebook token";
-    public static final String NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN =
-        "No email found for verification with this token";
-    public static final String EMAIL_TOKEN_EXPIRED = "User late with verify. Token is invalid.";
+    public static final String VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED = "Verification token not found or expired.";
     public static final String PASSWORD_RESTORE_LINK_ALREADY_SENT =
         "Password restore link already sent, please check your email: ";
     public static final String REFRESH_TOKEN_NOT_VALID = "Refresh token not valid!";

@@ -58,7 +58,6 @@ import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserDeactivationException;
 import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongIdException;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
@@ -143,7 +142,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVOAchievement findUserForAchievement(Long id) {
         User user = userRepo.findUserForAchievement(id)
-            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + id));
         return modelMapper.map(user, UserVOAchievement.class);
     }
 
@@ -697,9 +696,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserProfileDtoResponse getUserProfileInformation(Long userId) {
-        User user = userRepo
-            .findById(userId)
-            .orElseThrow(() -> new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+        User user = findUserById(userId);
 
         UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
         if (user.getUserLocation() != null) {
@@ -715,7 +712,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean checkIfTheUserIsOnline(Long userId) {
         if (userRepo.findById(userId).isEmpty()) {
-            throw new WrongIdException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId);
+            throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId);
         }
         Optional<Timestamp> lastActivityTime = userRepo.findLastActivityTimeById(userId);
         if (lastActivityTime.isPresent()) {

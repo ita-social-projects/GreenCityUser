@@ -2,7 +2,6 @@ package greencity.security.controller;
 
 import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
-import static greencity.constant.ErrorMessage.NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN;
 import static greencity.constant.ErrorMessage.PASSWORD_DOES_NOT_MATCH;
 import static greencity.constant.ErrorMessage.REFRESH_TOKEN_NOT_VALID;
 import static greencity.constant.ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID;
@@ -36,10 +35,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -130,18 +131,19 @@ public class OwnSecurityController {
     /**
      * Method for verifying users email.
      *
-     * @param token - {@link String} this is token (hash) to verify user.
+     * @param token - {@link String} this is token to verify user.
      * @return {@link ResponseEntity}
      */
-    @Operation(summary = "Verify email by email token (hash that contains link for verification)")
+    @Operation(summary = "Verify email by UUID email token")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = NO_EMAIL_FOUND_FOR_VERIFICATION_WITH_THIS_TOKEN)
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @GetMapping("/verifyEmail")
-    public ResponseEntity<Boolean> verify(@RequestParam @NotBlank String token,
-        @RequestParam("user_id") Long userId) {
-        return ResponseEntity.status(HttpStatus.OK).body(verifyEmailService.verifyByToken(userId, token));
+    public ResponseEntity<Boolean> verify(@RequestParam @NotNull @UUID String token,
+        @RequestParam("user_id") @NotNull Long userId) {
+        return ResponseEntity.ok().body(verifyEmailService.verifyByToken(userId, token));
     }
 
     /**

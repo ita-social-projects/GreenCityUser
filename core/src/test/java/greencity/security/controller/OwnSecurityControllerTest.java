@@ -23,7 +23,6 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -53,15 +52,12 @@ class OwnSecurityControllerTest {
     @Mock
     private PasswordRecoveryService passwordRecoveryService;
 
-    String email;
+    String email = "test@example.com";
 
     @BeforeEach
     void setUp() {
-        email = "test@example.com";
-
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(ownSecurityController)
-            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .build();
 
         Authentication auth = new UsernamePasswordAuthenticationToken(email, "password");
