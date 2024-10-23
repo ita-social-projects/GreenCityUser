@@ -57,7 +57,6 @@ import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserDeactivationException;
 import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongIdException;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
@@ -371,8 +370,8 @@ class UserServiceImplTest {
 
     @Test
     void findByIdBadIdTest() {
-        when(userRepo.findById(any())).thenThrow(WrongIdException.class);
-        assertThrows(WrongIdException.class, () -> userService.findById(1L));
+        when(userRepo.findById(any())).thenThrow(NotFoundException.class);
+        assertThrows(NotFoundException.class, () -> userService.findById(1L));
     }
 
     @Test
@@ -957,12 +956,12 @@ class UserServiceImplTest {
 
     @Test
     void getUserProfileInformationExceptionTest() {
-        assertThrows(WrongIdException.class, () -> userService.getUserProfileInformation(null));
+        assertThrows(NotFoundException.class, () -> userService.getUserProfileInformation(null));
     }
 
     @Test
     void checkIfTheUserIsOnlineExceptionTest() {
-        assertThrows(WrongIdException.class, () -> userService.checkIfTheUserIsOnline(null));
+        assertThrows(NotFoundException.class, () -> userService.checkIfTheUserIsOnline(null));
     }
 
     @Test

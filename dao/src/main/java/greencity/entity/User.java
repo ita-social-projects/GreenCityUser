@@ -4,17 +4,6 @@ import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ColumnResult;
@@ -35,6 +24,17 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.type.descriptor.jdbc.IntegerJdbcType;
 
@@ -63,9 +63,7 @@ import org.hibernate.type.descriptor.jdbc.IntegerJdbcType;
 @Setter
 @Builder
 @Table(name = "users")
-@EqualsAndHashCode(
-    exclude = {"verifyEmail", "ownSecurity",
-        "refreshTokenKey", "restorePasswordEmail", "userFriends"})
+@EqualsAndHashCode(exclude = {"verifyEmail", "ownSecurity", "refreshTokenKey", "restorePasswordEmail", "userFriends"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -91,7 +89,7 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST)
     private OwnSecurity ownSecurity;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private VerifyEmail verifyEmail;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST)

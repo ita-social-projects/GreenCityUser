@@ -12,7 +12,6 @@ import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.UserBlockedException;
 import greencity.exception.exceptions.WrongCaptchaException;
 import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongIdException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.UserDeactivationException;
@@ -168,16 +167,6 @@ class CustomExceptionHandlerTest {
         when(errorAttributes.getErrorAttributes(eq(webRequest),
             any(ErrorAttributeOptions.class))).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleNotFoundException(notFoundException, webRequest),
-            ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
-    }
-
-    @Test
-    void handleWrongIdException() {
-        WrongIdException wrongIdException = new WrongIdException("test");
-        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
-        when(errorAttributes.getErrorAttributes(eq(webRequest),
-            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleWrongIdException(wrongIdException, webRequest),
             ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
     }
 
