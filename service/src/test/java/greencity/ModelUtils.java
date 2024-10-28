@@ -21,6 +21,7 @@ import greencity.dto.user.EcoNewsAuthorDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
@@ -814,4 +815,20 @@ public class ModelUtils {
     public static PlaceAuthorDto getPlaceAuthorDto() {
         return PlaceAuthorDto.builder().id(1L).name("Name").email("author@gmail.com").build();
     }
+
+    public static UserInfo getUserInfo() {
+        return UserInfo.builder()
+            .sub("sub")
+            .name("name")
+            .givenName("given name")
+            .familyName("family name")
+            .picture("picture")
+            .email("test@mail.com")
+            .emailVerified("test@mail.com")
+            .locale("locale")
+            .error("error")
+            .errorDescription("error description")
+            .build();
+    }
+
 }
