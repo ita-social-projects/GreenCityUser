@@ -262,7 +262,7 @@ public class ModelUtils {
                 new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
                     "Ukraine", "Україна", 20.000000,
                     20.000000))
-            .showShoppingList(true)
+            .showToDoList(true)
             .showEcoPlace(true)
             .showLocation(true)
             .ownSecurity(OwnSecurityVO.builder()
