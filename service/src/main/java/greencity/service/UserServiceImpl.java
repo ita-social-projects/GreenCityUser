@@ -558,7 +558,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
-        user.setShowShoppingList(userProfileDtoRequest.getShowShoppingList());
+        user.setShowToDoList(userProfileDtoRequest.getShowShoppingList());
         setNotificationPreferencesForUser(user, userProfileDtoRequest);
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
