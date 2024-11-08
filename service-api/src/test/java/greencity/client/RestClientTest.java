@@ -4,7 +4,7 @@ import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.constant.AppConstant.FILES;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
-import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,26 +51,26 @@ class RestClientTest {
     private RestClient restClient;
 
     @Test
-    void getAllAvailableCustomShoppingListItems() {
+    void getAllAvailableCustomToDoListItems() {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long userId = 1L;
         Long habitId = 1L;
-        CustomShoppingListItemResponseDto customShoppingListItemResponseDto =
-            new CustomShoppingListItemResponseDto(1L, "test");
-        CustomShoppingListItemResponseDto[] customShoppingListItemResponseDtos =
-            new CustomShoppingListItemResponseDto[1];
-        customShoppingListItemResponseDtos[0] = customShoppingListItemResponseDto;
+        CustomToDoListItemResponseDto customToDoListItemResponseDto =
+            new CustomToDoListItemResponseDto(1L, "test");
+        CustomToDoListItemResponseDto[] customToDoListItemResponseDtos =
+            new CustomToDoListItemResponseDto[1];
+        customToDoListItemResponseDtos[0] = customToDoListItemResponseDto;
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
-            CustomShoppingListItemResponseDto[].class))
-                .thenReturn(ResponseEntity.ok(customShoppingListItemResponseDtos));
+            + RestTemplateLinks.CUSTOM_TO_DO_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
+            CustomToDoListItemResponseDto[].class))
+                .thenReturn(ResponseEntity.ok(customToDoListItemResponseDtos));
 
-        assertEquals(Arrays.asList(customShoppingListItemResponseDtos),
-            restClient.getAllAvailableCustomShoppingListItems(userId, habitId));
+        assertEquals(Arrays.asList(customToDoListItemResponseDtos),
+            restClient.getAllAvailableCustomToDoListItems(userId, habitId));
     }
 
     @Test

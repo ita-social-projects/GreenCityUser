@@ -67,7 +67,7 @@ class UserVOMapperTest {
                     .longitude(expected.getUserLocationDto().getLongitude())
                     .users(null)
                     .build())
-            .showShoppingList(expected.getShowShoppingList())
+            .showToDoList(expected.getShowToDoList())
             .showEcoPlace(expected.getShowEcoPlace())
             .showLocation(expected.getShowLocation())
             .ownSecurity(expected.getOwnSecurity() != null ? OwnSecurity.builder()

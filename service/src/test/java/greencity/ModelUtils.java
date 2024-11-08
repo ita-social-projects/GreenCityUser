@@ -262,7 +262,7 @@ public class ModelUtils {
                 new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
                     "Ukraine", "Україна", 20.000000,
                     20.000000))
-            .showShoppingList(true)
+            .showToDoList(true)
             .showEcoPlace(true)
             .showLocation(true)
             .ownSecurity(OwnSecurityVO.builder()
@@ -322,7 +322,7 @@ public class ModelUtils {
             .coordinates(new CoordinatesDto(1.0d, 1.0d))
             .showLocation(true)
             .showEcoPlace(true)
-            .showShoppingList(true)
+            .showToDoList(true)
             .emailPreferences(Set.of(
                 UserNotificationPreferenceDto.builder()
                     .emailPreference(EmailPreference.SYSTEM)

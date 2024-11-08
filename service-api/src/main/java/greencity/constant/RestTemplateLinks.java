@@ -4,7 +4,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class RestTemplateLinks {
-    public static final String CUSTOM_SHOPPING_LIST_ITEMS = "/custom/shopping-list-items/";
+    public static final String CUSTOM_TO_DO_LIST_ITEMS = "/custom/to-do-list-items/";
     public static final String FILES = "/files";
     public static final String SOCIAL_NETWORKS_IMAGE = "/social-networks/image";
     public static final String SOCIAL_NETWORKS = "/social-networks";

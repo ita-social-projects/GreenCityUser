@@ -65,7 +65,7 @@ public class UserVO {
 
     private Boolean showEcoPlace;
 
-    private Boolean showShoppingList;
+    private Boolean showToDoList;
 
     private LocalDateTime lastActivityTime;
 

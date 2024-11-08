@@ -126,7 +126,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         }
         user.setShowLocation(true);
         user.setShowEcoPlace(true);
-        user.setShowShoppingList(true);
+        user.setShowToDoList(true);
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
@@ -184,7 +184,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setUuid(employeeSignUpDto.getUuid());
         employee.setShowLocation(true);
         employee.setShowEcoPlace(true);
-        employee.setShowShoppingList(true);
+        employee.setShowToDoList(true);
         List<String> positionNames = employeeSignUpDto.getPositions().stream()
             .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
             .toList();

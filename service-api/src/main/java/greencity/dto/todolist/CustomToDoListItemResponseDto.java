@@ -1,4 +1,4 @@
-package greencity.dto.shoppinglist;
+package greencity.dto.todolist;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -14,7 +14,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class CustomShoppingListItemResponseDto {
+public class CustomToDoListItemResponseDto {
     @NonNull
     @Min(1)
     private Long id;

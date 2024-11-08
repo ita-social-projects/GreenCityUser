@@ -128,8 +128,8 @@ public class SecurityConfig {
                     "/ownSecurity/unblockAccount")
                 .permitAll()
                 .requestMatchers(HttpMethod.GET,
-                    "/user/shopping-list-items/habits/{habitId}/shopping-list",
-                    "/user/{userId}/{habitId}/custom-shopping-list-items/available",
+                    "/user/to-do-list-items/habits/{habitId}/to-do-list",
+                    "/user/{userId}/{habitId}/custom-to-do-list-items/available",
                     "/user/{userId}/profile/", "/user/isOnline/{userId}/",
                     "/user/{userId}/profileStatistics/",
                     "/user/userAndSixFriendsWithOnlineStatus",
@@ -151,7 +151,7 @@ public class SecurityConfig {
                     "/user/emailNotifications")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
-                    "/user/shopping-list-items",
+                    "/user/to-do-list-items",
                     "/user/{userId}/habit",
                     "/ownSecurity/set-password")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
@@ -178,13 +178,13 @@ public class SecurityConfig {
                     "/user/get-positions-authorities")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
-                    "/user/shopping-list-items/{userShoppingListItemId}",
+                    "/user/to-do-list-items/{userToDoListItemId}",
                     "/user/profilePicture",
                     "/user/deleteProfilePicture")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.DELETE,
-                    "/user/shopping-list-items/user-shopping-list-items",
-                    "/user/shopping-list-items",
+                    "/user/to-do-list-items/user-to-do-list-items",
+                    "/user/to-do-list-items",
                     "/ownSecurity/user")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,

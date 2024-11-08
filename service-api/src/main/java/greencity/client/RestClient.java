@@ -4,7 +4,7 @@ import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.constant.AppConstant.FILES;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
-import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
@@ -36,18 +36,18 @@ public class RestClient {
     private String greenCityUbsServerAddress;
 
     /**
-     * Method for finding all custom shopping list items.
+     * Method for finding all custom to-do list items.
      *
      * @param userId of {@link UserVO}
-     * @return list of {@link CustomShoppingListItemResponseDto}
+     * @return list of {@link CustomToDoListItemResponseDto}
      * @author Orest Mamchuk
      */
-    public List<CustomShoppingListItemResponseDto> getAllAvailableCustomShoppingListItems(Long userId, Long habitId) {
+    public List<CustomToDoListItemResponseDto> getAllAvailableCustomToDoListItems(Long userId, Long habitId) {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        ResponseEntity<CustomShoppingListItemResponseDto[]> exchange = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
-            CustomShoppingListItemResponseDto[].class);
-        CustomShoppingListItemResponseDto[] responseDtos = exchange.getBody();
+        ResponseEntity<CustomToDoListItemResponseDto[]> exchange = restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.CUSTOM_TO_DO_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
+            CustomToDoListItemResponseDto[].class);
+        CustomToDoListItemResponseDto[] responseDtos = exchange.getBody();
         return Arrays.asList(responseDtos);
     }
 
