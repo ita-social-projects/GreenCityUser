@@ -11,7 +11,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.RoleDto;
@@ -478,8 +478,8 @@ public class UserServiceImpl implements UserService {
      */
     @Transactional
     @Override
-    public List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId, Long habitId) {
-        return restClient.getAllAvailableCustomShoppingListItems(userId, habitId);
+    public List<CustomToDoListItemResponseDto> getAvailableCustomToDoListItems(Long userId, Long habitId) {
+        return restClient.getAllAvailableCustomToDoListItems(userId, habitId);
     }
 
     /**
@@ -558,7 +558,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setShowLocation(userProfileDtoRequest.getShowLocation());
         user.setShowEcoPlace(userProfileDtoRequest.getShowEcoPlace());
-        user.setShowToDoList(userProfileDtoRequest.getShowShoppingList());
+        user.setShowToDoList(userProfileDtoRequest.getShowToDoList());
         setNotificationPreferencesForUser(user, userProfileDtoRequest);
         userRepo.save(user);
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());

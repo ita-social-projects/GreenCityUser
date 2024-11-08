@@ -44,7 +44,7 @@ public class UserProfileDtoRequest {
 
     @NotNull
     @JsonDeserialize(using = BooleanValueDeserializer.class)
-    private Boolean showShoppingList;
+    private Boolean showToDoList;
 
     private CoordinatesDto coordinates;
 

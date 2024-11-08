@@ -11,7 +11,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.RoleDto;
@@ -666,7 +666,7 @@ class UserServiceImplTest {
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
-        request.setShowShoppingList(null);
+        request.setShowToDoList(null);
         request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(null).build());
 
         var myUser = ModelUtils.getUserWithSocialNetworks();
@@ -688,7 +688,7 @@ class UserServiceImplTest {
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
-        request.setShowShoppingList(null);
+        request.setShowToDoList(null);
         request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(1.0d).build());
 
         var myUser = ModelUtils.getUserWithSocialNetworks();
@@ -710,7 +710,7 @@ class UserServiceImplTest {
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
-        request.setShowShoppingList(null);
+        request.setShowToDoList(null);
         request.setCoordinates(CoordinatesDto.builder().latitude(1.0d).longitude(null).build());
 
         var myUser = ModelUtils.getUserWithSocialNetworks();
@@ -1216,14 +1216,14 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getAvailableCustomShoppingListItem() {
-        CustomShoppingListItemResponseDto customShoppingListItemResponseDto =
-            new CustomShoppingListItemResponseDto(1L, "test");
-        when(restClient.getAllAvailableCustomShoppingListItems(userId, habitId))
-            .thenReturn(Collections.singletonList(customShoppingListItemResponseDto));
+    void getAvailableCustomToDoListItem() {
+        CustomToDoListItemResponseDto customToDoListItemResponseDto =
+            new CustomToDoListItemResponseDto(1L, "test");
+        when(restClient.getAllAvailableCustomToDoListItems(userId, habitId))
+            .thenReturn(Collections.singletonList(customToDoListItemResponseDto));
 
-        assertEquals(Collections.singletonList(customShoppingListItemResponseDto),
-            userService.getAvailableCustomShoppingListItems(userId, habitId));
+        assertEquals(Collections.singletonList(customToDoListItemResponseDto),
+            userService.getAvailableCustomToDoListItems(userId, habitId));
     }
 
     @Test

@@ -322,7 +322,7 @@ public class ModelUtils {
             .coordinates(new CoordinatesDto(1.0d, 1.0d))
             .showLocation(true)
             .showEcoPlace(true)
-            .showShoppingList(true)
+            .showToDoList(true)
             .emailPreferences(Set.of(
                 UserNotificationPreferenceDto.builder()
                     .emailPreference(EmailPreference.SYSTEM)

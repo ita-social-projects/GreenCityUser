@@ -13,7 +13,7 @@ import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.position.PositionAuthoritiesDto;
-import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
@@ -275,22 +275,22 @@ public class UserController {
     }
 
     /**
-     * Method returns list of available (not ACTIVE) custom shopping list items for
+     * Method returns list of available (not ACTIVE) custom to-do list items for
      * user.
      *
      * @return {@link ResponseEntity}.
      */
-    @Operation(summary = "Get available custom shopping list items for current user.")
+    @Operation(summary = "Get available custom to-do list items for current user.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
-    @GetMapping("/{userId}/{habitId}/custom-shopping-list-items/available")
-    public ResponseEntity<List<CustomShoppingListItemResponseDto>> getAvailableCustomShoppingListItems(
+    @GetMapping("/{userId}/{habitId}/custom-to-do-list-items/available")
+    public ResponseEntity<List<CustomToDoListItemResponseDto>> getAvailableCustomToDoListItems(
         @Parameter(description = "Id of current user. Cannot be empty.") @PathVariable @CurrentUserId Long userId,
         @PathVariable Long habitId) {
-        return ResponseEntity.ok().body(userService.getAvailableCustomShoppingListItems(userId, habitId));
+        return ResponseEntity.ok().body(userService.getAvailableCustomToDoListItems(userId, habitId));
     }
 
     /**
