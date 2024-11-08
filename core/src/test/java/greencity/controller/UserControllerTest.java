@@ -262,15 +262,15 @@ class UserControllerTest {
     }
 
     @Test
-    void getAvailableCustomShoppingListItemTest() throws Exception {
+    void getAvailableCustomToDoListItemTest() throws Exception {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
-        mockMvc.perform(get(userLink + "/{userId}/{habitId}/custom-shopping-list-items/available", 1, 1)
+        mockMvc.perform(get(userLink + "/{userId}/{habitId}/custom-to-do-list-items/available", 1, 1)
             .headers(headers))
             .andExpect(status().isOk());
 
-        verify(userService).getAvailableCustomShoppingListItems(1L, 1L);
+        verify(userService).getAvailableCustomToDoListItems(1L, 1L);
     }
 
     @Test
@@ -366,7 +366,7 @@ class UserControllerTest {
             	"socialNetworks": [],
             	"showLocation": true,
             	"showEcoPlace": true,
-            	"showShoppingList": false,
+            	"showToDoList": false,
             	"coordinates":{\s
              \
             	"latitude": 20.000000,
@@ -404,7 +404,7 @@ class UserControllerTest {
                 "socialNetworks": [],
                 "showLocation": true,
                 "showEcoPlace": true,
-                "showShoppingList": false,
+                "showToDoList": false,
                 "coordinates": {
                     "latitude": 20.000000,
                     "longitude": 20.000000

@@ -24,7 +24,7 @@ public class UserProfileDtoResponse {
     private List<SocialNetworkResponseDTO> socialNetworks;
     private Boolean showLocation;
     private Boolean showEcoPlace;
-    private Boolean showShoppingList;
+    private Boolean showToDoList;
     private Float rating;
     private Role role;
     private UserLocationDto userLocationDto;

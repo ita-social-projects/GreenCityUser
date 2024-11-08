@@ -5,7 +5,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
@@ -242,13 +242,12 @@ public interface UserService {
     int updateUserRefreshToken(String refreshTokenKey, Long id);
 
     /**
-     * Method returns list of available (not ACTIVE) customShoppingListItem for
-     * user.
+     * Method returns list of available (not ACTIVE) customToDoListItem for user.
      *
      * @param userId id of the {@link UserVO} current user.
-     * @return List of {@link CustomShoppingListItemResponseDto}
+     * @return List of {@link CustomToDoListItemResponseDto}
      */
-    List<CustomShoppingListItemResponseDto> getAvailableCustomShoppingListItems(Long userId, Long habitID);
+    List<CustomToDoListItemResponseDto> getAvailableCustomToDoListItems(Long userId, Long habitID);
 
     /**
      * Counts all users by user {@link UserStatus} ACTIVATED.

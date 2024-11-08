@@ -139,8 +139,8 @@ public class User {
     @Column(name = "show_eco_place")
     private Boolean showEcoPlace;
 
-    @Column(name = "show_shopping_list")
-    private Boolean showShoppingList;
+    @Column(name = "show_to_do_list")
+    private Boolean showToDoList;
 
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;
