@@ -25,6 +25,7 @@ import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.TestersSignInRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -692,6 +693,22 @@ public class ModelUtils {
             .email("testEmail@gmail.com")
             .name("testName")
             .language("en")
+            .build();
+    }
+
+    public static TestersSignInRequest getTestersSignInRequest() {
+        return TestersSignInRequest.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .secretKey("secret-key")
+            .build();
+    }
+
+    public static TestersSignInRequest getTestersSignInRequestWithInvalidSecretKey() {
+        return TestersSignInRequest.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .secretKey("invalid-secret-key")
             .build();
     }
 }
