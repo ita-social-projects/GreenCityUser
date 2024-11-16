@@ -9,6 +9,7 @@ import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.TestersSignInRequest;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 
 /**
@@ -98,4 +99,14 @@ public interface OwnSecurityService {
      * @param token {@link String} token for unblocking user account.
      */
     void unblockAccount(String token);
+
+    /**
+     * Allows testers to sign in without captcha token using their credentials.
+     *
+     * @param request a {@link TestersSignInRequest} containing sign-in information
+     *                for testers.
+     * @return {@link SuccessSignInDto} containing sign-in success details, such as
+     *         access and refresh tokens.
+     */
+    SuccessSignInDto testersSignIn(TestersSignInRequest request);
 }

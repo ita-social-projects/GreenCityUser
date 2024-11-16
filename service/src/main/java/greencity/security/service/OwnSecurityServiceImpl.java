@@ -42,6 +42,7 @@ import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.TestersSignInRequest;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
@@ -95,6 +96,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private String blockTimeInMinutes;
     @Value("${cloud-flare.secret-key}")
     private String cloudFlareSecretKey;
+    @Value("${testers.sign-in-token}")
+    private String secretKey;
 
     /**
      * {@inheritDoc}
@@ -214,7 +217,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     @Override
     public SuccessSignInDto signIn(final OwnSignInDto dto) {
         String email = dto.getEmail();
-        UserVO user = validateUser(dto);
+        UserVO user = validateUser(email);
 
         handleUserStatus(user.getUserStatus());
         handleBruteForceProtection(email);
@@ -230,10 +233,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return createSuccessSignInResponse(user, email);
     }
 
-    private UserVO validateUser(final OwnSignInDto dto) {
-        UserVO user = userService.findByEmail(dto.getEmail());
+    private UserVO validateUser(final String email) {
+        UserVO user = userService.findByEmail(email);
         if (user == null) {
-            throw new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail());
+            throw new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
         }
         return user;
     }
@@ -474,6 +477,51 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(user);
         log.info("User {} unblocked", user.getEmail());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SuccessSignInDto testersSignIn(TestersSignInRequest request) {
+        String email = request.email();
+        UserVO user = validateUser(email);
+
+        handleUserStatus(user.getUserStatus());
+        validatePassword(convertRequestToDto(request), user);
+        validateSecretKey(request.secretKey());
+
+        if (!isEmailVerified(user)) {
+            throw new EmailNotVerified("You should verify the email first, check your email box!");
+        }
+
+        return createSuccessSignInResponse(user, email);
+    }
+
+    /**
+     * Validates the provided secret key against the stored secret key. If the keys
+     * do not match, throws a {@link BadRequestException}.
+     *
+     * @param key the secret key to validate
+     * @throws BadRequestException if the provided key is incorrect
+     */
+    private void validateSecretKey(String key) {
+        if (!secretKey.equals(key)) {
+            throw new BadRequestException(ErrorMessage.WRONG_SECRET_KEY);
+        }
+    }
+
+    /**
+     * Converts a {@link TestersSignInRequest} to an {@link OwnSignInDto}.
+     * 
+     * @param request the request to convert
+     * @return the converted {@link OwnSignInDto}
+     */
+    private OwnSignInDto convertRequestToDto(TestersSignInRequest request) {
+        return OwnSignInDto.builder()
+            .email(request.email())
+            .password(request.password())
+            .build();
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
