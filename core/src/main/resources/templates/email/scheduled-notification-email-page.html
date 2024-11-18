@@ -138,7 +138,7 @@
         </p>
 
         <p class="main-text">
-            <span th:text="${body}"></span>
+            <span th:utext="${body}"></span>
         </p>
 
         <div th:if="${isUbs == false}" class="vertical-center"><a th:text="#{notifications.button}" th:href="${notificationsLink}" class="notification-button" target="_blank"></a></div>
