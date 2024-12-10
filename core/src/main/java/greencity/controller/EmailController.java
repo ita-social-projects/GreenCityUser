@@ -85,4 +85,10 @@ public class EmailController {
         emailService.sendScheduledNotificationEmail(message);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/sendPlaceStatusChange")
+    public ResponseEntity<Object> sendPlaceStatusChange(@RequestBody PlaceStatusChangeDto dto) {
+        emailService.sendPlaceStatusChangeNotification(dto);
+        return ResponseEntity.ok().build();
+    }
 }

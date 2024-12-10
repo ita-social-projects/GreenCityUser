@@ -7,6 +7,7 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
 import greencity.validator.EmailAddressValidator;
@@ -315,6 +316,19 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
         return model;
+    }
+
+    @Override
+    public void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, dto.getUserName());
+        model.put(EmailConstants.PLACE_NAME, dto.getPlaceName());
+        model.put(EmailConstants.PLACE_STATUS, dto.getNewStatus().name());
+        model.put(EmailConstants.LANGUAGE, "en");
+
+        String template = createEmailTemplate(model, EmailConstants.PLACE_STATUS_CHANGE_PAGE);
+        sendEmail(dto.getUserEmail(), "Status of your place has been updated", template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {
