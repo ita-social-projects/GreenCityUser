@@ -10,7 +10,9 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.WrongEmailException;
+import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
 import jakarta.mail.Session;
@@ -20,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -32,8 +35,10 @@ import java.util.*;
 import java.util.concurrent.Executors;
 
 import static greencity.ModelUtils.getSubscriberDto;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.thymeleaf.context.Context;
@@ -239,6 +244,34 @@ class EmailServiceImplTest {
         service.sendBlockAccountNotificationWithUnblockLinkEmail(id, name, email, token, language, isUbs);
 
         verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendPlaceStatusChangeNotificationTest() {
+        PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
+        dto.setUserName("John Doe");
+        dto.setPlaceName("Central Park");
+        dto.setNewStatus(PlaceStatus.APPROVED);
+        dto.setUserEmail("john.doe@example.com");
+
+        String template = "<html>Sample Template</html>";
+        when(templateEngine.process(any(String.class), any(Context.class))).thenReturn(template);
+
+        service.sendPlaceStatusChangeNotification(dto);
+
+        verify(javaMailSender).createMimeMessage();
+        verify(javaMailSender).send(any(MimeMessage.class));
+
+        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+        verify(templateEngine).process(eq("email/place-status-change"), contextCaptor.capture());
+
+        Context capturedContext = contextCaptor.getValue();
+
+        assertEquals("http://localhost:4200", capturedContext.getVariable(EmailConstants.CLIENT_LINK));
+        assertEquals("John Doe", capturedContext.getVariable(EmailConstants.USER_NAME));
+        assertEquals("Central Park", capturedContext.getVariable(EmailConstants.PLACE_NAME));
+        assertEquals("APPROVED", capturedContext.getVariable(EmailConstants.PLACE_STATUS));
+        assertEquals("en", capturedContext.getVariable(EmailConstants.LANGUAGE));
     }
 
     private static Locale getLocale(String language) {
