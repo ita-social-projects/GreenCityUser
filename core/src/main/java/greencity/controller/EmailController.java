@@ -87,17 +87,18 @@ public class EmailController {
     }
 
     /**
-     * Method for sending an email notification about the status change of a place to the user.
+     * Method for sending an email notification about the status change of a place
+     * to the user.
      *
-     * @param dto Object containing the necessary information for sending the status change notification email.
-     *            The object includes:
-     *            - userName: The name of the user.
-     *            - userEmail: The email of the user who will receive the notification.
-     *            - placeName: The name of the place whose status has been changed.
-     *            - newStatus: The new status of the place.
+     * @param dto Object containing the necessary information for sending the status
+     *            change notification email. The object includes: - userName: The
+     *            name of the user. - userEmail: The email of the user who will
+     *            receive the notification. - placeName: The name of the place whose
+     *            status has been changed. - newStatus: The new status of the place.
      *
-     * @return ResponseEntity with HTTP status 200 OK if the email was successfully sent.
-     *         If any error occurs, an appropriate error response will be returned.
+     * @return ResponseEntity with HTTP status 200 OK if the email was successfully
+     *         sent. If any error occurs, an appropriate error response will be
+     *         returned.
      */
     @PostMapping("/sendPlaceStatusChange")
     public ResponseEntity<Object> sendPlaceStatusChange(@RequestBody PlaceStatusChangeDto dto) {
