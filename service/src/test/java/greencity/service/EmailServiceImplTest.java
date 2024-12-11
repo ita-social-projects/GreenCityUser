@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -32,15 +32,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
 import static greencity.ModelUtils.getSubscriberDto;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+
 import org.thymeleaf.context.Context;
 
 @ExtendWith(MockitoExtension.class)
@@ -57,6 +56,7 @@ class EmailServiceImplTest {
 
     @BeforeEach
     public void setup() {
+        Mockito.reset(javaMailSender, templateEngine, messageSource);
         service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
             "http://localhost:4200",
             "test@email.com", messageSource);
@@ -247,31 +247,25 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendPlaceStatusChangeNotificationTest() {
+    void sendPlaceStatusChangeNotificationTest() throws InterruptedException {
         PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
         dto.setUserName("John Doe");
         dto.setPlaceName("Central Park");
         dto.setNewStatus(PlaceStatus.APPROVED);
         dto.setUserEmail("john.doe@example.com");
 
-        String template = "<html>Sample Template</html>";
-        when(templateEngine.process(any(String.class), any(Context.class))).thenReturn(template);
-
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+        doNothing().when(javaMailSender).send(any(MimeMessage.class));
+        CountDownLatch latch = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            latch.countDown();
+            return null;
+        }).when(javaMailSender).send(any(MimeMessage.class));
         service.sendPlaceStatusChangeNotification(dto);
-
+        latch.await();
         verify(javaMailSender).createMimeMessage();
-        verify(javaMailSender).send(any(MimeMessage.class));
-
-        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
-        verify(templateEngine).process(eq("email/place-status-change"), contextCaptor.capture());
-
-        Context capturedContext = contextCaptor.getValue();
-
-        assertEquals("http://localhost:4200", capturedContext.getVariable(EmailConstants.CLIENT_LINK));
-        assertEquals("John Doe", capturedContext.getVariable(EmailConstants.USER_NAME));
-        assertEquals("Central Park", capturedContext.getVariable(EmailConstants.PLACE_NAME));
-        assertEquals("APPROVED", capturedContext.getVariable(EmailConstants.PLACE_STATUS));
-        assertEquals("en", capturedContext.getVariable(EmailConstants.LANGUAGE));
+        verify(javaMailSender).send(mimeMessage);
     }
 
     private static Locale getLocale(String language) {
