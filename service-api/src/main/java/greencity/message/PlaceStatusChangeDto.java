@@ -18,5 +18,5 @@ public class PlaceStatusChangeDto {
     private String userName;
 
     @NotNull
-    private String userEmail;
+    private String email;
 }

@@ -7,15 +7,20 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.entity.User;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
+import greencity.repository.LanguageRepo;
+import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,22 +48,26 @@ public class EmailServiceImpl implements EmailService {
     private final String senderEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
+    private final UserRepo userRepo;
+    private final LanguageRepo languageRepo;
 
     /**
      * Constructor.
      */
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender,
-        ITemplateEngine templateEngine,
-        @Qualifier("sendEmailExecutor") Executor executor,
-        @Value("${client.address}") String clientLink,
-        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource) {
+                            ITemplateEngine templateEngine,
+                            @Qualifier("sendEmailExecutor") Executor executor,
+                            @Value("${client.address}") String clientLink,
+                            @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo, LanguageRepo languageRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
         this.clientLink = clientLink;
         this.senderEmailAddress = senderEmailAddress;
         this.messageSource = messageSource;
+        this.userRepo = userRepo;
+        this.languageRepo = languageRepo;
     }
 
     /**
@@ -321,14 +330,16 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto) {
         Map<String, Object> model = new HashMap<>();
+        User user = userRepo.findByEmail(dto.getEmail())
+                .orElseThrow(() -> new NotFoundException("user with email " + dto.getEmail() + " does not exist."));
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getUserName());
         model.put(EmailConstants.PLACE_NAME, dto.getPlaceName());
         model.put(EmailConstants.PLACE_STATUS, dto.getNewStatus().name());
-        model.put(EmailConstants.LANGUAGE, "en");
+        model.put(EmailConstants.LANGUAGE, user.getLanguage().getCode());
 
         String template = createEmailTemplate(model, EmailConstants.PLACE_STATUS_CHANGE_PAGE);
-        sendEmail(dto.getUserEmail(), "Status of your place has been updated", template);
+        sendEmail(dto.getEmail(), "Status of your place has been updated", template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {
