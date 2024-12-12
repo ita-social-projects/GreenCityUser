@@ -100,6 +100,12 @@ public class EmailController {
      *         sent. If any error occurs, an appropriate error response will be
      *         returned.
      */
+    @Operation(summary = "Send email notification to user if place status changed")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
     @PostMapping("/sendPlaceStatusChange")
     public ResponseEntity<Object> sendPlaceStatusChange(@RequestBody PlaceStatusChangeDto dto) {
         emailService.sendPlaceStatusChangeNotification(dto);

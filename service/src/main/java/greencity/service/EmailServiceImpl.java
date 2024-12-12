@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.constant.EmailConstants;
+import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.SubscriberDto;
@@ -8,7 +9,6 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
-import greencity.exception.exceptions.NotFoundException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
@@ -48,7 +48,6 @@ public class EmailServiceImpl implements EmailService {
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
     private final UserRepo userRepo;
-    private final LanguageRepo languageRepo;
 
     /**
      * Constructor.
@@ -67,7 +66,6 @@ public class EmailServiceImpl implements EmailService {
         this.senderEmailAddress = senderEmailAddress;
         this.messageSource = messageSource;
         this.userRepo = userRepo;
-        this.languageRepo = languageRepo;
     }
 
     /**
@@ -331,7 +329,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto) {
         Map<String, Object> model = new HashMap<>();
         User user = userRepo.findByEmail(dto.getEmail())
-            .orElseThrow(() -> new NotFoundException("user with email " + dto.getEmail() + " does not exist."));
+            .orElseThrow(() -> new RuntimeException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail()));
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getUserName());
         model.put(EmailConstants.PLACE_NAME, dto.getPlaceName());

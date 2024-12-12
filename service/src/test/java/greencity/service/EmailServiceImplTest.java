@@ -291,6 +291,20 @@ class EmailServiceImplTest {
         verify(javaMailSender).send(mimeMessage);
     }
 
+    @Test
+    void sendPlaceStatusChangeNotificationUserNotFoundTest() {
+        PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
+        dto.setUserName(NAME);
+        dto.setPlaceName(PLACE_NAME);
+        dto.setNewStatus(PlaceStatus.APPROVED);
+        dto.setEmail(EMAIL);
+        when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> {
+            service.sendPlaceStatusChangeNotification(dto);
+        });
+        verify(userRepo).findByEmail(dto.getEmail());
+    }
+
     private static Locale getLocale(String language) {
         return switch (language) {
             case "ua" -> UA_LOCALE;
