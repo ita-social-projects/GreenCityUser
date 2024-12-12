@@ -184,7 +184,7 @@ class EmailControllerTest {
     void sendPlaceStatusChangeTest() {
         PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
         dto.setUserName("John Doe");
-        dto.setUserEmail("test@example.com");
+        dto.setEmail("test@example.com");
         dto.setPlaceName("Green Park");
         dto.setNewStatus(PlaceStatus.APPROVED);
 
@@ -194,7 +194,7 @@ class EmailControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/sendPlaceStatusChange")
             .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", "Bearer your_token_here") // Додати заголовок Authorization (якщо потрібен)
+            .header("Authorization", "Bearer your_token_here")
             .content(content))
             .andExpect(status().isOk());
 

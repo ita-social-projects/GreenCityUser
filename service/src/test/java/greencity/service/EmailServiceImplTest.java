@@ -9,12 +9,16 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.entity.Language;
+import greencity.entity.User;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.PlaceStatus;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
+import greencity.repository.LanguageRepo;
+import greencity.repository.UserRepo;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,7 +27,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -36,6 +39,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 
 import static greencity.ModelUtils.getSubscriberDto;
+import static greencity.TestConst.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -56,14 +60,23 @@ class EmailServiceImplTest {
     private ITemplateEngine templateEngine;
     @Mock
     private MessageSource messageSource;
+    @Mock
+    private UserRepo userRepo;
+    @Mock
+    LanguageRepo languageRepo;
     private static final Locale UA_LOCALE = Locale.of("uk", "UA");
 
     @BeforeEach
     public void setup() {
-        Mockito.reset(javaMailSender, templateEngine, messageSource);
-        service = new EmailServiceImpl(javaMailSender, templateEngine, Executors.newCachedThreadPool(),
+        service = new EmailServiceImpl(
+            javaMailSender,
+            templateEngine,
+            Executors.newCachedThreadPool(),
             "http://localhost:4200",
-            "test@email.com", messageSource);
+            "test@email.com",
+            messageSource,
+            userRepo,
+            languageRepo);
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
         when(templateEngine.process(any(String.class), any(Context.class))).thenReturn("<html></html>");
     }
@@ -253,11 +266,16 @@ class EmailServiceImplTest {
     @Test
     void sendPlaceStatusChangeNotificationTest() throws InterruptedException {
         PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
-        dto.setUserName("John Doe");
-        dto.setPlaceName("Central Park");
+        dto.setUserName(NAME);
+        dto.setPlaceName(PLACE_NAME);
         dto.setNewStatus(PlaceStatus.APPROVED);
-        dto.setUserEmail("john.doe@example.com");
-
+        dto.setEmail(EMAIL);
+        User user = new User();
+        user.setEmail(EMAIL);
+        user.setName(NAME);
+        Language language = new Language(SIMPLE_LONG_NUMBER, ENGLISH_CODE, List.of(user));
+        user.setLanguage(language);
+        when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
         doNothing().when(javaMailSender).send(any(MimeMessage.class));
@@ -268,6 +286,7 @@ class EmailServiceImplTest {
         }).when(javaMailSender).send(any(MimeMessage.class));
         service.sendPlaceStatusChangeNotification(dto);
         latch.await();
+        verify(userRepo).findByEmail(dto.getEmail());
         verify(javaMailSender).createMimeMessage();
         verify(javaMailSender).send(mimeMessage);
     }
