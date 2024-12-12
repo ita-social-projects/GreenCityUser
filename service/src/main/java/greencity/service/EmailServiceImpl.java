@@ -20,7 +20,6 @@ import jakarta.mail.internet.MimeMessage;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,10 +55,11 @@ public class EmailServiceImpl implements EmailService {
      */
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender,
-                            ITemplateEngine templateEngine,
-                            @Qualifier("sendEmailExecutor") Executor executor,
-                            @Value("${client.address}") String clientLink,
-                            @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo, LanguageRepo languageRepo) {
+        ITemplateEngine templateEngine,
+        @Qualifier("sendEmailExecutor") Executor executor,
+        @Value("${client.address}") String clientLink,
+        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo,
+        LanguageRepo languageRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
@@ -331,7 +331,7 @@ public class EmailServiceImpl implements EmailService {
     public void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto) {
         Map<String, Object> model = new HashMap<>();
         User user = userRepo.findByEmail(dto.getEmail())
-                .orElseThrow(() -> new NotFoundException("user with email " + dto.getEmail() + " does not exist."));
+            .orElseThrow(() -> new NotFoundException("user with email " + dto.getEmail() + " does not exist."));
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getUserName());
         model.put(EmailConstants.PLACE_NAME, dto.getPlaceName());
