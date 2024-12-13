@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.enums.PlaceStatus;
+import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
@@ -175,5 +177,27 @@ class EmailControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void sendPlaceStatusChangeTest() {
+        PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
+        dto.setUserName("John Doe");
+        dto.setEmail("test@example.com");
+        dto.setPlaceName("Green Park");
+        dto.setNewStatus(PlaceStatus.APPROVED);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String content = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/sendPlaceStatusChange")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer your_token_here")
+            .content(content))
+            .andExpect(status().isOk());
+
+        verify(emailService).sendPlaceStatusChangeNotification(dto);
     }
 }

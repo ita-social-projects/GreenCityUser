@@ -1,14 +1,19 @@
 package greencity.service;
 
 import greencity.constant.EmailConstants;
+import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.entity.User;
+import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
+import greencity.repository.LanguageRepo;
+import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -42,6 +47,7 @@ public class EmailServiceImpl implements EmailService {
     private final String senderEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
+    private final UserRepo userRepo;
 
     /**
      * Constructor.
@@ -51,13 +57,15 @@ public class EmailServiceImpl implements EmailService {
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
-        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource) {
+        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo,
+        LanguageRepo languageRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
         this.clientLink = clientLink;
         this.senderEmailAddress = senderEmailAddress;
         this.messageSource = messageSource;
+        this.userRepo = userRepo;
     }
 
     /**
@@ -315,6 +323,24 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
         return model;
+    }
+
+    @Override
+    public void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto) {
+        Map<String, Object> model = new HashMap<>();
+        String userEmail = dto.getEmail();
+        User user = userRepo.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + userEmail));
+        String userLanguageCode = user.getLanguage().getCode();
+        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.USER_NAME, dto.getUserName());
+        model.put(EmailConstants.PLACE_NAME, dto.getPlaceName());
+        model.put(EmailConstants.PLACE_STATUS, dto.getNewStatus().name());
+        model.put(EmailConstants.LANGUAGE, userLanguageCode);
+
+        String template = createEmailTemplate(model, EmailConstants.PLACE_STATUS_CHANGE_PAGE);
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.PLACE_STATUS, null,
+            getLocale(userLanguageCode)), template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {

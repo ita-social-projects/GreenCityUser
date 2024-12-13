@@ -4,6 +4,7 @@ import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
 
@@ -85,7 +86,7 @@ public interface EmailService {
 
     /**
      * Method for send violation to user.
-     * 
+     *
      * @param dto {@link UserViolationMailDto}-includes all information about
      *            Violation.
      */
@@ -138,4 +139,13 @@ public interface EmailService {
     void sendBlockAccountNotificationWithUnblockLinkEmail(
         Long userId, String userFistName, String userEmail, String token, String language,
         boolean isUbs);
+
+    /**
+     * Sends an email notification to a user regarding the status change of a place.
+     *
+     * @param dto the data transfer object containing information about the user,
+     *            place, and the new status of the place (e.g., PROPOSED, DECLINED,
+     *            APPROVED, DELETED).
+     */
+    void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto);
 }
