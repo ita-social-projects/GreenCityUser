@@ -40,6 +40,8 @@ public class EmailConstants {
     public static final String BODY = "body";
     public static final String UNLOCK_USER_LINK = "unlockUserLink";
     public static final String NOTIFICATIONS_LINK = "notificationsLink";
+    public static final String PLACE_NAME = "placeName";
+    public static final String PLACE_STATUS = "placeStatus";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
@@ -53,4 +55,5 @@ public class EmailConstants {
     public static final String SCHEDULED_NOTIFICATION_PAGE = "scheduled-notification-email-page";
     public static final String RECEIVE_INTERESTING_NEWS_EMAIL_PAGE = "receive-interesting-news-email-page";
     public static final String BLOCKED_USER_PAGE = "blocked-user-page";
+    public static final String PLACE_STATUS_CHANGE_PAGE = "place-status-change";
 }

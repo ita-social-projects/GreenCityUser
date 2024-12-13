@@ -85,4 +85,30 @@ public class EmailController {
         emailService.sendScheduledNotificationEmail(message);
         return ResponseEntity.ok().build();
     }
+
+    /**
+     * Method for sending an email notification about the status change of a place
+     * to the user.
+     *
+     * @param dto Object containing the necessary information for sending the status
+     *            change notification email. The object includes: - userName: The
+     *            name of the user. - userEmail: The email of the user who will
+     *            receive the notification. - placeName: The name of the place whose
+     *            status has been changed. - newStatus: The new status of the place.
+     *
+     * @return ResponseEntity with HTTP status 200 OK if the email was successfully
+     *         sent. If any error occurs, an appropriate error response will be
+     *         returned.
+     */
+    @Operation(summary = "Send email notification to user if place status changed")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/sendPlaceStatusChange")
+    public ResponseEntity<Object> sendPlaceStatusChange(@RequestBody PlaceStatusChangeDto dto) {
+        emailService.sendPlaceStatusChangeNotification(dto);
+        return ResponseEntity.ok().build();
+    }
 }
