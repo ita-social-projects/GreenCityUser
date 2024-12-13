@@ -41,9 +41,9 @@ import java.util.concurrent.Executors;
 import static greencity.ModelUtils.getSubscriberDto;
 
 import static greencity.TestConst.ENGLISH_CODE;
+import static greencity.TestConst.SIMPLE_LONG_NUMBER;
 import static greencity.TestConst.NAME;
 import static greencity.TestConst.EMAIL;
-import static greencity.TestConst.SIMPLE_LONG_NUMBER;
 import static greencity.TestConst.PLACE_NAME;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -276,38 +276,30 @@ class EmailServiceImplTest {
         dto.setPlaceName(PLACE_NAME);
         dto.setNewStatus(PlaceStatus.APPROVED);
         dto.setEmail(EMAIL);
-
         User user = new User();
         user.setEmail(EMAIL);
         user.setName(NAME);
         Language language = new Language(SIMPLE_LONG_NUMBER, ENGLISH_CODE, List.of(user));
         user.setLanguage(language);
-
         when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
-
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
-
         doNothing().when(javaMailSender).send(any(MimeMessage.class));
-
         CountDownLatch latch = new CountDownLatch(1);
         doAnswer(invocation -> {
             latch.countDown();
             return null;
         }).when(javaMailSender).send(any(MimeMessage.class));
-
         String subject = "Place Status Change Notification";
-        when(messageSource.getMessage(eq(EmailConstants.PLACE_STATUS), any(), eq(getLocale(ENGLISH_CODE))))
+        when(messageSource.getMessage(eq(EmailConstants.UPDATE_STATUS), any(), eq(getLocale(ENGLISH_CODE))))
             .thenReturn(subject);
 
         service.sendPlaceStatusChangeNotification(dto);
-
         latch.await();
-
         verify(userRepo).findByEmail(dto.getEmail());
         verify(javaMailSender).createMimeMessage();
         verify(javaMailSender).send(mimeMessage);
-        verify(messageSource).getMessage(eq(EmailConstants.PLACE_STATUS), any(), eq(getLocale(ENGLISH_CODE)));
+        verify(messageSource).getMessage(eq(EmailConstants.UPDATE_STATUS), any(), eq(getLocale(ENGLISH_CODE)));
     }
 
     @Test
