@@ -328,16 +328,19 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto) {
         Map<String, Object> model = new HashMap<>();
-        User user = userRepo.findByEmail(dto.getEmail())
-            .orElseThrow(() -> new RuntimeException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail()));
+        String userEmail = dto.getEmail();
+        User user = userRepo.findByEmail(userEmail)
+            .orElseThrow(() -> new RuntimeException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + userEmail));
+        String userLanguageCode = user.getLanguage().getCode();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getUserName());
         model.put(EmailConstants.PLACE_NAME, dto.getPlaceName());
         model.put(EmailConstants.PLACE_STATUS, dto.getNewStatus().name());
-        model.put(EmailConstants.LANGUAGE, user.getLanguage().getCode());
+        model.put(EmailConstants.LANGUAGE, userLanguageCode);
 
         String template = createEmailTemplate(model, EmailConstants.PLACE_STATUS_CHANGE_PAGE);
-        sendEmail(dto.getEmail(), "Status of your place has been updated", template);
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.PLACE_STATUS, null,
+            getLocale(userLanguageCode)), template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {

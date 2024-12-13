@@ -21,8 +21,6 @@ public class EmailConstants {
     public static final String DEACTIVATION = "user.deactivation.subject";
     public static final String ACTIVATION = "user.activation.subject";
     public static final String VIOLATION_EMAIL = "user.violation.subject";
-    public static final String PLACE_NAME = "placeName";
-    public static final String PLACE_STATUS = "placeStatus";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
@@ -42,6 +40,8 @@ public class EmailConstants {
     public static final String BODY = "body";
     public static final String UNLOCK_USER_LINK = "unlockUserLink";
     public static final String NOTIFICATIONS_LINK = "notificationsLink";
+    public static final String PLACE_NAME = "placeName";
+    public static final String PLACE_STATUS = "placeStatus";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
