@@ -21,6 +21,7 @@ public class EmailConstants {
     public static final String DEACTIVATION = "user.deactivation.subject";
     public static final String ACTIVATION = "user.activation.subject";
     public static final String VIOLATION_EMAIL = "user.violation.subject";
+    public static final String UPDATE_STATUS = "your.place.status.changed";
     // params
     public static final String CLIENT_LINK = "clientLink";
     public static final String USER_NAME = "name";
