@@ -339,7 +339,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.LANGUAGE, userLanguageCode);
 
         String template = createEmailTemplate(model, EmailConstants.PLACE_STATUS_CHANGE_PAGE);
-        sendEmail(userEmail, messageSource.getMessage(EmailConstants.PLACE_STATUS, null,
+        sendEmail(userEmail, messageSource.getMessage(EmailConstants.UPDATE_STATUS, null,
             getLocale(userLanguageCode)), template);
     }
 
