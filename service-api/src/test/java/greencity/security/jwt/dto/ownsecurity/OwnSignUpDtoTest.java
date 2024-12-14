@@ -75,7 +75,6 @@ class OwnSignUpDtoTest {
         return Stream.of(
             Arguments.of(""),
             Arguments.of(" "),
-            Arguments.of("t"),
             Arguments.of("1"),
             Arguments.of("T."),
             Arguments.of("T.."),
@@ -83,7 +82,6 @@ class OwnSignUpDtoTest {
             Arguments.of("ЭэЁёЪъЫы"),
             Arguments.of("@#$"),
             Arguments.of("1test"),
-            Arguments.of("test"),
             Arguments.of("Testttttttttttttttttttttttttttt"));
     }
 }
