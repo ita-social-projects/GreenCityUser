@@ -25,11 +25,5 @@ public class ValidationConstants {
     public static final String CATEGORY_NAME_BAD_FORMED = "{greenCity.validation.bad.formed.category.name}";
     public static final int PLACE_NAME_MAX_LENGTH = 30;
     public static final String USERNAME_REGEXP =
-        """
-            ^(?!.*\\.\\.)(?!.*\\.$)(?!.*\\-\\-)\
-            (?=[ЄІЇҐЁА-ЯA-Z])\
-            [ЄІЇҐЁєіїґёА-Яа-яA-Za-z0-9\\s-'’.\\"]\
-            {1,30}\
-            (?<![ЭэЁёъЪЫы])$\
-            """;
+        "^[ґҐіІєЄїЇА-Яа-яa-zA-Z](?!.*\\.$)(?!.*?\\.\\.)(?!.*?--)(?!.*?'')[-'ʼ’ ґҐіІєЄїЇА-Яа-я\\w.]{0,29}$";
 }
