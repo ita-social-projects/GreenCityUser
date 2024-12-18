@@ -277,7 +277,7 @@ class EmailServiceImplTest {
 
     @Test
     void sendNotificationByEmail() {
-        User user = User.builder().build();
+        User user = User.builder().language(new Language()).build();
         NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
         service.sendNotificationByEmail(dto, "test@gmail.com");
