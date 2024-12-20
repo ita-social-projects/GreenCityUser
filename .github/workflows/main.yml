@@ -8,9 +8,9 @@ concurrency: Testing
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master, dev, prod ]
+    branches: [ prod ]
   pull_request:
-    branches: [ master, dev, prod ]
+    branches: [ prod ]
 
 env:
   repository: user
