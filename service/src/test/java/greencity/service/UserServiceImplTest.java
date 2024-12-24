@@ -145,8 +145,8 @@ class UserServiceImplTest {
     private SimpMessagingTemplate messagingTemplate;
     private final AddressType[] addressTypes =
         {AddressType.LOCALITY, AddressType.ADMINISTRATIVE_AREA_LEVEL_1, AddressType.COUNTRY};
-    private final String LANGUAGE_UA = "uk"; // language for GeocodingApi it gets uk not ua.
-    private final String LANGUAGE_EN = "en";
+    private final String languageUa = "uk"; // language for GeocodingApi it gets uk not ua.
+    private final String languageEn = "en";
 
     private final User user = User.builder()
         .id(1L)
@@ -626,13 +626,13 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_UA, addressTypes))
+            languageUa, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
 
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_EN, addressTypes))
+            languageEn, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
@@ -649,13 +649,13 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_UA, addressTypes))
+            languageUa, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResultWithInsufficientData());
 
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_EN, addressTypes))
+            languageEn, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResultWithInsufficientData());
 
         assertThrows(InsufficientLocationDataException.class,
@@ -749,13 +749,13 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_UA, addressTypes))
+            languageUa, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
 
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_EN, addressTypes))
+            languageEn, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
@@ -786,13 +786,13 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_UA, addressTypes))
+            languageUa, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
 
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_EN, addressTypes))
+            languageEn, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
@@ -841,13 +841,13 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_UA, addressTypes))
+            languageUa, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
 
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_EN, addressTypes))
+            languageEn, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         assertEquals(1, myUser.getUserLocation().getUsers().size());
@@ -879,13 +879,13 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_UA, addressTypes))
+            languageUa, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
 
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_EN, addressTypes))
+            languageEn, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));
         verify(userRepo).findByEmail("test@gmail.com");
@@ -926,13 +926,13 @@ class UserServiceImplTest {
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_UA, addressTypes))
+            languageUa, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
 
         when(googleApiService.getLocationByCoordinates(
             request.getCoordinates().getLatitude(),
             request.getCoordinates().getLongitude(),
-            LANGUAGE_EN, addressTypes))
+            languageEn, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
 
         assertEquals(UpdateConstants.SUCCESS_EN, userService.saveUserProfile(request, "test@gmail.com"));

@@ -35,7 +35,7 @@ class GoogleApiServiceTest {
     GeocodingApiRequest request;
     private final AddressType[] addressTypes =
         {AddressType.LOCALITY, AddressType.ADMINISTRATIVE_AREA_LEVEL_1, AddressType.COUNTRY};
-    final String LANGUAGE_UA = "uk";
+    private final String languageUa = "uk";
     private final LatLng coordinates = new LatLng(20.000000, 20.000000);
 
     @Test
@@ -46,14 +46,14 @@ class GoogleApiServiceTest {
                 .thenReturn(request);
 
             when(request.latlng(coordinates)).thenReturn(request);
-            when(request.language(LANGUAGE_UA)).thenReturn(request);
+            when(request.language(languageUa)).thenReturn(request);
             when(request.resultType(addressTypes)).thenReturn(request);
             when(request.await()).thenReturn(ModelUtils.getGeocodingResult().toArray(GeocodingResult[]::new));
             assertDoesNotThrow(
-                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
+                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, languageUa,
                     addressTypes));
             verify(request).latlng(coordinates);
-            verify(request).language(LANGUAGE_UA);
+            verify(request).language(languageUa);
             verify(request).await();
         }
     }
@@ -65,18 +65,18 @@ class GoogleApiServiceTest {
             utilities.when(() -> GeocodingApi.newRequest(context))
                 .thenReturn(request);
 
-            when(request.language(LANGUAGE_UA)).thenReturn(request);
+            when(request.language(languageUa)).thenReturn(request);
             when(request.latlng(coordinates)).thenReturn(request);
             when(request.resultType(addressTypes)).thenReturn(request);
             when(request.await()).thenThrow(new InvalidRequestException("message"));
             String formattedCoordinates = "%.8f,%.8f".formatted(coordinates.lat, coordinates.lng);
             NotFoundException exception =
                 assertThrows(NotFoundException.class,
-                    () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
+                    () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, languageUa,
                         addressTypes));
 
             assertEquals(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + formattedCoordinates, exception.getMessage());
-            verify(request).language(LANGUAGE_UA);
+            verify(request).language(languageUa);
             verify(request).latlng(coordinates);
             verify(request).await();
         }
@@ -89,15 +89,15 @@ class GoogleApiServiceTest {
             utilities.when(() -> GeocodingApi.newRequest(context))
                 .thenReturn(request);
 
-            when(request.language(LANGUAGE_UA)).thenReturn(request);
+            when(request.language(languageUa)).thenReturn(request);
             when(request.resultType(addressTypes)).thenReturn(request);
             when(request.await()).thenThrow(new GoogleApiException("something went wrong"));
             when(request.latlng(coordinates)).thenReturn(request);
 
             assertThrows(GoogleApiException.class,
-                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
+                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, languageUa,
                     addressTypes));
-            verify(request).language(LANGUAGE_UA);
+            verify(request).language(languageUa);
             verify(request).latlng(coordinates);
             verify(request).await();
         }
@@ -106,22 +106,19 @@ class GoogleApiServiceTest {
     @Test
     @SneakyThrows
     void getLocationByCoordinatesThrowsInterruptedExceptionTest() {
-        String language = "uk";
-        LatLng coordinates = new LatLng(20.000000, 20.000000);
-
         try (MockedStatic<GeocodingApi> utilities = Mockito.mockStatic(GeocodingApi.class)) {
             utilities.when(() -> GeocodingApi.newRequest(context))
                 .thenReturn(request);
 
-            when(request.language(language)).thenReturn(request);
+            when(request.language(languageUa)).thenReturn(request);
             when(request.resultType(addressTypes)).thenReturn(request);
             when(request.await()).thenThrow(new InterruptedException());
             when(request.latlng(coordinates)).thenReturn(request);
 
             assertThrows(GoogleApiException.class,
-                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language,
+                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, languageUa,
                     addressTypes));
-            verify(request).language(language);
+            verify(request).language(languageUa);
             verify(request).latlng(coordinates);
             verify(request).await();
         }
