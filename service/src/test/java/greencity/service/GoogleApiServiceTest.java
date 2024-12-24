@@ -4,6 +4,7 @@ import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.GeocodingApiRequest;
 import com.google.maps.errors.InvalidRequestException;
+import com.google.maps.model.AddressType;
 import com.google.maps.model.GeocodingResult;
 import com.google.maps.model.LatLng;
 import greencity.ModelUtils;
@@ -32,48 +33,50 @@ class GoogleApiServiceTest {
     GeoApiContext context;
     @Mock
     GeocodingApiRequest request;
+    private final AddressType[] addressTypes =
+        {AddressType.LOCALITY, AddressType.ADMINISTRATIVE_AREA_LEVEL_1, AddressType.COUNTRY};
+    final String LANGUAGE_UA = "uk";
+    private final LatLng coordinates = new LatLng(20.000000, 20.000000);
 
     @Test
     @SneakyThrows
-    void testGetLocationByCoordinates() {
-        String language = "uk";
-        LatLng coordinates = new LatLng(20.000000, 20.000000);
+    void getLocationByCoordinatesTest() {
         try (MockedStatic<GeocodingApi> utilities = Mockito.mockStatic(GeocodingApi.class)) {
             utilities.when(() -> GeocodingApi.newRequest(context))
                 .thenReturn(request);
 
             when(request.latlng(coordinates)).thenReturn(request);
-            when(request.language(language)).thenReturn(request);
-            when(request.await()).thenReturn(new GeocodingResult[] {ModelUtils.getGeocodingResult().get(1)});
-
+            when(request.language(LANGUAGE_UA)).thenReturn(request);
+            when(request.resultType(addressTypes)).thenReturn(request);
+            when(request.await()).thenReturn(ModelUtils.getGeocodingResult().toArray(GeocodingResult[]::new));
             assertDoesNotThrow(
-                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));
+                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
+                        addressTypes));
             verify(request).latlng(coordinates);
-            verify(request).language(language);
+            verify(request).language(LANGUAGE_UA);
             verify(request).await();
         }
     }
 
     @Test
     @SneakyThrows
-    void testGtLocationByCoordinatesThrowsNotFoundException() {
-        String language = "uk";
-        LatLng coordinates = new LatLng(20.000000, 20.000000);
-
+    void getLocationByCoordinatesThrowsNotFoundExceptionTest() {
         try (MockedStatic<GeocodingApi> utilities = Mockito.mockStatic(GeocodingApi.class)) {
             utilities.when(() -> GeocodingApi.newRequest(context))
                 .thenReturn(request);
 
-            when(request.language(language)).thenReturn(request);
+            when(request.language(LANGUAGE_UA)).thenReturn(request);
             when(request.latlng(coordinates)).thenReturn(request);
+            when(request.resultType(addressTypes)).thenReturn(request);
             when(request.await()).thenThrow(new InvalidRequestException("message"));
             String formattedCoordinates = "%.8f,%.8f".formatted(coordinates.lat, coordinates.lng);
             NotFoundException exception =
                 assertThrows(NotFoundException.class,
-                    () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));
+                    () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
+                            addressTypes));
 
             assertEquals(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + formattedCoordinates, exception.getMessage());
-            verify(request).language(language);
+            verify(request).language(LANGUAGE_UA);
             verify(request).latlng(coordinates);
             verify(request).await();
         }
@@ -81,21 +84,20 @@ class GoogleApiServiceTest {
 
     @Test
     @SneakyThrows
-    void testGetLocationByCoordinatesThrowsGoogleApiException() {
-        String language = "uk";
-        LatLng coordinates = new LatLng(20.000000, 20.000000);
-
+    void getLocationByCoordinatesThrowsGoogleApiExceptionTest() {
         try (MockedStatic<GeocodingApi> utilities = Mockito.mockStatic(GeocodingApi.class)) {
             utilities.when(() -> GeocodingApi.newRequest(context))
                 .thenReturn(request);
 
-            when(request.language(language)).thenReturn(request);
+            when(request.language(LANGUAGE_UA)).thenReturn(request);
+            when(request.resultType(addressTypes)).thenReturn(request);
             when(request.await()).thenThrow(new GoogleApiException("something went wrong"));
             when(request.latlng(coordinates)).thenReturn(request);
 
             assertThrows(GoogleApiException.class,
-                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));
-            verify(request).language(language);
+                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
+                        addressTypes));
+            verify(request).language(LANGUAGE_UA);
             verify(request).latlng(coordinates);
             verify(request).await();
         }
@@ -103,7 +105,7 @@ class GoogleApiServiceTest {
 
     @Test
     @SneakyThrows
-    void testGetLocationByCoordinatesThrowsInterruptedException() {
+    void getLocationByCoordinatesThrowsInterruptedExceptionTest() {
         String language = "uk";
         LatLng coordinates = new LatLng(20.000000, 20.000000);
 
@@ -112,11 +114,13 @@ class GoogleApiServiceTest {
                 .thenReturn(request);
 
             when(request.language(language)).thenReturn(request);
+            when(request.resultType(addressTypes)).thenReturn(request);
             when(request.await()).thenThrow(new InterruptedException());
             when(request.latlng(coordinates)).thenReturn(request);
 
             assertThrows(GoogleApiException.class,
-                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language));
+                () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language,
+                        addressTypes));
             verify(request).language(language);
             verify(request).latlng(coordinates);
             verify(request).await();
