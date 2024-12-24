@@ -51,7 +51,7 @@ class GoogleApiServiceTest {
             when(request.await()).thenReturn(ModelUtils.getGeocodingResult().toArray(GeocodingResult[]::new));
             assertDoesNotThrow(
                 () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
-                        addressTypes));
+                    addressTypes));
             verify(request).latlng(coordinates);
             verify(request).language(LANGUAGE_UA);
             verify(request).await();
@@ -73,7 +73,7 @@ class GoogleApiServiceTest {
             NotFoundException exception =
                 assertThrows(NotFoundException.class,
                     () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
-                            addressTypes));
+                        addressTypes));
 
             assertEquals(ErrorMessage.NOT_FOUND_ADDRESS_BY_COORDINATES + formattedCoordinates, exception.getMessage());
             verify(request).language(LANGUAGE_UA);
@@ -96,7 +96,7 @@ class GoogleApiServiceTest {
 
             assertThrows(GoogleApiException.class,
                 () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, LANGUAGE_UA,
-                        addressTypes));
+                    addressTypes));
             verify(request).language(LANGUAGE_UA);
             verify(request).latlng(coordinates);
             verify(request).await();
@@ -120,7 +120,7 @@ class GoogleApiServiceTest {
 
             assertThrows(GoogleApiException.class,
                 () -> googleApiService.getLocationByCoordinates(coordinates.lat, coordinates.lng, language,
-                        addressTypes));
+                    addressTypes));
             verify(request).language(language);
             verify(request).latlng(coordinates);
             verify(request).await();

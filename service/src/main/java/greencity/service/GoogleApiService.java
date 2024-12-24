@@ -24,10 +24,10 @@ public class GoogleApiService {
     /**
      * Method gets user location by coordinates.
      *
-     * @param latitude    user's latitude
-     * @param longitude   user's longitude
+     * @param latitude     user's latitude
+     * @param longitude    user's longitude
      * @param addressTypes preferred result_types that should be included in the
-     *                    result.
+     *                     result.
      * @return {@link GeocodingResult}
      */
     public GeocodingResult getLocationByCoordinates(Double latitude, Double longitude, String lang,
