@@ -1,6 +1,7 @@
 package greencity.service;
 
 import com.google.maps.model.AddressComponentType;
+import com.google.maps.model.AddressType;
 import com.google.maps.model.GeocodingResult;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
@@ -610,14 +611,17 @@ public class UserServiceImpl implements UserService {
             old.getUsers().remove(user);
             user.setUserLocation(null);
         } else {
+            final AddressType[] addressTypes =
+                {AddressType.LOCALITY, AddressType.ADMINISTRATIVE_AREA_LEVEL_1, AddressType.COUNTRY};
+
             GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(
                 userProfileDtoRequest.getCoordinates().getLatitude(),
                 userProfileDtoRequest.getCoordinates().getLongitude(),
-                "uk");
+                "uk", addressTypes);
             GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(
                 userProfileDtoRequest.getCoordinates().getLatitude(),
                 userProfileDtoRequest.getCoordinates().getLongitude(),
-                "en");
+                "en", addressTypes);
             UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
                 userProfileDtoRequest.getCoordinates().getLatitude(),
                 userProfileDtoRequest.getCoordinates().getLongitude()).orElse(new UserLocation());
@@ -670,7 +674,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private void checkGeocodingResultContainsAllInformation(GeocodingResult geocodingResult, int size) {
-        if (geocodingResult.addressComponents.length <= size) {
+        if (geocodingResult.addressComponents.length < size) {
             throw new InsufficientLocationDataException(ErrorMessage.INSUFFICIENT_LOCATION_DATA_FOUND);
         }
     }
