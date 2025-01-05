@@ -7,8 +7,11 @@ import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
+import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
+import greencity.enums.LocationPrivacyPolicy;
 import greencity.enums.Role;
+import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -61,11 +64,11 @@ public class UserVO {
 
     private String profilePicturePath;
 
-    private Boolean showLocation;
+    private LocationPrivacyPolicy showLocation;
 
-    private Boolean showEcoPlace;
+    private EcoPlacePrivacyPolicy showEcoPlace;
 
-    private Boolean showToDoList;
+    private ToDoListPrivacyPolicy showToDoList;
 
     private LocalDateTime lastActivityTime;
 

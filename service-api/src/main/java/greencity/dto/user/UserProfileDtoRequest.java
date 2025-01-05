@@ -1,11 +1,16 @@
 package greencity.dto.user;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import greencity.annotations.EnumValidation;
 import greencity.annotations.ValidName;
 import greencity.annotations.ValidSocialNetworkLinks;
 import greencity.dto.CoordinatesDto;
+import greencity.enums.EcoPlacePrivacyPolicy;
+import greencity.enums.LocationPrivacyPolicy;
+import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.validator.BooleanValueDeserializer;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
@@ -35,16 +40,16 @@ public class UserProfileDtoRequest {
     private List<String> socialNetworks;
 
     @NotNull
-    @JsonDeserialize(using = BooleanValueDeserializer.class)
-    private Boolean showLocation;
+    @EnumValidation(enumClass = LocationPrivacyPolicy.class)
+    private LocationPrivacyPolicy showLocation;
 
     @NotNull
-    @JsonDeserialize(using = BooleanValueDeserializer.class)
-    private Boolean showEcoPlace;
+    @EnumValidation(enumClass = EcoPlacePrivacyPolicy.class)
+    private EcoPlacePrivacyPolicy showEcoPlace;
 
     @NotNull
-    @JsonDeserialize(using = BooleanValueDeserializer.class)
-    private Boolean showToDoList;
+    @EnumValidation(enumClass = ToDoListPrivacyPolicy.class)
+    private ToDoListPrivacyPolicy showToDoList;
 
     private CoordinatesDto coordinates;
 

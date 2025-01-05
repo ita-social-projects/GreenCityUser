@@ -17,10 +17,13 @@ import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.*;
+import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.LocationPrivacyPolicy;
 import greencity.enums.Role;
+import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
@@ -263,9 +266,9 @@ public class ModelUtils {
                 new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
                     "Ukraine", "Україна", 20.000000,
                     20.000000))
-            .showToDoList(true)
-            .showEcoPlace(true)
-            .showLocation(true)
+            .showToDoList(ToDoListPrivacyPolicy.PUBLIC)
+            .showEcoPlace(EcoPlacePrivacyPolicy.PUBLIC)
+            .showLocation(LocationPrivacyPolicy.PUBLIC)
             .ownSecurity(OwnSecurityVO.builder()
                 .id(1L)
                 .password("password")
@@ -321,9 +324,9 @@ public class ModelUtils {
                 "https://www.gmail.com",
                 "https://www.google.com"))
             .coordinates(new CoordinatesDto(1.0d, 1.0d))
-            .showLocation(true)
-            .showEcoPlace(true)
-            .showToDoList(true)
+            .showLocation(LocationPrivacyPolicy.PUBLIC)
+            .showEcoPlace(EcoPlacePrivacyPolicy.PUBLIC)
+            .showToDoList(ToDoListPrivacyPolicy.PUBLIC)
             .emailPreferences(Set.of(
                 UserNotificationPreferenceDto.builder()
                     .emailPreference(EmailPreference.SYSTEM)

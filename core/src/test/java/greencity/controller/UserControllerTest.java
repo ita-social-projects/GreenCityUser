@@ -364,9 +364,10 @@ class UserControllerTest {
             	"name": "Vovka",
             	"userCredo": "credo",
             	"socialNetworks": [],
-            	"showLocation": true,
-            	"showEcoPlace": true,
-            	"showToDoList": false,
+            	"showLocation": "PUBLIC",
+            	"showEcoPlace": "PUBLIC",
+            	"
+            	showToDoList": "PUBLIC",
             	"coordinates":{\s
              \
             	"latitude": 20.000000,
@@ -402,9 +403,9 @@ class UserControllerTest {
                 "name": "Vovka",
                 "userCredo": "credo",
                 "socialNetworks": [],
-                "showLocation": true,
-                "showEcoPlace": true,
-                "showToDoList": false,
+                "showLocation": "PUBLIC",
+                "showEcoPlace": "PUBLIC",
+                "showToDoList": "PRIVATE",
                 "coordinates": {
                     "latitude": 20.000000,
                     "longitude": 20.000000

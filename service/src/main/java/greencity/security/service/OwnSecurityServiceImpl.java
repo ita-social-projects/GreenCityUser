@@ -14,10 +14,13 @@ import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;
 import greencity.entity.VerifyEmail;
+import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.LocationPrivacyPolicy;
 import greencity.enums.Role;
+import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRefreshTokenException;
 import greencity.exception.exceptions.BadRequestException;
@@ -127,9 +130,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
-        user.setShowLocation(true);
-        user.setShowEcoPlace(true);
-        user.setShowToDoList(true);
+        user.setShowLocation(LocationPrivacyPolicy.PUBLIC);
+        user.setShowEcoPlace(EcoPlacePrivacyPolicy.PUBLIC);
+        user.setShowToDoList(ToDoListPrivacyPolicy.PUBLIC);
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
@@ -185,9 +188,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
         employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate()));
         employee.setUuid(employeeSignUpDto.getUuid());
-        employee.setShowLocation(true);
-        employee.setShowEcoPlace(true);
-        employee.setShowToDoList(true);
+        employee.setShowLocation(LocationPrivacyPolicy.PUBLIC);
+        employee.setShowEcoPlace(EcoPlacePrivacyPolicy.PUBLIC);
+        employee.setShowToDoList(ToDoListPrivacyPolicy.PUBLIC);
         List<String> positionNames = employeeSignUpDto.getPositions().stream()
             .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
             .toList();
