@@ -13,8 +13,11 @@ import greencity.dto.user.UserVO;
 import greencity.entity.Achievement;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
+import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
+import greencity.enums.LocationPrivacyPolicy;
 import greencity.enums.Role;
+import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.IdTokenExpiredException;
 import greencity.exception.exceptions.UserDeactivatedException;
@@ -44,7 +47,6 @@ import org.mockito.Mock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -188,9 +190,9 @@ class GoogleSecurityServiceImplTest {
             assertEquals(EmailNotification.DISABLED, savedUser.getEmailNotification(),
                 "Email notification should be DISABLED.");
             assertEquals(DEFAULT_RATING, savedUser.getRating());
-            assertTrue(savedUser.getShowLocation(), "showLocation should be true.");
-            assertTrue(savedUser.getShowEcoPlace(), "showEcoPlace should be true.");
-            assertTrue(savedUser.getShowToDoList(), "showToDoList should be true.");
+            assertEquals(LocationPrivacyPolicy.PUBLIC, savedUser.getShowLocation());
+            assertEquals(EcoPlacePrivacyPolicy.PUBLIC, savedUser.getShowEcoPlace());
+            assertEquals(ToDoListPrivacyPolicy.PUBLIC, savedUser.getShowToDoList());
             assertNotNull(savedUser.getNotificationPreferences(), "Notification preferences should be initialized.");
             assertFalse(savedUser.getNotificationPreferences().isEmpty(),
                 "Notification preferences should not be empty.");
