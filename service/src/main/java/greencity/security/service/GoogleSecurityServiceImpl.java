@@ -148,6 +148,9 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .showEcoPlace(EcoPlacePrivacyPolicy.PUBLIC)
             .showToDoList(ToDoListPrivacyPolicy.PUBLIC)
             .rating(DEFAULT_RATING)
+            .showLocation(true)
+            .showEcoPlace(true)
+            .showToDoList(true)
             .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
