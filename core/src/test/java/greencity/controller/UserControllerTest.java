@@ -361,20 +361,19 @@ class UserControllerTest {
 
         String json = """
             {
-            	"name": "Vovka",
-            	"userCredo": "credo",
-            	"socialNetworks": [],
-            	"showLocation": "PUBLIC",
-            	"showEcoPlace": "PUBLIC",
-            	"
-            	showToDoList": "PUBLIC",
-            	"coordinates":{\s
-             \
-            	"latitude": 20.000000,
-            	"longitude": 20.000000
-            	}
-            }\
+                "name": "Vovka",
+                "userCredo": "credo",
+                "socialNetworks": [],
+                "showLocation": "PUBLIC",
+                "showEcoPlace": "PUBLIC",
+                "showToDoList": "PUBLIC",
+                "coordinates": {
+                    "latitude": 20.000000,
+                    "longitude": 20.000000
+                }
+            }
             """;
+
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);

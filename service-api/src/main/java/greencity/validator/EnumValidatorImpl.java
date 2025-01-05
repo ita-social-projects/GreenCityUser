@@ -20,7 +20,6 @@ public class EnumValidatorImpl implements ConstraintValidator<EnumValidation, St
         for (Enum<?> enumValue : enumClass.getEnumConstants()) {
             if (enumValue.name().equals(s)) {
                 return true;
-
             }
         }
         return false;

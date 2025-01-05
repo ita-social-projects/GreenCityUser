@@ -138,15 +138,15 @@ public class User {
 
     @Column(name = "show_location")
     @Enumerated(value = EnumType.STRING)
-    private LocationPrivacyPolicy showLocation;
+    private LocationPrivacyPolicy showLocation = LocationPrivacyPolicy.PUBLIC;
 
     @Column(name = "show_eco_place")
     @Enumerated(value = EnumType.STRING)
-    private EcoPlacePrivacyPolicy showEcoPlace;
+    private EcoPlacePrivacyPolicy showEcoPlace = EcoPlacePrivacyPolicy.PUBLIC;
 
     @Column(name = "show_to_do_list")
     @Enumerated(value = EnumType.STRING)
-    private ToDoListPrivacyPolicy showToDoList;
+    private ToDoListPrivacyPolicy showToDoList = ToDoListPrivacyPolicy.PUBLIC;
 
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;

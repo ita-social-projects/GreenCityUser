@@ -6,7 +6,6 @@ import greencity.enums.LocationPrivacyPolicy;
 import greencity.enums.Role;
 import java.util.List;
 import java.util.Set;
-
 import greencity.enums.ToDoListPrivacyPolicy;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

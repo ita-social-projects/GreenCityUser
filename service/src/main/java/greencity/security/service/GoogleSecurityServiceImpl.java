@@ -12,10 +12,13 @@ import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;
+import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.LocationPrivacyPolicy;
 import greencity.enums.Role;
+import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.IdTokenExpiredException;
 import greencity.exception.exceptions.UserDeactivatedException;
@@ -141,6 +144,9 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
             .profilePicturePath(profilePicture)
+            .showLocation(LocationPrivacyPolicy.PUBLIC)
+            .showEcoPlace(EcoPlacePrivacyPolicy.PUBLIC)
+            .showToDoList(ToDoListPrivacyPolicy.PUBLIC)
             .rating(DEFAULT_RATING)
             .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
