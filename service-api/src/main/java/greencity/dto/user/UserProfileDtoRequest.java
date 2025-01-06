@@ -2,6 +2,9 @@ package greencity.dto.user;
 
 import greencity.annotations.ValidSocialNetworkLinks;
 import greencity.dto.CoordinatesDto;
+import greencity.enums.EcoPlacePrivacyPolicy;
+import greencity.enums.LocationPrivacyPolicy;
+import greencity.enums.ToDoListPrivacyPolicy;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
@@ -29,8 +32,8 @@ public class UserProfileDtoRequest {
     private String userCredo;
     @ValidSocialNetworkLinks
     private List<String> socialNetworks;
-    private Boolean showLocation;
-    private Boolean showEcoPlace;
-    private Boolean showShoppingList;
+    private LocationPrivacyPolicy showLocation;
+    private EcoPlacePrivacyPolicy showEcoPlace;
+    private ToDoListPrivacyPolicy showShoppingList;
     private CoordinatesDto coordinates;
 }
