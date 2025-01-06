@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RequiredArgsConstructor
-public class EnumValidatorImplTest {
+class EnumValidatorImplTest {
     private EnumValidatorImpl enumValidator;
     private ConstraintValidatorContext mockContext;
 
