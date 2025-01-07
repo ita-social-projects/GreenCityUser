@@ -1,6 +1,7 @@
 package greencity.dto.user;
 
 import greencity.dto.socialnetwork.SocialNetworkResponseDTO;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import java.util.List;
 import java.util.Set;
@@ -22,9 +23,9 @@ public class UserProfileDtoResponse {
     private String name;
     private String userCredo;
     private List<SocialNetworkResponseDTO> socialNetworks;
-    private Boolean showLocation;
-    private Boolean showEcoPlace;
-    private Boolean showToDoList;
+    private ProfilePrivacyPolicy showLocation;
+    private ProfilePrivacyPolicy showEcoPlace;
+    private ProfilePrivacyPolicy showToDoList;
     private Float rating;
     private Role role;
     private UserLocationDto userLocationDto;
