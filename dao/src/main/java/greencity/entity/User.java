@@ -2,6 +2,7 @@ package greencity.entity;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.enums.EmailNotification;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import jakarta.persistence.CascadeType;
@@ -134,13 +135,16 @@ public class User {
     private List<SocialNetwork> socialNetworks;
 
     @Column(name = "show_location")
-    private Boolean showLocation;
+    @Enumerated(value = EnumType.STRING)
+    private ProfilePrivacyPolicy showLocation = ProfilePrivacyPolicy.PUBLIC;
 
     @Column(name = "show_eco_place")
-    private Boolean showEcoPlace;
+    @Enumerated(value = EnumType.STRING)
+    private ProfilePrivacyPolicy showEcoPlace = ProfilePrivacyPolicy.PUBLIC;
 
     @Column(name = "show_to_do_list")
-    private Boolean showToDoList;
+    @Enumerated(value = EnumType.STRING)
+    private ProfilePrivacyPolicy showToDoList = ProfilePrivacyPolicy.PUBLIC;
 
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;
