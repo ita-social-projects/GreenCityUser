@@ -17,11 +17,9 @@ import greencity.entity.User;
 import greencity.entity.UserAchievement;
 import greencity.entity.UserAction;
 import greencity.entity.VerifyEmail;
-import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
-import greencity.enums.LocationPrivacyPolicy;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
-import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRefreshTokenException;
 import greencity.exception.exceptions.BadUserStatusException;
@@ -138,9 +136,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
-        user.setShowLocation(LocationPrivacyPolicy.PUBLIC);
-        user.setShowEcoPlace(EcoPlacePrivacyPolicy.PUBLIC);
-        user.setShowShoppingList(ToDoListPrivacyPolicy.PUBLIC);
+        user.setShowLocation(ProfilePrivacyPolicy.PUBLIC);
+        user.setShowEcoPlace(ProfilePrivacyPolicy.PUBLIC);
+        user.setShowShoppingList(ProfilePrivacyPolicy.PUBLIC);
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
@@ -219,9 +217,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setOwnSecurity(createOwnSecurity(dto, employee));
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
         employee.setUuid(employeeSignUpDto.getUuid());
-        employee.setShowLocation(LocationPrivacyPolicy.PUBLIC);
-        employee.setShowEcoPlace(EcoPlacePrivacyPolicy.PUBLIC);
-        employee.setShowShoppingList(ToDoListPrivacyPolicy.PUBLIC);
+        employee.setShowLocation(ProfilePrivacyPolicy.PUBLIC);
+        employee.setShowEcoPlace(ProfilePrivacyPolicy.PUBLIC);
+        employee.setShowShoppingList(ProfilePrivacyPolicy.PUBLIC);
         setEmployeePositionsAndAuthorities(employeeSignUpDto, employee);
         employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate(),
             validateOnlyDriverPosition(employee)));

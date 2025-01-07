@@ -11,11 +11,9 @@ import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
-import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
-import greencity.enums.LocationPrivacyPolicy;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
-import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.IdTokenExpiredException;
 import greencity.exception.exceptions.UserDeactivatedException;
@@ -139,9 +137,9 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .refreshTokenKey(jwtTool.generateTokenKey())
             .profilePicturePath(profilePicture)
             .rating(DEFAULT_RATING)
-            .showLocation(LocationPrivacyPolicy.PUBLIC)
-            .showEcoPlace(EcoPlacePrivacyPolicy.PUBLIC)
-            .showShoppingList(ToDoListPrivacyPolicy.PUBLIC)
+            .showLocation(ProfilePrivacyPolicy.PUBLIC)
+            .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
+            .showShoppingList(ProfilePrivacyPolicy.PUBLIC)
             .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
     }
