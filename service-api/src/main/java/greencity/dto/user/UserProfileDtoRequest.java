@@ -4,9 +4,7 @@ import greencity.annotations.EnumValidation;
 import greencity.annotations.ValidName;
 import greencity.annotations.ValidSocialNetworkLinks;
 import greencity.dto.CoordinatesDto;
-import greencity.enums.EcoPlacePrivacyPolicy;
-import greencity.enums.LocationPrivacyPolicy;
-import greencity.enums.ToDoListPrivacyPolicy;
+import greencity.enums.ProfilePrivacyPolicy;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -37,19 +35,19 @@ public class UserProfileDtoRequest {
     private List<String> socialNetworks;
 
     @NotNull
-    @EnumValidation(enumClass = LocationPrivacyPolicy.class)
+    @EnumValidation(enumClass = ProfilePrivacyPolicy.class)
     @Schema(example = "PUBLIC")
-    private LocationPrivacyPolicy showLocation;
+    private ProfilePrivacyPolicy showLocation;
 
     @NotNull
-    @EnumValidation(enumClass = EcoPlacePrivacyPolicy.class)
+    @EnumValidation(enumClass = ProfilePrivacyPolicy.class)
     @Schema(example = "PUBLIC")
-    private EcoPlacePrivacyPolicy showEcoPlace;
+    private ProfilePrivacyPolicy showEcoPlace;
 
     @NotNull
-    @EnumValidation(enumClass = ToDoListPrivacyPolicy.class)
+    @EnumValidation(enumClass = ProfilePrivacyPolicy.class)
     @Schema(example = "PUBLIC")
-    private ToDoListPrivacyPolicy showToDoList;
+    private ProfilePrivacyPolicy showToDoList;
 
     private CoordinatesDto coordinates;
 

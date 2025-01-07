@@ -1,11 +1,9 @@
 package greencity.entity;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
-import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
-import greencity.enums.LocationPrivacyPolicy;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
-import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -138,15 +136,15 @@ public class User {
 
     @Column(name = "show_location")
     @Enumerated(value = EnumType.STRING)
-    private LocationPrivacyPolicy showLocation = LocationPrivacyPolicy.PUBLIC;
+    private ProfilePrivacyPolicy showLocation = ProfilePrivacyPolicy.PUBLIC;
 
     @Column(name = "show_eco_place")
     @Enumerated(value = EnumType.STRING)
-    private EcoPlacePrivacyPolicy showEcoPlace = EcoPlacePrivacyPolicy.PUBLIC;
+    private ProfilePrivacyPolicy showEcoPlace = ProfilePrivacyPolicy.PUBLIC;
 
     @Column(name = "show_to_do_list")
     @Enumerated(value = EnumType.STRING)
-    private ToDoListPrivacyPolicy showToDoList = ToDoListPrivacyPolicy.PUBLIC;
+    private ProfilePrivacyPolicy showToDoList = ProfilePrivacyPolicy.PUBLIC;
 
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;

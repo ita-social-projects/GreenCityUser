@@ -13,11 +13,9 @@ import greencity.dto.user.UserVO;
 import greencity.entity.Achievement;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
-import greencity.enums.EcoPlacePrivacyPolicy;
 import greencity.enums.EmailNotification;
-import greencity.enums.LocationPrivacyPolicy;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
-import greencity.enums.ToDoListPrivacyPolicy;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.IdTokenExpiredException;
 import greencity.exception.exceptions.UserDeactivatedException;
@@ -190,9 +188,9 @@ class GoogleSecurityServiceImplTest {
             assertEquals(EmailNotification.DISABLED, savedUser.getEmailNotification(),
                 "Email notification should be DISABLED.");
             assertEquals(DEFAULT_RATING, savedUser.getRating());
-            assertEquals(LocationPrivacyPolicy.PUBLIC, savedUser.getShowLocation());
-            assertEquals(EcoPlacePrivacyPolicy.PUBLIC, savedUser.getShowEcoPlace());
-            assertEquals(ToDoListPrivacyPolicy.PUBLIC, savedUser.getShowToDoList());
+            assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowLocation());
+            assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowEcoPlace());
+            assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowToDoList());
             assertNotNull(savedUser.getNotificationPreferences(), "Notification preferences should be initialized.");
             assertFalse(savedUser.getNotificationPreferences().isEmpty(),
                 "Notification preferences should not be empty.");
