@@ -1,6 +1,7 @@
 package greencity.validator;
 
 import greencity.annotations.EnumValidation;
+import greencity.enums.ProfilePrivacyPolicy;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,11 +17,6 @@ class EnumValidatorImplTest {
     private EnumValidatorImpl enumValidator;
     private ConstraintValidatorContext mockContext;
 
-    private enum TestEnum {
-        FIRST_VALUE,
-        SECOND_VALUE
-    }
-
     @BeforeEach
     void setUp() {
         enumValidator = new EnumValidatorImpl();
@@ -28,15 +24,16 @@ class EnumValidatorImplTest {
 
         EnumValidation mockAnnotation = mock(EnumValidation.class);
 
-        when(mockAnnotation.enumClass()).thenAnswer(invocation -> TestEnum.class);
+        when(mockAnnotation.enumClass()).thenAnswer(invocation -> ProfilePrivacyPolicy.class);
 
         enumValidator.initialize(mockAnnotation);
     }
 
     @Test
     void IsValidWithValidValueTest() {
-        assertTrue(enumValidator.isValid("FIRST_VALUE", mockContext));
-        assertTrue(enumValidator.isValid("SECOND_VALUE", mockContext));
+        assertTrue(enumValidator.isValid("PRIVATE", mockContext));
+        assertTrue(enumValidator.isValid("FRIEND_ONLY", mockContext));
+        assertTrue(enumValidator.isValid("PUBLIC", mockContext));
     }
 
     @Test
@@ -52,6 +49,6 @@ class EnumValidatorImplTest {
 
     @Test
     void IsValidWithCaseSensitiveValueTest() {
-        assertFalse(enumValidator.isValid("first_value", mockContext));
+        assertFalse(enumValidator.isValid("friends_only", mockContext));
     }
 }

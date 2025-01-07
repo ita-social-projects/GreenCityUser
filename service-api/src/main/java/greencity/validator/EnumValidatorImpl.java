@@ -1,11 +1,12 @@
 package greencity.validator;
 
 import greencity.annotations.EnumValidation;
+import greencity.enums.ProfilePrivacyPolicy;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class EnumValidatorImpl implements ConstraintValidator<EnumValidation, String> {
-    private Class enumClass;
+    private Class<ProfilePrivacyPolicy> enumClass;
 
     @Override
     public void initialize(EnumValidation constraintAnnotation) {
