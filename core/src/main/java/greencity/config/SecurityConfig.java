@@ -52,6 +52,7 @@ public class SecurityConfig {
     private final JwtTool jwtTool;
     private final UserService userService;
     private static final String USER_LINK = "/user";
+    private static final String COMMIT_INFO = "/commit-info";
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Value("${spring.messaging.stomp.websocket.allowed-origins}")
@@ -119,7 +120,8 @@ public class SecurityConfig {
                     "/socket/**",
                     "/user/findAllByEmailNotification",
                     "/user/checkByUuid",
-                    "/user/get-user-rating")
+                    "/user/get-user-rating",
+                    COMMIT_INFO)
                 .permitAll()
                 .requestMatchers(HttpMethod.POST,
                     "/ownSecurity/signUp",
