@@ -132,5 +132,10 @@
             <artifactId>google-maps-services</artifactId>
             <version>${google.maps.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.eclipse.jgit</groupId>
+            <artifactId>org.eclipse.jgit</artifactId>
+            <version>${org.eclipse.jgit.version}</version>
+        </dependency>
     </dependencies>
 </project>

@@ -46,6 +46,11 @@ public final class ErrorMessage {
     public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
     public static final String EXPIRED_GOOGLE_ID_TOKEN = "Expired Google id token";
     public static final String TRANSACTION_FAILED = "Transaction failed";
+    public static final String WARNING_GIT_DIRECTORY_NOT_FOUND =
+        "WARNING: .git directory not found. Git commit info will be unavailable.";
+    public static final String GIT_REPOSITORY_NOT_INITIALIZED =
+        "Git repository not initialized. Commit info is unavailable.";
+    public static final String FAILED_TO_FETCH_COMMIT_INFO = "Failed to fetch commit info due to I/O error: ";
 
     private ErrorMessage() {
     }
