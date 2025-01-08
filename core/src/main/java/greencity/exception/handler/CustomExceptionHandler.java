@@ -76,7 +76,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Exception handler for BadUpdateRequestException.
-     * 
+     *
      * @param exception which is being intercepted
      * @param request   contains details about occurred exception
      * @return ResponseEntity which contains details about exception and 400 status
@@ -359,5 +359,24 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
+     * Method intercepts exception {@link ResourceNotFoundException}.
+     *
+     * @param ex      Exception that should be intercepted.
+     * @param request Contains details about the occurred exception.
+     * @return {@code ResponseEntity} which contains the HTTP status and body with
+     *         the exception message.
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public final ResponseEntity<Object> handleResourceNotFoundException(ResourceNotFoundException ex,
+        WebRequest request) {
+        log.warn(ex.getMessage(), ex);
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        exceptionResponse.setMessage(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
     }
 }
