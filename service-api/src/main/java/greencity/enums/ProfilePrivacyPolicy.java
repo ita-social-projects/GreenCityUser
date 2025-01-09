@@ -2,6 +2,6 @@ package greencity.enums;
 
 public enum ProfilePrivacyPolicy {
     PRIVATE,
-    FRIEND_ONLY,
+    FRIENDS_ONLY,
     PUBLIC
 }
