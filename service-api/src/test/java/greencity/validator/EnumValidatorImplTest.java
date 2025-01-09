@@ -32,7 +32,7 @@ class EnumValidatorImplTest {
     @Test
     void IsValidWithValidValueTest() {
         assertTrue(enumValidator.isValid("PRIVATE", mockContext));
-        assertTrue(enumValidator.isValid("FRIEND_ONLY", mockContext));
+        assertTrue(enumValidator.isValid("FRIENDS_ONLY", mockContext));
         assertTrue(enumValidator.isValid("PUBLIC", mockContext));
     }
 
