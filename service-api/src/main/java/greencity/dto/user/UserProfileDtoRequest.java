@@ -29,9 +29,11 @@ public class UserProfileDtoRequest {
     private String name;
 
     @Size(max = 170)
+    @Schema(example = "Lets Make The World A Better Place")
     private String userCredo;
 
     @ValidSocialNetworkLinks
+    @Schema(example = "https://www.facebook.com/greencity")
     private List<String> socialNetworks;
 
     @NotNull
