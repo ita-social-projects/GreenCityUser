@@ -313,8 +313,8 @@ class UserControllerTest {
             .file(jsonFile)
             .headers(headers)
             .principal(principal)
-            .accept(MediaType.APPLICATION_JSON)
-            .contentType(MediaType.APPLICATION_JSON))
+            .accept(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
             .andExpect(status().isOk());
     }
 
