@@ -18,6 +18,7 @@ import greencity.entity.UserAchievement;
 import greencity.entity.UserAction;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRefreshTokenException;
@@ -135,9 +136,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
-        user.setShowLocation(true);
-        user.setShowEcoPlace(true);
-        user.setShowShoppingList(true);
+        user.setShowLocation(ProfilePrivacyPolicy.PUBLIC);
+        user.setShowEcoPlace(ProfilePrivacyPolicy.PUBLIC);
+        user.setShowShoppingList(ProfilePrivacyPolicy.PUBLIC);
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
@@ -216,9 +217,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setOwnSecurity(createOwnSecurity(dto, employee));
         employee.setRole(Role.ROLE_UBS_EMPLOYEE);
         employee.setUuid(employeeSignUpDto.getUuid());
-        employee.setShowLocation(true);
-        employee.setShowEcoPlace(true);
-        employee.setShowShoppingList(true);
+        employee.setShowLocation(ProfilePrivacyPolicy.PUBLIC);
+        employee.setShowEcoPlace(ProfilePrivacyPolicy.PUBLIC);
+        employee.setShowShoppingList(ProfilePrivacyPolicy.PUBLIC);
         setEmployeePositionsAndAuthorities(employeeSignUpDto, employee);
         employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate(),
             validateOnlyDriverPosition(employee)));
