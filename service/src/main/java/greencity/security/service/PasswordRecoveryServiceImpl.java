@@ -76,11 +76,18 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
         User user = restorePasswordEmail.getUser();
+        String recipientName = (user.getName() != null && !user.getName().isBlank())
+            ? user.getName()
+            : (user.getFirstName() != null && !user.getFirstName().isBlank()
+                ? user.getFirstName()
+                : "User");
         UserStatus userStatus = restorePasswordEmail.getUser().getUserStatus();
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {
             updatePassword(form.getPassword(), restorePasswordEmail.getUser().getId());
-            emailService.sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(),
-                user.getName(), form.getIsUbs());
+            emailService.sendSuccessRestorePasswordByEmail(user.getEmail(),
+                user.getLanguage().getCode(),
+                recipientName,
+                form.getIsUbs());
             applicationEventPublisher.publishEvent(
                 new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
             user.setRestorePasswordEmail(null);
@@ -112,9 +119,14 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
                 .expiryDate(calculateExpirationDate(tokenExpirationTimeInHours))
                 .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
+        String recipientName = (user.getFirstName() != null && !user.getFirstName().isBlank())
+            ? user.getFirstName()
+            : (user.getName() != null && !user.getName().isBlank()
+                ? user.getName()
+                : "User");
         emailService.sendRestoreEmail(
             user.getId(),
-            user.getFirstName(),
+            recipientName,
             user.getEmail(),
             token,
             user.getLanguage().getCode(),
