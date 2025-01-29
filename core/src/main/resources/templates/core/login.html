@@ -24,7 +24,7 @@
                         console.log('User:', user);
                         console.log('response: ', response)
                         console.log('Access Token: ', response.authResponse.accessToken)
-                        fetch('https://200a-91-245-77-57.ngrok-free.app/facebook-login', {
+                        fetch('https://200a-91-245-77-57.ngrok-free.app/facebookSecurity/login', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -45,6 +45,7 @@
                                     const data = JSON.parse(text);
                                     console.log('Server response:', data);
                                     if (data.status === 'success') {
+                                        localStorage.setItem('authToken', data.token);
                                         window.location.href = data.redirectUrl;
                                     }
                                 } catch (error) {
@@ -56,6 +57,19 @@
                     });
                 }
             }, {scope: 'email'});
+            const authToken = localStorage.getItem('authToken');
+            if (authToken) {
+                fetch('https://your-api-endpoint.com/protected-route', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                })
+                    .then(res => res.json())
+                    .then(data => console.log('Protected data:', data))
+                    .catch(err => console.log('Error:', err));
+            }
+
         }
     </script>
 </head>

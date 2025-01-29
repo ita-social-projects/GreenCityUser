@@ -14,12 +14,15 @@ import greencity.service.UserService;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
@@ -125,23 +128,30 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
     }
 
-    public ResponseEntity<?> authenticateWithFacebook(Map<String, String> request) {
+    public ResponseEntity<?> authenticateWithFacebook(Map<String, String> request, HttpServletResponse response) {
         HttpHeaders headers = createCorsHeaders();
-
         if (!request.containsKey("accessToken")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(headers).body("Missing access token");
         }
 
         String accessToken = request.get("accessToken");
         String verifyUrl = "https://graph.facebook.com/me?fields=id,name,email&access_token=" + accessToken;
-
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.getForEntity(verifyUrl, String.class);
+        ResponseEntity<String> fbResponse = restTemplate.getForEntity(verifyUrl, String.class);
 
-        if (response.getStatusCode().is2xxSuccessful()) {
+        if (fbResponse.getStatusCode().is2xxSuccessful()) {
+            ResponseCookie jwtCookie = ResponseCookie.from("accessToken", accessToken)
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(3600)
+                    .build();
+
+            response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+
             return ResponseEntity.ok().headers(headers).body(Map.of(
                     "status", "success",
-                    "redirectUrl", REDIRECT_URL
+                    "redirectUrl", "https://www.greencity.cx.ua/#/ubs"
             ));
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(headers).body("Invalid Facebook token");

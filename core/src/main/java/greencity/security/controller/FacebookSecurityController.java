@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -65,12 +66,7 @@ public class FacebookSecurityController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginWithFacebook(@RequestBody Map<String, String> request) {
-        return facebookSecurityService.authenticateWithFacebook(request);
-    }
-
-    @GetMapping("/login")
-    public String loginFaceBookPage(){
-        return "resources/templates/core/login";
+    public ResponseEntity<?> loginWithFacebook(@RequestBody Map<String, String> request, HttpServletResponse response) {
+        return facebookSecurityService.authenticateWithFacebook(request, response);
     }
 }
