@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Login with Facebook</title>
+    <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/en_US/sdk.js"></script>
+    <script>
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '964118242488651',
+                cookie     : true,
+                xfbml      : true,
+                version    : 'v17.0'
+            });
+
+            FB.AppEvents.logPageView();
+        };
+
+        function loginWithFacebook() {
+            FB.login(function(response) {
+                if (response.authResponse) {
+                    FB.api('/me', {fields: 'name,email'}, function(user) {
+                        console.log('User:', user);
+                        console.log('response: ', response)
+                        console.log('Access Token: ', response.authResponse.accessToken)
+                        fetch('https://200a-91-245-77-57.ngrok-free.app/facebook-login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'ngrok-skip-browser-warning': 'true'
+                            },
+                            mode: 'cors',
+                            credentials: 'include',
+                            body: JSON.stringify({
+                                accessToken: response.authResponse.accessToken,
+                                userID: user.id,
+                                name: user.name,
+                                email: user.email
+                            })
+                        })
+                            .then(res => res.text())
+                            .then(text => {
+                                try {
+                                    const data = JSON.parse(text);
+                                    console.log('Server response:', data);
+                                    if (data.status === 'success') {
+                                        window.location.href = data.redirectUrl;
+                                    }
+                                } catch (error) {
+                                    console.log('Error parsing JSON:', text);
+                                }
+                            })
+                            .catch(error => console.log('Error:', error));
+
+                    });
+                }
+            }, {scope: 'email'});
+        }
+    </script>
+</head>
+<body>
+<button onclick="loginWithFacebook()">Увійти через Facebook</button>
+</body>
+</html>

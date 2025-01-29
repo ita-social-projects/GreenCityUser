@@ -12,17 +12,22 @@ import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * {@inheritDoc}
@@ -34,6 +39,9 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final UserService userService;
     private final JwtTool jwtTool;
     private final ModelMapper modelMapper;
+
+    private static final String NGROK_URL = "https://200a-91-245-77-57.ngrok-free.app";
+    private static final String REDIRECT_URL = "https://www.greencity.cx.ua/#/ubs";
     @Value("${address}")
     private String address;
     @Value("${spring.social.facebook.app-id}")
@@ -116,4 +124,35 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
     }
+
+    public ResponseEntity<?> authenticateWithFacebook(Map<String, String> request) {
+        HttpHeaders headers = createCorsHeaders();
+
+        if (!request.containsKey("accessToken")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(headers).body("Missing access token");
+        }
+
+        String accessToken = request.get("accessToken");
+        String verifyUrl = "https://graph.facebook.com/me?fields=id,name,email&access_token=" + accessToken;
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(verifyUrl, String.class);
+
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.ok().headers(headers).body(Map.of(
+                    "status", "success",
+                    "redirectUrl", REDIRECT_URL
+            ));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(headers).body("Invalid Facebook token");
+        }
+    }
+
+    private HttpHeaders createCorsHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Access-Control-Allow-Origin", NGROK_URL);
+        headers.add("Access-Control-Allow-Credentials", "true");
+        return headers;
+    }
+
 }

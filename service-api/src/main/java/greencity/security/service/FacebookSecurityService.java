@@ -1,6 +1,9 @@
 package greencity.security.service;
 
 import greencity.security.dto.SuccessSignInDto;
+import org.springframework.http.ResponseEntity;
+
+import java.util.Map;
 
 /**
  * Provides the facebook social logic.
@@ -24,4 +27,6 @@ public interface FacebookSecurityService {
      * @return {@link SuccessSignInDto} if token valid
      */
     SuccessSignInDto generateFacebookAccessToken(String code);
+
+    ResponseEntity<?> authenticateWithFacebook(Map<String, String> request);
 }
