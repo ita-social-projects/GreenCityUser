@@ -66,7 +66,7 @@ public class FacebookSecurityController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginWithFacebook(@RequestBody Map<String, String> request, HttpServletResponse response) {
+    public SuccessSignInDto loginWithFacebook(@RequestBody Map<String, String> request, HttpServletResponse response) {
         return facebookSecurityService.authenticateWithFacebook(request, response);
     }
 }

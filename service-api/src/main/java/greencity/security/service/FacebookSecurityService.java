@@ -2,7 +2,6 @@ package greencity.security.service;
 
 import greencity.security.dto.SuccessSignInDto;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Map;
 
@@ -29,5 +28,5 @@ public interface FacebookSecurityService {
      */
     SuccessSignInDto generateFacebookAccessToken(String code);
 
-    ResponseEntity<?> authenticateWithFacebook(Map<String, String> request, HttpServletResponse response);
+    SuccessSignInDto authenticateWithFacebook(Map<String, String> request, HttpServletResponse response);
 }

@@ -1,19 +1,33 @@
 package greencity.security.service;
 
+import greencity.client.RestClient;
 import greencity.constant.AppConstant;
+
+import static greencity.constant.AppConstant.DEFAULT_RATING;
 import static greencity.constant.AppConstant.REGISTRATION_EMAIL_FIELD_NAME;
 import greencity.constant.ErrorMessage;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
+import greencity.entity.Language;
 import greencity.entity.User;
+import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +35,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 import org.springframework.social.oauth2.OAuth2Parameters;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.client.RestClientException;
 
 /**
  * {@inheritDoc}
@@ -41,10 +54,12 @@ import org.springframework.web.client.RestTemplate;
 public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final UserService userService;
     private final JwtTool jwtTool;
+    private final UserRepo userRepo;
+    private final PlatformTransactionManager transactionManager;
     private final ModelMapper modelMapper;
+    private final RestClient restClient;
 
     private static final String NGROK_URL = "https://200a-91-245-77-57.ngrok-free.app";
-    private static final String REDIRECT_URL = "https://www.greencity.cx.ua/#/ubs";
     @Value("${address}")
     private String address;
     @Value("${spring.social.facebook.app-id}")
@@ -128,41 +143,72 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
     }
 
-    public ResponseEntity<?> authenticateWithFacebook(Map<String, String> request, HttpServletResponse response) {
-        HttpHeaders headers = createCorsHeaders();
-        if (!request.containsKey("accessToken")) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).headers(headers).body("Missing access token");
-        }
-
-        String accessToken = request.get("accessToken");
-        String verifyUrl = "https://graph.facebook.com/me?fields=id,name,email&access_token=" + accessToken;
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<String> fbResponse = restTemplate.getForEntity(verifyUrl, String.class);
-
-        if (fbResponse.getStatusCode().is2xxSuccessful()) {
-            ResponseCookie jwtCookie = ResponseCookie.from("accessToken", accessToken)
-                    .httpOnly(true)
-                    .secure(true)
-                    .path("/")
-                    .maxAge(3600)
-                    .build();
-
-            response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
-
-            return ResponseEntity.ok().headers(headers).body(Map.of(
-                    "status", "success",
-                    "redirectUrl", "https://www.greencity.cx.ua/#/ubs"
-            ));
+    public SuccessSignInDto authenticateWithFacebook(Map<String, String> request, HttpServletResponse response) {
+        String email = request.get("email");
+        UserVO userVO = userService.findByEmail(email);
+        if (userVO == null) {
+            log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "{}", email);
+            return handleNewUser(email, request.get("name"), request.get("picture"), request.get("language"));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).headers(headers).body("Invalid Facebook token");
+            if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {
+                throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
+            }
+            log.info("Google sign-in exist user - {}", userVO.getEmail());
+            return getSuccessSignInDto(userVO);
         }
+
     }
 
-    private HttpHeaders createCorsHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Access-Control-Allow-Origin", NGROK_URL);
-        headers.add("Access-Control-Allow-Credentials", "true");
-        return headers;
+    private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
+        User newUser = createNewUser(email, userName, profilePicture, language);
+        User savedUser = saveNewUser(newUser);
+        try {
+            restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
+        } catch (RestClientException e) {
+            log.error("Failed to create UBS profile for user - {}", savedUser.getEmail(), e);
+            throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
+        }
+        UserVO userVO = modelMapper.map(savedUser, UserVO.class);
+        log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
+        return getSuccessSignInDto(userVO);
+    }
+
+    private User createNewUser(String email, String userName, String profilePicture, String language) {
+        User user = User.builder()
+                .email(email)
+                .name(userName)
+                .role(Role.ROLE_USER)
+                .dateOfRegistration(LocalDateTime.now())
+                .lastActivityTime(LocalDateTime.now())
+                .userStatus(UserStatus.ACTIVATED)
+                .emailNotification(EmailNotification.DISABLED)
+                .refreshTokenKey(jwtTool.generateTokenKey())
+                .profilePicturePath(profilePicture)
+                .showLocation(ProfilePrivacyPolicy.PUBLIC)
+                .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
+                .showToDoList(ProfilePrivacyPolicy.PUBLIC)
+                .rating(DEFAULT_RATING)
+                .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
+                .build();
+        Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
+                .map(emailPreference -> UserNotificationPreference.builder()
+                        .user(user)
+                        .emailPreference(emailPreference)
+                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                        .build())
+                .collect(Collectors.toSet());
+        user.setNotificationPreferences(userNotificationPreferences);
+        return user;
+    }
+
+    private User saveNewUser(User newUser) {
+        TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        return transactionTemplate.execute(status -> {
+            newUser.setUuid(UUID.randomUUID().toString());
+            Long id = userRepo.save(newUser).getId();
+            newUser.setId(id);
+            return newUser;
+        });
     }
 
 }
