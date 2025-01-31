@@ -24,7 +24,7 @@
                         console.log('User:', user);
                         console.log('Response: ', response);
                         console.log('Access Token: ', response.authResponse.accessToken);
-
+                        const language = navigator.language || navigator.userLanguage;
                         fetch('https://200a-91-245-77-57.ngrok-free.app/facebookSecurity/login', {
                             method: 'POST',
                             headers: {
@@ -37,14 +37,15 @@
                                 accessToken: response.authResponse.accessToken,
                                 userID: user.id,
                                 name: user.name,
-                                email: user.email
+                                email: user.email,
+                                language: language
                             })
                         })
                             .then(res => res.json())
                             .then(data => {
                                 console.log('Server response:', data);
                                 if (data.accessToken) {
-                                    window.location.href = "https://www.greencity.cx.ua/#/ubs";
+                                    window.location.href = "http://localhost:4200/#/ubs";
                                 }
                             })
                             .catch(error => console.log('Error:', error));

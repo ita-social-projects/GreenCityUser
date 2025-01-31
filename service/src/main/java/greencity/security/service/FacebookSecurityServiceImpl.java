@@ -1,5 +1,7 @@
 package greencity.security.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 
@@ -22,19 +24,23 @@ import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Map;
+import greencity.dto.user.UserInfo;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.util.EntityUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.facebook.connect.FacebookConnectionFactory;
@@ -54,10 +60,13 @@ import org.springframework.web.client.RestClientException;
 public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final UserService userService;
     private final JwtTool jwtTool;
+    private final HttpClient httpClient;
     private final UserRepo userRepo;
     private final PlatformTransactionManager transactionManager;
     private final ModelMapper modelMapper;
     private final RestClient restClient;
+    private final ObjectMapper objectMapper;
+
 
     private static final String NGROK_URL = "https://200a-91-245-77-57.ngrok-free.app";
     @Value("${address}")
@@ -66,6 +75,8 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private String facebookAppId;
     @Value("${spring.social.facebook.app-secret}")
     private String facebookAppSecret;
+    @Value("https://graph.facebook.com/v18.0/me?fields=id,name,email,picture&access_token=")
+    private String userInfoUrl;
 
     /**
      * {@inheritDoc}
@@ -137,26 +148,34 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .build();
     }
 
-    private SuccessSignInDto getSuccessSignInDto(UserVO user) {
-        String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
-        String refreshToken = jwtTool.createRefreshToken(user);
-        return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
+    public SuccessSignInDto authenticate(String fbToken, String language) {
+        try {
+            UserInfo userInfo = getUserInfoFromFacebook(fbToken);
+            if (userInfo.getEmail() == null) {
+                throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN);
+            }
+            String profilePicture = null;
+            if (userInfo.getPicture() != null) {
+                profilePicture = userInfo.getPicture();
+            }
+            return processAuthentication(userInfo.getEmail(), userInfo.getName(), profilePicture, language);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN + e.getMessage());
+        }
     }
 
-    public SuccessSignInDto authenticateWithFacebook(Map<String, String> request, HttpServletResponse response) {
-        String email = request.get("email");
+    private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture, String language) {
         UserVO userVO = userService.findByEmail(email);
         if (userVO == null) {
             log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "{}", email);
-            return handleNewUser(email, request.get("name"), request.get("picture"), request.get("language"));
+            return handleNewUser(email, userName, profilePicture, language);
         } else {
             if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {
                 throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
             }
-            log.info("Google sign-in exist user - {}", userVO.getEmail());
+            log.info("Facebook sign-in exist user - {}", userVO.getEmail());
             return getSuccessSignInDto(userVO);
         }
-
     }
 
     private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
@@ -169,7 +188,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
         }
         UserVO userVO = modelMapper.map(savedUser, UserVO.class);
-        log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
+        log.info("Facebook sign-up and sign-in user - {}", userVO.getEmail());
         return getSuccessSignInDto(userVO);
     }
 
@@ -211,4 +230,36 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         });
     }
 
+    private SuccessSignInDto getSuccessSignInDto(UserVO user) {
+        String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
+        String refreshToken = jwtTool.createRefreshToken(user);
+        return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
+    }
+
+    private UserInfo getUserInfoFromFacebook(String accessToken) throws IOException {
+        String requestUrl = userInfoUrl + "?fields=id,name,email,picture&access_token=" + accessToken;
+        HttpGet request = new HttpGet(requestUrl);
+        HttpResponse response = httpClient.execute(request);
+        String jsonResponse = EntityUtils.toString(response.getEntity());
+        JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+
+        String id = jsonNode.get("id").asText();
+        String name = jsonNode.get("name").asText();
+        String email = jsonNode.get("email").asText();
+        String pictureUrl = null;
+
+        if (jsonNode.has("picture")) {
+            JsonNode pictureNode = jsonNode.get("picture").get("data");
+            if (pictureNode != null && pictureNode.has("url")) {
+                pictureUrl = pictureNode.get("url").asText();
+            }
+        }
+
+        UserInfo userInfo = new UserInfo();
+        userInfo.setName(name);
+        userInfo.setEmail(email);
+        userInfo.setPicture(pictureUrl);
+
+        return userInfo;
+    }
 }

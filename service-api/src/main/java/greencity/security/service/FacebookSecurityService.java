@@ -28,5 +28,5 @@ public interface FacebookSecurityService {
      */
     SuccessSignInDto generateFacebookAccessToken(String code);
 
-    SuccessSignInDto authenticateWithFacebook(Map<String, String> request, HttpServletResponse response);
+    SuccessSignInDto authenticate(String fbToken, String language);
 }

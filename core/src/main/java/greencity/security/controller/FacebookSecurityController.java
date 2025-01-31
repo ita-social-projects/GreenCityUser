@@ -66,7 +66,17 @@ public class FacebookSecurityController {
     }
 
     @PostMapping("/login")
-    public SuccessSignInDto loginWithFacebook(@RequestBody Map<String, String> request, HttpServletResponse response) {
-        return facebookSecurityService.authenticateWithFacebook(request, response);
+    public SuccessSignInDto loginWithFacebook(@RequestBody Map<String, String> request) {
+        String fbToken = request.get("accessToken");
+        String language = request.get("language");
+        System.out.println();
+        System.out.println(fbToken);
+        System.out.println(language);
+
+        if (fbToken == null || language == null) {
+            throw new IllegalArgumentException("fbToken or language is missing");
+        }
+
+        return facebookSecurityService.authenticate(fbToken, language);
     }
 }
