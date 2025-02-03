@@ -67,15 +67,13 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-
-    private static final String NGROK_URL = "https://200a-91-245-77-57.ngrok-free.app";
     @Value("${address}")
     private String address;
     @Value("${spring.social.facebook.app-id}")
     private String facebookAppId;
     @Value("${spring.social.facebook.app-secret}")
     private String facebookAppSecret;
-    @Value("https://graph.facebook.com/v18.0/me?fields=id,name,email,picture&access_token=")
+    @Value("https://graph.facebook.com/v22.0/me?fields=id,name,email,picture&access_token=")
     private String userInfoUrl;
 
     /**
@@ -233,6 +231,10 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private SuccessSignInDto getSuccessSignInDto(UserVO user) {
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
+        System.out.println();
+        System.out.println();
+        System.out.println(accessToken);
+        System.out.println(refreshToken);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
     }
 
