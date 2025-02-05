@@ -29,14 +29,15 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import greencity.dto.user.UserInfo;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.modelmapper.ModelMapper;
@@ -147,6 +148,9 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     }
 
     public SuccessSignInDto authenticate(String fbToken, String language) {
+        if (fbToken == null || language == null) {
+            throw new IllegalArgumentException(ErrorMessage.FB_TOKEN_OR_LANGUAGE_MISSING);
+        }
         try {
             UserInfo userInfo = getUserInfoFromFacebook(fbToken);
             if (userInfo.getEmail() == null) {
@@ -162,7 +166,8 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
     }
 
-    private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture, String language) {
+    private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture,
+        String language) {
         UserVO userVO = userService.findByEmail(email);
         if (userVO == null) {
             log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "{}", email);
@@ -171,7 +176,6 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {
                 throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
             }
-            log.info("Facebook sign-in exist user - {}", userVO.getEmail());
             return getSuccessSignInDto(userVO);
         }
     }
@@ -182,38 +186,36 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {
-            log.error("Failed to create UBS profile for user - {}", savedUser.getEmail(), e);
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
         }
         UserVO userVO = modelMapper.map(savedUser, UserVO.class);
-        log.info("Facebook sign-up and sign-in user - {}", userVO.getEmail());
         return getSuccessSignInDto(userVO);
     }
 
     private User createNewUser(String email, String userName, String profilePicture, String language) {
         User user = User.builder()
-                .email(email)
-                .name(userName)
-                .role(Role.ROLE_USER)
-                .dateOfRegistration(LocalDateTime.now())
-                .lastActivityTime(LocalDateTime.now())
-                .userStatus(UserStatus.ACTIVATED)
-                .emailNotification(EmailNotification.DISABLED)
-                .refreshTokenKey(jwtTool.generateTokenKey())
-                .profilePicturePath(profilePicture)
-                .showLocation(ProfilePrivacyPolicy.PUBLIC)
-                .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
-                .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-                .rating(DEFAULT_RATING)
-                .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
-                .build();
+            .email(email)
+            .name(userName)
+            .role(Role.ROLE_USER)
+            .dateOfRegistration(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
+            .userStatus(UserStatus.ACTIVATED)
+            .emailNotification(EmailNotification.DISABLED)
+            .refreshTokenKey(jwtTool.generateTokenKey())
+            .profilePicturePath(profilePicture)
+            .showLocation(ProfilePrivacyPolicy.PUBLIC)
+            .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
+            .showToDoList(ProfilePrivacyPolicy.PUBLIC)
+            .rating(DEFAULT_RATING)
+            .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
+            .build();
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
-                .map(emailPreference -> UserNotificationPreference.builder()
-                        .user(user)
-                        .emailPreference(emailPreference)
-                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
-                        .build())
-                .collect(Collectors.toSet());
+            .map(emailPreference -> UserNotificationPreference.builder()
+                .user(user)
+                .emailPreference(emailPreference)
+                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                .build())
+            .collect(Collectors.toSet());
         user.setNotificationPreferences(userNotificationPreferences);
         return user;
     }
@@ -231,37 +233,31 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private SuccessSignInDto getSuccessSignInDto(UserVO user) {
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
-        System.out.println();
-        System.out.println();
-        System.out.println(accessToken);
-        System.out.println(refreshToken);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
     }
 
     private UserInfo getUserInfoFromFacebook(String accessToken) throws IOException {
         String requestUrl = userInfoUrl + "?fields=id,name,email,picture&access_token=" + accessToken;
         HttpGet request = new HttpGet(requestUrl);
-        HttpResponse response = httpClient.execute(request);
-        String jsonResponse = EntityUtils.toString(response.getEntity());
-        JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-
-        String id = jsonNode.get("id").asText();
-        String name = jsonNode.get("name").asText();
-        String email = jsonNode.get("email").asText();
-        String pictureUrl = null;
-
-        if (jsonNode.has("picture")) {
-            JsonNode pictureNode = jsonNode.get("picture").get("data");
-            if (pictureNode != null && pictureNode.has("url")) {
-                pictureUrl = pictureNode.get("url").asText();
+        try (CloseableHttpResponse response = (CloseableHttpResponse) httpClient.execute(request)) {
+            int statusCode = response.getStatusLine().getStatusCode();
+            if (statusCode != 200) {
+                throw new IOException("Facebook API returned status: " + statusCode);
             }
+            String jsonResponse = EntityUtils.toString(response.getEntity());
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+            String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "Unknown";
+            String email = jsonNode.has("email") ? jsonNode.get("email").asText() : null;
+            String pictureUrl = Optional.ofNullable(jsonNode.get("picture"))
+                .map(p -> p.get("data"))
+                .map(d -> d.get("url"))
+                .map(JsonNode::asText)
+                .orElse(null);
+            UserInfo userInfo = new UserInfo();
+            userInfo.setName(name);
+            userInfo.setEmail(email);
+            userInfo.setPicture(pictureUrl);
+            return userInfo;
         }
-
-        UserInfo userInfo = new UserInfo();
-        userInfo.setName(name);
-        userInfo.setEmail(email);
-        userInfo.setPicture(pictureUrl);
-
-        return userInfo;
     }
 }

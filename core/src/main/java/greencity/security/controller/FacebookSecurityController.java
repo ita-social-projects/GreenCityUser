@@ -1,6 +1,7 @@
 package greencity.security.controller;
 
 import static greencity.constant.ErrorMessage.BAD_FACEBOOK_TOKEN;
+
 import greencity.constant.HttpStatuses;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.service.FacebookSecurityService;
@@ -9,19 +10,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -67,19 +62,6 @@ public class FacebookSecurityController {
 
     @PostMapping(value = "/login", consumes = "application/json")
     public SuccessSignInDto loginWithFacebook(@RequestBody Map<String, String> request) {
-        String fbToken = request.get("token");
-        String language = request.get("lang");
-
-        System.out.println();
-        System.out.println("Received token: " + fbToken);
-        System.out.println("Received language: " + language);
-        System.out.println();
-
-        if (fbToken == null || language == null) {
-            throw new IllegalArgumentException("fbToken or language is missing");
-        }
-
-        return facebookSecurityService.authenticate(fbToken, language);
+        return facebookSecurityService.authenticate(request.get("token"), request.get("lang"));
     }
-
 }
