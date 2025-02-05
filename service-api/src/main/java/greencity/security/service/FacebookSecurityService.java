@@ -1,9 +1,6 @@
 package greencity.security.service;
 
 import greencity.security.dto.SuccessSignInDto;
-import jakarta.servlet.http.HttpServletResponse;
-
-import java.util.Map;
 
 /**
  * Provides the facebook social logic.

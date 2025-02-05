@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.client.RestClient;
 import greencity.constant.AppConstant;
-
 import static greencity.constant.AppConstant.DEFAULT_RATING;
 import static greencity.constant.AppConstant.REGISTRATION_EMAIL_FIELD_NAME;
 import greencity.constant.ErrorMessage;
@@ -24,7 +23,6 @@ import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
-
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -33,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
@@ -147,6 +144,34 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .build();
     }
 
+    private User createNewUser(String email, String userName, String profilePicture, String language) {
+        User user = User.builder()
+                .email(email)
+                .name(userName)
+                .role(Role.ROLE_USER)
+                .dateOfRegistration(LocalDateTime.now())
+                .lastActivityTime(LocalDateTime.now())
+                .userStatus(UserStatus.ACTIVATED)
+                .emailNotification(EmailNotification.DISABLED)
+                .refreshTokenKey(jwtTool.generateTokenKey())
+                .profilePicturePath(profilePicture)
+                .showLocation(ProfilePrivacyPolicy.PUBLIC)
+                .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
+                .showToDoList(ProfilePrivacyPolicy.PUBLIC)
+                .rating(DEFAULT_RATING)
+                .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
+                .build();
+        Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
+                .map(emailPreference -> UserNotificationPreference.builder()
+                        .user(user)
+                        .emailPreference(emailPreference)
+                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                        .build())
+                .collect(Collectors.toSet());
+        user.setNotificationPreferences(userNotificationPreferences);
+        return user;
+    }
+
     public SuccessSignInDto authenticate(String fbToken, String language) {
         if (fbToken == null || language == null) {
             throw new IllegalArgumentException(ErrorMessage.FB_TOKEN_OR_LANGUAGE_MISSING);
@@ -190,34 +215,6 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
         UserVO userVO = modelMapper.map(savedUser, UserVO.class);
         return getSuccessSignInDto(userVO);
-    }
-
-    private User createNewUser(String email, String userName, String profilePicture, String language) {
-        User user = User.builder()
-            .email(email)
-            .name(userName)
-            .role(Role.ROLE_USER)
-            .dateOfRegistration(LocalDateTime.now())
-            .lastActivityTime(LocalDateTime.now())
-            .userStatus(UserStatus.ACTIVATED)
-            .emailNotification(EmailNotification.DISABLED)
-            .refreshTokenKey(jwtTool.generateTokenKey())
-            .profilePicturePath(profilePicture)
-            .showLocation(ProfilePrivacyPolicy.PUBLIC)
-            .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
-            .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-            .rating(DEFAULT_RATING)
-            .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
-            .build();
-        Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
-            .map(emailPreference -> UserNotificationPreference.builder()
-                .user(user)
-                .emailPreference(emailPreference)
-                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
-                .build())
-            .collect(Collectors.toSet());
-        user.setNotificationPreferences(userNotificationPreferences);
-        return user;
     }
 
     private User saveNewUser(User newUser) {
