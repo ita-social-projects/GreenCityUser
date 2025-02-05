@@ -33,6 +33,7 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <checkstyle-maven-plugin.version>3.3.1</checkstyle-maven-plugin.version>
+        <org.eclipse.jgit.version>7.1.0.202411261347-r</org.eclipse.jgit.version>
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
