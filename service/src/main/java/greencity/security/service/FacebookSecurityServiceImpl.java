@@ -144,7 +144,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .build();
     }
 
-    private User createNewUser(String email, String userName, String profilePicture, String language) {
+    User createNewUser(String email, String userName, String profilePicture, String language) {
         User user = User.builder()
             .email(email)
             .name(userName)
@@ -191,7 +191,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
     }
 
-    private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture,
+    SuccessSignInDto processAuthentication(String email, String userName, String profilePicture,
         String language) {
         UserVO userVO = userService.findByEmail(email);
         if (userVO == null) {
@@ -205,7 +205,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
     }
 
-    private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
+    SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, profilePicture, language);
         User savedUser = saveNewUser(newUser);
         try {
@@ -217,7 +217,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         return getSuccessSignInDto(userVO);
     }
 
-    private User saveNewUser(User newUser) {
+    User saveNewUser(User newUser) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
@@ -227,13 +227,13 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         });
     }
 
-    private SuccessSignInDto getSuccessSignInDto(UserVO user) {
+    SuccessSignInDto getSuccessSignInDto(UserVO user) {
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);
     }
 
-    private UserInfo getUserInfoFromFacebook(String accessToken) throws IOException {
+    UserInfo getUserInfoFromFacebook(String accessToken) throws IOException {
         String requestUrl = userInfoUrl + "?fields=id,name,email,picture&access_token=" + accessToken;
         HttpGet request = new HttpGet(requestUrl);
         try (CloseableHttpResponse response = (CloseableHttpResponse) httpClient.execute(request)) {
