@@ -59,4 +59,9 @@ public class ErrorMessage {
         "User account is blocked due to too many failed login attempts. Try again in %s minutes";
     public static final String WRONG_SECRET_KEY = "Wrong secret key";
     public static final String FB_TOKEN_OR_LANGUAGE_MISSING = "fbToken or language is missing";
+    public static final String WARNING_GIT_DIRECTORY_NOT_FOUND =
+        "WARNING: .git directory not found. Git commit info will be unavailable.";
+    public static final String GIT_REPOSITORY_NOT_INITIALIZED =
+        "Git repository not initialized. Commit info is unavailable.";
+    public static final String FAILED_TO_FETCH_COMMIT_INFO = "Failed to fetch commit info due to I/O error: ";
 }
