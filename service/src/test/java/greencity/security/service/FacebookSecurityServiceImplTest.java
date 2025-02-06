@@ -212,7 +212,8 @@ class FacebookSecurityServiceImplTest {
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(400);
 
-        IOException exception = assertThrows(IOException.class, () -> facebookSecurityService.getUserInfoFromFacebook(accessToken));
+        IOException exception =
+            assertThrows(IOException.class, () -> facebookSecurityService.getUserInfoFromFacebook(accessToken));
         assertTrue(exception.getMessage().contains("Facebook API returned status"));
     }
 }
