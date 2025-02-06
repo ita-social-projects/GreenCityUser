@@ -71,7 +71,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private String facebookAppId;
     @Value("${spring.social.facebook.app-secret}")
     private String facebookAppSecret;
-    @Value("https://graph.facebook.com/v22.0/me?fields=id,name,email,picture&access_token=")
+    @Value("${facebook.resource.userInfoUri}")
     private String userInfoUrl;
 
     /**
@@ -205,7 +205,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
     }
 
-    SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
+    private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, profilePicture, language);
         User savedUser = saveNewUser(newUser);
         try {
