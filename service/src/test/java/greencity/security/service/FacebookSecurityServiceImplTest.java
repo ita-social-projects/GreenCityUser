@@ -1,5 +1,6 @@
 package greencity.security.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -250,5 +252,19 @@ class FacebookSecurityServiceImplTest {
         IOException exception =
             assertThrows(IOException.class, () -> facebookSecurityService.getUserInfoFromFacebook(accessToken));
         assertTrue(exception.getMessage().contains("Facebook API returned status"));
+    }
+
+    @Test
+    void createNewUser_ShouldReturnUserWithGivenEmailAndUserName() {
+        String email = "test@example.com";
+        String userName = "testUser";
+        when(jwtTool.generateTokenKey()).thenReturn("fakeTokenKey");
+
+        User user = facebookSecurityService.createNewUser(email, userName);
+
+        assertNotNull(user);
+        assertEquals(email, user.getEmail());
+        assertEquals(userName, user.getName());
+        assertEquals("fakeTokenKey", user.getRefreshTokenKey());
     }
 }

@@ -130,7 +130,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
     }
 
-    private User createNewUser(String email, String userName) {
+    User createNewUser(String email, String userName) {
         return User.builder()
             .email(email)
             .name(userName)
