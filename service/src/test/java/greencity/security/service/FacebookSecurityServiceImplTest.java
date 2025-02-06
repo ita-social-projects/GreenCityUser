@@ -172,4 +172,18 @@ class FacebookSecurityServiceImplTest {
         assertEquals("accessToken", result.getAccessToken());
         assertEquals("refreshToken", result.getRefreshToken());
     }
+
+    @Test
+    void generateFacebookAuthorizeURLTest() {
+        ReflectionTestUtils.setField(facebookSecurityService, "address", "http://localhost:8080");
+        ReflectionTestUtils.setField(facebookSecurityService, "facebookAppId", "12345");
+        ReflectionTestUtils.setField(facebookSecurityService, "facebookAppSecret", "6789");
+
+        String expected = """
+            https://www.facebook.com/v2.5/dialog/oauth?client_id=12345&response_type=code&redirect\
+            _uri=http%3A%2F%2Flocalhost%3A8080%2FfacebookSecurity%2Ffacebook&scope=email\
+            """;
+        String actual = facebookSecurityService.generateFacebookAuthorizeURL();
+        assertEquals(expected, actual);
+    }
 }
