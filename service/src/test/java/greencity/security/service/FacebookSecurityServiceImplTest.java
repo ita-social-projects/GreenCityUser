@@ -2,25 +2,19 @@ package greencity.security.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
-import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.ProfilePrivacyPolicy;
@@ -34,7 +28,6 @@ import greencity.service.UserService;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,8 +38,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.web.client.RestClientException;
-
 import java.io.IOException;
 
 @ExtendWith(MockitoExtension.class)
@@ -90,7 +81,7 @@ class FacebookSecurityServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(facebookSecurityService, "address", "http://localhost:8080");
+        ReflectionTestUtils.setField(facebookSecurityService, "address", "http://localhost:8060");
         ReflectionTestUtils.setField(facebookSecurityService, "jwtTool", jwtTool);
         ReflectionTestUtils.setField(facebookSecurityService, "restClient", restClient);
     }
@@ -208,6 +199,50 @@ class FacebookSecurityServiceImplTest {
     void getUserInfoFromFacebook_ShouldThrowIOException_WhenResponseStatusIsNot200() throws IOException {
         String accessToken = "invalid_token";
 
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+        when(httpResponse.getStatusLine()).thenReturn(statusLine);
+        when(statusLine.getStatusCode()).thenReturn(400);
+
+        IOException exception =
+            assertThrows(IOException.class, () -> facebookSecurityService.getUserInfoFromFacebook(accessToken));
+        assertTrue(exception.getMessage().contains("Facebook API returned status"));
+    }
+
+    @Test
+    void handleNewUser_ShouldCreateAndSaveUser() {
+        String email = "newuser@example.com";
+        String userName = "New User";
+        String profilePicture = "profile.jpg";
+        String language = "1";
+
+        User savedUser = new User();
+        savedUser.setId(1L);
+        savedUser.setEmail(email);
+        savedUser.setName(userName);
+
+        UserVO userVO = new UserVO();
+        userVO.setId(1L);
+        userVO.setName(userName);
+
+        UbsProfileCreationDto profileDto = new UbsProfileCreationDto();
+
+        doReturn(1L).when(modelMapper).map(language, Long.class);
+        doReturn(savedUser).when(userRepo).save(any(User.class));
+        doReturn(userVO).when(modelMapper).map(any(User.class), eq(UserVO.class));
+        doReturn(profileDto).when(modelMapper).map(any(User.class), eq(UbsProfileCreationDto.class));
+        doReturn("accessToken").when(jwtTool).createAccessToken(any(), any());
+        doReturn("refreshToken").when(jwtTool).createRefreshToken(any());
+
+        SuccessSignInDto result = facebookSecurityService.handleNewUser(email, userName, profilePicture, language);
+
+        assertNotNull(result);
+        assertEquals(1L, result.getUserId());
+        assertEquals(userName, result.getName());
+    }
+
+    @Test
+    void getUserInfoFromFacebook_ShouldThrowException_WhenFacebookReturnsError() throws IOException {
+        String accessToken = "invalid_token";
         when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
         when(httpResponse.getStatusLine()).thenReturn(statusLine);
         when(statusLine.getStatusCode()).thenReturn(400);
