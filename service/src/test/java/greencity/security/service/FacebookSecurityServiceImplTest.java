@@ -2,15 +2,25 @@ package greencity.security.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
+import greencity.dto.ubs.UbsProfileCreationDto;
+import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
+import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.ProfilePrivacyPolicy;
@@ -24,6 +34,7 @@ import greencity.service.UserService;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +45,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.client.RestClientException;
 
 import java.io.IOException;
 
@@ -48,6 +60,9 @@ class FacebookSecurityServiceImplTest {
 
     @Mock
     private UserRepo userRepo;
+
+    @Mock
+    private User user;
 
     @Mock
     private JwtTool jwtTool;
@@ -68,6 +83,9 @@ class FacebookSecurityServiceImplTest {
     private PlatformTransactionManager transactionManager;
 
     @Mock
+    private ObjectMapper objectMapper;
+
+    @Mock
     private RestClient restClient;
 
     @BeforeEach
@@ -75,7 +93,6 @@ class FacebookSecurityServiceImplTest {
         ReflectionTestUtils.setField(facebookSecurityService, "address", "http://localhost:8080");
         ReflectionTestUtils.setField(facebookSecurityService, "jwtTool", jwtTool);
         ReflectionTestUtils.setField(facebookSecurityService, "restClient", restClient);
-
     }
 
     @Test
@@ -185,5 +202,17 @@ class FacebookSecurityServiceImplTest {
             """;
         String actual = facebookSecurityService.generateFacebookAuthorizeURL();
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void getUserInfoFromFacebook_ShouldThrowIOException_WhenResponseStatusIsNot200() throws IOException {
+        String accessToken = "invalid_token";
+
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
+        when(httpResponse.getStatusLine()).thenReturn(statusLine);
+        when(statusLine.getStatusCode()).thenReturn(400);
+
+        IOException exception = assertThrows(IOException.class, () -> facebookSecurityService.getUserInfoFromFacebook(accessToken));
+        assertTrue(exception.getMessage().contains("Facebook API returned status"));
     }
 }

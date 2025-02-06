@@ -205,7 +205,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
     }
 
-    private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
+    SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, profilePicture, language);
         User savedUser = saveNewUser(newUser);
         try {
