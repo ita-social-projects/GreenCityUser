@@ -1,76 +1,43 @@
 package greencity.security.service;
 
-import greencity.TestConst;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.refEq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.anyLong;
-import static org.mockito.Mockito.never;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import greencity.ModelUtils;
+import greencity.TestConst;
+import greencity.client.CloudFlareClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
-import greencity.dto.position.PositionDto;
+import greencity.dto.security.CloudFlareRequest;
+import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
-import greencity.entity.Achievement;
-import greencity.entity.Language;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.VerifyEmail;
-import greencity.entity.Position;
+import greencity.entity.*;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRefreshTokenException;
-import greencity.exception.exceptions.BadUserStatusException;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.PasswordsDoNotMatchesException;
-import greencity.exception.exceptions.UserAlreadyHasPasswordException;
-import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.UserBlockedException;
-import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.*;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
-import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
-import greencity.security.dto.ownsecurity.OwnSignInDto;
-import greencity.security.dto.ownsecurity.OwnSignUpDto;
-import greencity.security.dto.ownsecurity.SetPasswordDto;
-import greencity.security.dto.ownsecurity.UpdatePasswordDto;
+import greencity.security.dto.ownsecurity.*;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
-
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
+import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -78,6 +45,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -113,6 +81,12 @@ class OwnSecurityServiceImplTest {
     @Mock
     AuthorityRepo authorityRepo;
 
+    @Mock
+    LoginAttemptService loginAttemptService;
+
+    @Mock
+    CloudFlareClient cloudFlareClient;
+
     private OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -120,13 +94,17 @@ class OwnSecurityServiceImplTest {
     private UserVO notVerifiedUser;
     private UpdatePasswordDto updatePasswordDto;
     private UserManagementDto userManagementDto;
+    private User userForBruteForceTest;
+    private TestersSignInRequest request;
 
     @BeforeEach
     public void init() {
-        initMocks(this);
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
-            jwtTool, 1, restorePasswordEmailRepo, modelMapper,
-            userRepo, emailService, authorityRepo);
+            jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo,
+            loginAttemptService, cloudFlareClient);
+
+        ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
+        ReflectionTestUtils.setField(ownSecurityService, "secretKey", "secret-key");
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")
@@ -157,6 +135,17 @@ class OwnSecurityServiceImplTest {
             .role(Role.ROLE_USER)
             .userStatus(UserStatus.BLOCKED)
             .build();
+        userForBruteForceTest = User.builder()
+            .id(1L)
+            .email("test@somemail.com")
+            .name("Test")
+            .language(Language.builder()
+                .id(1L)
+                .code("en")
+                .build())
+            .userStatus(UserStatus.ACTIVATED)
+            .build();
+        request = ModelUtils.getTestersSignInRequest();
     }
 
     @Test
@@ -172,13 +161,13 @@ class OwnSecurityServiceImplTest {
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
-        ownSecurityService.signUp(ModelUtils.getOwnSignUpDto(), "en");
+        ownSecurityService.signUp(new OwnSignUpDto(), "en");
         verify(emailService, times(1)).sendVerificationEmail(
             refEq(user.getId()),
             refEq(user.getName()),
             refEq(user.getEmail()),
             refEq(user.getVerifyEmail().getToken()),
-            refEq("en"), eq(true));
+            refEq("en"), eq(false));
         verify(jwtTool, times(2)).generateTokenKey();
     }
 
@@ -293,7 +282,7 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void signUpThrowsUserAlreadyRegisteredExceptionTest() {
-        OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
+        OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
         User user = User.builder().verifyEmail(new VerifyEmail()).build();
         UserVO userVO = UserVO.builder().verifyEmail(new VerifyEmailVO()).build();
         List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
@@ -312,6 +301,11 @@ class OwnSecurityServiceImplTest {
     @Test
     void signIn() {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
+
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("new-access-token");
         when(jwtTool.createRefreshToken(any(UserVO.class))).thenReturn("new-refresh-token");
@@ -322,6 +316,9 @@ class OwnSecurityServiceImplTest {
         verify(passwordEncoder, times(1)).matches(anyString(), anyString());
         verify(jwtTool, times(1)).createAccessToken(anyString(), any(Role.class));
         verify(jwtTool, times(1)).createRefreshToken(any(UserVO.class));
+        verify(loginAttemptService, times(1)).isBlockedByCaptcha(anyString());
+        verify(loginAttemptService, times(1)).isBlockedByWrongPassword(anyString());
+        verify(cloudFlareClient, times(1)).getCloudFlareResponse(any(CloudFlareRequest.class));
     }
 
     @Test
@@ -330,6 +327,11 @@ class OwnSecurityServiceImplTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("new-access-token");
         when(jwtTool.createRefreshToken(any(UserVO.class))).thenReturn("new-refresh-token");
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
+
         assertThrows(EmailNotVerified.class,
             () -> ownSecurityService.signIn(ownSignInDto));
     }
@@ -350,6 +352,11 @@ class OwnSecurityServiceImplTest {
             .role(Role.ROLE_USER)
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
+
         assertThrows(WrongPasswordException.class, () -> ownSecurityService.signIn(ownSignInDto));
     }
 
@@ -364,7 +371,13 @@ class OwnSecurityServiceImplTest {
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
-        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        Exception exception = assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        String expectedMessage = ErrorMessage.USER_DEACTIVATED;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -378,7 +391,13 @@ class OwnSecurityServiceImplTest {
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
-        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        Exception exception = assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        String expectedMessage = ErrorMessage.USER_BLOCKED;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -390,9 +409,37 @@ class OwnSecurityServiceImplTest {
             .ownSecurity(OwnSecurityVO.builder().password("password").build())
             .role(Role.ROLE_USER)
             .build();
+
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(passwordEncoder.matches("password", "password")).thenReturn(true);
-        assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        Exception exception = assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        String expectedMessage = ErrorMessage.USER_CREATED;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void signInDeletedUserTest() {
+        UserVO user = UserVO.builder()
+            .email("test@gmail.com")
+            .id(1L)
+            .userStatus(UserStatus.DELETED)
+            .ownSecurity(OwnSecurityVO.builder().password("password").build())
+            .role(Role.ROLE_USER)
+            .build();
+
+        when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+        when(passwordEncoder.matches("password", "password")).thenReturn(true);
+
+        Exception exception = assertThrows(BadUserStatusException.class, () -> ownSecurityService.signIn(ownSignInDto));
+
+        String expectedMessage = ErrorMessage.USER_DELETED;
+        String actualMessage = exception.getMessage();
+
+        assertTrue(actualMessage.contains(expectedMessage));
     }
 
     @Test
@@ -438,13 +485,6 @@ class OwnSecurityServiceImplTest {
         when(userService.findByEmail("test@gmail.com")).thenReturn(verifiedUser);
         assertThrows(UserDeactivatedException.class,
             () -> ownSecurityService.updateAccessTokens("12345"));
-    }
-
-    @Test
-    void updatePasswordTest() {
-        when(passwordEncoder.encode("password")).thenReturn("encodedPassword");
-        ownSecurityService.updatePassword("password", 1L);
-        verify(ownSecurityRepo).updatePassword("encodedPassword", 1L);
     }
 
     @Test
@@ -578,39 +618,189 @@ class OwnSecurityServiceImplTest {
     }
 
     @Test
-    void signUpEmployeeWithoutEmailSending() {
-        EmployeeSignUpDto employeeSignUpDto = new EmployeeSignUpDto();
-        employeeSignUpDto.setPositions(List.of(PositionDto.builder()
-            .name("Водій")
-            .nameEn("Driver")
-            .build()));
-        employeeSignUpDto.setEmail("test@example.com");
-        OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
-        User employee = new User();
-        employee.setEmail("test@example.com");
-        employee.setPositions(List.of(Position.builder()
-            .name("Водій")
-            .nameEn("Driver")
-            .build()));
-        employee.setAuthorities(Collections.emptyList());
+    void deleteUserByEmailTest() {
+        User deactivatedUser = User.builder()
+            .id(1L)
+            .email("test@somemail.com")
+            .userStatus(UserStatus.ACTIVATED)
+            .build();
+        Optional<User> optionalUser = Optional.of(deactivatedUser);
 
-        when(modelMapper.map(employeeSignUpDto, OwnSignUpDto.class)).thenReturn(ownSignUpDto);
-        when(jwtTool.generateTokenKey()).thenReturn("tokenKey");
-        when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn("tokenKeyWithDate");
-        when(userRepo.save(any(User.class))).thenReturn(employee);
-        when(authorityRepo.findAuthoritiesByPositions(anyList())).thenReturn(employee.getAuthorities());
-        when(positionRepo.findPositionsByNames(anyList())).thenReturn(employee.getPositions());
+        when(userRepo.findByEmail(deactivatedUser.getEmail())).thenReturn(optionalUser);
 
-        SuccessSignUpDto result = ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
+        ownSecurityService.deleteUserByEmail(deactivatedUser.getEmail());
+        assertEquals(UserStatus.DELETED, deactivatedUser.getUserStatus());
 
-        assertNotNull(result);
+        verify(userRepo, times(1)).findByEmail(deactivatedUser.getEmail());
+        verify(userRepo, times(1)).save(deactivatedUser);
+    }
 
-        verify(emailService, never()).sendRestoreEmail(
-            anyLong(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyString(),
-            anyBoolean());
+    @Test
+    void deleteUserByEmail_UserNotExists() {
+        String nonExistUserEmail = "nonexistent@somemail.com";
+
+        when(userRepo.findByEmail(nonExistUserEmail)).thenReturn(Optional.empty());
+
+        assertThrows(WrongEmailException.class, () -> ownSecurityService.deleteUserByEmail(nonExistUserEmail));
+    }
+
+    @Test
+    void deleteUserByEmailNotVerifiedUserTest() {
+        User newNotVerifiedUser = User.builder()
+            .id(1L)
+            .email("test@somemail.com")
+            .userStatus(UserStatus.DEACTIVATED)
+            .build();
+        Optional<User> optionalUser = Optional.of(newNotVerifiedUser);
+        String email = newNotVerifiedUser.getEmail();
+
+        when(userRepo.findByEmail(newNotVerifiedUser.getEmail())).thenReturn(optionalUser);
+        assertThrows(EmailNotVerified.class, () -> ownSecurityService.deleteUserByEmail(email));
+
+        verify(userRepo, times(1)).findByEmail(newNotVerifiedUser.getEmail());
+    }
+
+    @Test
+    void singInBlockedUser() {
+        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
+        when(userRepo.findByEmail(anyString()))
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
+
+        assertThrows(UserBlockedException.class,
+            () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void singInBlockedUserByPassword() {
+        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(true);
+        when(userRepo.findByEmail(anyString()))
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
+
+        assertThrows(WrongPasswordException.class,
+            () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void throwExceptionWhenCaptchaIsNotValid() {
+        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(userRepo.findByEmail(anyString()))
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(false, null, null, null));
+
+        assertThrows(WrongCaptchaException.class,
+            () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void unblockUserTest() {
+        when(jwtTool.getEmailOutOfAccessToken(anyString())).thenReturn("test@mail.com");
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(userForBruteForceTest));
+
+        ownSecurityService.unblockAccount("test@mail.com");
+
+        verify(jwtTool, times(1)).getEmailOutOfAccessToken(anyString());
+        verify(userRepo, times(1)).findByEmail(anyString());
+        verify(userRepo, times(1)).save(userForBruteForceTest);
+    }
+
+    @Test
+    void unblockUserWithInvalidToken() {
+        when(jwtTool.getEmailOutOfAccessToken(anyString())).thenThrow(IllegalArgumentException.class);
+
+        assertThrows(BadRequestException.class, () -> ownSecurityService.unblockAccount("test@mail.com"));
+    }
+
+    @Test
+    void testersSignInTest() {
+        UserVO userVO = ModelUtils.getUserVOWithData();
+        userVO.setVerifyEmail(null);
+
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        ownSecurityService.testersSignIn(request);
+
+        verify(userService).findByEmail(anyString());
+        verify(passwordEncoder).matches(anyString(), anyString());
+    }
+
+    @Test
+    void testersSignInTestWrongEmailException() {
+        when(userService.findByEmail(anyString())).thenReturn(null);
+
+        assertThrows(WrongEmailException.class, () -> ownSecurityService.testersSignIn(request));
+
+        verify(userService).findByEmail(anyString());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = UserStatus.class, names = {"DEACTIVATED", "DELETED", "BLOCKED", "CREATED"})
+    void testersSignInTestBadUserStatusException(UserStatus userStatus) {
+        UserVO userVO = ModelUtils.getUserVOWithData();
+        userVO.setUserStatus(userStatus);
+
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+
+        assertThrows(BadUserStatusException.class, () -> ownSecurityService.testersSignIn(request));
+
+        verify(userService).findByEmail(anyString());
+    }
+
+    @Test
+    void testersSignInTestWrongPasswordException() {
+        UserVO userVO = ModelUtils.getUserVOWithData();
+
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
+        assertThrows(WrongPasswordException.class, () -> ownSecurityService.testersSignIn(request));
+
+        verify(userService).findByEmail(anyString());
+        verify(passwordEncoder).matches(anyString(), anyString());
+    }
+
+    @Test
+    void testersSignInTestWrongPasswordExceptionWithNullOwnSecurity() {
+        UserVO userVO = ModelUtils.getUserVOWithData();
+        userVO.setOwnSecurity(null);
+
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+
+        assertThrows(WrongPasswordException.class, () -> ownSecurityService.testersSignIn(request));
+
+        verify(userService).findByEmail(anyString());
+    }
+
+    @Test
+    void testersSignInTestBadRequestExceptionWithInvalidSecretKey() {
+        UserVO userVO = ModelUtils.getUserVOWithData();
+        TestersSignInRequest testersSignInRequest = ModelUtils.getTestersSignInRequestWithInvalidSecretKey();
+
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        assertThrows(BadRequestException.class, () -> ownSecurityService.testersSignIn(testersSignInRequest));
+
+        verify(userService).findByEmail(anyString());
+        verify(passwordEncoder).matches(anyString(), anyString());
+    }
+
+    @Test
+    void testersSignInTestWithEmailNotVerifiedException() {
+        UserVO userVO = ModelUtils.getUserVOWithData();
+
+        when(userService.findByEmail(anyString())).thenReturn(userVO);
+        when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        assertThrows(EmailNotVerified.class, () -> ownSecurityService.testersSignIn(request));
+
+        verify(userService).findByEmail(anyString());
+        verify(passwordEncoder).matches(anyString(), anyString());
     }
 }

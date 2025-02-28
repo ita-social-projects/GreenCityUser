@@ -7,7 +7,9 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfig {
     /**
-     * {@inheritDoc}
+     * Creates a RestTemplate bean.
+     *
+     * @return {@link RestTemplate}
      */
     @Bean
     public RestTemplate restTemplate() {

@@ -2,14 +2,22 @@ package greencity.mapping;
 
 import greencity.ModelUtils;
 import greencity.dto.user.UserVO;
-import greencity.entity.*;
+import greencity.entity.Achievement;
+import greencity.entity.AchievementCategory;
+import greencity.entity.Language;
+import greencity.entity.OwnSecurity;
+import greencity.entity.User;
+import greencity.entity.UserAchievement;
+import greencity.entity.UserAction;
+import greencity.entity.UserLocation;
+import greencity.entity.VerifyEmail;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class UserVOMapperTest {
@@ -35,7 +43,6 @@ class UserVOMapperTest {
                     .id(expected.getVerifyEmail().getUser().getId())
                     .name(expected.getVerifyEmail().getUser().getName())
                     .build())
-                .expiryDate(expected.getVerifyEmail().getExpiryDate())
                 .token(expected.getVerifyEmail().getToken())
                 .build() : null)
             .userFriends(expected.getUserFriends() != null ? expected.getUserFriends()
@@ -60,7 +67,7 @@ class UserVOMapperTest {
                     .longitude(expected.getUserLocationDto().getLongitude())
                     .users(null)
                     .build())
-            .showShoppingList(expected.getShowShoppingList())
+            .showToDoList(expected.getShowToDoList())
             .showEcoPlace(expected.getShowEcoPlace())
             .showLocation(expected.getShowLocation())
             .ownSecurity(expected.getOwnSecurity() != null ? OwnSecurity.builder()

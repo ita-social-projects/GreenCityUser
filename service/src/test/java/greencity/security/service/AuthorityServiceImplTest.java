@@ -1,8 +1,14 @@
 package greencity.security.service;
 
+import static greencity.ModelUtils.TEST_EMAIL;
+import static greencity.ModelUtils.createAdmin;
+import static greencity.ModelUtils.createEmployee;
+import static greencity.ModelUtils.getAuthority;
+import static greencity.ModelUtils.getPositions;
+import static greencity.ModelUtils.getUser;
+import static greencity.ModelUtils.getUserEmployeeAuthorityDto;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.position.PositionDto;
-import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.entity.Authority;
 import greencity.entity.Position;
 import greencity.entity.User;
@@ -12,40 +18,27 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
-import greencity.service.EmailService;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static greencity.ModelUtils.TEST_EMAIL;
-import static greencity.ModelUtils.createAdmin;
-import static greencity.ModelUtils.createEmployee;
-import static greencity.ModelUtils.createDriver;
-import static greencity.ModelUtils.getPositions;
-import static greencity.ModelUtils.getAuthority;
-import static greencity.ModelUtils.getUser;
-import static greencity.ModelUtils.getUserEmployeeAuthorityDto;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -57,11 +50,7 @@ class AuthorityServiceImplTest {
     @Mock
     private PositionRepo positionRepo;
     @Mock
-    private PositionService positionService;
-    @Mock
     private Authentication auth;
-    @Mock
-    private EmailService emailService;
     @InjectMocks
     private AuthorityServiceImpl authorityService;
 
@@ -98,7 +87,6 @@ class AuthorityServiceImplTest {
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         when(authorityRepo.findAuthoritiesByNames(authoritiesName)).thenReturn(authority);
-        when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Супер адмін"));
 
         employee.setAuthorities(authority);
         authorityService.updateEmployeesAuthorities(getUserEmployeeAuthorityDto());
@@ -143,7 +131,6 @@ class AuthorityServiceImplTest {
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         when(positionRepo.findPositionsByNames(positionNames)).thenReturn(positions);
         when(authorityRepo.findAuthoritiesByPositions(positionNames)).thenReturn(List.of(getAuthority()));
-        when(positionService.getEmployeeLoginPositionNames()).thenReturn(List.of("Супер адмін"));
 
         authorityService.updateAuthoritiesToRelatedPositions(EmployeePositionsDto.builder()
             .email(TEST_EMAIL)
@@ -163,50 +150,5 @@ class AuthorityServiceImplTest {
     void updateAuthoritiesToRelatedPositionsThrowsNotFoundExceptionTest() {
         var dto = new EmployeePositionsDto();
         assertThrows(UsernameNotFoundException.class, () -> authorityService.updateAuthoritiesToRelatedPositions(dto));
-    }
-
-    @Test
-    void updateEmployeesAuthoritiesWithSendingRestoreEmailTest() {
-        UserEmployeeAuthorityDto dto = getUserEmployeeAuthorityDto();
-        User employeeDriver = createDriver();
-
-        when(userRepo.findByEmail(dto.getEmployeeEmail())).thenReturn(Optional.of(employeeDriver));
-        when(authorityRepo.findAuthoritiesByNames(dto.getAuthorities())).thenReturn(employeeDriver.getAuthorities());
-
-        authorityService.updateEmployeesAuthorities(dto);
-
-        verify(emailService, times(1)).sendRestoreEmail(
-            employeeDriver.getId(),
-            employeeDriver.getFirstName(),
-            employeeDriver.getEmail(),
-            employeeDriver.getRestorePasswordEmail().getToken(),
-            employeeDriver.getLanguage().getCode(),
-            true);
-        verify(userRepo, times(1)).save(employeeDriver);
-    }
-
-    @Test
-    void updateEmployeesAuthoritiesWithNotSendingRestoreEmailTest() {
-        UserEmployeeAuthorityDto dto = getUserEmployeeAuthorityDto();
-        User employeeDriverWithAuthorities = createDriver();
-        employeeDriverWithAuthorities.setAuthorities(List.of(Authority.builder()
-            .name("Test")
-            .id(1L)
-            .build()));
-
-        when(userRepo.findByEmail(dto.getEmployeeEmail())).thenReturn(Optional.of(employeeDriverWithAuthorities));
-        when(authorityRepo.findAuthoritiesByNames(dto.getAuthorities()))
-            .thenReturn(employeeDriverWithAuthorities.getAuthorities());
-
-        authorityService.updateEmployeesAuthorities(dto);
-
-        verify(emailService, never()).sendRestoreEmail(
-            employeeDriverWithAuthorities.getId(),
-            employeeDriverWithAuthorities.getFirstName(),
-            employeeDriverWithAuthorities.getEmail(),
-            employeeDriverWithAuthorities.getRestorePasswordEmail().getToken(),
-            employeeDriverWithAuthorities.getLanguage().getCode(),
-            true);
-        verify(userRepo, times(1)).save(employeeDriverWithAuthorities);
     }
 }

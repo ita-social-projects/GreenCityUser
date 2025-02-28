@@ -5,7 +5,12 @@ import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
-import greencity.security.dto.ownsecurity.*;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
+import greencity.security.dto.ownsecurity.OwnSignInDto;
+import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.TestersSignInRequest;
+import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 
 /**
  * Provides the interface to manage {@link OwnSecurityService} entity.
@@ -28,7 +33,6 @@ public interface OwnSecurityService {
      *
      * @param dto a value of {@link EmployeeSignUpDto}
      * @return {@link SuccessSignUpDto}
-     * @author Inna Yashna
      */
     SuccessSignUpDto signUpEmployee(EmployeeSignUpDto dto, String language);
 
@@ -47,14 +51,6 @@ public interface OwnSecurityService {
      * @return {@link AccessRefreshTokensDto} this is DTO with new access token
      */
     AccessRefreshTokensDto updateAccessTokens(String refreshToken);
-
-    /**
-     * Method for updating password.
-     *
-     * @param pass {@link String}
-     * @param id   {@link Long}
-     */
-    void updatePassword(String pass, Long id);
 
     /**
      * Method for updating current password.
@@ -88,4 +84,29 @@ public interface OwnSecurityService {
      * @param email {@link String} email of user.
      */
     void setPassword(SetPasswordDto dto, String email);
+
+    /**
+     * Method to delete (deactivate) a user by email, setting their status to
+     * DELETED.
+     *
+     * @param email {@link String} email of the user to be deleted.
+     */
+    void deleteUserByEmail(String email);
+
+    /**
+     * Unblocks user account by provided token.
+     *
+     * @param token {@link String} token for unblocking user account.
+     */
+    void unblockAccount(String token);
+
+    /**
+     * Allows testers to sign in without captcha token using their credentials.
+     *
+     * @param request a {@link TestersSignInRequest} containing sign-in information
+     *                for testers.
+     * @return {@link SuccessSignInDto} containing sign-in success details, such as
+     *         access and refresh tokens.
+     */
+    SuccessSignInDto testersSignIn(TestersSignInRequest request);
 }

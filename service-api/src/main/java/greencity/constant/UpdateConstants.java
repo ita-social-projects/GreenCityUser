@@ -1,11 +1,11 @@
 package greencity.constant;
 
-public final class UpdateConstants {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class UpdateConstants {
     public static final String SUCCESS_UA = "Користувача успішно оновлено.";
     public static final String SUCCESS_EN = "User successfully updated.";
-
-    private UpdateConstants() {
-    }
 
     /**
      * Method return user message depends on users language.

@@ -1,19 +1,15 @@
 package greencity.mapping;
 
 import greencity.ModelUtils;
-import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.entity.Language;
 import greencity.entity.User;
-import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import java.time.LocalDateTime;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDateTime;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserAdminRegistrationDtoMapperTest {

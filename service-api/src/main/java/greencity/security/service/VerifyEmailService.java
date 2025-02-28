@@ -1,12 +1,7 @@
 package greencity.security.service;
 
-import java.time.LocalDateTime;
-
 /**
  * Service that does email verification.
- *
- * @author Yurii Koval
- * @version 2.0
  */
 public interface VerifyEmailService {
     /**
@@ -14,18 +9,12 @@ public interface VerifyEmailService {
      *
      * @param userId {@link Long} - user's id.
      * @param token  {@link String} - token that confirms the user is the owner of
-     *               his/her email.
+     *               email.
      */
     Boolean verifyByToken(Long userId, String token);
 
     /**
-     * Checks whether a user is not late with email verification.
-     *
-     * @return {@code boolean}
+     * This method remove all accounts that not verified by email at 00:00.
      */
-    boolean isNotExpired(LocalDateTime emailExpiredDate);
-
-    /**
-     * Deletes email verification tokens that are expired.
-     */
+    void removeUnusedTokensWithAccounts();
 }

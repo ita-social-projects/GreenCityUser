@@ -1,24 +1,19 @@
 package greencity.validator;
 
-import java.util.List;
-import java.util.Locale;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import greencity.annotations.ValidLanguage;
 import greencity.client.RestClient;
-import lombok.AllArgsConstructor;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import java.util.List;
+import java.util.Locale;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class LanguageValidator implements ConstraintValidator<ValidLanguage, Locale> {
-    private List<String> codes;
     private final RestClient restClient;
+    private List<String> codes;
 
     @Override
     public void initialize(ValidLanguage constraintAnnotation) {

@@ -1,14 +1,12 @@
 package greencity.controller;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
-import greencity.dto.notification.NotificationDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.SendChangePlaceStatusEmailMessage;
-import greencity.message.SendEventCreationNotification;
+import greencity.enums.PlaceStatus;
+import greencity.message.PlaceStatusChangeDto;
+import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendHabitNotification;
 import greencity.message.SendReportEmailMessage;
 import greencity.service.EmailService;
@@ -22,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.Mockito.verify;
@@ -48,97 +47,86 @@ class EmailControllerTest {
     }
 
     @Test
-    void addEcoNews() throws Exception {
-        String content =
-            "{\"unsubscribeToken\":\"string\"," +
-                "\"creationDate\":\"2021-02-05T15:10:22.434Z\"," +
-                "\"imagePath\":\"string\"," +
-                "\"source\":\"string\"," +
-                "\"author\":{\"id\":0,\"name\":\"string\",\"email\":\"test.email@gmail.com\" }," +
-                "\"title\":\"string\"," +
-                "\"text\":\"string\"}";
+    void sendInterestingEcoNews() throws Exception {
+        String content = """
+            {
+                "ecoNewsList": [
+                    {
+                        "ecoNewsId": 1,
+                        "imagePath": "https://google.com",
+                        "title": "Title",
+                        "text": "Text"
+                    }
+                ],
+                "subscribers": [
+                    {
+                        "name": "Ilia",
+                        "email": "email@gmail.com",
+                        "language": "ua",
+                        "unsubscribeToken": "d1d3a8b9-2488-48b5-9c7a-3d0b2896063b"
+                    }
+                ]
+            }
+            """;
 
-        mockPerform(content, "/addEcoNews");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.registerModule(new JavaTimeModule());
-        EcoNewsForSendEmailDto message = objectMapper.readValue(content, EcoNewsForSendEmailDto.class);
-
-        verify(emailService).sendCreatedNewsForAuthor(message);
-    }
-
-    @Test
-    void addEventComment() throws Exception {
-        String content =
-            "{\"id\":\"1\"," +
-                "\"createdDate\":\"2021-02-05T15:10:22.434Z\"," +
-                "\"text\":\"string\"," +
-                "\"organizer\":{\"id\":0,\"name\":\"string\",\"userProfilePicturePath\":\"string\" }," +
-                "\"author\":{\"id\":0,\"name\":\"string\",\"organizerRating\":\"1.0\" }," +
-                "\"eventId\":\"2\"," +
-                "\"email\":\"inna@gmail.com\"}";
-
-        mockPerform(content, "/addEventComment");
+        mockPerform(content, "/sendInterestingEcoNews");
 
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        objectMapper.registerModule(new JavaTimeModule());
-        EventCommentForSendEmailDto message = objectMapper.readValue(content, EventCommentForSendEmailDto.class);
+        InterestingEcoNewsDto message = objectMapper.readValue(content, InterestingEcoNewsDto.class);
 
-        verify(emailService).sendNewCommentForEventOrganizer(message);
+        verify(emailService).sendInterestingEcoNews(message);
     }
 
     @Test
     void sendReport() throws Exception {
-        String content = "{" +
-            "\"categoriesDtoWithPlacesDtoMap\":" +
-            "{\"additionalProp1\":" +
-            "[{\"category\":{\"name\":\"string\",\"parentCategoryId\":0}," +
-            "\"name\":\"string\"}]," +
-            "\"additionalProp2\":" +
-            "[{\"category\":{\"name\":\"string\",\"parentCategoryId\":0}," +
-            "\"name\":\"string\"}]," +
-            "\"additionalProp3\":[{\"category\":{\"name\":\"string\",\"parentCategoryId\":0}," +
-            "\"name\":\"string\"}]}," +
-            "\"emailNotification\":\"string\"," +
-            "\"subscribers\":[{\"email\":\"string\",\"id\":0,\"name\":\"string\"}]}";
+        String content = """
+            {
+                "categoriesDtoWithPlacesDtoMap": {
+                    "additionalProp1": [
+                        {
+                            "category": {
+                                "name": "string",
+                                "parentCategoryId": 0
+                            },
+                            "name": "string"
+                        }
+                    ],
+                    "additionalProp2": [
+                        {
+                            "category": {
+                                "name": "string",
+                                "parentCategoryId": 0
+                            },
+                            "name": "string"
+                        }
+                    ]
+                },
+                "periodicity": "WEEKLY",
+                "subscribers": [
+                    {
+                        "email": "string",
+                        "name": "string",
+                        "language": "en"
+                    }
+                ]
+            }
+            """;
 
         mockPerform(content, "/sendReport");
 
-        SendReportEmailMessage message =
-            new ObjectMapper().readValue(content, SendReportEmailMessage.class);
+        SendReportEmailMessage message = new ObjectMapper().readValue(content, SendReportEmailMessage.class);
 
-        verify(emailService).sendAddedNewPlacesReportEmail(
-            message.getSubscribers(), message.getCategoriesDtoWithPlacesDtoMap(),
-            message.getEmailNotification());
-    }
-
-    @Test
-    void changePlaceStatus() throws Exception {
-        String content = "{" +
-            "\"authorEmail\":\"string\"," +
-            "\"authorFirstName\":\"string\"," +
-            "\"placeName\":\"string\"," +
-            "\"placeStatus\":\"string\"" +
-            "}";
-
-        mockPerform(content, "/changePlaceStatus");
-
-        SendChangePlaceStatusEmailMessage message =
-            new ObjectMapper().readValue(content, SendChangePlaceStatusEmailMessage.class);
-
-        verify(emailService).sendChangePlaceStatusEmail(
-            message.getAuthorFirstName(), message.getPlaceName(),
-            message.getPlaceStatus(), message.getAuthorEmail());
+        verify(emailService).sendAddedNewPlacesReportEmail(message);
     }
 
     @Test
     void sendHabitNotification() throws Exception {
-        String content = "{" +
-            "\"email\":\"string\"," +
-            "\"name\":\"string\"" +
-            "}";
+        String content = """
+            {\
+            "email":"string",\
+            "name":"string"\
+            }\
+            """;
 
         mockPerform(content, "/sendHabitNotification");
 
@@ -157,11 +145,13 @@ class EmailControllerTest {
 
     @Test
     void sendUserViolationEmailTest() throws Exception {
-        String content = "{" +
-            "\"name\":\"String\"," +
-            "\"email\":\"String@gmail.com\"," +
-            "\"violationDescription\":\"string string\"" +
-            "}";
+        String content = """
+            {\
+            "name":"String",\
+            "email":"String@gmail.com",\
+            "violationDescription":"string string"\
+            }\
+            """;
 
         mockPerform(content, "/sendUserViolation");
 
@@ -171,39 +161,43 @@ class EmailControllerTest {
 
     @Test
     @SneakyThrows
-    void sendUserNotification() {
-        String content = "{" +
-            "\"title\":\"title\"," +
-            "\"body\":\"body\"" +
-            "}";
-        String email = "email@mail.com";
-
-        mockMvc.perform(post(LINK + "/notification")
+    void sendUserReceivedScheduledNotification() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test body")
+            .username("test user")
+            .email("test@gmail.com")
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
+        String content = objectMapper.writeValueAsString(message);
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/scheduled/notification")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(content)
-            .param("email", email))
+            .content(content))
             .andExpect(status().isOk());
-
-        NotificationDto notification = new ObjectMapper().readValue(content, NotificationDto.class);
-        verify(emailService).sendNotificationByEmail(notification, email);
     }
 
     @Test
     @SneakyThrows
-    void sendEventCreatedNotificationTest() {
-        String content = "{" +
-            "\"email\":\"email@mail.com\"," +
-            "\"messageBody\":\"messageBody\"" +
-            "}";
-        String email = "email@mail.com";
+    void sendPlaceStatusChangeTest() {
+        PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
+        dto.setUserName("John Doe");
+        dto.setEmail("test@example.com");
+        dto.setPlaceName("Green Park");
+        dto.setNewStatus(PlaceStatus.APPROVED);
 
-        mockMvc.perform(post(LINK + "/sendEventNotification")
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String content = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/sendPlaceStatusChange")
             .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer your_token_here")
             .content(content))
             .andExpect(status().isOk());
 
-        SendEventCreationNotification notification = new ObjectMapper()
-            .readValue(content, SendEventCreationNotification.class);
-        verify(emailService).sendEventCreationNotification(email, notification.getMessageBody());
+        verify(emailService).sendPlaceStatusChangeNotification(dto);
     }
 }

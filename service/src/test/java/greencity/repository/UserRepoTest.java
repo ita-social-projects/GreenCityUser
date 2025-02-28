@@ -3,35 +3,32 @@ package greencity.repository;
 import greencity.ModelUtils;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
+import static greencity.enums.EmailNotification.DISABLED;
+import static greencity.enums.EmailNotification.IMMEDIATELY;
 import greencity.enums.UserStatus;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static greencity.enums.EmailNotification.DISABLED;
-import static greencity.enums.EmailNotification.IMMEDIATELY;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
+import org.mockito.Mock;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
 class UserRepoTest {
@@ -116,7 +113,7 @@ class UserRepoTest {
         assertEquals(1, disabled.size());
         assertEquals(1L, immediately.get(1).getId());
         assertEquals(2, immediately.size());
-        assertEquals("test2@email.com", disabled.get(0).getEmail());
+        assertEquals("test2@email.com", disabled.getFirst().getEmail());
         verify(userRepo).findAllByEmailNotification(EmailNotification.DISABLED);
         verify(userRepo, times(1)).findAllByEmailNotification(EmailNotification.IMMEDIATELY);
     }
@@ -128,15 +125,6 @@ class UserRepoTest {
         Long actual = userRepo.countAllByUserStatus(UserStatus.ACTIVATED);
         assertEquals(expected, actual);
         verify(userRepo).countAllByUserStatus(UserStatus.ACTIVATED);
-    }
-
-    @Test
-    void getProfilePicturePathByUserIdTest() {
-        String expected = "pathToPicture";
-        when(userRepo.getProfilePicturePathByUserId(anyLong())).thenReturn(Optional.of(expected));
-        String actual = userRepo.getProfilePicturePathByUserId(5L).get();
-        assertEquals(expected, actual);
-        verify(userRepo).getProfilePicturePathByUserId(5L);
     }
 
     @Test
@@ -275,33 +263,6 @@ class UserRepoTest {
 
         assertEquals(expectedUser, actualUser);
         verify(userRepo).findUserByUuid(uuid);
-    }
-
-    @Test
-    void countOfMutualFriendsTest() {
-        Integer expected = 2;
-
-        when(userRepo.countOfMutualFriends(anyLong())).thenReturn(expected);
-
-        Integer actualFriends = userRepo.countOfMutualFriends(1L);
-
-        assertEquals(expected, actualFriends);
-        verify(userRepo).countOfMutualFriends(1L);
-    }
-
-    @Test
-    void updateUserLastActivityTimeTest() {
-        LocalDateTime expectedTime = LocalDateTime.of(2020, 9, 29, 0, 0, 0);
-        User user3 = ModelUtils.getUser();
-        user3.setId(3L);
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of((user3)));
-
-        userRepo.updateUserLastActivityTime(3L, expectedTime);
-
-        User user = userRepo.findByEmail("test3@email.com").get();
-
-        assertEquals(expectedTime, user.getLastActivityTime());
-        verify(userRepo).findByEmail("test3@email.com");
     }
 
     @Test

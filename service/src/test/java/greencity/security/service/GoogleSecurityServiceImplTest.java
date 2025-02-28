@@ -13,6 +13,8 @@ import greencity.dto.user.UserVO;
 import greencity.entity.Achievement;
 import greencity.entity.User;
 import greencity.entity.UserAchievement;
+import greencity.enums.EmailNotification;
+import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.IdTokenExpiredException;
@@ -28,9 +30,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import static greencity.ModelUtils.getUserInfo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static greencity.constant.AppConstant.DEFAULT_RATING;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -38,10 +39,17 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.StringEntity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -172,7 +180,22 @@ class GoogleSecurityServiceImplTest {
         verify(userService).findByEmail("taras@mail.com");
 
         verify(modelMapper).map(any(), eq(UserVO.class));
-        verify(userRepo).save(any());
+        verify(userRepo).save(argThat(savedUser -> {
+            assertEquals(Role.ROLE_USER, savedUser.getRole(), "Role should be USER.");
+            assertEquals(UserStatus.ACTIVATED, savedUser.getUserStatus(), "User status should be ACTIVATED.");
+            assertNotNull(savedUser.getDateOfRegistration(), "Date of registration should be set.");
+            assertNotNull(savedUser.getLastActivityTime(), "Last activity time should be set.");
+            assertEquals(EmailNotification.DISABLED, savedUser.getEmailNotification(),
+                "Email notification should be DISABLED.");
+            assertEquals(DEFAULT_RATING, savedUser.getRating());
+            assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowLocation());
+            assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowEcoPlace());
+            assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowToDoList());
+            assertNotNull(savedUser.getNotificationPreferences(), "Notification preferences should be initialized.");
+            assertFalse(savedUser.getNotificationPreferences().isEmpty(),
+                "Notification preferences should not be empty.");
+            return true;
+        }));
     }
 
     @Test

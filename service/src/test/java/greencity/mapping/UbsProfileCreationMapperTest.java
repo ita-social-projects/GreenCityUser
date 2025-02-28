@@ -1,14 +1,13 @@
 package greencity.mapping;
 
+import static greencity.ModelUtils.getUbsProfileCreationDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.entity.User;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static greencity.ModelUtils.getUbsProfileCreationDto;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class UbsProfileCreationMapperTest {

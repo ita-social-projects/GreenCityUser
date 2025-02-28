@@ -1,9 +1,11 @@
 package greencity.constant;
 
-public final class ValidationConstants {
-    public static final String USER_CREATED = "{greenCity.validation.user.created}";
-    public static final int MAX_AMOUNT_OF_SOCIAL_NETWORK_LINKS = 5;
+import lombok.experimental.UtilityClass;
 
-    private ValidationConstants() {
-    }
+@UtilityClass
+public class ValidationConstants {
+    public static final String EMAIL_REGEXP = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+    public static final String INVALID_EMAIL = "{greenCity.validation.invalid.email}";
+
+    public static final String USER_CREATED = "{greenCity.validation.user.created}";
 }

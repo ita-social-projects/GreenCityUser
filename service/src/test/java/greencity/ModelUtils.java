@@ -1,63 +1,37 @@
 package greencity;
 
-import com.google.maps.model.AddressComponent;
-import com.google.maps.model.AddressComponentType;
-import com.google.maps.model.GeocodingResult;
-import com.google.maps.model.Geometry;
-import com.google.maps.model.LatLng;
+import com.google.maps.model.*;
 import greencity.constant.AppConstant;
 import greencity.dto.CoordinatesDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
-import greencity.dto.econews.AddEcoNewsDtoResponse;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.position.PositionDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.EcoNewsAuthorDto;
-import greencity.dto.user.UserAdminRegistrationDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.dto.user.UserInfo;
-import greencity.dto.user.UserLocationDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UsersFriendDto;
+import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.dto.user.PlaceAuthorDto;
-import greencity.entity.Achievement;
-import greencity.entity.AchievementCategory;
-import greencity.entity.Authority;
-import greencity.entity.Language;
-import greencity.entity.OwnSecurity;
-import greencity.entity.Position;
-import greencity.entity.RestorePasswordEmail;
-import greencity.entity.SocialNetwork;
-import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserLocation;
-import greencity.entity.VerifyEmail;
+import greencity.entity.*;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.TestersSignInRequest;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class ModelUtils {
     public static final User TEST_USER = createUser();
@@ -73,33 +47,6 @@ public class ModelUtils {
     public static final UserManagementDto CREATE_USER_MANAGER_DTO = createUserManagerDto();
     public static final List<UserAllFriendsDto> CREATE_USER_ALL_FRIENDS_DTO = createUserAllFriendsDto();
     public static final String TEST_EMAIL = "taras@gmail.com";
-
-    public static UsersFriendDto usersFriendDto = new UsersFriendDto() {
-        @Override
-        public Long getId() {
-            return 1L;
-        }
-
-        @Override
-        public String getName() {
-            return TestConst.NAME;
-        }
-
-        @Override
-        public String getCity() {
-            return "test";
-        }
-
-        @Override
-        public Double getRating() {
-            return 20.0;
-        }
-
-        @Override
-        public String getProfilePicture() {
-            return "profile";
-        }
-    };
 
     public static User getUser() {
         return User.builder()
@@ -125,8 +72,9 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
-                20.000000, new ArrayList<User>()))
+            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
+                "Львівська", "Ukraine", "Україна", 20.000000,
+                20.000000, new ArrayList<>()))
             .language(new Language(1L, "en", null))
             .build();
     }
@@ -155,7 +103,7 @@ public class ModelUtils {
             .amountHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER)
             .amountHabitsAcquired(TestConst.SIMPLE_LONG_NUMBER)
             .amountPublishedNews(TestConst.SIMPLE_LONG_NUMBER)
-            .amountOrganizedAndAttendedEvents(TestConst.SIMPLE_LONG_NUMBER)
+            .amountOrganizedAndAttendedEvents(TestConst.SIMPLE_LONG_TWO_NUMBER)
             .build();
     }
 
@@ -217,13 +165,6 @@ public class ModelUtils {
             .build();
     }
 
-    public static UserEmployeeAuthorityDto getSuperAdminEmployeeAuthorityDto() {
-        return UserEmployeeAuthorityDto.builder()
-            .employeeEmail("superadmin@gmail.com")
-            .authorities(List.of("test1"))
-            .build();
-    }
-
     public static List<Position> getPositions() {
         return List.of(Position.builder()
             .id(1L)
@@ -258,6 +199,7 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
+            .userLocation(null)
             .build();
     }
 
@@ -308,7 +250,6 @@ public class ModelUtils {
                     .id(13L)
                     .name("user")
                     .build())
-                .expiryDate(LocalDateTime.of(2021, 7, 7, 7, 7))
                 .token("toooookkkeeeeen42324532542")
                 .build())
             .userFriends(Collections.singletonList(
@@ -320,9 +261,10 @@ public class ModelUtils {
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
             .userLocationDto(
-                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська", "Ukraine", "Україна", 20.000000,
+                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
+                    "Ukraine", "Україна", 20.000000,
                     20.000000))
-            .showShoppingList(ProfilePrivacyPolicy.PUBLIC)
+            .showToDoList(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .ownSecurity(OwnSecurityVO.builder()
@@ -379,10 +321,27 @@ public class ModelUtils {
                 "https://www.youtube.com",
                 "https://www.gmail.com",
                 "https://www.google.com"))
-            .coordinates(new CoordinatesDto(null, null))
+            .coordinates(new CoordinatesDto(1.0d, 1.0d))
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
-            .showShoppingList(ProfilePrivacyPolicy.PUBLIC)
+            .showToDoList(ProfilePrivacyPolicy.PUBLIC)
+            .emailPreferences(Set.of(
+                UserNotificationPreferenceDto.builder()
+                    .emailPreference(EmailPreference.SYSTEM)
+                    .periodicity(EmailPreferencePeriodicity.IMMEDIATELY)
+                    .build(),
+                UserNotificationPreferenceDto.builder()
+                    .emailPreference(EmailPreference.COMMENTS)
+                    .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                    .build(),
+                UserNotificationPreferenceDto.builder()
+                    .emailPreference(EmailPreference.LIKES)
+                    .periodicity(EmailPreferencePeriodicity.NEVER)
+                    .build(),
+                UserNotificationPreferenceDto.builder()
+                    .emailPreference(EmailPreference.INVITES)
+                    .periodicity(EmailPreferencePeriodicity.MONTHLY)
+                    .build()))
             .build();
     }
 
@@ -407,26 +366,6 @@ public class ModelUtils {
 
     public static UserAchievement getUserAchievement() {
         return new UserAchievement(1L, getUser(), getAchievement(), false);
-    }
-
-    public static EcoNewsAuthorDto getEcoNewsAuthorDto() {
-        return EcoNewsAuthorDto.builder()
-            .id(1L)
-            .name("taras")
-            .build();
-    }
-
-    public static AddEcoNewsDtoResponse getAddEcoNewsDtoResponse() {
-        return AddEcoNewsDtoResponse.builder()
-            .id(1L)
-            .title("title")
-            .text("texttexttexttext")
-            .ecoNewsAuthorDto(getEcoNewsAuthorDto())
-            .creationDate(ZonedDateTime.now())
-            .imagePath("/imagePath")
-            .source("source")
-            .tags(Collections.singletonList("tag"))
-            .build();
     }
 
     public static UserViolationMailDto getUserViolationMailDto() {
@@ -497,34 +436,6 @@ public class ModelUtils {
             .build();
     }
 
-    public static User createEmployeeDriver() {
-        return User.builder()
-            .id(1L)
-            .email("taras@gmail.com")
-            .authorities(authorities())
-            .role(Role.ROLE_UBS_EMPLOYEE)
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Водій")
-                .nameEn("Driver")
-                .build()))
-            .build();
-    }
-
-    public static User createSuperAdmin() {
-        return User.builder()
-            .id(1L)
-            .email("superadmin@gmail.com")
-            .authorities(authorities())
-            .role(Role.ROLE_UBS_EMPLOYEE)
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Супер адмін")
-                .nameEn("Super admin")
-                .build()))
-            .build();
-    }
-
     public static User createAdmin() {
         return User.builder()
             .id(2L)
@@ -532,20 +443,6 @@ public class ModelUtils {
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_ADMIN)
             .authorities(authorities())
-            .build();
-    }
-
-    public static User createEmployeeAdmin() {
-        return User.builder()
-            .id(1L)
-            .email("taras@gmail.com")
-            .authorities(authorities())
-            .role(Role.ROLE_UBS_EMPLOYEE)
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Адмін")
-                .nameEn("Admin")
-                .build()))
             .build();
     }
 
@@ -640,30 +537,6 @@ public class ModelUtils {
         return User.builder()
             .positions(List.of(Position.builder()
                 .id(1L).name("Адмін")
-                .nameEn("Admin")
-                .build()))
-            .authorities(List.of(Authority.builder()
-                .name("Auth")
-                .build()))
-            .build();
-    }
-
-    public static User getEmployeeWithPositionsAndRelatedAuthorities_UA() {
-        return User.builder()
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Адмін")
-                .build()))
-            .authorities(List.of(Authority.builder()
-                .name("Auth")
-                .build()))
-            .build();
-    }
-
-    public static User getEmployeeWithPositionsAndRelatedAuthorities_EN() {
-        return User.builder()
-            .positions(List.of(Position.builder()
-                .id(1L)
                 .nameEn("Admin")
                 .build()))
             .authorities(List.of(Authority.builder()
@@ -791,32 +664,6 @@ public class ModelUtils {
         return geocodingResults;
     }
 
-    public static User createDriver() {
-        return User.builder()
-            .id(1L)
-            .email("taras@gmail.com")
-            .role(Role.ROLE_UBS_EMPLOYEE)
-            .positions(List.of(Position.builder()
-                .id(1L)
-                .name("Водій")
-                .nameEn("Driver")
-                .build()))
-            .authorities(List.of())
-            .language(Language.builder()
-                .code("en")
-                .build())
-            .firstName("Test")
-            .restorePasswordEmail(RestorePasswordEmail.builder()
-                .expiryDate(LocalDateTime.now().plusMonths(1))
-                .token("sadasdasv23e1asc0")
-                .build())
-            .build();
-    }
-
-    public static PlaceAuthorDto getPlaceAuthorDto() {
-        return PlaceAuthorDto.builder().id(1L).name("Name").email("author@gmail.com").build();
-    }
-
     public static UserInfo getUserInfo() {
         return UserInfo.builder()
             .sub("sub")
@@ -829,6 +676,40 @@ public class ModelUtils {
             .locale("locale")
             .error("error")
             .errorDescription("error description")
+            .build();
+    }
+
+    public static GeocodingResult getGeocodingResultWithInsufficientData() {
+        GeocodingResult geocodingResult = new GeocodingResult();
+        AddressComponent locality = new AddressComponent();
+        locality.longName = "fake data";
+        locality.types = new AddressComponentType[] {AddressComponentType.UNKNOWN};
+        geocodingResult.addressComponents = new AddressComponent[] {locality};
+
+        return geocodingResult;
+    }
+
+    public static SubscriberDto getSubscriberDto() {
+        return SubscriberDto.builder()
+            .email("testEmail@gmail.com")
+            .name("testName")
+            .language("en")
+            .build();
+    }
+
+    public static TestersSignInRequest getTestersSignInRequest() {
+        return TestersSignInRequest.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .secretKey("secret-key")
+            .build();
+    }
+
+    public static TestersSignInRequest getTestersSignInRequestWithInvalidSecretKey() {
+        return TestersSignInRequest.builder()
+            .email("test@gmail.com")
+            .password("password")
+            .secretKey("invalid-secret-key")
             .build();
     }
 

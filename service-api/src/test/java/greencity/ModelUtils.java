@@ -1,13 +1,14 @@
 package greencity;
 
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidatorContext;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 
 public class ModelUtils {
 
     public static URL getUrl() throws MalformedURLException {
-        return new URL(TestConst.SITE);
+        return URI.create(TestConst.SITE).toURL();
     }
 
     public static ConstraintValidatorContext.ConstraintViolationBuilder getConstraintViolationBuilder() {

@@ -3,7 +3,7 @@ package greencity.security.service;
 import greencity.security.dto.SuccessSignInDto;
 
 /**
- * Provides the google social logic.
+ * Provides the Google social logic.
  *
  * @author Nazar Stasyuk && Yurii Koval
  * @version 1.0
@@ -11,10 +11,10 @@ import greencity.security.dto.SuccessSignInDto;
 
 public interface GoogleSecurityService {
     /**
-     * Method that allow you authenticate with google idToken.
+     * Method that allow you to authenticate with Google token.
      *
-     * @param idToken {@link String} - google id token.
+     * @param token {@link String} - Google id token.
      * @return {@link SuccessSignInDto} if token valid
      */
-    SuccessSignInDto authenticate(String idToken, String language);
+    SuccessSignInDto authenticate(String token, String language);
 }

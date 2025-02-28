@@ -1,161 +1,122 @@
 package greencity.service;
 
 import greencity.ModelUtils;
+import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
-import greencity.dto.econews.AddEcoNewsDtoResponse;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventAuthorDto;
-import greencity.dto.eventcomment.EventCommentAuthorDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
-import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
-import greencity.dto.notification.NotificationDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.place.PlaceNotificationDto;
-import greencity.dto.user.PlaceAuthorDto;
+import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.Language;
 import greencity.entity.User;
-import greencity.exception.exceptions.LanguageNotSupportedException;
-import greencity.exception.exceptions.NotFoundException;
+import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.PlaceStatus;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.message.PlaceStatusChangeDto;
+import greencity.message.ScheduledEmailMessage;
+import greencity.message.SendReportEmailMessage;
+import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
+import jakarta.mail.Session;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
-import greencity.constant.EmailConstants;
 
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Locale;
-import java.util.Optional;
 
+import static greencity.ModelUtils.getSubscriberDto;
+
+import static greencity.TestConst.ENGLISH_CODE;
+import static greencity.TestConst.SIMPLE_LONG_NUMBER;
+import static greencity.TestConst.NAME;
+import static greencity.TestConst.EMAIL;
+import static greencity.TestConst.PLACE_NAME;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
-import org.springframework.context.MessageSource;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doAnswer;
 
+import org.thymeleaf.context.Context;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class EmailServiceImplTest {
     private EmailService service;
-    private PlaceAuthorDto placeAuthorDto;
     @Mock
     private JavaMailSender javaMailSender;
     @Mock
     private ITemplateEngine templateEngine;
     @Mock
+    private MessageSource messageSource;
+    @Mock
     private UserRepo userRepo;
     @Mock
-    private MessageSource messageSource;
-    private static final Locale UA_LOCALE = new Locale("uk", "UA");
+    LanguageRepo languageRepo;
+    private static final Locale UA_LOCALE = Locale.of("uk", "UA");
 
     @BeforeEach
     public void setup() {
-        initMocks(this);
-        service = new EmailServiceImpl(javaMailSender, templateEngine, userRepo, Executors.newCachedThreadPool(),
-            "http://localhost:4200", "http://localhost:4200", "http://localhost:8080",
-            "test@email.com", messageSource);
-        placeAuthorDto = PlaceAuthorDto.builder()
-            .id(1L)
-            .email("testEmail@gmail.com")
-            .name("testName")
-            .build();
+        service = new EmailServiceImpl(
+            javaMailSender,
+            templateEngine,
+            Executors.newCachedThreadPool(),
+            "http://localhost:4200",
+            "test@email.com",
+            messageSource,
+            userRepo,
+            languageRepo);
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
-    }
-
-    @Test
-    void sendChangePlaceStatusEmailTest() {
-        String authorFirstName = "test author first name";
-        String placeName = "test place name";
-        String placeStatus = "test place status";
-        String authorEmail = "test author email";
-
-        when(userRepo.findByEmail(authorEmail)).thenReturn(Optional.of(ModelUtils.getUserWithUserLocation()));
-        when(messageSource.getMessage(EmailConstants.CHANGE_PLACE_STATUS, null,
-            getLocale("en"))).thenReturn("Updated place status");
-        service.sendChangePlaceStatusEmail(authorFirstName, placeName, placeStatus, authorEmail);
-        verify(messageSource).getMessage(EmailConstants.CHANGE_PLACE_STATUS, null, getLocale("en"));
+        when(templateEngine.process(any(String.class), any(Context.class))).thenReturn("<html></html>");
     }
 
     @Test
     void sendAddedNewPlacesReportEmailTest() {
-        CategoryDto testCategory = CategoryDto.builder().name("CategoryName").build();
-        PlaceNotificationDto testPlace1 =
-            PlaceNotificationDto.builder().name("PlaceName1").category(testCategory).build();
-        PlaceNotificationDto testPlace2 =
-            PlaceNotificationDto.builder().name("PlaceName2").category(testCategory).build();
-        Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlacesTest = new HashMap<>();
-        categoriesWithPlacesTest.put(testCategory, Arrays.asList(testPlace1, testPlace2));
-
-        when(userRepo.findByEmail("author@gmail.com")).thenReturn(Optional.of(ModelUtils.getUserWithUserLocation()));
-        when(messageSource.getMessage(EmailConstants.NEW_PLACES, null,
-            getLocale("en"))).thenReturn("You have added new place");
-        service.sendAddedNewPlacesReportEmail(
-            Collections.singletonList(ModelUtils.getPlaceAuthorDto()), categoriesWithPlacesTest, "DAILY");
-        verify(javaMailSender).createMimeMessage();
-        verify(messageSource).getMessage(EmailConstants.NEW_PLACES, null, getLocale("en"));
-    }
-
-    @Test
-    void sendCreatedNewsForAuthorTest() {
-        EcoNewsForSendEmailDto dto = new EcoNewsForSendEmailDto();
-        PlaceAuthorDto placeAuthorDto = new PlaceAuthorDto();
-        placeAuthorDto.setEmail("test@gmail.com");
-        dto.setAuthor(placeAuthorDto);
-
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(ModelUtils.getUserWithUserLocation()));
-        when(messageSource.getMessage(EmailConstants.CREATED_NEWS, null,
-            getLocale("en"))).thenReturn("Created news");
-        service.sendCreatedNewsForAuthor(dto);
-        verify(javaMailSender).createMimeMessage();
-        verify(messageSource).getMessage(EmailConstants.CREATED_NEWS, null, getLocale("en"));
-    }
-
-    @Test
-    void sendNewNewsForSubscriber() {
-        List<NewsSubscriberResponseDto> newsSubscriberResponseDtos =
-            Collections.singletonList(new NewsSubscriberResponseDto("test@gmail.com", "someUnsubscribeToken"));
-        AddEcoNewsDtoResponse addEcoNewsDtoResponse = ModelUtils.getAddEcoNewsDtoResponse();
-
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(ModelUtils.getUserWithUserLocation()));
-        when(messageSource.getMessage(EmailConstants.NEWS, null,
-            getLocale("en"))).thenReturn("News");
-        service.sendNewNewsForSubscriber(newsSubscriberResponseDtos, addEcoNewsDtoResponse);
-        verify(javaMailSender).createMimeMessage();
-        verify(messageSource).getMessage(EmailConstants.NEWS, null, getLocale("en"));
-    }
-
-    @Test
-    void sendNewCommentForEventOrganizer() {
-        var dto = EventCommentForSendEmailDto.builder()
-            .id(1L)
-            .email("inna@gmail.com")
-            .createdDate(LocalDateTime.MIN)
-            .text("new comment")
-            .eventId(2L)
-            .author(EventCommentAuthorDto.builder()
-                .id(3L)
-                .name("Author")
-                .build())
-            .organizer(EventAuthorDto.builder()
-                .id(4L)
-                .name("Organizer")
-                .build())
+        SendReportEmailMessage sendReportEmailMessage = SendReportEmailMessage.builder()
+            .subscribers(List.of(getSubscriberDto()))
+            .categoriesDtoWithPlacesDtoMap(Map.of(
+                CategoryDto.builder()
+                    .name("Cycling routes")
+                    .build(),
+                List.of(
+                    PlaceNotificationDto.builder()
+                        .name("Central Park")
+                        .category(CategoryDto.builder()
+                            .name("Hotels")
+                            .build())
+                        .build())))
+            .periodicity(EmailPreferencePeriodicity.WEEKLY)
             .build();
+        service.sendAddedNewPlacesReportEmail(sendReportEmailMessage);
+        verify(javaMailSender).createMimeMessage();
+    }
 
-        service.sendNewCommentForEventOrganizer(dto);
+    @Test
+    void sendInterestingEcoNewsTest() {
+        InterestingEcoNewsDto dto = new InterestingEcoNewsDto();
+        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", "ua", UUID.randomUUID())));
 
+        when(messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null, getLocale("ua")))
+            .thenReturn("Interesting Eco News");
+
+        service.sendInterestingEcoNews(dto);
         verify(javaMailSender).createMimeMessage();
     }
 
@@ -165,31 +126,22 @@ class EmailServiceImplTest {
     void sendVerificationEmail(Long id, String name, String email, String token, String language) {
         when(messageSource.getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language)))
             .thenReturn("Verify your email address");
-        service.sendVerificationEmail(id, name, email, token, language, false);
 
+        service.sendVerificationEmail(id, name, email, token, language, false);
         verify(javaMailSender).createMimeMessage();
         verify(messageSource).getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language));
-
     }
 
     @Test
     void sendVerificationEmailLanguageNotFoundException() {
-        assertThrows(LanguageNotSupportedException.class,
+        assertThrows(IllegalStateException.class,
             () -> service.sendVerificationEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
     @Test
     void sendApprovalEmail() {
-        when(messageSource.getMessage(EmailConstants.APPROVE_REGISTRATION_SUBJECT, null,
-            getLocale("en"))).thenReturn("Approve your registration");
-        var user = ModelUtils.getUserWithUserLocation();
-        user.setLanguage(Language.builder().code("en").build());
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-        service.sendApprovalEmail(1L, "userName", "test@gmail.com",
-            "someToken");
+        service.sendApprovalEmail(1L, "userName", "test@gmail.com", "someToken");
         verify(javaMailSender).createMimeMessage();
-        verify(messageSource).getMessage(EmailConstants.APPROVE_REGISTRATION_SUBJECT, null,
-            getLocale("en"));
     }
 
     @ParameterizedTest
@@ -204,62 +156,56 @@ class EmailServiceImplTest {
 
     @Test
     void sendRestoreEmailLanguageNotFoundException() {
-        assertThrows(LanguageNotSupportedException.class,
+        assertThrows(IllegalStateException.class,
             () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
     @Test
     void sendHabitNotification() {
-        service.sendHabitNotification("userName", "userEmail");
+        service.sendHabitNotification("userName", "userEmail@gmail.com");
         verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendHabitNotificationWithInvalidEmail() {
+        assertThrows(WrongEmailException.class,
+            () -> service.sendHabitNotification("userName", "userEmail"));
     }
 
     @Test
     void sendReasonOfDeactivation() {
-        when(messageSource.getMessage(EmailConstants.DEACTIVATION, null,
-            getLocale("en"))).thenReturn("Your account was deactivated");
-        List<String> test = List.of("test", "test");
         UserDeactivationReasonDto test1 = UserDeactivationReasonDto.builder()
-            .deactivationReasons(test)
+            .deactivationReason("test")
             .lang("en")
             .email("test@ukr.net")
             .name("test")
             .build();
+        when(messageSource.getMessage(EmailConstants.DEACTIVATION, null, getLocale(test1.getLang())))
+            .thenReturn("Deactivation");
         service.sendReasonOfDeactivation(test1);
         verify(javaMailSender).createMimeMessage();
-        verify(messageSource).getMessage(EmailConstants.DEACTIVATION, null, getLocale("en"));
     }
 
     @Test
     void sendMessageOfActivation() {
-        when(messageSource.getMessage(EmailConstants.ACTIVATION, null,
-            getLocale("en"))).thenReturn("Your account was activated");
         UserActivationDto test1 = UserActivationDto.builder()
             .lang("en")
             .email("test@ukr.net")
             .name("test")
             .build();
+        when(messageSource.getMessage(EmailConstants.ACTIVATION, null, getLocale(test1.getLang())))
+            .thenReturn("Activation");
         service.sendMessageOfActivation(test1);
         verify(javaMailSender).createMimeMessage();
-        verify(messageSource).getMessage(EmailConstants.ACTIVATION, null, getLocale("en"));
     }
 
     @Test
     void sendUserViolationEmailTest() {
-        when(messageSource.getMessage(EmailConstants.VIOLATION_EMAIL, null,
-            getLocale("en"))).thenReturn("Violation email");
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
+        when(messageSource.getMessage(EmailConstants.VIOLATION_EMAIL, null, getLocale(dto.getLanguage())))
+            .thenReturn("Violation email");
         service.sendUserViolationEmail(dto);
         verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendUserViolationEmailWithEmptyLanguageTest() {
-        UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
-        dto.setLanguage("");
-        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
-        dto.setLanguage(null);
-        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
     }
 
     @Test
@@ -276,55 +222,105 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendNotificationByEmail() {
-        User user = User.builder().language(new Language()).build();
-        NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-        service.sendNotificationByEmail(dto, "test@gmail.com");
-        verify(userRepo).findByEmail(anyString());
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendNotificationByEmailNotFoundException() {
-        NotificationDto dto = NotificationDto.builder().title("title").body("body").build();
-        assertThrows(NotFoundException.class, () -> service.sendNotificationByEmail(dto, "test@gmail.com"));
-    }
-
-    @Test
-    void sendEventCreatedNotificationTest() {
-        service.sendEventCreationNotification("test@gmail.com", "message");
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
     void sendUserViolationEmailWithUnsupportedLanguageTest() {
         UserViolationMailDto dto = ModelUtils.getUserViolationMailDto();
         dto.setLanguage("de");
-        assertThrows(LanguageNotSupportedException.class, () -> service.sendUserViolationEmail(dto));
+        assertThrows(IllegalStateException.class, () -> service.sendUserViolationEmail(dto));
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, false",
-        "1, Test, test@gmail.com, token, true"})
-    void sendCreateNewPasswordForEmployee(Long id, String name, String email, String token,
-        Boolean isUbs) {
-        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS, null, getLocale("ua")))
-            .thenReturn("Create password for Green City");
-        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS_UBS, null, getLocale("ua")))
-            .thenReturn("Create password for Pick Up City");
-        service.sendCreateNewPasswordForEmployee(id, name, email, token, isUbs);
+    @Test
+    void sendScheduledNotificationEmailTest() {
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test body")
+            .username("test user")
+            .email("test@gmail.com")
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
+        service.sendScheduledNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
+        "1, Test, test@gmail.com, token, en, true"})
+    void sendCreateNewPasswordForEmployee(Long id, String name, String email, String token, String language,
+        Boolean isUbs) {
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS, null, getLocale(language)))
+            .thenReturn("Create password for Green City");
+        when(messageSource.getMessage(EmailConstants.CONFIRM_CREATING_PASS_UBS, null, getLocale(language)))
+            .thenReturn("Create password for Pick Up City");
+        service.sendCreateNewPasswordForEmployee(id, name, email, token, language, isUbs);
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
+        "1, Test, test@gmail.com, token, en, true"})
+    void sendBlockAccountNotificationWithUnblockLinkEmailTest(Long id, String name, String email,
+        String token, String language,
+        Boolean isUbs) {
+        when(messageSource.getMessage(EmailConstants.BLOCKED_USER, null, getLocale(language)))
+            .thenReturn("Your account is blocked");
+
+        service.sendBlockAccountNotificationWithUnblockLinkEmail(id, name, email, token, language, isUbs);
+
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendPlaceStatusChangeNotificationTest() throws InterruptedException {
+        PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
+        dto.setUserName(NAME);
+        dto.setPlaceName(PLACE_NAME);
+        dto.setNewStatus(PlaceStatus.APPROVED);
+        dto.setEmail(EMAIL);
+        User user = new User();
+        user.setEmail(EMAIL);
+        user.setName(NAME);
+        Language language = new Language(SIMPLE_LONG_NUMBER, ENGLISH_CODE, List.of(user));
+        user.setLanguage(language);
+        when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+        doNothing().when(javaMailSender).send(any(MimeMessage.class));
+        CountDownLatch latch = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            latch.countDown();
+            return null;
+        }).when(javaMailSender).send(any(MimeMessage.class));
+        String subject = "Place Status Change Notification";
+        when(messageSource.getMessage(eq(EmailConstants.UPDATE_STATUS), any(), eq(getLocale(ENGLISH_CODE))))
+            .thenReturn(subject);
+
+        service.sendPlaceStatusChangeNotification(dto);
+        latch.await();
+        verify(userRepo).findByEmail(dto.getEmail());
+        verify(javaMailSender).createMimeMessage();
+        verify(javaMailSender).send(mimeMessage);
+        verify(messageSource).getMessage(eq(EmailConstants.UPDATE_STATUS), any(), eq(getLocale(ENGLISH_CODE)));
+    }
+
+    @Test
+    void sendPlaceStatusChangeNotificationUserNotFoundTest() {
+        PlaceStatusChangeDto dto = new PlaceStatusChangeDto();
+        dto.setUserName(NAME);
+        dto.setPlaceName(PLACE_NAME);
+        dto.setNewStatus(PlaceStatus.APPROVED);
+        dto.setEmail(EMAIL);
+        when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.empty());
+        assertThrows(RuntimeException.class, () -> {
+            service.sendPlaceStatusChangeNotification(dto);
+        });
+        verify(userRepo).findByEmail(dto.getEmail());
+    }
+
     private static Locale getLocale(String language) {
-        switch (language) {
-            case "ua":
-                return UA_LOCALE;
-            case "en":
-                return Locale.ENGLISH;
-            default:
-                throw new IllegalStateException("Unexpected value: " + language);
-        }
+        return switch (language) {
+            case "ua" -> UA_LOCALE;
+            case "en" -> Locale.ENGLISH;
+            default -> throw new IllegalStateException("Unexpected value: " + language);
+        };
     }
 }

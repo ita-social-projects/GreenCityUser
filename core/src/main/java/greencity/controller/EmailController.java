@@ -1,22 +1,19 @@
 package greencity.controller;
 
 import greencity.constant.HttpStatuses;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
-import greencity.dto.notification.NotificationDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.message.SendChangePlaceStatusEmailMessage;
-import greencity.message.SendEventCreationNotification;
-import greencity.message.SendHabitNotification;
-import greencity.message.SendReportEmailMessage;
+import greencity.message.*;
 import greencity.service.EmailService;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AllArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/email")
@@ -25,27 +22,14 @@ public class EmailController {
     private final EmailService emailService;
 
     /**
-     * Method for sending news for users who subscribed for updates.
-     *
-     * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
-     */
-    @PostMapping("/addEcoNews")
-    public ResponseEntity<Object> addEcoNews(@RequestBody EcoNewsForSendEmailDto message) {
-        emailService.sendCreatedNewsForAuthor(message);
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
-     * Method for sending notification to the event organizer about the EventComment
-     * addition.
+     * Method for sending interesting news for subscribers.
      *
      * @param message - object with all necessary data for sending email
      */
-    @PostMapping("/addEventComment")
-    public ResponseEntity<Object> addEventComment(@RequestBody EventCommentForSendEmailDto message) {
-        emailService.sendNewCommentForEventOrganizer(message);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @PostMapping("/sendInterestingEcoNews")
+    public ResponseEntity<Object> sendInterestingEcoNews(@RequestBody InterestingEcoNewsDto message) {
+        emailService.sendInterestingEcoNews(message);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -53,26 +37,11 @@ public class EmailController {
      * added new places.
      *
      * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
      */
     @PostMapping("/sendReport")
     public ResponseEntity<Object> sendReport(@RequestBody SendReportEmailMessage message) {
-        emailService.sendAddedNewPlacesReportEmail(message.getSubscribers(), message.getCategoriesDtoWithPlacesDtoMap(),
-            message.getEmailNotification());
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    /**
-     * Method for sending simple notification to {@code User} about status change.
-     *
-     * @param message - object with all necessary data for sending email
-     * @author Taras Kavkalo
-     */
-    @PostMapping("/changePlaceStatus")
-    public ResponseEntity<Object> changePlaceStatus(@RequestBody SendChangePlaceStatusEmailMessage message) {
-        emailService.sendChangePlaceStatusEmail(message.getAuthorFirstName(), message.getPlaceName(),
-            message.getPlaceStatus(), message.getAuthorEmail());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        emailService.sendAddedNewPlacesReportEmail(message);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -80,12 +49,11 @@ public class EmailController {
      *
      * @param sendHabitNotification - object with all necessary data for sending
      *                              email
-     * @author Taras Kavkalo
      */
     @PostMapping("/sendHabitNotification")
     public ResponseEntity<Object> sendHabitNotification(@RequestBody SendHabitNotification sendHabitNotification) {
         emailService.sendHabitNotification(sendHabitNotification.getName(), sendHabitNotification.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -93,51 +61,54 @@ public class EmailController {
      *
      * @param dto {@link UserViolationMailDto} - object with all necessary data for
      *            sending email.
-     * @author Zakhar Veremchuk
      */
     @PostMapping("/sendUserViolation")
     public ResponseEntity<Object> sendUserViolation(@RequestBody UserViolationMailDto dto) {
         emailService.sendUserViolationEmail(dto);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     /**
-     * Sends notification to user on email.
+     * Sends scheduled email notification to user.
      *
-     * @param notification {@link NotificationDto} - object with all necessary data
-     *                     for sending notification via email.
-     * @param email        {@link String} - user's email.
-     * @author Ann Sakhno
+     * @param message {@link ScheduledEmailMessage} - object with all necessary data
+     *                for sending notification via email.
      */
-    @ApiOperation(value = "Send notification to user via email")
+    @Operation(summary = "Send scheduled email notification to user")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(code = 401, message = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(code = 403, message = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    @PostMapping("/notification")
-    public ResponseEntity<Object> sendUserNotification(@RequestBody NotificationDto notification,
-        @RequestParam("email") String email) {
-        emailService.sendNotificationByEmail(notification, email);
-        return ResponseEntity.status(HttpStatus.OK).build();
+    @PostMapping("/scheduled/notification")
+    public ResponseEntity<Void> sendScheduledNotification(@RequestBody ScheduledEmailMessage message) {
+        emailService.sendScheduledNotificationEmail(message);
+        return ResponseEntity.ok().build();
     }
 
     /**
-     * Sends email notification about event status when it has been created by user.
+     * Method for sending an email notification about the status change of a place
+     * to the user.
      *
-     * @param notification - object with all necessary data for sending notification
-     *                     via email
-     * @author Olena Sotnik
+     * @param dto Object containing the necessary information for sending the status
+     *            change notification email. The object includes: - userName: The
+     *            name of the user. - userEmail: The email of the user who will
+     *            receive the notification. - placeName: The name of the place whose
+     *            status has been changed. - newStatus: The new status of the place.
+     *
+     * @return ResponseEntity with HTTP status 200 OK if the email was successfully
+     *         sent. If any error occurs, an appropriate error response will be
+     *         returned.
      */
-    @ApiOperation(value = "Send event creation notification to user via email")
+    @Operation(summary = "Send email notification to user if place status changed")
     @ApiResponses(value = {
-        @ApiResponse(code = 200, message = HttpStatuses.OK),
-        @ApiResponse(code = 400, message = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
-    @PostMapping("/sendEventNotification")
-    @ResponseStatus(HttpStatus.OK)
-    public void sendEventNotification(@RequestBody SendEventCreationNotification notification) {
-        emailService.sendEventCreationNotification(notification.getEmail(), notification.getMessageBody());
+    @PostMapping("/sendPlaceStatusChange")
+    public ResponseEntity<Object> sendPlaceStatusChange(@RequestBody PlaceStatusChangeDto dto) {
+        emailService.sendPlaceStatusChangeNotification(dto);
+        return ResponseEntity.ok().build();
     }
 }

@@ -1,18 +1,15 @@
 package greencity.constant;
 
-public final class ErrorMessage {
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ErrorMessage {
     public static final String USER_NOT_FOUND_BY_ID = "The user does not exist by this id: ";
     public static final String USER_NOT_FOUND_BY_UUID = "The user does not exist by this uuid: ";
     public static final String USER_NOT_FOUND_BY_EMAIL = "The user does not exist by this email: ";
     public static final String USER_CANT_UPDATE_THEMSELVES = "User can't update themselves";
     public static final String IMPOSSIBLE_UPDATE_USER_STATUS = "Impossible to update status of admin or moderator";
-    public static final String PROFILE_PICTURE_NOT_FOUND_BY_ID = "Profile picture not found by id : ";
     public static final String IMAGE_EXISTS = "Image should be download, PNG or JPEG ";
-    public static final String OWN_USER_ID = "You can not perform actions with your own id : ";
-    public static final String USER_FRIENDS_LIST = "You don't have a friend with this id : ";
-    public static final String FRIEND_EXISTS = "Friend with this id has already been added : ";
-    public static final String NOT_FOUND_REQUEST = "Not found friend request from user with id: ";
-    public static final String NOT_FOUND_ANY_FRIENDS = "Not found any friends by id: ";
     public static final String USER_CANNOT_ADD_MORE_THAN_5_SOCIAL_NETWORK_LINKS =
         "User cannot add more than 5 social network links";
     public static final String INVALID_URI = "The string could not be parsed as a URI reference.";
@@ -20,10 +17,11 @@ public final class ErrorMessage {
     public static final String USER_CANNOT_ADD_SAME_SOCIAL_NETWORK_LINKS =
         "User cannot add the same social network links";
     public static final String USER_DEACTIVATED = "User is deactivated";
-    public static final String BAD_GOOGLE_TOKEN = "Bad google token";
+    public static final String BAD_GOOGLE_TOKEN = "Bad google token. ";
+    public static final String EXPIRED_GOOGLE_ID_TOKEN = "Google id token is not valid or expired. ";
+    public static final String TRANSACTION_FAILED = "Transaction failed and rolled back due to restClient failure. ";
     public static final String BAD_FACEBOOK_TOKEN = "Bad facebook token";
-    public static final String NO_ANY_EMAIL_TO_VERIFY_BY_THIS_TOKEN = "No any email to verify by this token";
-    public static final String EMAIL_TOKEN_EXPIRED = "User late with verify. Token is invalid.";
+    public static final String VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED = "Verification token not found or expired.";
     public static final String PASSWORD_RESTORE_LINK_ALREADY_SENT =
         "Password restore link already sent, please check your email: ";
     public static final String REFRESH_TOKEN_NOT_VALID = "Refresh token not valid!";
@@ -40,18 +38,29 @@ public final class ErrorMessage {
     public static final String LINK_IS_NO_ACTIVE = "This link is no longer active";
     public static final String USER_BLOCKED = "User is blocked";
     public static final String USER_CREATED = "User is not activated";
-    public static final String USER_DOES_NOT_LOGIN = "User has not login in the system by this email: ";
+    public static final String USER_DELETED = "User deleted";
     public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
     public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
     public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
-    public static final String EXPIRED_GOOGLE_ID_TOKEN = "Expired Google id token";
-    public static final String TRANSACTION_FAILED = "Transaction failed";
+    public static final String NOT_VALID_BOOLEAN_VALUE = "%s is not a valid Boolean value for %s";
+    public static final String INSUFFICIENT_LOCATION_DATA_FOUND =
+        "Insufficient location data found for the provided coordinates.";
+    public static final String USER_CANNOT_DEACTIVATE_YOURSELF = "You cannot deactivate yourself if you are not a USER";
+    public static final String USER_CANNOT_DEACTIVATE_OTHERS = "USER cannot deactivate other users";
+    public static final String ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN = "ADMIN cannot deactivate other ADMIN users";
+    public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER =
+        "You do not have permission to deactivate this user";
+    public static final String BASE64_DECODE_MESSAGE = "Can't decode from base64 format";
+    public static final String BRUTEFORCE_PROTECTION_MESSAGE =
+        "User account is blocked due to too many failed login attempts.";
+    public static final String COULD_NOT_RETRIEVE_CHECKOUT_RESPONSE = "Could not retrieve checkout response";
+    public static final String WRONG_CAPTCHA = "Wrong captcha";
+    public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS =
+        "User account is blocked due to too many failed login attempts. Try again in %s minutes";
+    public static final String WRONG_SECRET_KEY = "Wrong secret key";
     public static final String WARNING_GIT_DIRECTORY_NOT_FOUND =
         "WARNING: .git directory not found. Git commit info will be unavailable.";
     public static final String GIT_REPOSITORY_NOT_INITIALIZED =
         "Git repository not initialized. Commit info is unavailable.";
     public static final String FAILED_TO_FETCH_COMMIT_INFO = "Failed to fetch commit info due to I/O error: ";
-
-    private ErrorMessage() {
-    }
 }

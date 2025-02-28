@@ -8,8 +8,6 @@ import greencity.entity.User;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Collectors;
-
 @Component
 public class UserVOAchievementMapper extends AbstractConverter<User, UserVOAchievement> {
     @Override
@@ -27,7 +25,7 @@ public class UserVOAchievementMapper extends AbstractConverter<User, UserVOAchie
                         .id(userAchievement.getAchievement().getId())
                         .build())
                     .build())
-                .collect(Collectors.toList()) : null)
+                .toList() : null)
             .build();
     }
 }

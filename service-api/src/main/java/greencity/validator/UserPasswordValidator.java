@@ -1,13 +1,18 @@
 package greencity.validator;
 
 import greencity.annotations.PasswordValidation;
-import org.passay.*;
-
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import org.passay.CharacterRule;
+import org.passay.EnglishCharacterData;
+import org.passay.LengthRule;
+import org.passay.PasswordData;
+import org.passay.PasswordValidator;
+import org.passay.RuleResult;
+import org.passay.WhitespaceRule;
 
 public class UserPasswordValidator implements ConstraintValidator<PasswordValidation, String> {
-    private PasswordValidator validator;
+    private final PasswordValidator validator;
 
     /**
      * Default constructor that init PasswordValidator.
@@ -20,11 +25,6 @@ public class UserPasswordValidator implements ConstraintValidator<PasswordValida
             new CharacterRule(EnglishCharacterData.Digit, 1),
             new CharacterRule(EnglishCharacterData.Special, 1),
             new WhitespaceRule());
-    }
-
-    @Override
-    public void initialize(PasswordValidation constraintAnnotation) {
-        // Initializes the validator in preparation for #isValid calls
     }
 
     @Override

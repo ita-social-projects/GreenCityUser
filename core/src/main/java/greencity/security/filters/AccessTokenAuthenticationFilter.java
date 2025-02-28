@@ -4,24 +4,21 @@ import greencity.dto.user.UserVO;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Class that provide Authentication object based on JWT.
@@ -30,20 +27,11 @@ import java.util.Optional;
  * @version 1.0
  */
 @Slf4j
+@RequiredArgsConstructor
 public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
     private final JwtTool jwtTool;
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
-
-    /**
-     * Constructor.
-     */
-    public AccessTokenAuthenticationFilter(JwtTool jwtTool, AuthenticationManager authenticationManager,
-        UserService userService) {
-        this.jwtTool = jwtTool;
-        this.authenticationManager = authenticationManager;
-        this.userService = userService;
-    }
 
     private String getTokenFromCookies(Cookie[] cookies) {
         return Arrays.stream(cookies)
@@ -89,9 +77,9 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (ExpiredJwtException e) {
-                log.info("Token has expired: " + token);
+                log.info("Token has expired: {}", token);
             } catch (Exception e) {
-                log.info("Access denied with token: " + e.getMessage());
+                log.info("Access denied with token: {}", e.getMessage());
             }
         }
         chain.doFilter(request, response);

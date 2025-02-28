@@ -5,7 +5,9 @@ import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.service.OwnSecurityService;
 import greencity.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,33 +16,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import springfox.documentation.annotations.ApiIgnore;
-
-import javax.validation.Valid;
 
 @Controller
-@ApiIgnore
+@Hidden
 @RequestMapping("/management")
+@RequiredArgsConstructor
 public class ManagementSecurityController {
+    private static final String SIGN_IN_FORM = "signInForm";
+    private static final String MANAGEMENT_LOGIN_PAGE = "core/management_login";
     private final OwnSecurityService service;
     private final UserService userService;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
-    private static final String SIGN_IN_FORM = "signInForm";
-    private static final String MANAGEMENT_LOGIN_PAGE = "core/management_login";
-
-    /**
-     * Constructor.
-     *
-     * @param service     - - {@link OwnSecurityService} - service for security
-     *                    logic.
-     * @param userService - {@link UserService} - service for User manipulations.
-     */
-    @Autowired
-    public ManagementSecurityController(OwnSecurityService service, UserService userService) {
-        this.service = service;
-        this.userService = userService;
-    }
 
     /**
      * Controller returns view for management log in.

@@ -1,8 +1,7 @@
 package greencity.constant;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
 
 class UpdateConstantsTest {
 

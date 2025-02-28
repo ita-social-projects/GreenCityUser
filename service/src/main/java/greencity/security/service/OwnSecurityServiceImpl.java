@@ -1,34 +1,36 @@
 package greencity.security.service;
 
+import greencity.client.CloudFlareClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
-import greencity.dto.achievement.AchievementVO;
+import greencity.dto.security.CloudFlareRequest;
+import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
-import greencity.entity.AchievementCategory;
-import greencity.entity.Authority;
 import greencity.entity.Language;
 import greencity.entity.OwnSecurity;
-import greencity.entity.Position;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
+import greencity.entity.UserNotificationPreference;
 import greencity.entity.VerifyEmail;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.PasswordsDoNotMatchesException;
 import greencity.exception.exceptions.UserAlreadyHasPasswordException;
 import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.UserBlockedException;
 import greencity.exception.exceptions.UserDeactivatedException;
+import greencity.exception.exceptions.WrongCaptchaException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
@@ -41,28 +43,27 @@ import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.TestersSignInRequest;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
-import greencity.service.AchievementService;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
-
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,56 +71,39 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * {@inheritDoc}
+ * The class provides implementation of the {@code OwnSecurityService}.
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class OwnSecurityServiceImpl implements OwnSecurityService {
+    private static final String VALID_PW_CHARS =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final OwnSecurityRepo ownSecurityRepo;
     private final PositionRepo positionRepo;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTool jwtTool;
-    private final Integer expirationTime;
     private final RestorePasswordEmailRepo restorePasswordEmailRepo;
     private final ModelMapper modelMapper;
     private final UserRepo userRepo;
-    private static final String VALID_PW_CHARS =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+{}[]|:;<>?,./";
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
-    private static final int EXPIRATION_MONTHS_FOR_DRIVERS_RESTORE_EMAIL = 6;
-
-    /**
-     * Constructor.
-     */
-    @Autowired
-    public OwnSecurityServiceImpl(OwnSecurityRepo ownSecurityRepo,
-        PositionRepo positionRepo,
-        UserService userService,
-        PasswordEncoder passwordEncoder,
-        JwtTool jwtTool,
-        @Value("${verifyEmailTimeHour}") Integer expirationTime,
-        RestorePasswordEmailRepo restorePasswordEmailRepo,
-        ModelMapper modelMapper,
-        UserRepo userRepo, EmailService emailService, AuthorityRepo authorityRepo) {
-        this.ownSecurityRepo = ownSecurityRepo;
-        this.positionRepo = positionRepo;
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtTool = jwtTool;
-        this.expirationTime = expirationTime;
-        this.restorePasswordEmailRepo = restorePasswordEmailRepo;
-        this.modelMapper = modelMapper;
-        this.userRepo = userRepo;
-        this.emailService = emailService;
-        this.authorityRepo = authorityRepo;
-    }
+    private final LoginAttemptService loginAttemptService;
+    private final CloudFlareClient cloudFlareClient;
+    @Value("${verifyEmailTimeHour}")
+    private Integer expirationTime;
+    @Value("${bruteForceSettings.blockTimeInMinutes}")
+    private String blockTimeInMinutes;
+    @Value("${cloud-flare.secret-key}")
+    private String cloudFlareSecretKey;
+    @Value("${testers.sign-in-token}")
+    private String secretKey;
 
     /**
      * {@inheritDoc}
      *
-     * @return
+     * @return {@link SuccessSignUpDto}
      */
     @Transactional
     @Override
@@ -128,6 +112,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setOwnSecurity(createOwnSecurity(dto, user));
         user.setVerifyEmail(createVerifyEmail(user, jwtTool.generateTokenKey()));
         user.setUuid(UUID.randomUUID().toString());
+        Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
+            .map(emailPreference -> UserNotificationPreference.builder()
+                .user(user)
+                .emailPreference(emailPreference)
+                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                .build())
+            .collect(Collectors.toSet());
+        user.setNotificationPreferences(userNotificationPreferences);
         try {
             User savedUser = userRepo.save(user);
             user.setId(savedUser.getId());
@@ -138,7 +130,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         }
         user.setShowLocation(ProfilePrivacyPolicy.PUBLIC);
         user.setShowEcoPlace(ProfilePrivacyPolicy.PUBLIC);
-        user.setShowShoppingList(ProfilePrivacyPolicy.PUBLIC);
+        user.setShowToDoList(ProfilePrivacyPolicy.PUBLIC);
         return new SuccessSignUpDto(user.getId(), user.getName(), user.getEmail(), true);
     }
 
@@ -146,7 +138,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return User.builder()
             .name(dto.getName())
             .firstName(dto.getName())
-            .email(dto.getEmail().toLowerCase())
+            .email(dto.getEmail())
             .dateOfRegistration(LocalDateTime.now())
             .role(Role.ROLE_USER)
             .refreshTokenKey(refreshTokenKey)
@@ -160,15 +152,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .build();
     }
 
-    private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken,
-        boolean isOnlyDriver) {
-        if (isOnlyDriver) {
-            return RestorePasswordEmail.builder()
-                .user(user)
-                .token(emailVerificationToken)
-                .expiryDate(LocalDateTime.now().plusMonths(EXPIRATION_MONTHS_FOR_DRIVERS_RESTORE_EMAIL))
-                .build();
-        }
+    private RestorePasswordEmail createRestorePasswordEmail(User user, String emailVerificationToken) {
         return RestorePasswordEmail.builder()
             .user(user)
             .token(emailVerificationToken)
@@ -187,112 +171,40 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return VerifyEmail.builder()
             .user(user)
             .token(emailVerificationToken)
-            .expiryDate(calculateExpirationDateTime())
             .build();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @return
      */
     public SuccessSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto, String language) {
         String password = generatePassword();
         employeeSignUpDto.setPassword(password);
         OwnSignUpDto dto = modelMapper.map(employeeSignUpDto, OwnSignUpDto.class);
-        User employee = createAndConfigureEmployee(dto, language, employeeSignUpDto);
+        User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
+        employee.setOwnSecurity(createOwnSecurity(dto, employee));
+        employee.setRole(Role.ROLE_UBS_EMPLOYEE);
+        employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate()));
+        employee.setUuid(employeeSignUpDto.getUuid());
+        employee.setShowLocation(ProfilePrivacyPolicy.PUBLIC);
+        employee.setShowEcoPlace(ProfilePrivacyPolicy.PUBLIC);
+        employee.setShowToDoList(ProfilePrivacyPolicy.PUBLIC);
+        List<String> positionNames = employeeSignUpDto.getPositions().stream()
+            .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
+            .toList();
+        employee.setAuthorities(authorityRepo.findAuthoritiesByPositions(positionNames));
+        employee.setPositions(positionRepo.findPositionsByNames(positionNames));
 
         try {
             User savedUser = userRepo.save(employee);
-            handlePostSaveActions(dto, employee, savedUser);
+            employee.setId(savedUser.getId());
+            emailService.sendCreateNewPasswordForEmployee(savedUser.getId(), savedUser.getFirstName(),
+                employee.getEmail(), savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
 
         return new SuccessSignUpDto(employee.getId(), employee.getName(), employee.getEmail(), true);
-    }
-
-    private User createAndConfigureEmployee(OwnSignUpDto dto, String language, EmployeeSignUpDto employeeSignUpDto) {
-        User employee = createNewRegisteredUser(dto, jwtTool.generateTokenKey(), language);
-        employee.setOwnSecurity(createOwnSecurity(dto, employee));
-        employee.setRole(Role.ROLE_UBS_EMPLOYEE);
-        employee.setUuid(employeeSignUpDto.getUuid());
-        employee.setShowLocation(ProfilePrivacyPolicy.PUBLIC);
-        employee.setShowEcoPlace(ProfilePrivacyPolicy.PUBLIC);
-        employee.setShowShoppingList(ProfilePrivacyPolicy.PUBLIC);
-        setEmployeePositionsAndAuthorities(employeeSignUpDto, employee);
-        employee.setRestorePasswordEmail(createRestorePasswordEmail(employee, jwtTool.generateTokenKeyWithCodedDate(),
-            validateOnlyDriverPosition(employee)));
-
-        return employee;
-    }
-
-    private void setEmployeePositionsAndAuthorities(EmployeeSignUpDto employeeSignUpDto, User employee) {
-        List<String> positionNames = employeeSignUpDto.getPositions().stream()
-            .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
-            .collect(Collectors.toList());
-
-        List<Authority> authorities = authorityRepo.findAuthoritiesByPositions(positionNames);
-        employee.setAuthorities(authorities);
-
-        List<Position> positions = positionRepo.findPositionsByNames(positionNames);
-        employee.setPositions(positions);
-    }
-
-    private void handlePostSaveActions(OwnSignUpDto dto, User employee, User savedUser) {
-        employee.setId(savedUser.getId());
-        if (!validateOnlyDriverPosition(employee) && employee.getRestorePasswordEmail() != null) {
-            emailService.sendCreateNewPasswordForEmployee(employee.getId(), employee.getFirstName(),
-                employee.getEmail(), employee.getRestorePasswordEmail().getToken(), dto.isUbs());
-        }
-    }
-
-    private boolean validateOnlyDriverPosition(User employee) {
-        List<Position> employeePositions = employee.getPositions();
-        List<Authority> authorities = employee.getAuthorities();
-        return employeePositions.size() == 1
-            && authorities.isEmpty()
-            && employeePositions.stream()
-                .map(Position::getNameEn)
-                .anyMatch("Driver"::equals);
-    }
-
-    static List<UserAchievement> getUserAchievements(User user, AchievementService achievementService) {
-        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
-        return achievementList.stream()
-            .map(a -> {
-                UserAchievement userAchievement = new UserAchievement();
-                userAchievement.setAchievement(a);
-                userAchievement.setUser(user);
-                return userAchievement;
-            })
-            .collect(Collectors.toList());
-    }
-
-    static List<UserAction> getUserActions(User user, AchievementService achievementService) {
-        List<Achievement> achievementList = buildAchievementList(achievementService.findAll());
-        return achievementList.stream()
-            .map(a -> {
-                UserAction userAction = new UserAction();
-                userAction.setAchievementCategory(a.getAchievementCategory());
-                userAction.setUser(user);
-                return userAction;
-            })
-            .collect(Collectors.toList());
-    }
-
-    static List<Achievement> buildAchievementList(List<AchievementVO> achievementVOList) {
-        List<Achievement> achievements = new ArrayList<>();
-        for (AchievementVO achievementVO : achievementVOList) {
-            achievements.add(Achievement.builder()
-                .id(achievementVO.getId())
-                .achievementCategory(AchievementCategory.builder()
-                    .id(achievementVO.getAchievementCategory().getId())
-                    .name(achievementVO.getAchievementCategory().getName())
-                    .build())
-                .build());
-        }
-        return achievements;
     }
 
     private LocalDateTime calculateExpirationDateTime() {
@@ -305,28 +217,154 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Override
     public SuccessSignInDto signIn(final OwnSignInDto dto) {
-        UserVO user = userService.findByEmail(dto.getEmail().toLowerCase());
-        if (user == null) {
-            throw new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail());
-        }
-        if (!isPasswordCorrect(dto, user)) {
-            throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
-        }
-        if (user.getVerifyEmail() != null) {
+        String email = dto.getEmail();
+        UserVO user = validateUser(email);
+
+        handleUserStatus(user.getUserStatus());
+        handleBruteForceProtection(email);
+
+        verifyCaptcha(dto, email);
+
+        validatePassword(dto, user);
+
+        if (!isEmailVerified(user)) {
             throw new EmailNotVerified("You should verify the email first, check your email box!");
         }
-        if (user.getUserStatus() == UserStatus.DEACTIVATED) {
-            throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED);
+
+        return createSuccessSignInResponse(user, email);
+    }
+
+    private UserVO validateUser(final String email) {
+        UserVO user = userService.findByEmail(email);
+        if (user == null) {
+            throw new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
         }
-        if (user.getUserStatus() == UserStatus.BLOCKED) {
-            throw new BadUserStatusException(ErrorMessage.USER_BLOCKED);
+        return user;
+    }
+
+    /**
+     * Checks if user is blocked by brute-force protection (captcha or wrong
+     * password). If user is blocked, logs error and blocks user by email. If user
+     * exceeded wrong password attempts, throws WrongPasswordException.
+     *
+     * @param email user email
+     */
+    private void handleBruteForceProtection(String email) {
+        if (loginAttemptService.isBlockedByCaptcha(email)) {
+            log.error("Brute force protection, user with email is blocked - {}", email);
+            blockUserByEmail(email);
         }
-        if (user.getUserStatus() == UserStatus.CREATED) {
-            throw new BadUserStatusException(ErrorMessage.USER_CREATED);
+
+        if (loginAttemptService.isBlockedByWrongPassword(email)) {
+            log.error("Too many failed login attempts - {}, account is blocked for {} minutes", email,
+                blockTimeInMinutes);
+            throw new WrongPasswordException(
+                String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
         }
-        String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
+    }
+
+    /**
+     * Checks if captcha is valid. If captcha is not valid, logs error, increments
+     * wrong captcha attempts and throws WrongCaptchaException.
+     *
+     * @param dto   - {@link OwnSignInDto} that have sign-in information
+     * @param email - user email
+     */
+    private void verifyCaptcha(final OwnSignInDto dto, String email) {
+        if (!getCloudFlareResponse(dto).success()) {
+            loginAttemptService.loginFailedByCaptcha(email);
+            throw new WrongCaptchaException(ErrorMessage.WRONG_CAPTCHA);
+        }
+    }
+
+    /**
+     * Validates password for user. If password is not correct, logs error,
+     * increments wrong password attempts and throws WrongPasswordException.
+     *
+     * @param dto  - {@link OwnSignInDto} that have sign-in information
+     * @param user - user with password to be validated
+     */
+    private void validatePassword(final OwnSignInDto dto, UserVO user) {
+        if (!isPasswordCorrect(dto, user)) {
+            loginAttemptService.loginFailedByWrongPassword(dto.getEmail());
+            throw new WrongPasswordException(ErrorMessage.BAD_PASSWORD);
+        }
+    }
+
+    /**
+     * Checks if user has verified email. User is considered verified if there is no
+     * VerifyEmail entity associated with his/her account.
+     *
+     * @param user - user to be checked
+     * @return true if user has verified email, false otherwise
+     */
+    private boolean isEmailVerified(UserVO user) {
+        return user.getVerifyEmail() == null;
+    }
+
+    /**
+     * Creates a {@link SuccessSignInDto} that is used to sign in user. Creates a
+     * new access token and a new refresh token and returns them in the
+     * {@link SuccessSignInDto} object.
+     *
+     * @param user  user that is being signed in
+     * @param email user's email
+     * @return {@link SuccessSignInDto} with access token, refresh token and user's
+     *         name
+     */
+    private SuccessSignInDto createSuccessSignInResponse(UserVO user, String email) {
+        String accessToken = jwtTool.createAccessToken(email, user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), true);
+    }
+
+    /**
+     * Blocks user by email. Sets user status to {@link UserStatus#BLOCKED}, saves
+     * user and logs info about blocking. Then sends email with link to unblock and
+     * restore password page and throws {@link UserBlockedException} with message
+     * that contains time for which account is blocked.
+     *
+     * @param email email of user to be blocked
+     * @throws UserBlockedException if user is blocked
+     * @throws NotFoundException    if user with given email is not found
+     */
+    private void blockUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+
+        user.setUserStatus(UserStatus.BLOCKED);
+        userRepo.save(user);
+        log.info("User with email {} is blocked", user.getEmail());
+
+        emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
+            user.getId(), user.getName(), user.getEmail(),
+            jwtTool.generateUnblockToken(email), getLanguageFromUser(user), false);
+
+        throw new UserBlockedException(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE);
+    }
+
+    /**
+     * Calls CloudFlare api to check if given captcha is valid.
+     *
+     * @param dto - {@link OwnSignInDto} that contains captcha token
+     * @return {@link CloudFlareResponse} with result of captcha validation
+     */
+    private CloudFlareResponse getCloudFlareResponse(OwnSignInDto dto) {
+        return cloudFlareClient.getCloudFlareResponse(CloudFlareRequest.builder()
+            .secret(cloudFlareSecretKey)
+            .response(dto.getCaptchaToken())
+            .build());
+    }
+
+    /**
+     * Gets user language from user object. If user language code is "1", method
+     * returns "ua", otherwise - "en".
+     *
+     * @param user user to get language from
+     * @return "ua" or "en" depending on user language code
+     */
+    private String getLanguageFromUser(User user) {
+        return user.getLanguage().getCode().equals("1") ? "ua" : "en";
     }
 
     private boolean isPasswordCorrect(OwnSignInDto signInDto, UserVO user) {
@@ -372,17 +410,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     /**
      * {@inheritDoc}
-     *
-     * @author Dmytro Dovhal
-     */
-    @Override
-    public void updatePassword(String pass, Long id) {
-        String password = passwordEncoder.encode(pass);
-        ownSecurityRepo.updatePassword(password, id);
-    }
-
-    /**
-     * {@inheritDoc}
      */
     @Override
     @Transactional
@@ -413,6 +440,89 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         user.setOwnSecurity(ownSecurity);
         return modelMapper.map(
             savePasswordRestorationTokenForUser(user, jwtTool.generateTokenKey()), UserAdminRegistrationDto.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public void deleteUserByEmail(String email) {
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+
+        if (user.getUserStatus() != UserStatus.ACTIVATED) {
+            throw new EmailNotVerified(ErrorMessage.USER_EMAIL_IS_NOT_VERIFIED);
+        }
+
+        user.setUserStatus(UserStatus.DELETED);
+        userRepo.save(user);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Transactional
+    @Override
+    public void unblockAccount(String token) {
+        String email;
+        try {
+            email = jwtTool.getEmailOutOfAccessToken(token);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID);
+        }
+        loginAttemptService.deleteEmailFromCache(email);
+
+        User user = userRepo.findByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        user.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(user);
+        log.info("User {} unblocked", user.getEmail());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public SuccessSignInDto testersSignIn(TestersSignInRequest request) {
+        String email = request.email();
+        UserVO user = validateUser(email);
+
+        handleUserStatus(user.getUserStatus());
+        validatePassword(convertRequestToDto(request), user);
+        validateSecretKey(request.secretKey());
+
+        if (!isEmailVerified(user)) {
+            throw new EmailNotVerified("You should verify the email first, check your email box!");
+        }
+
+        return createSuccessSignInResponse(user, email);
+    }
+
+    /**
+     * Validates the provided secret key against the stored secret key. If the keys
+     * do not match, throws a {@link BadRequestException}.
+     *
+     * @param key the secret key to validate
+     * @throws BadRequestException if the provided key is incorrect
+     */
+    private void validateSecretKey(String key) {
+        if (!secretKey.equals(key)) {
+            throw new BadRequestException(ErrorMessage.WRONG_SECRET_KEY);
+        }
+    }
+
+    /**
+     * Converts a {@link TestersSignInRequest} to an {@link OwnSignInDto}.
+     * 
+     * @param request the request to convert
+     * @return the converted {@link OwnSignInDto}
+     */
+    private OwnSignInDto convertRequestToDto(TestersSignInRequest request) {
+        return OwnSignInDto.builder()
+            .email(request.email())
+            .password(request.password())
+            .build();
     }
 
     private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
@@ -528,5 +638,38 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .user(user)
             .build());
         userRepo.save(user);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @author Dmytro Dovhal
+     */
+    private void updatePassword(String pass, Long id) {
+        String password = passwordEncoder.encode(pass);
+        ownSecurityRepo.updatePassword(password, id);
+    }
+
+    /**
+     * Checks {@code UserStatus} and throws an exception if the user status is
+     * DEACTIVATED, BLOCKED, CREATED, or DELETED.
+     *
+     * @param status - the status of the User
+     * @throws BadUserStatusException if the user status is DEACTIVATED, BLOCKED,
+     *                                CREATED, or DELETED.
+     */
+    private void handleUserStatus(UserStatus status) {
+        switch (status) {
+            case DEACTIVATED:
+                throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED);
+            case BLOCKED:
+                throw new BadUserStatusException(ErrorMessage.USER_BLOCKED);
+            case CREATED:
+                throw new BadUserStatusException(ErrorMessage.USER_CREATED);
+            case DELETED:
+                throw new BadUserStatusException(ErrorMessage.USER_DELETED);
+            default:
+                break;
+        }
     }
 }

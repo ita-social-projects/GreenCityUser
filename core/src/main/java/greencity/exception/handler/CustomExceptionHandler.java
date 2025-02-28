@@ -1,13 +1,42 @@
 package greencity.exception.handler;
 
 import greencity.constant.AppConstant;
-import greencity.exception.exceptions.*;
-import lombok.AllArgsConstructor;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadSocialNetworkLinksException;
+import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.BadUserStatusException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.InsufficientLocationDataException;
+import greencity.exception.exceptions.InvalidURLException;
+import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserBlockedException;
+import greencity.exception.exceptions.WrongCaptchaException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
+import greencity.exception.exceptions.GoogleApiException;
+import greencity.exception.exceptions.UserDeactivationException;
+import greencity.exception.exceptions.Base64DecodedException;
+import greencity.exception.exceptions.ResourceNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,24 +47,14 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
  * Custom exception handler.
- *
- * @author Marian Milian
  */
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RestControllerAdvice
 @Slf4j
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
-    private ErrorAttributes errorAttributes;
+    private final ErrorAttributes errorAttributes;
 
     /**
      * Method intercept exception {@link ConstraintViolationException}.
@@ -44,10 +63,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request contain detail about occur exception
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
-     * @author Yurii Savchenko
      */
     @ExceptionHandler(ConstraintViolationException.class)
-    public final ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex,
+    public final ResponseEntity<Object> handleConstraintViolationException(
+        ConstraintViolationException ex,
         WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
@@ -59,16 +78,34 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Method intercept exception {@link IllegalArgumentException}.
+     *
+     * @param ex      the IllegalArgumentException that was thrown
+     * @param request the WebRequest that triggered the exception
+     * @return a ResponseEntity containing the {@link ExceptionResponse} with
+     *         details about the error and a 400 Bad Request HTTP status
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public final ResponseEntity<Object> handleIllegalArgumentException(
+        IllegalArgumentException ex,
+        WebRequest request) {
+        log.info(ex.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        exceptionResponse.setMessage(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
      * Method intercept exception {@link BadRequestException}.
      *
      * @param ex      Exception witch should be intercepted.
      * @param request contain detail about occur exception
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
-     * @author Yurii Savchenko
      */
     @ExceptionHandler(BadRequestException.class)
-    public final ResponseEntity<Object> handleBadRequestException(BadRequestException ex, WebRequest request) {
+    public final ResponseEntity<Object> handleBadRequestException(BadRequestException ex,
+        WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
@@ -97,26 +134,10 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request contain detail about occur exception
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
-     * @author Marian Milian
      */
     @ExceptionHandler(NotFoundException.class)
-    public final ResponseEntity<Object> handleNotFoundException(NotFoundException ex, WebRequest request) {
-        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
-        log.trace(ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
-    }
-
-    /**
-     * Method intercept exception {@link WrongIdException}.
-     *
-     * @param ex      Exception witch should be intercepted.
-     * @param request contain detail about occur exception
-     * @return ResponseEntity witch contain http status and body with message of
-     *         exception.
-     * @author Julia Seti
-     */
-    @ExceptionHandler(WrongIdException.class)
-    public final ResponseEntity<Object> handleWrongIdException(WrongIdException ex, WebRequest request) {
+    public final ResponseEntity<Object> handleNotFoundException(NotFoundException ex,
+        WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
@@ -128,7 +149,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request contain detail about occur exception
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
-     * @author Roman Zahorui
      */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public final ResponseEntity<Object> handleConversionFailedException(
@@ -140,7 +160,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         if (requiredType != null) {
             className = requiredType.getSimpleName();
         }
-        String message = String.format("Wrong %s. Should be '%s'", propName, className);
+        String message = "Wrong %s. Should be '%s'".formatted(propName, className);
         exceptionResponse.setMessage(message);
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
@@ -152,7 +172,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request contain detail about occur exception
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
-     * @author Nazar Stasyuk
      */
     @ExceptionHandler(BadRefreshTokenException.class)
     public final ResponseEntity<Object> handleBadRefreshTokenException(WebRequest request) {
@@ -166,7 +185,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @param ex Exception witch should be intercepted.
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
-     * @author Nazar Stasyuk
      */
     @ExceptionHandler(UserAlreadyRegisteredException.class)
     public final ResponseEntity<Object> handleBadEmailException(UserAlreadyRegisteredException ex) {
@@ -185,7 +203,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler(BadSocialNetworkLinksException.class)
-    public final ResponseEntity<Object> handleBadSocialNetworkLinkException(BadSocialNetworkLinksException ex,
+    public final ResponseEntity<Object> handleBadSocialNetworkLinkException(
+        BadSocialNetworkLinksException ex,
         WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
@@ -217,7 +236,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler(EmailNotVerified.class)
-    public final ResponseEntity<Object> handleEmailNotVerified(EmailNotVerified ex, WebRequest request) {
+    public final ResponseEntity<Object> handleEmailNotVerified(EmailNotVerified ex,
+        WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
@@ -266,7 +286,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(
-        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+        HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
@@ -276,18 +296,19 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
         HttpHeaders headers,
-        HttpStatus status,
+        HttpStatusCode status,
         WebRequest request) {
         List<ValidationExceptionDto> collect =
             ex.getBindingResult().getFieldErrors().stream()
                 .map(ValidationExceptionDto::new)
-                .collect(Collectors.toList());
+                .toList();
         log.trace(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(collect);
     }
 
     private Map<String, Object> getErrorAttributes(WebRequest webRequest) {
-        return new HashMap<>(errorAttributes.getErrorAttributes(webRequest, true));
+        return new HashMap<>(errorAttributes.getErrorAttributes(webRequest,
+            ErrorAttributeOptions.of(ErrorAttributeOptions.Include.MESSAGE)));
     }
 
     /**
@@ -298,7 +319,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler(PasswordsDoNotMatchesException.class)
-    public final ResponseEntity<Object> handlePasswordsDoNotMatchesException(PasswordsDoNotMatchesException ex) {
+    public final ResponseEntity<Object> handlePasswordsDoNotMatchesException(
+        PasswordsDoNotMatchesException ex) {
         ValidationExceptionDto validationExceptionDto =
             new ValidationExceptionDto(AppConstant.PASSWORD, ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
@@ -339,7 +361,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler(MultipartException.class)
-    public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(MultipartException me) {
+    public final ResponseEntity<Object> handleBadRequestWhenProfilePictureExceeded(
+        MultipartException me) {
         log.error("Error when profile picture was being uploaded {}", me);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(me.getMessage());
     }
@@ -351,13 +374,120 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      * @param request contain detail about occur exception
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
-     * @author Volodymyr Mladonov
      */
     @ExceptionHandler({LanguageNotSupportedException.class})
     public ResponseEntity<Object> handleLanguageNotFoundException(LanguageNotSupportedException ex,
         WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
+     * Method interceptor exception {@link GoogleApiException}.
+     *
+     * @param googleApiException Exception witch should be intercepted
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     */
+    @ExceptionHandler(GoogleApiException.class)
+    public ResponseEntity<Object> handleGoogleApiException(GoogleApiException googleApiException) {
+        ValidationExceptionDto validationExceptionDto =
+            new ValidationExceptionDto(AppConstant.GOOGLE_API, googleApiException.getMessage());
+        if (googleApiException.getMessage() != null
+            && googleApiException.getMessage().contains("Geocoding result was not found")) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationExceptionDto);
+        } else {
+            validationExceptionDto.setMessage(googleApiException.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
+        }
+    }
+
+    /**
+     * Exception handler for InsufficientLocationDataException.
+     *
+     * @param exception which is being intercepted
+     * @param request   contains details about occurred exception
+     * @return ResponseEntity which contains details about exception and 400 status
+     *         code
+     */
+    @ExceptionHandler(InsufficientLocationDataException.class)
+    public final ResponseEntity<Object> handleInsufficientLocationDataException(
+        InsufficientLocationDataException exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
+     * Handles UserDeactivationException and returns a ResponseEntity with a
+     * Forbidden status code and an ExceptionResponse body containing error details.
+     *
+     * @param exception the UserDeactivationException instance
+     * @param request   the current web request
+     * @return a ResponseEntity containing the HTTP status code and error response
+     *         body
+     */
+    @ExceptionHandler(UserDeactivationException.class)
+    public ResponseEntity<Object> handleUserDeactivationException(
+        UserDeactivationException exception, WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(exceptionResponse);
+    }
+
+    /**
+     * Handles exceptions of type {@link Base64DecodedException}.
+     *
+     * @param exception the exception that was thrown due to issues with Base64
+     *                  decoding.
+     * @param request   the current {@link WebRequest} in which the exception
+     *                  occurred.
+     * @return a {@link ResponseEntity} containing an {@link ExceptionResponse} with
+     *         error attributes and an HTTP status of 400 (Bad Request).
+     */
+    @ExceptionHandler(Base64DecodedException.class)
+    public ResponseEntity<Object> handleBase64DecodedException(Base64DecodedException exception,
+        WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
+     * Handles exceptions of type {@link UserBlockedException}.
+     *
+     * @param exception the UserBlockedException instance
+     * @param request   the current web request
+     * @return a ResponseEntity containing the HTTP status code and error response
+     *         body
+     */
+    @ExceptionHandler(UserBlockedException.class)
+    public ResponseEntity<Object> handleUserBlockedException(UserBlockedException exception,
+        WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.LOCKED).body(exceptionResponse);
+    }
+
+    /**
+     * Handles exceptions of type {@link WrongCaptchaException}.
+     *
+     * @param exception the WrongCaptchaException instance
+     * @param request   the current web request
+     * @return a ResponseEntity containing the HTTP status code and error response
+     *         body
+     */
+    @ExceptionHandler(WrongCaptchaException.class)
+    public ResponseEntity<Object> handleWrongCaptchaException(WrongCaptchaException exception,
+        WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 

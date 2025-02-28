@@ -3,11 +3,11 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
-import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.constant.AppConstant;
+import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.converters.UserArgumentResolver;
-import greencity.dto.PageableAdvancedDto;
 import greencity.dto.EmployeePositionsDto;
+import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
@@ -15,6 +15,8 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -23,8 +25,7 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UserAddRatingDto;
-import greencity.dto.user.UserCityDto;
+import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.security.service.AuthorityService;
@@ -46,10 +47,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -59,15 +60,17 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -82,16 +85,15 @@ class UserControllerTest {
     private AuthorityService authorityService;
     @Mock
     private PositionService positionService;
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() {
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(userController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver(),
-                new UserArgumentResolver(userService, new ModelMapper()))
+                new UserArgumentResolver(userService))
             .build();
-        objectMapper = new ObjectMapper();
     }
 
     @Test
@@ -99,10 +101,12 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        String content = "{\n"
-            + "  \"id\": 0,\n"
-            + "  \"userStatus\": \"BLOCKED\"\n"
-            + "}";
+        String content = """
+            {
+              "id": 0,
+              "userStatus": "BLOCKED"
+            }
+            """;
 
         mockMvc.perform(patch(userLink + "/status")
             .principal(principal)
@@ -131,9 +135,11 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        String content = "{\n"
-            + "  \"role\": \"ROLE_USER\"\n"
-            + "}";
+        String content = """
+            {
+              "role": "ROLE_USER"
+            }\
+            """;
 
         mockMvc.perform(patch(userLink + "/1/role")
             .principal(principal)
@@ -187,6 +193,7 @@ class UserControllerTest {
     void getEmailNotificationsTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
+        when(userService.getEmailNotificationsStatuses("testmail@gmail.com")).thenReturn(EmailNotification.IMMEDIATELY);
 
         mockMvc.perform(get(userLink + "/emailNotifications")
             .principal(principal))
@@ -201,9 +208,11 @@ class UserControllerTest {
         int pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
 
-        String content = "{\n"
-            + "  \"searchReg\": \"string\"\n"
-            + "}";
+        String content = """
+            {
+              "searchReg": "string"
+            }\
+            """;
 
         mockMvc.perform(post(userLink + "/filter?page=1")
             .contentType(MediaType.APPLICATION_JSON)
@@ -234,10 +243,12 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        String content = "{\n"
-            + "  \"emailNotification\": \"DISABLED\",\n"
-            + "  \"name\": \"String\"\n"
-            + "}";
+        String content = """
+            {
+              "emailNotification": "DISABLED",
+              "name": "String"
+            }\
+            """;
 
         ObjectMapper mapper = new ObjectMapper();
         UserUpdateDto userUpdateDto =
@@ -253,15 +264,15 @@ class UserControllerTest {
     }
 
     @Test
-    void getAvailableCustomShoppingListItemTest() throws Exception {
+    void getAvailableCustomToDoListItemTest() throws Exception {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
-        mockMvc.perform(get(userLink + "/{userId}/{habitId}/custom-shopping-list-items/available", 1, 1)
+        mockMvc.perform(get(userLink + "/{userId}/{habitId}/custom-to-do-list-items/available", 1, 1)
             .headers(headers))
             .andExpect(status().isOk());
 
-        verify(userService).getAvailableCustomShoppingListItems(1L, 1L);
+        verify(userService).getAvailableCustomToDoListItems(1L, 1L);
     }
 
     @Test
@@ -277,10 +288,12 @@ class UserControllerTest {
         UserVO user = ModelUtils.getUserVO();
         Principal principal = mock(Principal.class);
 
-        String json = "{\n"
-            + "\t\"id\": 1,\n"
-            + "\t\"profilePicturePath\": \"ima\""
-            + "}";
+        String json = """
+            {
+            	"id": 1,
+            	"profilePicturePath": "ima"\
+            }\
+            """;
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
@@ -302,8 +315,8 @@ class UserControllerTest {
             .file(jsonFile)
             .headers(headers)
             .principal(principal)
-            .accept(MediaType.APPLICATION_JSON)
-            .contentType(MediaType.APPLICATION_JSON))
+            .accept(MediaType.MULTIPART_FORM_DATA_VALUE)
+            .contentType(MediaType.MULTIPART_FORM_DATA_VALUE))
             .andExpect(status().isOk());
     }
 
@@ -311,7 +324,7 @@ class UserControllerTest {
     void deleteUserProfilePictureTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@email.com");
-        mockMvc.perform(patch(userLink + "/deleteProfilePicture")
+        mockMvc.perform(delete(userLink + "/deleteProfilePicture")
             .principal(principal))
             .andExpect(status().isOk());
 
@@ -346,20 +359,23 @@ class UserControllerTest {
     @Test
     void saveTest() throws Exception {
         Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("testName");
+        when(principal.getName()).thenReturn("Vovka");
 
-        String json = "{\n"
-            + "\t\"name\": \"testName\",\n"
-            + "\t\"userCredo\": \"credo\",\n"
-            + "\t\"socialNetworks\": [],\n"
-            + "\t\"showLocation\": \"PUBLIC\",\n"
-            + "\t\"showEcoPlace\": \"PUBLIC\",\n"
-            + "\t\"showShoppingList\": \"PUBLIC\",\n"
-            + "\t\"coordinates\":{ \n "
-            + "\t\"latitude\": 20.000000,\n"
-            + "\t\"longitude\": 20.000000\n"
-            + "\t}\n"
-            + "}";
+        String json = """
+            {
+                "name": "Vovka",
+                "userCredo": "credo",
+                "socialNetworks": [],
+                "showLocation": "PUBLIC",
+                "showEcoPlace": "PUBLIC",
+                "showToDoList": "PUBLIC",
+                "coordinates": {
+                    "latitude": 20.000000,
+                    "longitude": 20.000000
+                }
+            }
+            """;
+
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
@@ -375,7 +391,54 @@ class UserControllerTest {
         ObjectMapper mapper = new ObjectMapper();
         UserProfileDtoRequest dto = mapper.readValue(json, UserProfileDtoRequest.class);
 
-        verify(userService).saveUserProfile(dto, "testName");
+        verify(userService).saveUserProfile(dto, "Vovka");
+    }
+
+    @Test
+    void saveWithEmailPreferencesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("Vovka");
+
+        String json = """
+            {
+                "name": "Vovka",
+                "userCredo": "credo",
+                "socialNetworks": [],
+                "showLocation": "PUBLIC",
+                "showEcoPlace": "PUBLIC",
+                "showToDoList": "PRIVATE",
+                "coordinates": {
+                    "latitude": 20.000000,
+                    "longitude": 20.000000
+                },
+                "emailPreferences": [
+                    {
+                        "emailPreference": "SYSTEM",
+                         "periodicity": "DAILY"
+                    },
+                    {
+                         "emailPreference": "LIKES",
+                         "periodicity": "NEVER"
+                    }
+                ]
+            }
+            """;
+        String accessToken = "accessToken";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+
+        this.mockMvc.perform(put(userLink + "/profile")
+            .headers(headers)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(json)
+            .param("accessToken", "accessToken")
+            .principal(principal))
+            .andExpect(status().isOk());
+
+        ObjectMapper mapper = new ObjectMapper();
+        UserProfileDtoRequest dto = mapper.readValue(json, UserProfileDtoRequest.class);
+
+        verify(userService).saveUserProfile(dto, "Vovka");
     }
 
     @Test
@@ -422,7 +485,7 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/findById")
             .param("id", "1"))
             .andExpect(status().isOk())
-            .andExpect(content().contentType("application/json;charset=UTF-8"))
+            .andExpect(content().contentType("application/json"))
             .andExpect(jsonPath("$.id").value(1L))
             .andExpect(jsonPath("$.name").value(TestConst.NAME))
             .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
@@ -645,18 +708,6 @@ class UserControllerTest {
     }
 
     @Test
-    void saveUserTest() throws Exception {
-        when(userService.save(ModelUtils.getUserVO())).thenReturn(ModelUtils.getUserVO());
-        mockMvc.perform(post(userLink)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(ModelUtils.getUserVO())))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.name").value(TestConst.NAME))
-            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
-    }
-
-    @Test
     void findAllByEmailNotificationTest() throws Exception {
         EmailNotification notification = EmailNotification.DAILY;
         when(userService.findAllByEmailNotification(notification))
@@ -754,20 +805,6 @@ class UserControllerTest {
     }
 
     @Test
-    void getEmployeeLoginPositionNamesTest() throws Exception {
-        Principal principal = mock(Principal.class);
-        when(principal.getName()).thenReturn("testmail@gmail.com");
-
-        mockMvc.perform(get(userLink + "/get-employee-login-positions" + "?email=" + principal.getName())
-            .principal(principal)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(principal.getName())))
-            .andExpect(status().isOk());
-
-        verify(positionService).getEmployeeLoginPositionNames(principal.getName());
-    }
-
-    @Test
     void editAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
         List<String> list = new ArrayList<>();
@@ -778,10 +815,12 @@ class UserControllerTest {
             .build();
         when(principal.getName()).thenReturn("testmail@gmail.com");
 
-        String content = "{\n"
-            + "  \"authorities\":[ \"EDIT_ORDER\"],\n"
-            + "  \"employeeEmail\": \"test@mail.com\"\n"
-            + "}";
+        String content = """
+            {
+              "authorities":[ "EDIT_ORDER"],
+              "employeeEmail": "test@mail.com"
+            }\
+            """;
 
         mockMvc.perform(put(userLink + "/edit-authorities")
             .principal(principal)
@@ -796,7 +835,6 @@ class UserControllerTest {
     void updatePositionsAndRelatedAuthoritiesTest() throws Exception {
         Principal principal = mock(Principal.class);
         var dto = new EmployeePositionsDto();
-        ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(dto);
         mockMvc.perform(put(userLink + "/authorities")
             .principal(principal)
@@ -833,7 +871,6 @@ class UserControllerTest {
             .rating(10.0)
             .build();
 
-        ObjectMapper objectMapper = new ObjectMapper();
         String json = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(put(userLink + "/user-rating")
@@ -845,4 +882,10 @@ class UserControllerTest {
         verify(userService).updateUserRating(dto);
     }
 
+    @Test
+    void checkUsersOnlineStatusTest() {
+        var request = new UsersOnlineStatusRequestDto();
+        userController.checkUsersOnlineStatus(request);
+        verify(userService).checkUsersOnlineStatus(request);
+    }
 }

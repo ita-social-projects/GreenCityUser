@@ -3,8 +3,8 @@ package greencity.converters;
 import greencity.annotations.CurrentUser;
 import greencity.dto.user.UserVO;
 import greencity.service.UserService;
-import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
+import java.security.Principal;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -12,13 +12,10 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.security.Principal;
-
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
-    UserService userService;
-    ModelMapper modelMapper;
+    private final UserService userService;
 
     /**
      * Method checks if parameter is {@link UserVO} and is annotated with

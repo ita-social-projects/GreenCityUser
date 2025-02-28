@@ -1,71 +1,35 @@
 package greencity.service;
 
-import greencity.dto.category.CategoryDto;
-import greencity.dto.econews.AddEcoNewsDtoResponse;
-import greencity.dto.econews.EcoNewsForSendEmailDto;
-import greencity.dto.eventcomment.EventCommentForSendEmailDto;
-import greencity.dto.newssubscriber.NewsSubscriberResponseDto;
-import greencity.dto.notification.NotificationDto;
-import greencity.dto.place.PlaceNotificationDto;
-import greencity.dto.user.PlaceAuthorDto;
+import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-
 import greencity.dto.violation.UserViolationMailDto;
-import java.util.List;
-import java.util.Map;
+import greencity.message.PlaceStatusChangeDto;
+import greencity.message.ScheduledEmailMessage;
+import greencity.message.SendReportEmailMessage;
 
 /**
  * Provides the interface to manage sending emails to {@code User}.
  */
 public interface EmailService {
     /**
-     * Method for sending notification to {@link User}'s who subscribed for updates
-     * about added new places.
+     * Method for sending notification to users who subscribed for updates about
+     * added new places.
      *
-     * @param subscribers          list of users for receiving email.
-     * @param categoriesWithPlaces map with {@link Category} and {@link Place}`s
-     *                             which were created.
-     * @param notification         type of notification.
+     * @param message object with all necessary data for sending email
      */
-    void sendAddedNewPlacesReportEmail(List<PlaceAuthorDto> subscribers,
-        Map<CategoryDto, List<PlaceNotificationDto>> categoriesWithPlaces,
-        String notification);
+    void sendAddedNewPlacesReportEmail(SendReportEmailMessage message);
 
     /**
-     * Method for sending news for users who subscribed for updates.
-     */
-    void sendNewNewsForSubscriber(List<NewsSubscriberResponseDto> subscribers,
-        AddEcoNewsDtoResponse newsDto);
-
-    /**
-     * Method for sending notification to the event organizer about the
-     * EventComment. addition
+     * Method for sending interesting news for subscribers.
      *
-     * @param dto - includes all information about EventComment and author.
+     * @param interestingEcoNews includes all information about ecoNews and
+     *                           subscribers.
      */
-    void sendNewCommentForEventOrganizer(EventCommentForSendEmailDto dto);
+    void sendInterestingEcoNews(InterestingEcoNewsDto interestingEcoNews);
 
     /**
-     * Method for sending created news for author.
-     *
-     * @param newDto - includes all information about ecoNews and author.
-     */
-    void sendCreatedNewsForAuthor(EcoNewsForSendEmailDto newDto);
-
-    /**
-     * Method for sending simple notification to {@code User} about change status.
-     *
-     * @param authorFirstName place author's first name.
-     * @param placeName       name of a place.
-     * @param placeStatus     updated status of a place.
-     * @param authorEmail     author's email.
-     */
-    void sendChangePlaceStatusEmail(String authorFirstName, String placeName,
-        String placeStatus, String authorEmail);
-
-    /**
-     * Method for sending verification email to {@link User}.
+     * Method for sending verification email to {@code User}.
      *
      * @param userId    user id.
      * @param userName  name current user.
@@ -122,42 +86,19 @@ public interface EmailService {
 
     /**
      * Method for send violation to user.
-     * 
+     *
      * @param dto {@link UserViolationMailDto}-includes all information about
      *            Violation.
-     * @author Zakhar Veremchuk.
      */
     void sendUserViolationEmail(UserViolationMailDto dto);
-
-    /**
-     * Method for send notification to user.
-     *
-     * @param notification {@link NotificationDto}-includes all information about
-     *                     notification.
-     * @param email        letter is sent to this email.
-     * @author Ann Sakhno.
-     */
-    void sendNotificationByEmail(NotificationDto notification, String email);
 
     /**
      * Method for send information about success restoring password.
      *
      * @param email    letter is sent to this email.
      * @param language language which will be used in letter.
-     *
-     * @author Pavlo Hural.
      */
     void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
-
-    /**
-     * Method for email notification on email about event creation status.
-     *
-     * @param email       notification is sent to this email.
-     * @param messageBody contains message which will be send on user's email.
-     *
-     * @author Olena Sotnik.
-     */
-    void sendEventCreationNotification(String email, String messageBody);
 
     /**
      * Sends email message to create new password for employee after signUp.
@@ -168,10 +109,43 @@ public interface EmailService {
      *                         constants
      * @param employeeEmail    {@link String} user email which will be used for
      *                         sending recovery letter
+     * @param language         {@link String} language code used for email
+     *                         notification
      * @param token            {@link String} token for password save(restoration)
-     *
-     * @author Olena Sotnik
      */
     void sendCreateNewPasswordForEmployee(Long employeeId, String employeeFistName, String employeeEmail, String token,
+        String language, boolean isUbs);
+
+    /**
+     * Sends an email notification user that received scheduled message
+     * {@link ScheduledEmailMessage}.
+     *
+     * @param message {@link ScheduledEmailMessage}
+     */
+    void sendScheduledNotificationEmail(ScheduledEmailMessage message);
+
+    /**
+     * Sends an email notification user that his account has been blocked and
+     * includes link for unblocking.
+     *
+     * @param userId       the user id is used for recovery link building
+     * @param userFistName user first name is used in email model constants
+     * @param userEmail    user email which will be used for sending recovery letter
+     * @param token        token for password save(restoration)
+     * @param language     language code used for email notification
+     * @param isUbs        {@code true} if user is from UBS, {@code false} if user
+     *                     is from admin panel
+     */
+    void sendBlockAccountNotificationWithUnblockLinkEmail(
+        Long userId, String userFistName, String userEmail, String token, String language,
         boolean isUbs);
+
+    /**
+     * Sends an email notification to a user regarding the status change of a place.
+     *
+     * @param dto the data transfer object containing information about the user,
+     *            place, and the new status of the place (e.g., PROPOSED, DECLINED,
+     *            APPROVED, DELETED).
+     */
+    void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto);
 }

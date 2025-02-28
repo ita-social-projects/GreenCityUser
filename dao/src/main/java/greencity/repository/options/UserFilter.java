@@ -3,15 +3,15 @@ package greencity.repository.options;
 import greencity.constant.RepoConstants;
 import greencity.dto.filter.FilterUserDto;
 import greencity.entity.User;
-import org.springframework.data.jpa.domain.Specification;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 
 /**
  * The class implements {@link Specification}. Constructor takes a {@code DTO}
@@ -20,17 +20,9 @@ import java.util.Optional;
  *
  * @author Rostyslav Khasanov
  */
+@RequiredArgsConstructor
 public class UserFilter implements Specification<User> {
     private final transient FilterUserDto filterUserDto;
-
-    /**
-     * The constructor takes {@link FilterUserDto} object.
-     *
-     * @param filterUserDto object contains fields to filter by.
-     */
-    public UserFilter(FilterUserDto filterUserDto) {
-        this.filterUserDto = filterUserDto;
-    }
 
     /**
      * Forms a list of {@link Predicate} based on type of the classes initialized in
@@ -65,10 +57,10 @@ public class UserFilter implements Specification<User> {
      * Returns a String criteria for search.
      *
      * @param criteria String for search.
-     * @return String creteria not be {@literal null}.
+     * @return String criteria not be {@literal null}.
      */
     private String replaceCriteria(String criteria) {
-        criteria = Optional.ofNullable(criteria).orElseGet(() -> "");
+        criteria = Optional.ofNullable(criteria).orElse("");
         criteria = criteria.trim();
         criteria = criteria.replace("_", "\\_");
         criteria = criteria.replace("%", "\\%");

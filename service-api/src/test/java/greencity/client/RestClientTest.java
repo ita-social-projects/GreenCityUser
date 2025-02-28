@@ -1,16 +1,26 @@
 package greencity.client;
 
+import static greencity.constant.AppConstant.AUTHORIZATION;
+import static greencity.constant.AppConstant.FILES;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
-import greencity.dto.shoppinglist.CustomShoppingListItemResponseDto;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.enums.AchievementCategoryType;
-import greencity.enums.AchievementType;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Arrays;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -24,20 +34,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-
-import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.IMAGE;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RestClientTest {
@@ -55,61 +51,26 @@ class RestClientTest {
     private RestClient restClient;
 
     @Test
-    void calculateAchievement() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress + RestTemplateLinks.CALCULATE_ACHIEVEMENT
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_ID + 1L
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SETTER + AchievementType.INCREMENT
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SOCIAL_NETWORK + AchievementCategoryType.ECO_NEWS
-            + RestTemplateLinks.CALCULATE_ACHIEVEMENT_SIZE + 1,
-            HttpMethod.POST, entity, Object.class)).thenReturn(ResponseEntity.status(HttpStatus.OK).build());
-        assertEquals(ResponseEntity.status(HttpStatus.OK).build(),
-            restClient.calculateAchievement(1L, AchievementType.INCREMENT, AchievementCategoryType.ECO_NEWS, 1));
-    }
-
-    @Test
-    void getAllAvailableCustomShoppingListItems() {
+    void getAllAvailableCustomToDoListItems() {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
         Long userId = 1L;
         Long habitId = 1L;
-        CustomShoppingListItemResponseDto customShoppingListItemResponseDto =
-            new CustomShoppingListItemResponseDto(1L, "test");
-        CustomShoppingListItemResponseDto[] customShoppingListItemResponseDtos =
-            new CustomShoppingListItemResponseDto[1];
-        customShoppingListItemResponseDtos[0] = customShoppingListItemResponseDto;
+        CustomToDoListItemResponseDto customToDoListItemResponseDto =
+            new CustomToDoListItemResponseDto(1L, "test");
+        CustomToDoListItemResponseDto[] customToDoListItemResponseDtos =
+            new CustomToDoListItemResponseDto[1];
+        customToDoListItemResponseDtos[0] = customToDoListItemResponseDto;
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_SHOPPING_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
-            CustomShoppingListItemResponseDto[].class))
-                .thenReturn(ResponseEntity.ok(customShoppingListItemResponseDtos));
+            + RestTemplateLinks.CUSTOM_TO_DO_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
+            CustomToDoListItemResponseDto[].class))
+                .thenReturn(ResponseEntity.ok(customToDoListItemResponseDtos));
 
-        assertEquals(Arrays.asList(customShoppingListItemResponseDtos),
-            restClient.getAllAvailableCustomShoppingListItems(userId, habitId));
-    }
-
-    @Test
-    void convertToMultipartImage() {
-        MultipartFile image = new MockMultipartFile("data", "filename.png",
-            "image/png", "some xml".getBytes());
-        String profilePicturePath = "profilePicturePath";
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.FILES_CONVERT + RestTemplateLinks.IMAGE
-            + profilePicturePath, HttpMethod.POST, entity, MultipartFile.class))
-                .thenReturn(ResponseEntity.ok(image));
-        assertEquals(image, restClient.convertToMultipartImage(profilePicturePath));
-        verify(httpServletRequest).getHeader(any());
+        assertEquals(Arrays.asList(customToDoListItemResponseDtos),
+            restClient.getAllAvailableCustomToDoListItems(userId, habitId));
     }
 
     @Test
@@ -130,17 +91,17 @@ class RestClientTest {
             }
         };
         LinkedMultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
-        map.add(IMAGE, fileAsResource);
+        map.add(FILES, fileAsResource);
         HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = new HttpEntity<>(map, headers);
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.postForObject(greenCityServerAddress +
-            RestTemplateLinks.FILES_IMAGE, requestEntity,
+            RestTemplateLinks.FILES, requestEntity,
             String.class)).thenReturn(imagePath);
         assertEquals(imagePath,
             restClient.uploadImage(image));
         verify(httpServletRequest).getHeader(any());
         verify(restTemplate).postForObject(greenCityServerAddress +
-            RestTemplateLinks.FILES_IMAGE, requestEntity,
+            RestTemplateLinks.FILES, requestEntity,
             String.class);
     }
 
@@ -185,8 +146,9 @@ class RestClientTest {
         Long publishedNews = 5L;
         Long userId = 1L;
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.ECONEWS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class))
+        when(restTemplate.exchange(
+            greenCityServerAddress + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.AUTHOR_ID + userId,
+            HttpMethod.GET, entity, Long.class))
                 .thenReturn(ResponseEntity.ok(publishedNews));
         assertEquals(publishedNews, restClient.findAmountOfPublishedNews(userId));
     }
@@ -223,11 +185,11 @@ class RestClientTest {
 
     @Test
     void getAllLanguageCodes() {
-        String[] allLanguageCodes = new String[3];
+        String[] allLanguageCodes = new String[2];
         allLanguageCodes[0] = "en";
         allLanguageCodes[1] = "uk";
         when(restTemplate.getForObject(greenCityServerAddress
-            + RestTemplateLinks.LANGUAGE, String[].class)).thenReturn(allLanguageCodes);
+            + RestTemplateLinks.LANGUAGES + RestTemplateLinks.CODES, String[].class)).thenReturn(allLanguageCodes);
 
         assertEquals(Arrays.asList(allLanguageCodes), restClient.getAllLanguageCodes());
     }
@@ -273,7 +235,7 @@ class RestClientTest {
     }
 
     @Test
-    void findAmountOfEventsOrganizedAndAttendedByUserTest() {
+    void findAmountOfEventsAttendedByUserTest() {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, accessToken);
@@ -281,15 +243,36 @@ class RestClientTest {
         Long userId = 1L;
         when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
         when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT
-            + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class))
+            + RestTemplateLinks.EVENTS_ATTENDED_COUNT_BY_USER_ID + userId,
+            HttpMethod.GET, entity, Long.class))
                 .thenReturn(ResponseEntity.ok(1L));
 
-        assertEquals(1, restClient.findAmountOfEventsOrganizedAndAttendedByUser(userId));
+        assertEquals(1, restClient.findAmountOfEventsAttendedByUser(userId));
 
         verify(httpServletRequest).getHeader(AUTHORIZATION);
         verify(restTemplate).exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ORGANIZED_OR_ATTENDED_BY_USER_COUNT
-            + RestTemplateLinks.USER_ID + userId, HttpMethod.GET, entity, Long.class);
+            + RestTemplateLinks.EVENTS_ATTENDED_COUNT_BY_USER_ID + userId,
+            HttpMethod.GET, entity, Long.class);
+    }
+
+    @Test
+    void findAmountOfEventsOrganizedByUserTest() {
+        String accessToken = "accessToken";
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        Long userId = 1L;
+        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
+        when(restTemplate.exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_ORGANIZED_COUNT_BY_USER_ID + userId,
+            HttpMethod.GET, entity, Long.class))
+                .thenReturn(ResponseEntity.ok(1L));
+
+        assertEquals(1, restClient.findAmountOfEventsOrganizedByUser(userId));
+
+        verify(httpServletRequest).getHeader(AUTHORIZATION);
+        verify(restTemplate).exchange(greenCityServerAddress
+            + RestTemplateLinks.EVENTS_ORGANIZED_COUNT_BY_USER_ID + userId,
+            HttpMethod.GET, entity, Long.class);
     }
 }

@@ -1,13 +1,14 @@
 package greencity.dto.user;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Builder
-@EqualsAndHashCode
 public class UserActivationDto {
     private String email;
     private String name;

@@ -2,7 +2,6 @@ package greencity.mapping;
 
 import greencity.ModelUtils;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.user.UserVO;
 import greencity.entity.User;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;

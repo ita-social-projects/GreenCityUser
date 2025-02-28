@@ -11,12 +11,10 @@ import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
 import greencity.entity.UserLocation;
-import org.modelmapper.AbstractConverter;
-import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import org.modelmapper.AbstractConverter;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserVOMapper extends AbstractConverter<User, UserVO> {
@@ -37,7 +35,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                     .id(user.getVerifyEmail().getUser().getId())
                     .name(user.getVerifyEmail().getUser().getName())
                     .build())
-                .expiryDate(user.getVerifyEmail().getExpiryDate())
                 .token(user.getVerifyEmail().getToken())
                 .build() : null)
             .userFriends(user.getUserFriends() != null ? user.getUserFriends()
@@ -45,7 +42,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                     .id(user1.getId())
                     .name(user1.getName())
                     .build())
-                .collect(Collectors.toList()) : null)
+                .toList() : null)
             .refreshTokenKey(user.getRefreshTokenKey())
             .ownSecurity(user.getOwnSecurity() != null ? OwnSecurityVO.builder()
                 .id(user.getOwnSecurity().getId())
@@ -59,7 +56,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .dateOfRegistration(user.getDateOfRegistration())
             .userLocationDto(convertUserLocationToDto(user.getUserLocation()))
             .profilePicturePath(user.getProfilePicturePath())
-            .showShoppingList(user.getShowShoppingList())
+            .showToDoList(user.getShowToDoList())
             .showEcoPlace(user.getShowEcoPlace())
             .showLocation(user.getShowLocation())
             .lastActivityTime(user.getLastActivityTime())
@@ -73,7 +70,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                         .id(userAchievement.getAchievement().getId())
                         .build())
                     .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
+                .toList() : new ArrayList<>())
             .userActions(user.getUserActions() != null ? user.getUserActions()
                 .stream().map(userAction -> UserActionVO.builder()
                     .id(userAction.getId())
@@ -85,7 +82,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                         .id(userAction.getUser().getId())
                         .build())
                     .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
+                .toList() : new ArrayList<>())
             .languageVO(LanguageVO.builder()
                 .id(user.getLanguage().getId())
                 .code(user.getLanguage().getCode())

@@ -1,13 +1,12 @@
 package greencity.security.dto.ownsecurity;
 
 import greencity.constant.ValidationConstants;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
@@ -15,9 +14,11 @@ import javax.validation.constraints.NotBlank;
 @Builder
 public class OwnSignInDto {
     @NotBlank
-    @Email(message = ValidationConstants.INVALID_EMAIL)
+    @Email(regexp = ValidationConstants.EMAIL_REGEXP, message = ValidationConstants.INVALID_EMAIL)
     private String email;
 
     @NotBlank
     private String password;
+
+    private String captchaToken;
 }

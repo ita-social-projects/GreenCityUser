@@ -3,17 +3,16 @@ package greencity.dto.user;
 import greencity.constant.ValidationConstants;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,7 +29,7 @@ public class UserManagementDto {
         message = ValidationConstants.USERNAME_MESSAGE)
     private String name;
 
-    @Email(message = ValidationConstants.INVALID_EMAIL)
+    @Email(regexp = ValidationConstants.EMAIL_REGEXP, message = ValidationConstants.INVALID_EMAIL)
     @NotBlank
     private String email;
 
