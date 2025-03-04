@@ -30,19 +30,19 @@ public class UserLocation {
     private String cityEn;
 
     @Column(name = "city_uk")
-    private String cityUa;
+    private String cityUk;
 
     @Column(name = "region_en")
     private String regionEn;
 
     @Column(name = "region_uk")
-    private String regionUa;
+    private String regionUk;
 
     @Column(name = "country_en")
     private String countryEn;
 
     @Column(name = "country_uk")
-    private String countryUa;
+    private String countryUk;
 
     @Column(name = "latitude")
     private Double latitude;

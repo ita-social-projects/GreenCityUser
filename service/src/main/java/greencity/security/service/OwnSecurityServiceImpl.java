@@ -190,7 +190,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         employee.setShowEcoPlace(ProfilePrivacyPolicy.PUBLIC);
         employee.setShowToDoList(ProfilePrivacyPolicy.PUBLIC);
         List<String> positionNames = employeeSignUpDto.getPositions().stream()
-            .flatMap(position -> Stream.of(position.getName(), position.getNameEn()))
+            .flatMap(position -> Stream.of(position.getNameUk(), position.getNameEn()))
             .toList();
         employee.setAuthorities(authorityRepo.findAuthoritiesByPositions(positionNames));
         employee.setPositions(positionRepo.findPositionsByNames(positionNames));

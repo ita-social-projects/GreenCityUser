@@ -14,7 +14,7 @@ public class UserCityDto {
     @NotNull
     private Long id;
     private String cityEn;
-    private String cityUa;
+    private String cityUk;
     private Double latitude;
     private double longitude;
 }

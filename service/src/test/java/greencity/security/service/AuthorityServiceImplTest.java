@@ -136,7 +136,7 @@ class AuthorityServiceImplTest {
             .email(TEST_EMAIL)
             .positions(List.of(PositionDto.builder()
                 .id(1L)
-                .name("Супер адмін")
+                .nameUk("Супер адмін")
                 .build()))
             .build());
         authority.getEmployees().add(createAdmin());
