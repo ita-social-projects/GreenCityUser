@@ -223,8 +223,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         handleUserStatus(user.getUserStatus());
         handleBruteForceProtection(email);
 
-        verifyCaptcha(dto, email);
-
         validatePassword(dto, user);
 
         if (!isEmailVerified(user)) {
@@ -260,20 +258,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 blockTimeInMinutes);
             throw new WrongPasswordException(
                 String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
-        }
-    }
-
-    /**
-     * Checks if captcha is valid. If captcha is not valid, logs error, increments
-     * wrong captcha attempts and throws WrongCaptchaException.
-     *
-     * @param dto   - {@link OwnSignInDto} that have sign-in information
-     * @param email - user email
-     */
-    private void verifyCaptcha(final OwnSignInDto dto, String email) {
-        if (!getCloudFlareResponse(dto).success()) {
-            loginAttemptService.loginFailedByCaptcha(email);
-            throw new WrongCaptchaException(ErrorMessage.WRONG_CAPTCHA);
         }
     }
 
@@ -341,19 +325,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             jwtTool.generateUnblockToken(email), getLanguageFromUser(user), false);
 
         throw new UserBlockedException(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE);
-    }
-
-    /**
-     * Calls CloudFlare api to check if given captcha is valid.
-     *
-     * @param dto - {@link OwnSignInDto} that contains captcha token
-     * @return {@link CloudFlareResponse} with result of captcha validation
-     */
-    private CloudFlareResponse getCloudFlareResponse(OwnSignInDto dto) {
-        return cloudFlareClient.getCloudFlareResponse(CloudFlareRequest.builder()
-            .secret(cloudFlareSecretKey)
-            .response(dto.getCaptchaToken())
-            .build());
     }
 
     /**
