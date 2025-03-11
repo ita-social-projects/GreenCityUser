@@ -1,19 +1,11 @@
 package greencity.security.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
+import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
@@ -27,7 +19,6 @@ import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +29,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
 import java.io.IOException;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class FacebookSecurityServiceImplTest {
@@ -76,11 +75,24 @@ class FacebookSecurityServiceImplTest {
     @Mock
     private RestClient restClient;
 
+    @Mock
+    private WebClient webClient;
+
+    @Mock
+    private WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
+
+    @Mock
+    private WebClient.RequestHeadersSpec requestHeadersSpec;
+
+    @Mock
+    private WebClient.ResponseSpec responseSpec;
+
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(facebookSecurityService, "address", "http://localhost:8060");
-        ReflectionTestUtils.setField(facebookSecurityService, "jwtTool", jwtTool);
-        ReflectionTestUtils.setField(facebookSecurityService, "restClient", restClient);
+        ReflectionTestUtils.setField(facebookSecurityService, "facebookAppId", "12345");
+        ReflectionTestUtils.setField(facebookSecurityService, "facebookAppSecret", "6789");
+        ReflectionTestUtils.setField(facebookSecurityService, "userInfoUrl", "https://graph.facebook.com/me");
     }
 
     @Test
@@ -107,19 +119,53 @@ class FacebookSecurityServiceImplTest {
     @Test
     void authenticate_ShouldThrowException_WhenTokenOrLanguageIsNull() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> facebookSecurityService.authenticate(null, "en"));
+                () -> facebookSecurityService.authenticate(null, "en"));
         assertEquals(ErrorMessage.FB_TOKEN_OR_LANGUAGE_MISSING, exception.getMessage());
     }
 
     @Test
+    void authenticate_ShouldReturnSuccessSignInDto_WhenValidToken() {
+        String fbToken = "token";
+        UserInfo userInfo = new UserInfo();
+        userInfo.setEmail("test@example.com");
+        userInfo.setName("Test User");
+        userInfo.setPicture("profile.jpg");
+
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(UserInfo.class)).thenReturn(Mono.just(userInfo));
+
+        UserVO userVO = new UserVO();
+        userVO.setId(1L);
+        userVO.setEmail("test@example.com");
+        userVO.setName("Test User");
+        userVO.setUserStatus(UserStatus.ACTIVATED);
+
+        when(userService.findByEmail("test@example.com")).thenReturn(userVO);
+        when(jwtTool.createAccessToken(anyString(), any())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+
+        SuccessSignInDto result = facebookSecurityService.authenticate(fbToken, "en");
+
+        assertNotNull(result);
+        assertEquals(1L, result.getUserId());
+        assertEquals("accessToken", result.getAccessToken());
+        assertEquals("refreshToken", result.getRefreshToken());
+    }
+
+    @Test
     void authenticate_ShouldThrowException_WhenFacebookReturnsInvalidData() throws IOException {
-        String fbToken = "invalid_token";
-        HttpGet mockRequest = new HttpGet("http://fake-url.com");
-        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
-        when(httpResponse.getStatusLine()).thenReturn(statusLine);
-        when(statusLine.getStatusCode()).thenReturn(400);
+        String fbToken = "fakeToken";
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(UserInfo.class)).thenReturn(Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)));
+
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> facebookSecurityService.authenticate(fbToken, "en"));
+                () -> facebookSecurityService.authenticate(fbToken, "en"));
         assertTrue(exception.getMessage().contains(ErrorMessage.BAD_FACEBOOK_TOKEN));
     }
 
@@ -146,7 +192,7 @@ class FacebookSecurityServiceImplTest {
         userVO.setUserStatus(UserStatus.DEACTIVATED);
         when(userService.findByEmail(email)).thenReturn(userVO);
         assertThrows(UserDeactivatedException.class,
-            () -> facebookSecurityService.processAuthentication(email, "Test User", "profile.jpg", "1"));
+                () -> facebookSecurityService.processAuthentication(email, "Test User", "profile.jpg", "1"));
     }
 
     @Test
@@ -180,29 +226,47 @@ class FacebookSecurityServiceImplTest {
 
     @Test
     void generateFacebookAuthorizeURLTest() {
-        ReflectionTestUtils.setField(facebookSecurityService, "address", "http://localhost:8080");
-        ReflectionTestUtils.setField(facebookSecurityService, "facebookAppId", "12345");
-        ReflectionTestUtils.setField(facebookSecurityService, "facebookAppSecret", "6789");
+        String expected = "https://www.facebook.com/v22.0/dialog/oauth" +
+                "?client_id=12345" +
+                "&redirect_uri=http://localhost:8060/facebookSecurity/facebook" +
+                "&scope=email";
 
-        String expected = """
-            https://www.facebook.com/v2.5/dialog/oauth?client_id=12345&response_type=code&redirect\
-            _uri=http%3A%2F%2Flocalhost%3A8080%2FfacebookSecurity%2Ffacebook&scope=email\
-            """;
         String actual = facebookSecurityService.generateFacebookAuthorizeURL();
         assertEquals(expected, actual);
     }
 
     @Test
-    void getUserInfoFromFacebook_ShouldThrowIOException_WhenResponseStatusIsNot200() throws IOException {
-        String accessToken = "invalid_token";
+    void generateFacebookAccessToken_ShouldThrowException_WhenInvalidCode() {
+        String code = "invalid_code";
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)));
 
-        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
-        when(httpResponse.getStatusLine()).thenReturn(statusLine);
-        when(statusLine.getStatusCode()).thenReturn(400);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> facebookSecurityService.generateFacebookAccessToken(code));
+        assertTrue(exception.getMessage().contains(ErrorMessage.BAD_FACEBOOK_TOKEN));
+    }
 
-        IOException exception =
-            assertThrows(IOException.class, () -> facebookSecurityService.getUserInfoFromFacebook(accessToken));
-        assertTrue(exception.getMessage().contains("Facebook API returned status"));
+    @Test
+    void generateFacebookAccessToken_ShouldThrowException_WhenAccessTokenIsNull() throws Exception {
+        String code = "valid_code";
+        String accessTokenResponse = "{}";
+
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.just(accessTokenResponse));
+
+        JsonNode accessTokenNode = mock(JsonNode.class);
+        when(objectMapper.readTree(accessTokenResponse)).thenReturn(accessTokenNode);
+        when(accessTokenNode.get("access_token")).thenReturn(null);
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> facebookSecurityService.generateFacebookAccessToken(code));
+        assertTrue(exception.getMessage().contains(ErrorMessage.BAD_FACEBOOK_TOKEN));
     }
 
     @Test
@@ -223,30 +287,18 @@ class FacebookSecurityServiceImplTest {
 
         UbsProfileCreationDto profileDto = new UbsProfileCreationDto();
 
-        doReturn(1L).when(modelMapper).map(language, Long.class);
-        doReturn(savedUser).when(userRepo).save(any(User.class));
-        doReturn(userVO).when(modelMapper).map(any(User.class), eq(UserVO.class));
-        doReturn(profileDto).when(modelMapper).map(any(User.class), eq(UbsProfileCreationDto.class));
-        doReturn("accessToken").when(jwtTool).createAccessToken(any(), any());
-        doReturn("refreshToken").when(jwtTool).createRefreshToken(any());
+        when(modelMapper.map(language, Long.class)).thenReturn(1L);
+        when(userRepo.save(any(User.class))).thenReturn(savedUser);
+        when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
+        when(modelMapper.map(any(User.class), eq(UbsProfileCreationDto.class))).thenReturn(profileDto);
+        when(jwtTool.createAccessToken(any(), any())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
 
         SuccessSignInDto result = facebookSecurityService.handleNewUser(email, userName, profilePicture, language);
 
         assertNotNull(result);
         assertEquals(1L, result.getUserId());
         assertEquals(userName, result.getName());
-    }
-
-    @Test
-    void getUserInfoFromFacebook_ShouldThrowException_WhenFacebookReturnsError() throws IOException {
-        String accessToken = "invalid_token";
-        when(httpClient.execute(any(HttpGet.class))).thenReturn(httpResponse);
-        when(httpResponse.getStatusLine()).thenReturn(statusLine);
-        when(statusLine.getStatusCode()).thenReturn(400);
-
-        IOException exception =
-            assertThrows(IOException.class, () -> facebookSecurityService.getUserInfoFromFacebook(accessToken));
-        assertTrue(exception.getMessage().contains("Facebook API returned status"));
     }
 
     @Test
@@ -261,5 +313,24 @@ class FacebookSecurityServiceImplTest {
         assertEquals(email, user.getEmail());
         assertEquals(userName, user.getName());
         assertEquals("fakeTokenKey", user.getRefreshTokenKey());
+    }
+
+    @Test
+    void authenticate_ShouldThrowException_WhenEmailIsNull() {
+        String fbToken = "fakeToken";
+        UserInfo userInfo = new UserInfo();
+        userInfo.setEmail(null);
+        userInfo.setName("name");
+        userInfo.setPicture("picture.png");
+
+        when(webClient.get()).thenReturn(requestHeadersUriSpec);
+        when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(UserInfo.class)).thenReturn(Mono.just(userInfo));
+
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> facebookSecurityService.authenticate(fbToken, "en"));
+        assertTrue(exception.getMessage().contains(ErrorMessage.BAD_FACEBOOK_TOKEN));
     }
 }
