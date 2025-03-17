@@ -27,7 +27,6 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-import java.io.IOException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;

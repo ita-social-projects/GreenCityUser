@@ -220,6 +220,10 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .doOnError(e -> log.error("Error retrieving data: {}", e.getMessage()))
             .block();
 
+        if (userInfo == null) {
+            throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN);
+        }
+
         if (userInfo.getEmail() == null) {
             throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN);
         }
