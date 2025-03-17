@@ -67,9 +67,9 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     @Override
     public String generateFacebookAuthorizeURL() {
         return "https://www.facebook.com/v22.0/dialog/oauth" +
-                "?client_id=" + facebookAppId +
-                "&redirect_uri=" + address + "/facebookSecurity/facebook" +
-                "&scope=email";
+            "?client_id=" + facebookAppId +
+            "&redirect_uri=" + address + "/facebookSecurity/facebook" +
+            "&scope=email";
     }
 
     /**
@@ -83,52 +83,52 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         log.info("Starting retrieval of Facebook Access Token for code: {}", code);
 
         String tokenUrl = "https://graph.facebook.com/v19.0/oauth/access_token" +
-                "?client_id=" + facebookAppId +
-                "&redirect_uri=" + address + "/facebookSecurity/facebook" +
-                "&client_secret=" + facebookAppSecret +
-                "&code=" + code;
+            "?client_id=" + facebookAppId +
+            "&redirect_uri=" + address + "/facebookSecurity/facebook" +
+            "&client_secret=" + facebookAppSecret +
+            "&code=" + code;
 
         String accessToken = webClient.get()
-                .uri(tokenUrl)
-                .retrieve()
-                .onStatus(status -> status != HttpStatus.OK,
-                        response -> Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)))
-                .bodyToMono(String.class)
-                .map(response -> {
-                    try {
-                        JsonNode jsonNode = objectMapper.readTree(response);
-                        return jsonNode.get("access_token").asText();
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN, e);
-                    }
-                })
-                .doOnSuccess(token -> log.info("Successfully retrieved Facebook Access Token: {}", token))
-                .doOnError(e -> log.error("Error retrieving Access Token: {}", e.getMessage()))
-                .block();
+            .uri(tokenUrl)
+            .retrieve()
+            .onStatus(status -> status != HttpStatus.OK,
+                response -> Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)))
+            .bodyToMono(String.class)
+            .map(response -> {
+                try {
+                    JsonNode jsonNode = objectMapper.readTree(response);
+                    return jsonNode.get("access_token").asText();
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN, e);
+                }
+            })
+            .doOnSuccess(token -> log.info("Successfully retrieved Facebook Access Token: {}", token))
+            .doOnError(e -> log.error("Error retrieving Access Token: {}", e.getMessage()))
+            .block();
 
         if (accessToken != null) {
             String userInfoRequestUrl = userInfoUrl + "?fields=id,name,email&access_token=" + accessToken;
             log.info(" Executing request to Facebook API: {}", userInfoRequestUrl);
 
             UserVO byEmail = webClient.get()
-                    .uri(userInfoRequestUrl)
-                    .retrieve()
-                    .onStatus(status -> status != HttpStatus.OK,
-                            response -> Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)))
-                    .bodyToMono(String.class)
-                    .map(response -> {
-                        try {
-                            JsonNode jsonNode = objectMapper.readTree(response);
-                            String email = jsonNode.has("email") ? jsonNode.get("email").asText() : null;
-                            String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "Unknown";
-                            log.info(" Received email: {}, name: {}", email, name);
-                            return processUser(email, name);
-                        } catch (Exception e) {
-                            throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN, e);
-                        }
-                    })
-                    .doOnError(e -> log.error(" Error retrieving user data: {}", e.getMessage()))
-                    .block();
+                .uri(userInfoRequestUrl)
+                .retrieve()
+                .onStatus(status -> status != HttpStatus.OK,
+                    response -> Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)))
+                .bodyToMono(String.class)
+                .map(response -> {
+                    try {
+                        JsonNode jsonNode = objectMapper.readTree(response);
+                        String email = jsonNode.has("email") ? jsonNode.get("email").asText() : null;
+                        String name = jsonNode.has("name") ? jsonNode.get("name").asText() : "Unknown";
+                        log.info(" Received email: {}, name: {}", email, name);
+                        return processUser(email, name);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN, e);
+                    }
+                })
+                .doOnError(e -> log.error(" Error retrieving user data: {}", e.getMessage()))
+                .block();
 
             return getSuccessSignInDto(byEmail);
         } else {
@@ -153,44 +153,44 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
 
     User createNewUser(String email, String name) {
         return User.builder()
-                .email(email)
-                .name(name)
-                .role(Role.ROLE_USER)
-                .uuid(UUID.randomUUID().toString())
-                .dateOfRegistration(LocalDateTime.now())
-                .lastActivityTime(LocalDateTime.now())
-                .userStatus(UserStatus.ACTIVATED)
-                .emailNotification(EmailNotification.DISABLED)
-                .refreshTokenKey(jwtTool.generateTokenKey())
-                .language(Language.builder().id(1L).build())
-                .build();
+            .email(email)
+            .name(name)
+            .role(Role.ROLE_USER)
+            .uuid(UUID.randomUUID().toString())
+            .dateOfRegistration(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
+            .userStatus(UserStatus.ACTIVATED)
+            .emailNotification(EmailNotification.DISABLED)
+            .refreshTokenKey(jwtTool.generateTokenKey())
+            .language(Language.builder().id(1L).build())
+            .build();
     }
 
     User createNewUser(String email, String userName, String profilePicture, String language) {
         User user = User.builder()
-                .email(email)
-                .name(userName)
-                .role(Role.ROLE_USER)
-                .dateOfRegistration(LocalDateTime.now())
-                .lastActivityTime(LocalDateTime.now())
-                .userStatus(UserStatus.ACTIVATED)
-                .emailNotification(EmailNotification.DISABLED)
-                .refreshTokenKey(jwtTool.generateTokenKey())
-                .profilePicturePath(profilePicture)
-                .showLocation(ProfilePrivacyPolicy.PUBLIC)
-                .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
-                .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-                .rating(DEFAULT_RATING)
-                .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
-                .build();
+            .email(email)
+            .name(userName)
+            .role(Role.ROLE_USER)
+            .dateOfRegistration(LocalDateTime.now())
+            .lastActivityTime(LocalDateTime.now())
+            .userStatus(UserStatus.ACTIVATED)
+            .emailNotification(EmailNotification.DISABLED)
+            .refreshTokenKey(jwtTool.generateTokenKey())
+            .profilePicturePath(profilePicture)
+            .showLocation(ProfilePrivacyPolicy.PUBLIC)
+            .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
+            .showToDoList(ProfilePrivacyPolicy.PUBLIC)
+            .rating(DEFAULT_RATING)
+            .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
+            .build();
 
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
-                .map(emailPreference -> UserNotificationPreference.builder()
-                        .user(user)
-                        .emailPreference(emailPreference)
-                        .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
-                        .build())
-                .collect(Collectors.toSet());
+            .map(emailPreference -> UserNotificationPreference.builder()
+                .user(user)
+                .emailPreference(emailPreference)
+                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                .build())
+            .collect(Collectors.toSet());
         user.setNotificationPreferences(userNotificationPreferences);
         return user;
     }
@@ -213,14 +213,14 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
 
         UserInfo userInfo = webClient.get()
-                .uri(userInfoUrl + "?fields=id,name,email,picture&access_token=" + fbToken)
-                .retrieve()
-                .onStatus(status -> status != HttpStatus.OK,
-                        response -> Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)))
-                .bodyToMono(UserInfo.class)
-                .doOnSuccess(info -> log.info("Received UserInfo: email={}, name={}", info.getEmail(), info.getName()))
-                .doOnError(e -> log.error("Error retrieving data: {}", e.getMessage()))
-                .block();
+            .uri(userInfoUrl + "?fields=id,name,email,picture&access_token=" + fbToken)
+            .retrieve()
+            .onStatus(status -> status != HttpStatus.OK,
+                response -> Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)))
+            .bodyToMono(UserInfo.class)
+            .doOnSuccess(info -> log.info("Received UserInfo: email={}, name={}", info.getEmail(), info.getName()))
+            .doOnError(e -> log.error("Error retrieving data: {}", e.getMessage()))
+            .block();
 
         if (userInfo.getEmail() == null) {
             throw new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN);

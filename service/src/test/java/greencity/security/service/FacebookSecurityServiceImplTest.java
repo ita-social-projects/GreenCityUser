@@ -119,7 +119,7 @@ class FacebookSecurityServiceImplTest {
     @Test
     void authenticate_ShouldThrowException_WhenTokenOrLanguageIsNull() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> facebookSecurityService.authenticate(null, "en"));
+            () -> facebookSecurityService.authenticate(null, "en"));
         assertEquals(ErrorMessage.FB_TOKEN_OR_LANGUAGE_MISSING, exception.getMessage());
     }
 
@@ -162,10 +162,11 @@ class FacebookSecurityServiceImplTest {
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(UserInfo.class)).thenReturn(Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)));
+        when(responseSpec.bodyToMono(UserInfo.class))
+            .thenReturn(Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> facebookSecurityService.authenticate(fbToken, "en"));
+            () -> facebookSecurityService.authenticate(fbToken, "en"));
         assertTrue(exception.getMessage().contains(ErrorMessage.BAD_FACEBOOK_TOKEN));
     }
 
@@ -192,7 +193,7 @@ class FacebookSecurityServiceImplTest {
         userVO.setUserStatus(UserStatus.DEACTIVATED);
         when(userService.findByEmail(email)).thenReturn(userVO);
         assertThrows(UserDeactivatedException.class,
-                () -> facebookSecurityService.processAuthentication(email, "Test User", "profile.jpg", "1"));
+            () -> facebookSecurityService.processAuthentication(email, "Test User", "profile.jpg", "1"));
     }
 
     @Test
@@ -227,9 +228,9 @@ class FacebookSecurityServiceImplTest {
     @Test
     void generateFacebookAuthorizeURLTest() {
         String expected = "https://www.facebook.com/v22.0/dialog/oauth" +
-                "?client_id=12345" +
-                "&redirect_uri=http://localhost:8060/facebookSecurity/facebook" +
-                "&scope=email";
+            "?client_id=12345" +
+            "&redirect_uri=http://localhost:8060/facebookSecurity/facebook" +
+            "&scope=email";
 
         String actual = facebookSecurityService.generateFacebookAuthorizeURL();
         assertEquals(expected, actual);
@@ -242,10 +243,11 @@ class FacebookSecurityServiceImplTest {
         when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestHeadersSpec);
         when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.onStatus(any(), any())).thenReturn(responseSpec);
-        when(responseSpec.bodyToMono(String.class)).thenReturn(Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)));
+        when(responseSpec.bodyToMono(String.class))
+            .thenReturn(Mono.error(new IllegalArgumentException(ErrorMessage.BAD_FACEBOOK_TOKEN)));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> facebookSecurityService.generateFacebookAccessToken(code));
+            () -> facebookSecurityService.generateFacebookAccessToken(code));
         assertTrue(exception.getMessage().contains(ErrorMessage.BAD_FACEBOOK_TOKEN));
     }
 
@@ -265,7 +267,7 @@ class FacebookSecurityServiceImplTest {
         when(accessTokenNode.get("access_token")).thenReturn(null);
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> facebookSecurityService.generateFacebookAccessToken(code));
+            () -> facebookSecurityService.generateFacebookAccessToken(code));
         assertTrue(exception.getMessage().contains(ErrorMessage.BAD_FACEBOOK_TOKEN));
     }
 
@@ -330,7 +332,7 @@ class FacebookSecurityServiceImplTest {
         when(responseSpec.bodyToMono(UserInfo.class)).thenReturn(Mono.just(userInfo));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> facebookSecurityService.authenticate(fbToken, "en"));
+            () -> facebookSecurityService.authenticate(fbToken, "en"));
         assertTrue(exception.getMessage().contains(ErrorMessage.BAD_FACEBOOK_TOKEN));
     }
 }
