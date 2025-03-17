@@ -29,13 +29,11 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import static greencity.constant.AppConstant.DEFAULT_RATING;
 
 /**
@@ -66,10 +64,10 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
 
     @Override
     public String generateFacebookAuthorizeURL() {
-        return "https://www.facebook.com/v22.0/dialog/oauth" +
-            "?client_id=" + facebookAppId +
-            "&redirect_uri=" + address + "/facebookSecurity/facebook" +
-            "&scope=email";
+        return "https://www.facebook.com/v22.0/dialog/oauth"
+            + "?client_id=" + facebookAppId
+            + "&redirect_uri=" + address + "/facebookSecurity/facebook"
+            + "&scope=email";
     }
 
     /**
@@ -82,11 +80,11 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     public SuccessSignInDto generateFacebookAccessToken(String code) {
         log.info("Starting retrieval of Facebook Access Token for code: {}", code);
 
-        String tokenUrl = "https://graph.facebook.com/v19.0/oauth/access_token" +
-            "?client_id=" + facebookAppId +
-            "&redirect_uri=" + address + "/facebookSecurity/facebook" +
-            "&client_secret=" + facebookAppSecret +
-            "&code=" + code;
+        String tokenUrl = "https://graph.facebook.com/v19.0/oauth/access_token"
+            + "?client_id=" + facebookAppId
+            + "&redirect_uri=" + address + "/facebookSecurity/facebook"
+            + "&client_secret=" + facebookAppSecret
+            + "&code=" + code;
 
         String accessToken = webClient.get()
             .uri(tokenUrl)
