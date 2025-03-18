@@ -39,7 +39,7 @@ Though there are three GitHub projects ([GreenCity](https://github.com/ita-socia
 ### 4.1. Required to install
 
 * Java 21
-* PostgreSQL 9.5 or higher
+* PostgreSQL 9.5 or higher;
 
 ### 4.2. How to run
 
