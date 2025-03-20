@@ -55,13 +55,13 @@ class AuthorityServiceImplTest {
     private AuthorityServiceImpl authorityService;
 
     @BeforeEach
-    public void initSecurityContext() {
+    void initSecurityContext() {
         when(auth.getName()).thenReturn(TEST_EMAIL);
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @AfterEach
-    public void clearSecurityContext() {
+    void clearSecurityContext() {
         SecurityContextHolder.clearContext();
     }
 
