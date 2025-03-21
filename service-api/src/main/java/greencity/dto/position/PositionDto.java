@@ -17,6 +17,6 @@ import lombok.Setter;
 @Builder
 public class PositionDto {
     private Long id;
-    private String name;
+    private String nameUk;
     private String nameEn;
 }
