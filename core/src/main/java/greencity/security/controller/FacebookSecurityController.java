@@ -11,9 +11,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
 
 /**
  * Controller that provide google security logic.
@@ -53,5 +56,10 @@ public class FacebookSecurityController {
     @GetMapping("/facebook")
     public SuccessSignInDto generateFacebookAccessToken(@RequestParam("code") String code) {
         return facebookSecurityService.generateFacebookAccessToken(code);
+    }
+
+    @PostMapping(value = "/login", consumes = "application/json")
+    public SuccessSignInDto loginWithFacebook(@RequestBody Map<String, String> request) {
+        return facebookSecurityService.authenticate(request.get("token"), request.get("lang"));
     }
 }

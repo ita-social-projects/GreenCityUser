@@ -130,6 +130,9 @@ public class SecurityConfig {
                     "/ownSecurity/unblockAccount",
                     "/api/testers/sign-in")
                 .permitAll()
+                .requestMatchers(HttpMethod.GET, "/facebookSecurity/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/facebookSecurity/login").permitAll()
+                .requestMatchers(HttpMethod.GET, "/check-auth").permitAll()
                 .requestMatchers(HttpMethod.GET,
                     "/user/to-do-list-items/habits/{habitId}/to-do-list",
                     "/user/{userId}/{habitId}/custom-to-do-list-items/available",
