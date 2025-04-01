@@ -13,51 +13,6 @@
                      oldTableName="user"/>
     </changeSet>
     <changeSet author="Yuriy"
-               id="2">
-        <renameTable newTableName="categories"
-                     oldTableName="category"/>
-    </changeSet>
-    <changeSet author="Yuriy"
-               id="3">
-        <renameTable newTableName="comments"
-                     oldTableName="comment"/>
-    </changeSet>
-    <changeSet author="Yuriy"
-               id="4">
-        <renameTable newTableName="discount_values"
-                     oldTableName="discount_value"/>
-    </changeSet>
-    <changeSet author="Yuriy"
-               id="5">
-        <renameTable newTableName="estimates"
-                     oldTableName="estimate"/>
-    </changeSet>
-    <changeSet author="Yuriy"
-               id="6">
-        <renameTable newTableName="favorite_places"
-                     oldTableName="favorite_place"/>
-    </changeSet>
-    <changeSet author="Yuriy"
-               id="7">
-        <renameTable newTableName="locations"
-                     oldTableName="location"/>
-    </changeSet>
-    <changeSet author="Yuriy"
-               id="8">
-        <renameTable newTableName="photos"
-                     oldTableName="photo"/>
-    </changeSet>
-    <changeSet author="Yuriy"
-               id="9">
-        <renameTable newTableName="places"
-                     oldTableName="place"/>
-    </changeSet>
-    <changeSet author="Yuriy"
-               id="10">
-        <renameTable newTableName="specifications"
-                     oldTableName="specification"/>
-    </changeSet>
-    <changeSet author="Yuriy"
                id="11">
         <renameTable newTableName="verify_emails"
                      oldTableName="verify_email"/>

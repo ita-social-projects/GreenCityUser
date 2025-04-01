@@ -14,18 +14,7 @@
     </changeSet>
 
     <changeSet id="Bilonizhka26" author="Oleh Bilonizhka">
-        <dropTable tableName="employee_position"/>
-        <dropTable tableName="order_employee"/>
-        <dropTable tableName="employees"/>
         <dropTable tableName="positions"/>
-        <dropTable tableName="change_of_points_mapping"/>
-        <dropTable tableName="order_additional"/>
-        <dropTable tableName="order_bag_mapping"/>
-        <dropTable tableName="certificate"/>
-        <dropTable tableName="orders"/>
-        <dropTable tableName="ubs_user"/>
-        <dropTable tableName="address"/>
-        <dropTable tableName="bag"/>
         <dropColumn tableName="users" columnName="current_points"/>
         <dropColumn tableName="users" columnName="violations"/>
     </changeSet>
