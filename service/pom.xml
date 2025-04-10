@@ -11,6 +11,7 @@
 
     <properties>
         <modelmapper.version>3.2.0</modelmapper.version>
+        <spring-social-facebook.version>2.0.3.RELEASE</spring-social-facebook.version>
         <google.api-client.version>2.1.4</google.api-client.version>
         <commons-fileupload.version>1.5</commons-fileupload.version>
         <commons-io.version>2.15.0</commons-io.version>
@@ -52,8 +53,10 @@
             <artifactId>spring-tx</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>org.springframework.social</groupId>
+            <artifactId>spring-social-facebook</artifactId>
+            <version>${spring-social-facebook.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.google.api-client</groupId>
