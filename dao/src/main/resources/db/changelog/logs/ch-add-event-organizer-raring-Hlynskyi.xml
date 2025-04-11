@@ -2,7 +2,13 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
-    <changeSet author="Danylo Hlynskyi" id="event-add-event-organizer-rating-Hlynskyi">
+    <changeSet author="Danylo Hlynskyi" id="event-add-event-organizer-rating-Hlynskyi" runAlways="true">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="users" columnName="event_organizer_rating" />
+            </not>
+        </preConditions>
+
         <addColumn tableName="users">
             <column name="event_organizer_rating" type="DOUBLE"/>
         </addColumn>

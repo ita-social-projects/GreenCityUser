@@ -4,7 +4,11 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="Herchanivska-10" author="Viktoriia Herchanivska">
+    <changeSet id="Herchanivska-10" author="Viktoriia Herchanivska" runAlways="true">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="users" columnName="show_shopping_list" />
+        </preConditions>
+
         <renameColumn tableName="users" oldColumnName="show_shopping_list" newColumnName="show_to_do_list"/>
     </changeSet>
 </databaseChangeLog>

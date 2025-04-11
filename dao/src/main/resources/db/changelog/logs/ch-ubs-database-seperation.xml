@@ -13,7 +13,13 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="Bilonizhka26" author="Oleh Bilonizhka">
+    <changeSet id="Bilonizhka26" author="Oleh Bilonizhka" runAlways="true">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="positions" />
+            <columnExists tableName="users" columnName="current_points" />
+            <columnExists tableName="users" columnName="violations" />
+        </preConditions>
+
         <dropTable tableName="positions"/>
         <dropColumn tableName="users" columnName="current_points"/>
         <dropColumn tableName="users" columnName="violations"/>
