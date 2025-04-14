@@ -21,9 +21,9 @@ public class Achievement {
     private String title;
 
     @Column(nullable = false, length = 300)
-    private String name;
+    private String nameUk;
     @Column(nullable = false, length = 300)
-    private String nameEng;
+    private String nameEn;
 
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "achievement", fetch = FetchType.LAZY)
     private List<UserAchievement> userAchievements;

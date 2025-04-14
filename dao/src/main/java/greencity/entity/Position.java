@@ -30,9 +30,9 @@ public class Position {
     private Long id;
 
     @Column(nullable = false, length = 30, unique = true)
-    private String name;
+    private String nameUk;
 
-    @Column(nullable = false, length = 30, unique = true, name = "name_eng")
+    @Column(nullable = false, length = 30, unique = true, name = "name_en")
     private String nameEn;
 
     @ManyToMany(mappedBy = "positions", cascade = CascadeType.ALL)

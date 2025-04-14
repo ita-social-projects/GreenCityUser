@@ -741,7 +741,7 @@ class UserControllerTest {
             .andExpect(jsonPath("$.length()").value(5))
             .andExpect(jsonPath("$.id").value(1L))
             .andExpect(jsonPath("$.cityEn").value("Lviv"))
-            .andExpect(jsonPath("$.cityUa").value("Львів"))
+            .andExpect(jsonPath("$.cityUk").value("Львів"))
             .andExpect(jsonPath("$.latitude").value(49.842957))
             .andExpect(jsonPath("$.longitude").value(24.031111));
         verify(userService).findAllUsersCities(1L);
