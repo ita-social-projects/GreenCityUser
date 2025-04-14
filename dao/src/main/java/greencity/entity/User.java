@@ -178,4 +178,48 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserNotificationPreference> notificationPreferences = new HashSet<>();
+
+
+
+    // new
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<UserNotificationPreference> emailPreference = new HashSet<>();
+
+
+
+
+    // goes to greencity
+    @OneToMany(mappedBy = "user")
+    @Builder.Default
+    private List<Estimate> estimates = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    private List<CustomToDoListItem> customToDoListItems = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "usersLikedNews")
+    private Set<EcoNews> ecoNewsLiked;
+
+    @Column(name = "event_organizer_rating")
+    private Double eventOrganizerRating;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Filter> filters = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "followers", fetch = FetchType.LAZY)
+    private Set<EcoNews> favoriteEcoNews;
+
+    @ManyToMany(mappedBy = "followers", fetch = FetchType.LAZY)
+    private Set<Habit> favoriteHabits;
+
+    @ManyToMany(mappedBy = "followers", fetch = FetchType.LAZY)
+    private Set<Event> favoriteEvents;
+
+    @ManyToMany(mappedBy = "attenders", fetch = FetchType.LAZY)
+    private Set<Event> subscribedEvents;
+
+    @ManyToMany(mappedBy = "requesters", fetch = FetchType.LAZY)
+    private Set<Event> requestedEvents;
 }
