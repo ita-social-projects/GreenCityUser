@@ -23,8 +23,10 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserLocationDto;
+import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -34,7 +36,9 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.dto.user.UserProfileStatisticsDto;
 import greencity.dto.user.UserRoleDto;
+import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
@@ -1112,5 +1116,42 @@ public class UserServiceImpl implements UserService {
     @Override
     public String findUserLanguageByUuid(String uuid) {
         return findUserByUuid(uuid).getLanguage().getCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserRoleStatisticDto> getUserRolesDistribution() {
+        return userRepo.getUserRolesDistribution();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserStatusStatisticDto> getUserStatusesDistribution() {
+        return userRepo.getUserStatusesDistribution();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserLocationStatisticDto> getUserLocationsDistribution(String groupBy) {
+        return switch (groupBy) {
+            case "city" -> userRepo.getUserLocationsDistributionByCity();
+            case "region" -> userRepo.getUserLocationsDistributionByRegion();
+            case "country" -> userRepo.getUserLocationsDistributionByCountry();
+            default -> userRepo.getUserLocationsDistributionByCity();
+        };
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution() {
+        return userRepo.getUserEmailPreferencesDistribution();
     }
 }
