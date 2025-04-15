@@ -64,6 +64,7 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -1147,5 +1148,21 @@ public class UserController {
     @GetMapping("/email-preferences-distribution")
     public ResponseEntity<List<UserEmailPreferencesStatisticDto>> getUserEmailPreferencesDistribution() {
         return ResponseEntity.ok().body(userService.getUserEmailPreferencesDistribution());
+    }
+
+    /**
+     * Count total active users in the system.
+     *
+     * @return number of active users in the system
+     */
+    @Operation(summary = "Get user email preferences distribution")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/count-active-users")
+    public ResponseEntity<Long> countActiveUsers() {
+        return ResponseEntity.ok(userService.countActiveUsers());
     }
 }

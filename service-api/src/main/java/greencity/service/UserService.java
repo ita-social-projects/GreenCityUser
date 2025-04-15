@@ -480,4 +480,9 @@ public interface UserService {
      * @return {@link List} of {@link UserEmailPreferencesStatisticDto}
      */
     List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution();
+
+    /**
+     * Count total active users in the system.
+     */
+    Long countActiveUsers();
 }

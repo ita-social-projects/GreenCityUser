@@ -1154,4 +1154,12 @@ public class UserServiceImpl implements UserService {
     public List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution() {
         return userRepo.getUserEmailPreferencesDistribution();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long countActiveUsers() {
+        return userRepo.countActiveUsers();
+    }
 }
