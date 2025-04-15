@@ -23,8 +23,10 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -33,7 +35,9 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.dto.user.UserProfileStatisticsDto;
 import greencity.dto.user.UserRoleDto;
+import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
@@ -1079,5 +1083,69 @@ public class UserController {
     public ResponseEntity<HttpStatus> updateUserRating(@Valid @RequestBody UserAddRatingDto userAddRatingDto) {
         userService.updateUserRating(userAddRatingDto);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Get user roles distribution
+     *
+     * @return {@link List} of {@link UserRoleStatisticDto}.
+     */
+    @Operation(summary = "Get user roles distribution")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/roles-distribution")
+    public ResponseEntity<List<UserRoleStatisticDto>> getUserRolesDistribution() {
+        return ResponseEntity.ok().body(userService.getUserRolesDistribution());
+    }
+
+    /**
+     * Get user statuses distribution
+     *
+     * @return {@link List} of {@link UserStatusStatisticDto}.
+     */
+    @Operation(summary = "Get user statuses distribution")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/statuses-distribution")
+    public ResponseEntity<List<UserStatusStatisticDto>> getUserStatusesDistribution() {
+        return ResponseEntity.ok().body(userService.getUserStatusesDistribution());
+    }
+
+    /**
+     * Get user locations distribution
+     *
+     * @return {@link List} of {@link UserLocationStatisticDto}.
+     */
+    @Operation(summary = "Get user locations distribution")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/locations-distribution")
+    public ResponseEntity<List<UserLocationStatisticDto>> getUserLocationsDistribution(@RequestParam(name = "group-by") String groupBy) {
+        return ResponseEntity.ok().body(userService.getUserLocationsDistribution(groupBy));
+    }
+
+    /**
+     * Get user email preferences distribution
+     *
+     * @return {@link List} of {@link UserEmailPreferencesStatisticDto}.
+     */
+    @Operation(summary = "Get user email preferences distribution")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/email-preferences-distribution")
+    public ResponseEntity<List<UserEmailPreferencesStatisticDto>> getUserEmailPreferencesDistribution() {
+        return ResponseEntity.ok().body(userService.getUserEmailPreferencesDistribution());
     }
 }
