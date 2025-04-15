@@ -19,6 +19,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -175,8 +176,7 @@ public class RestClient {
      * @return id of ubs profile {@link Long};
      * @author Maksym Golik
      */
-
-    public Long createUbsProfile(UbsProfileCreationDto ubsProfile) {
+    public Long createUbsProfile(UbsProfileCreationDto ubsProfile) throws RestClientException {
         return restTemplate
             .postForEntity(greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
                 ubsProfile, Long.class)
