@@ -1,11 +1,17 @@
 package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
+import greencity.dto.user.UserEmailPreferencesStatisticDto;
+import greencity.dto.user.UserLocationStatisticDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserRoleStatisticDto;
+import greencity.dto.user.UserStatusStatisticDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -252,4 +258,113 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users where users.id in (:usersId)")
     List<User> getAllUsersByUsersId(List<Long> usersId);
+    
+    /**
+     * Find all {@link UserManagementVO}.
+     *
+     * @param filter   filter parameters
+     * @param pageable pagination
+     * @return list of all {@link UserManagementVO}
+     */
+    @Query(" SELECT new greencity.dto.user.UserManagementVO(u.id, u.name, u.email, u.userCredo, u.role, u.userStatus) " + " FROM User u ")
+    Page<UserManagementVO> findAllManagementVo(Specification<User> filter, Pageable pageable);
+
+    /**
+     * Retrieves the distribution of user roles for active users.
+     *
+     * @return A list of UserRoleStatisticDto objects containing the role and the
+     *         count of users with that role.
+     */
+    @Query("""
+     SELECT new greencity.dto.user.UserRoleStatisticDto(u.role, COUNT(u.id))
+     FROM User u
+     WHERE u.userStatus = 2
+     GROUP BY u.role
+     """)
+    List<UserRoleStatisticDto> getUserRolesDistribution();
+
+    /**
+     * Retrieves the distribution of user statuses across all users.
+     *
+     * @return A list of UserStatusStatisticDto objects containing the status and
+     *         the count of users with that status.
+     */
+    @Query("""
+       SELECT new greencity.dto.user.UserStatusStatisticDto(u.userStatus, COUNT(u.id))
+       FROM User u
+       GROUP BY u.userStatus
+       """)
+    List<UserStatusStatisticDto> getUserStatusesDistribution();
+
+    /**
+     * Retrieves the distribution of users by city.
+     *
+     * @return A list of UserLocationStatisticDto objects containing the city name
+     *         and the count of users in that city.
+     */
+    @Query("""
+       SELECT new greencity.dto.user.UserLocationStatisticDto(
+              COALESCE(ul.cityEn, 'No Location'), COUNT(u.id))
+       FROM User u
+       LEFT JOIN u.userLocation ul
+       WHERE u.userStatus = 2
+       GROUP BY ul.cityEn
+       """)
+    List<UserLocationStatisticDto> getUserLocationsDistributionByCity();
+
+    /**
+     * Retrieves the distribution of users by region.
+     *
+     * @return A list of UserLocationStatisticDto objects containing the region name
+     *         and the count of users in that region.
+     */
+    @Query("""
+       SELECT new greencity.dto.user.UserLocationStatisticDto(
+              COALESCE(ul.regionEn, 'No Location'), COUNT(u.id))
+       FROM User u
+       LEFT JOIN u.userLocation ul
+       WHERE u.userStatus = 2
+       GROUP BY ul.regionEn
+       """)
+    List<UserLocationStatisticDto> getUserLocationsDistributionByRegion();
+
+    /**
+     * Retrieves the distribution of users by country.
+     *
+     * @return A list of UserLocationStatisticDto objects containing the country
+     *         name and the count of users in that country.
+     */
+    @Query("""
+       SELECT new greencity.dto.user.UserLocationStatisticDto(
+              COALESCE(ul.countryEn, 'No Location'), COUNT(u.id))
+       FROM User u
+       LEFT JOIN u.userLocation ul
+       WHERE u.userStatus = 2
+       GROUP BY ul.countryEn
+       """)
+    List<UserLocationStatisticDto> getUserLocationsDistributionByCountry();
+
+    /**
+     * Retrieves the distribution of user email preferences and their periodicity.
+     *
+     * @return A list of UserEmailPreferencesStatisticDto objects containing the
+     *         email preference, periodicity, and the count of users with that
+     *         combination.
+     */
+    @Query("""
+            SELECT new greencity.dto.user.UserEmailPreferencesStatisticDto(
+                uep.emailPreference, uep.periodicity, COUNT(uep.id)
+            )
+            FROM UserNotificationPreference uep
+            LEFT JOIN User u
+            WHERE u.userStatus = 2
+            GROUP BY uep.emailPreference, uep.periodicity
+       """)
+    List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution();
+
+    /**
+     * Count total active users in the system.
+     */
+    @Query("SELECT COUNT(u) FROM User u WHERE u.userStatus IN (greencity.enums.UserStatus.ACTIVATED) ")
+    Long countActiveUsers();
 }
