@@ -15,6 +15,7 @@ import java.util.Base64;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
@@ -75,6 +76,35 @@ public class JwtTool {
                 accessTokenKey.getBytes(StandardCharsets.UTF_8)),
                 Jwts.SIG.HS256)
             .compact();
+    }
+
+    /**
+     * Method for creating access token.
+     *
+     * @param email this is email of user.
+     * @param roles roles of user.
+     */
+    public String createAccessToken(String email, List<Role> roles) {
+        List<String> roleNames = roles.stream().map(Role::name).toList();
+
+        ClaimsBuilder claims = Jwts.claims().subject(email);
+        claims.add(ROLE, roleNames);
+
+        if (roles.contains(Role.ROLE_UBS_EMPLOYEE)) {
+            claims.add("employee_authorities", authorityService.getAllEmployeesAuthorities(email));
+        }
+        Date now = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(now);
+        calendar.add(Calendar.MINUTE, accessTokenValidTimeInMinutes);
+        return Jwts.builder()
+                .claims(claims.build())
+                .issuedAt(now)
+                .expiration(calendar.getTime())
+                .signWith(Keys.hmacShaKeyFor(
+                                accessTokenKey.getBytes(StandardCharsets.UTF_8)),
+                        Jwts.SIG.HS256)
+                .compact();
     }
 
     /**
