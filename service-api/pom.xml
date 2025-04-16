@@ -129,6 +129,12 @@
             <version>${passay.version}</version>
         </dependency>
         <dependency>
+            <groupId>greencityuser</groupId>
+            <artifactId>dao</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
             <version>${apache.commons.version}</version>

@@ -14,8 +14,8 @@ import lombok.NoArgsConstructor;
 public class AchievementVO {
     private Long id;
     private String title;
-    private String nameUk;
-    private String nameEn;
+    private String name;
+    private String nameEng;
     @NotEmpty
     private AchievementCategoryVO achievementCategory;
     @NotEmpty

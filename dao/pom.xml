@@ -17,12 +17,6 @@
     <artifactId>dao</artifactId>
     <dependencies>
         <dependency>
-            <groupId>greencityuser</groupId>
-            <artifactId>service-api</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>

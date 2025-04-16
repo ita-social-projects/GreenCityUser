@@ -24,6 +24,4 @@ public interface FacebookSecurityService {
      * @return {@link SuccessSignInDto} if token valid
      */
     SuccessSignInDto generateFacebookAccessToken(String code);
-
-    SuccessSignInDto authenticate(String fbToken, String language);
 }
