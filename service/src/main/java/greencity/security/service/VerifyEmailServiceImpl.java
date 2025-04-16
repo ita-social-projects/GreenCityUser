@@ -42,19 +42,18 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED));
 
         User user = verifyEmail.getUser();
-        user.setUserStatus(UserStatus.ACTIVATED);
-        userRepo.save(user);
-        verifyEmailRepo.deleteByTokenAndUserId(token, userId);
-        log.info("User has successfully verify the email by token {}.", token);
-
         try {
             Long ubsProfileId = restClient.createUbsProfile(modelMapper.map(user, UbsProfileCreationDto.class));
             log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId, user.getUuid());
         } catch (RestClientException e) {
             log.warn("Ubs profile has not been created for user with uuid {}.", user.getUuid());
-            TransactionInterceptor.currentTransactionStatus().setRollbackOnly();
             return false;
         }
+
+        user.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(user);
+        verifyEmailRepo.deleteByTokenAndUserId(token, userId);
+        log.info("User has successfully verify the email by token {}.", token);
 
         return true;
     }
