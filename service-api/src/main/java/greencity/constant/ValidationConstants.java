@@ -23,7 +23,7 @@ public class ValidationConstants {
     public static final String USERNAME_REGEXP = """
         ^(?!.*\\.\\.)(?!.*\\.$)(?!.*\\-\\-)\
         (?=[ЄІЇҐЁА-ЯA-Z])\
-        [ЄІЇҐЁєіїґёА-Яа-яA-Za-z0-9\\s-'’.\\"]\
+        [ЄІЇҐЁєіїґёА-Яа-яA-Za-z0-9\\s\\-'\\"’.ʼ]\
         {1,30}\
         (?<![ЭэЁёъЪЫы])$\
         """;
