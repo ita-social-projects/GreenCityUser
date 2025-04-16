@@ -17,11 +17,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.client.RestClientException;
 import static greencity.ModelUtils.getUbsProfileCreationDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -61,6 +63,24 @@ class VerifyEmailServiceImplTest {
         verifyEmailService.verifyByToken(1L, "token");
         verify(verifyEmailRepo).deleteByTokenAndUserId("token", 1L);
         verify(restClient).createUbsProfile(ubsProfile);
+    }
+
+    @Test
+    void verifyByTokenNotExpiredTokenTestWhenRestClientThrowsException() {
+        String exceptionMessage = "exception message";
+        String token = "token";
+        Long userId = 1L;
+        UbsProfileCreationDto ubsProfile = getUbsProfileCreationDto();
+
+        when(verifyEmailRepo.findByTokenAndUserId(token, userId)).thenReturn(Optional.of(verifyEmail));
+        when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(ubsProfile);
+        when(restClient.createUbsProfile(ubsProfile)).thenThrow(new RestClientException(exceptionMessage));
+
+        verifyEmailService.verifyByToken(1L, "token");
+
+        verify(restClient).createUbsProfile(ubsProfile);
+        verify(userRepo, never()).save(any(User.class));
+        verify(verifyEmailRepo, never()).deleteByTokenAndUserId("token", 1L);
     }
 
     @Test
