@@ -21,6 +21,11 @@ public class GreenCityRemoteClientFallbackFactory implements FallbackFactory<Gre
                 //TODO: log
                 return Optional.empty();
             }
+
+            @Override
+            public void deleteAll(List<String> paths) {
+                //TODO: log
+            }
         };
     }
 }
