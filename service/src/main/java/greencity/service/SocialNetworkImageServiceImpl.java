@@ -1,5 +1,6 @@
 package greencity.service;
 
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.AppConstant;
 import greencity.constant.CacheConstants;
 import greencity.constant.ErrorMessage;
@@ -47,7 +48,7 @@ import org.springframework.web.multipart.MultipartFile;
 @EnableCaching
 public class SocialNetworkImageServiceImpl implements SocialNetworkImageService {
     private final SocialNetworkImageRepo socialNetworkImageRepo;
-    private final FileService fileService;
+    private final GreenCityRemoteClient greenCityRemoteClient;
     private final ModelMapper modelMapper;
 
     /**
@@ -100,7 +101,7 @@ public class SocialNetworkImageServiceImpl implements SocialNetworkImageService 
             .orElseThrow(() -> new NotFoundException(ErrorMessage.SOCIAL_NETWORK_IMAGE_FOUND_BY_ID + id));
         String path = image.getImagePath();
         socialNetworkImageRepo.deleteById(id);
-        fileService.delete(path);
+        greenCityRemoteClient.deleteAllFiles(List.of(path));
     }
 
     /**
@@ -113,7 +114,7 @@ public class SocialNetworkImageServiceImpl implements SocialNetworkImageService 
         List<SocialNetworkImage> images = socialNetworkImageRepo.findAllById(listId);
         List<String> paths = images.stream().map(image -> image.getImagePath()).toList();
         listId.forEach(socialNetworkImageRepo::deleteById);
-        paths.forEach(fileService::delete);
+        greenCityRemoteClient.deleteAllFiles(paths);
     }
 
     @Override
@@ -121,7 +122,9 @@ public class SocialNetworkImageServiceImpl implements SocialNetworkImageService 
         MultipartFile image) {
         SocialNetworkImage toSave = modelMapper.map(socialNetworkImageRequestDTO, SocialNetworkImage.class);
         if (image != null) {
-            toSave.setImagePath(fileService.upload(image));
+            String uploadedFileUrl = greenCityRemoteClient.uploadFile(image)
+                    .orElseThrow(() -> new NotSavedException());
+            toSave.setImagePath(uploadedFileUrl);
         }
         try {
             socialNetworkImageRepo.save(toSave);
@@ -167,7 +170,9 @@ public class SocialNetworkImageServiceImpl implements SocialNetworkImageService 
         SocialNetworkImage toUpdate = findById(socialNetworkImageResponseDTO.getId());
         toUpdate.setHostPath(socialNetworkImageResponseDTO.getHostPath());
         if (image != null) {
-            toUpdate.setImagePath(fileService.upload(image));
+            String uploadedFileUrl = greenCityRemoteClient.uploadFile(image)
+                    .orElseThrow(() -> new NotSavedException());
+            toUpdate.setImagePath(uploadedFileUrl);
         }
         socialNetworkImageRepo.save(toUpdate);
     }
@@ -245,6 +250,7 @@ public class SocialNetworkImageServiceImpl implements SocialNetworkImageService 
         }
         MultipartFile multipartFile = new MultipartFileImpl("mainFile", tempFile.getName(),
             Files.probeContentType(tempFile.toPath()), Files.readAllBytes(tempFile.toPath()));
-        return fileService.upload(multipartFile);
+        return greenCityRemoteClient.uploadFile(multipartFile)
+                .orElseThrow(() -> new NotSavedException());
     }
 }
