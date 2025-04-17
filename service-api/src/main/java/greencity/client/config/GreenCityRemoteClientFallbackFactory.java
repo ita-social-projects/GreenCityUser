@@ -2,6 +2,8 @@ package greencity.client.config;
 
 import feign.hystrix.FallbackFactory;
 import greencity.client.GreenCityRemoteClient;
+import greencity.dto.achievement.AchievementVO;
+import greencity.dto.achievement.UserAchievementVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,17 @@ public class GreenCityRemoteClientFallbackFactory implements FallbackFactory<Gre
             @Override
             public void deleteAllFiles(List<String> paths) {
                 //TODO: log
+            }
+
+            @Override
+            public Optional<List<AchievementVO>> findAllAchievements() {
+                //TODO: throw exc
+                return Optional.empty();
+            }
+
+            @Override
+            public List<UserAchievementVO> findAllUserAchievementsByUserId(Long userId) {
+                throw new RuntimeException("not implemented");
             }
         };
     }

@@ -3,15 +3,18 @@ package greencity.client;
 import greencity.client.config.GreenCityRemoteClientFallbackFactory;
 import greencity.client.config.GreenCityRemoteClientInterceptor;
 import greencity.dto.achievement.AchievementVO;
+import greencity.dto.achievement.UserAchievementVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -55,4 +58,14 @@ public interface GreenCityRemoteClient {
      */
     @GetMapping("/achievements/all")
     Optional<List<AchievementVO>> findAllAchievements();
+
+    /**
+     * Method returns all user achievements by user id
+     *
+     * @param userId id of the user
+     *
+     * @return list of {@link UserAchievementVO}
+     */
+    @GetMapping("/user-achievements/users/{userId}")
+    List<UserAchievementVO> findAllUserAchievementsByUserId(@PathVariable Long userId);
 }
