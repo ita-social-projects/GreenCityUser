@@ -145,10 +145,6 @@ public class User {
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserAction> userActions = new ArrayList<>();
-
     @Column(columnDefinition = "varchar(60)")
     private String uuid;
 
