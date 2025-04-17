@@ -113,10 +113,6 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
     private List<User> userFriends = new ArrayList<>();
 
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<UserAchievement> userAchievements = new ArrayList<>();
-
     @Column(name = "rating")
     private Double rating;
 
