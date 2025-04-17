@@ -86,5 +86,8 @@ public interface GreenCityRemoteClient {
     // TODO
     LanguageVO findLanguageById(Long languageId);
 
+    // TODO
+    Boolean languageExistsById(Long languageId);
+
 
 }

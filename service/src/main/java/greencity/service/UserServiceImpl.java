@@ -3,6 +3,7 @@ package greencity.service;
 import com.google.maps.model.AddressComponentType;
 import com.google.maps.model.AddressType;
 import com.google.maps.model.GeocodingResult;
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -12,6 +13,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
@@ -43,7 +45,6 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
-import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
@@ -65,7 +66,6 @@ import greencity.exception.exceptions.UserDeactivationException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
-import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
@@ -104,7 +104,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RestClient restClient;
-    private final LanguageRepo languageRepo;
+    private final GreenCityRemoteClient greenCityRemoteClient;
     private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
     private final GoogleApiService googleApiService;
@@ -566,7 +566,10 @@ public class UserServiceImpl implements UserService {
         user.setShowToDoList(userProfileDtoRequest.getShowToDoList());
         setNotificationPreferencesForUser(user, userProfileDtoRequest);
         userRepo.save(user);
-        return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
+
+        Long languageId = user.getLanguageId();
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
+        return UpdateConstants.getResultByLanguageCode(languageVO.getCode());
     }
 
     private void setNotificationPreferencesForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
@@ -863,11 +866,15 @@ public class UserServiceImpl implements UserService {
             .reason(reason)
             .user(foundUser)
             .build());
+
+        Long languageId = foundUser.getLanguageId();
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
+
         return UserDeactivationReasonDto.builder()
             .email(foundUser.getEmail())
             .name(foundUser.getName())
             .deactivationReason(reason)
-            .lang(foundUser.getLanguage().getCode())
+            .lang(languageVO.getCode())
             .build();
     }
 
@@ -908,10 +915,14 @@ public class UserServiceImpl implements UserService {
         User foundUser = findUserById(id);
         foundUser.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(foundUser);
+
+        Long languageId = foundUser.getLanguageId();
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
+
         return UserActivationDto.builder()
             .email(foundUser.getEmail())
             .name(foundUser.getName())
-            .lang(foundUser.getLanguage().getCode())
+            .lang(languageVO.getCode())
             .build();
     }
 
@@ -920,10 +931,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserLanguage(Long userId, Long languageId) {
-        Language language = languageRepo.findById(languageId)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
+        if (!greenCityRemoteClient.languageExistsById(languageId)) {
+            throw new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId);
+        }
+
         User user = findUserById(userId);
-        user.setLanguage(language);
+        user.setLanguageId(languageId);
         userRepo.save(user);
     }
 
@@ -1115,7 +1128,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String findUserLanguageByUuid(String uuid) {
-        return findUserByUuid(uuid).getLanguage().getCode();
+        User user = findUserByUuid(uuid);
+        Long languageId = user.getLanguageId();
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
+        return languageVO.getCode();
     }
 
     /**

@@ -4,6 +4,7 @@ import feign.hystrix.FallbackFactory;
 import greencity.client.GreenCityRemoteClient;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.useraction.UserActionVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -47,6 +48,16 @@ public class GreenCityRemoteClientFallbackFactory implements FallbackFactory<Gre
 
             @Override
             public List<UserActionVO> findAllUserActionsByUserId(Long userId) {
+                throw new RuntimeException("not implemented");
+            }
+
+            @Override
+            public LanguageVO findLanguageById(Long languageId) {
+                throw new RuntimeException("not implemented");
+            }
+
+            @Override
+            public Boolean languageExistsById(Long languageId) {
                 throw new RuntimeException("not implemented");
             }
         };
