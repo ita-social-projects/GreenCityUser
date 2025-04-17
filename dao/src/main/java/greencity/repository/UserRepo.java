@@ -211,7 +211,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param id {@link Long} -current user's id.
      * @return {@link User}.
      */
-    @Query(value = "select u from User u join fetch u.userAchievements where u.id = :id")
+    @Query(value = "select u from User u where u.id = :id")
     Optional<User> findUserForAchievement(Long id);
 
     /**
