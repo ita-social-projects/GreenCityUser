@@ -28,8 +28,10 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
     @Override
     protected UserVO convert(User user) {
         Long userId = user.getId();
+        Long languageId = user.getLanguageId();
         List<UserAchievementVO> userAchievements = greenCityRemoteClient.findAllUserAchievementsByUserId(userId);
         List<UserActionVO> userActions = greenCityRemoteClient.findAllUserActionsByUserId(userId);
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
 
         return UserVO.builder()
             .id(userId)
@@ -95,8 +97,8 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                     .build())
                 .toList())
             .languageVO(LanguageVO.builder()
-                .id(user.getLanguage().getId())
-                .code(user.getLanguage().getCode())
+                .id(languageVO.getId())
+                .code(languageVO.getCode())
                 .build())
             .build();
     }
