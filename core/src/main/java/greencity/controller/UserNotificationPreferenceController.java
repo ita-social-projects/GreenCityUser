@@ -1,10 +1,25 @@
 package greencity.controller;
 
+import greencity.constant.HttpStatuses;
+import greencity.dto.emailpreference.EmailPreferenceDto;
+import greencity.dto.user.UserNotificationPreferenceVO;
+import greencity.service.UserNotificationPreferenceService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user-notification-preference")
@@ -13,6 +28,38 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class UserNotificationPreferenceController {
 
+    private final UserNotificationPreferenceService userNotificationPreferenceService;
 
+    /**
+     * Get user notification preferences by user id.
+     *
+     * @return list of {@link UserNotificationPreferenceVO}
+     */
+    @Operation(summary = "Get user notification preferences by user id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+                    content = @Content(schema = @Schema(implementation = UserNotificationPreferenceVO.class))),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping
+    public ResponseEntity<List<UserNotificationPreferenceVO>> findAllByUserId(@RequestParam Long userId) {
+        return ResponseEntity.ok().body(userNotificationPreferenceService.findAllByUserId(userId));
+    }
 
+    /**
+     * Check is user notification preference exists by params in EmailPreferenceDto
+     *
+     * @return boolean of whether UserNotificationPreference exists
+     */
+    @Operation(summary = "Check is user notification preference exists by params in EmailPreferenceDto.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/search")
+    public ResponseEntity<Boolean> existsByUserIdAndEmailPreferenceAndPeriodicity(@RequestBody EmailPreferenceDto emailPreferenceDto) {
+        return ResponseEntity.ok().body(userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(emailPreferenceDto));
+    }
 }
