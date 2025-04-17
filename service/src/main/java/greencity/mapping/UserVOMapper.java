@@ -1,5 +1,6 @@
 package greencity.mapping;
 
+import greencity.client.GreenCityRemoteClient;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
@@ -11,17 +12,27 @@ import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
 import greencity.entity.UserLocation;
-import java.util.ArrayList;
-import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.Optional;
+
 @Component
+@RequiredArgsConstructor
 public class UserVOMapper extends AbstractConverter<User, UserVO> {
+
+    private final GreenCityRemoteClient greenCityRemoteClient;
+
     @Override
     protected UserVO convert(User user) {
+        Long userId = user.getId();
+        List<UserAchievementVO> userAchievements = greenCityRemoteClient.findAllUserAchievementsByUserId(userId);
+        List<UserActionVO> userActions = greenCityRemoteClient.findAllUserActionsByUserId(userId);
+
         return UserVO.builder()
-            .id(user.getId())
+            .id(userId)
             .name(user.getName())
             .email(user.getEmail())
             .role(user.getRole())
@@ -60,7 +71,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .showEcoPlace(user.getShowEcoPlace())
             .showLocation(user.getShowLocation())
             .lastActivityTime(user.getLastActivityTime())
-            .userAchievements(user.getUserAchievements() != null ? user.getUserAchievements()
+            .userAchievements(userAchievements
                 .stream().map(userAchievement -> UserAchievementVO.builder()
                     .id(userAchievement.getId())
                     .user(UserVO.builder()
@@ -70,8 +81,8 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                         .id(userAchievement.getAchievement().getId())
                         .build())
                     .build())
-                .toList() : new ArrayList<>())
-            .userActions(user.getUserActions() != null ? user.getUserActions()
+                .toList())
+            .userActions(userActions
                 .stream().map(userAction -> UserActionVO.builder()
                     .id(userAction.getId())
                     .achievementCategory(AchievementCategoryVO.builder()
@@ -82,7 +93,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                         .id(userAction.getUser().getId())
                         .build())
                     .build())
-                .toList() : new ArrayList<>())
+                .toList())
             .languageVO(LanguageVO.builder()
                 .id(user.getLanguage().getId())
                 .code(user.getLanguage().getCode())
