@@ -596,6 +596,23 @@ public class UserController {
     }
 
     /**
+     * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by id.
+     *
+     * @param id - {@link UserVO}'s id
+     * @return {@link UserVO}.
+     */
+    @Operation(summary = "Get find not 'DEACTIVATED' User by id")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/findNotDeactivatedById")
+    public ResponseEntity<UserVO> findNotDeactivatedById(@RequestParam Long id) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedById(id).orElse(null));
+    }
+
+    /**
      * Method creates record in ubs table.
      *
      * @return {@link UbsTableCreationDto}

@@ -76,6 +76,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Optional<User> findNotDeactivatedByEmail(String email);
 
     /**
+     * Find not 'DEACTIVATED' {@link User} by id.
+     *
+     * @param id - {@link User}'s id
+     * @return found {@link User}
+     */
+    @Query("FROM User WHERE id=:id AND userStatus <> 1")
+    Optional<User> findNotDeactivatedById(Long id);
+
+    /**
      * Find all {@link User}'s with {@link EmailNotification} type.
      *
      * @param emailNotification - type of {@link EmailNotification}

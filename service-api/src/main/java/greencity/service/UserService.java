@@ -128,6 +128,14 @@ public interface UserService {
     Optional<UserVO> findNotDeactivatedByEmail(String email);
 
     /**
+     * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by id.
+     *
+     * @param id - {@link UserVO}'s id
+     * @return {@link Optional} of found {@link UserVO}.
+     */
+    Optional<UserVO> findNotDeactivatedById(Long id);
+
+    /**
      * Find UserVO's id by UserVO email.
      *
      * @param email - {@link UserVO} email

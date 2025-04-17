@@ -307,6 +307,18 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    @Transactional
+    public Optional<UserVO> findNotDeactivatedById(Long id) {
+        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        log.info("user: {}", notDeactivatedById);
+        return Optional.of(modelMapper.map(notDeactivatedById, UserVO.class));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Long findIdByEmail(String email) {
         log.info(LogMessage.IN_FIND_ID_BY_EMAIL, email);
         return userRepo.findIdByEmail(email).orElseThrow(
