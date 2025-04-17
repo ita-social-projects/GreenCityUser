@@ -59,7 +59,7 @@ public interface EmailService {
      *                     letter.
      * @param token        password recovery token.
      */
-    void sendRestoreEmail(Long userId, String userFistName, String userEmail, String token, String language,
+    void sendRestoreEmail(Long userId, String userFistName, String userEmail, String token, Long languageId,
         boolean isUbs);
 
     /**
@@ -96,9 +96,9 @@ public interface EmailService {
      * Method for send information about success restoring password.
      *
      * @param email    letter is sent to this email.
-     * @param language language which will be used in letter.
+     * @param languageId id of language which will be used in letter.
      */
-    void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);
+    void sendSuccessRestorePasswordByEmail(String email, Long languageId, String userName, boolean isUbs);
 
     /**
      * Sends email message to create new password for employee after signUp.

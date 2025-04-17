@@ -150,8 +150,11 @@ public class EmailServiceImpl implements EmailService {
      * {@inheritDoc}
      */
     @Override
-    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language,
+    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, Long languageId,
         boolean isUbs) {
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
+        String language = languageVO.getCode();
+
         Map<String, Object> model = buildModelMapForPasswordRestore(userId, userName, token, language, isUbs);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
         sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null,
@@ -242,7 +245,10 @@ public class EmailServiceImpl implements EmailService {
      * {@inheritDoc}
      */
     @Override
-    public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs) {
+    public void sendSuccessRestorePasswordByEmail(String email, Long languageId, String userName, boolean isUbs) {
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
+        String language = languageVO.getCode();
+
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
         model.put(EmailConstants.USER_NAME, userName);
