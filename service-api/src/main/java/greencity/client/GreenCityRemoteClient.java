@@ -81,13 +81,19 @@ public interface GreenCityRemoteClient {
     @GetMapping("/achievements/user-actions/{userId}")
     List<UserActionVO> findAllUserActionsByUserId(@PathVariable Long userId);
 
+    /**
+     * Method for finding Language by id.
+     *
+     * @return {@link LanguageVO}
+     */
+    @GetMapping("/languages/{id}")
+    LanguageVO findLanguageById(@PathVariable Long id);
 
-
-    // TODO
-    LanguageVO findLanguageById(Long languageId);
-
-    // TODO
-    Boolean languageExistsById(Long languageId);
-
-
+    /**
+     * Check whether Language exists by id.
+     *
+     * @return boolean of whether language exists by that id
+     */
+    @GetMapping("/languages/{id}/exists")
+    Boolean languageExistsById(@PathVariable Long id);
 }
