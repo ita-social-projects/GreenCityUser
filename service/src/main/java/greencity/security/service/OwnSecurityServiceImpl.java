@@ -1,8 +1,10 @@
 package greencity.security.service;
 
 import greencity.client.CloudFlareClient;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.security.CloudFlareRequest;
 import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
@@ -91,6 +93,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final AuthorityRepo authorityRepo;
     private final LoginAttemptService loginAttemptService;
     private final CloudFlareClient cloudFlareClient;
+    private final GreenCityRemoteClient greenCityRemoteClient;
     @Value("${verifyEmailTimeHour}")
     private Integer expirationTime;
     @Value("${bruteForceSettings.blockTimeInMinutes}")
@@ -146,9 +149,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
-            .language(Language.builder()
-                .id(modelMapper.map(language, Long.class))
-                .build())
+            .languageId(modelMapper.map(language, Long.class))
             .build();
     }
 
@@ -364,7 +365,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * @return "ua" or "en" depending on user language code
      */
     private String getLanguageFromUser(User user) {
-        return user.getLanguage().getCode().equals("1") ? "ua" : "en";
+        Long languageId = user.getLanguageId();
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
+        return languageVO.getCode();
     }
 
     private boolean isPasswordCorrect(OwnSignInDto signInDto, UserVO user) {
@@ -536,10 +539,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
             .rating(AppConstant.DEFAULT_RATING)
-            .language(Language.builder()
-                .id(2L)
-                .code("en")
-                .build())
+            .languageId(2L)
             .build();
     }
 
