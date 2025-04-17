@@ -4,6 +4,7 @@ import greencity.client.config.GreenCityRemoteClientFallbackFactory;
 import greencity.client.config.GreenCityRemoteClientInterceptor;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.useraction.UserActionVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -79,4 +80,11 @@ public interface GreenCityRemoteClient {
      */
     @GetMapping("/achievements/user-actions/{userId}")
     List<UserActionVO> findAllUserActionsByUserId(@PathVariable Long userId);
+
+
+
+    // TODO
+    LanguageVO findLanguageById(Long languageId);
+
+
 }
