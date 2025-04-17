@@ -9,7 +9,6 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
-import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
@@ -146,7 +145,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
             .rating(DEFAULT_RATING)
-            .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
+            .languageId(modelMapper.map(language, Long.class))
             .build();
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
             .map(emailPreference -> UserNotificationPreference.builder()
