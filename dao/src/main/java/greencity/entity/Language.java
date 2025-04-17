@@ -20,7 +20,4 @@ public class Language {
 
     @Column(name = "code", nullable = false, unique = true, length = 35)
     private String code;
-
-    @OneToMany(mappedBy = "language")
-    private List<User> users;
 }

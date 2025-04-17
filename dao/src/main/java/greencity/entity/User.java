@@ -148,8 +148,7 @@ public class User {
     @Column(columnDefinition = "varchar(60)")
     private String uuid;
 
-    @ManyToOne
-    private Language language;
+    private Long languageId;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserDeactivationReason> userDeactivationReasons;
