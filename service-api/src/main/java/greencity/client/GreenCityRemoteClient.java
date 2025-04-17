@@ -4,6 +4,7 @@ import greencity.client.config.GreenCityRemoteClientFallbackFactory;
 import greencity.client.config.GreenCityRemoteClientInterceptor;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.useraction.UserActionVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -66,6 +67,16 @@ public interface GreenCityRemoteClient {
      *
      * @return list of {@link UserAchievementVO}
      */
-    @GetMapping("/user-achievements/users/{userId}")
+    @GetMapping("/achievements/user-achievements/{userId}")
     List<UserAchievementVO> findAllUserAchievementsByUserId(@PathVariable Long userId);
+
+    /**
+     * Method returns all user actions by user id
+     *
+     * @param userId id of the user
+     *
+     * @return list of {@link UserActionVO}
+     */
+    @GetMapping("/achievements/user-actions/{userId}")
+    List<UserActionVO> findAllUserActionsByUserId(@PathVariable Long userId);
 }
