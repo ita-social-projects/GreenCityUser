@@ -10,7 +10,6 @@ import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
-import greencity.entity.Language;
 import greencity.entity.OwnSecurity;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
