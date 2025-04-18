@@ -425,6 +425,22 @@ public class UserController {
     }
 
     /**
+     * Method returns six user friends sorted by rating.
+     *
+     * @return list of {@link UserVO}.
+     */
+    @Operation(summary = "Get six user friends sorted by rating")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/{userId}/sixFriends/")
+    public ResponseEntity<List<UserVO>> getSixFriendsWithTheHighestRating(@PathVariable Long userId) {
+        return ResponseEntity.ok().body(userService.getSixFriendsWithTheHighestRating(userId));
+    }
+
+    /**
      * The method get {@link UserVO}s with online status for the current user-id.
      *
      * @return {@link UserAndFriendsWithOnlineStatusDto}.

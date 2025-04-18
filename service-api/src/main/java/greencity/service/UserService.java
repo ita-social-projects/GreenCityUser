@@ -311,6 +311,14 @@ public interface UserService {
     UserProfileStatisticsDto getUserProfileStatistics(Long userId);
 
     /**
+     * Get six friends with the highest rating.
+     *
+     * @param userId id of user whose friends we are getting
+     * @return list of {@link UserVO}
+     */
+    List<UserVO> getSixFriendsWithTheHighestRating(Long userId);
+
+    /**
      * Get user and six friends with the online status {@link UserVO}.
      *
      * @param userId {@link Long}
