@@ -11,6 +11,7 @@ import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.position.PositionDto;
+import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.*;
 import greencity.dto.useraction.UserActionVO;
@@ -368,6 +369,12 @@ public class ModelUtils {
         return new UserAchievement(1L, getUser(), getAchievement(), false);
     }
 
+    public static List<SocialNetworkVO> getListSocialNetworkVO() {
+        List<SocialNetworkVO> socialNetworkVO = new ArrayList<>();
+        socialNetworkVO.add(SocialNetworkVO.builder().id(1L).url("url").build());
+        return socialNetworkVO;
+    }
+
     public static UserViolationMailDto getUserViolationMailDto() {
         return UserViolationMailDto.builder()
             .email("string@gmail.com")
@@ -543,6 +550,30 @@ public class ModelUtils {
                 .name("Auth")
                 .build()))
             .build();
+    }
+
+    public static SocialNetworkImage getSocialNetworkImage() {
+        return SocialNetworkImage.builder()
+                .id(1L)
+                .hostPath("hostPath")
+                .imagePath("imagePath")
+                .build();
+    }
+
+    public static SocialNetworkImage getSocialNetworkImageId2() {
+        return SocialNetworkImage.builder()
+                .id(2L)
+                .hostPath("hostPath2")
+                .imagePath("imagePath2")
+                .build();
+    }
+
+    public static SocialNetworkImage getSocialNetworkImageId3() {
+        return SocialNetworkImage.builder()
+                .id(3L)
+                .hostPath("hostPath3")
+                .imagePath("imagePath3")
+                .build();
     }
 
     public static User getEmployeeWithPositionsAndRelatedAuthorities_Empty() {
