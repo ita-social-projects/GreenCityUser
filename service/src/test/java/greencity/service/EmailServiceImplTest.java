@@ -5,6 +5,7 @@ import greencity.client.GreenCityRemoteClient;
 import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
@@ -40,7 +41,6 @@ import java.util.concurrent.Executors;
 import static greencity.ModelUtils.getSubscriberDto;
 
 import static greencity.TestConst.ENGLISH_CODE;
-import static greencity.TestConst.SIMPLE_LONG_NUMBER;
 import static greencity.TestConst.NAME;
 import static greencity.TestConst.EMAIL;
 import static greencity.TestConst.PLACE_NAME;
@@ -150,9 +150,13 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, 1, false",
-        "1, Test, test@gmail.com, token, en, 2, false"})
-    void sendRestoreEmail(Long id, String name, String email, String token, String language, Long languageId, Boolean isUbs) {
+    @CsvSource(value = {"1, Test, test@gmail.com, ua, 1, false",
+        "1, Test, test@gmail.com, en, 2, false"})
+    void sendRestoreEmail(Long id, String name, String email, String token, Long languageId, Boolean isUbs) {
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
+        String language = languageVO.getCode();
+
+        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
         when(messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)))
             .thenReturn("Confirm restoring password");
         service.sendRestoreEmail(id, name, email, token, languageId, isUbs);
@@ -162,6 +166,10 @@ class EmailServiceImplTest {
     @Test
     void sendRestoreEmailLanguageNotFoundException() {
         Long languageId = ModelUtils.getLanguageId();
+
+        when(greenCityRemoteClient.findLanguageById(languageId))
+                .thenThrow(new IllegalStateException());
+
         assertThrows(IllegalStateException.class,
             () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", languageId, false));
     }
@@ -219,8 +227,12 @@ class EmailServiceImplTest {
         String email = "test@gmail.com";
         String lang = "en";
         Long languageId = ModelUtils.getLanguageId();
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
         String userName = "Helgi";
         boolean isUbs = false;
+
+        when(greenCityRemoteClient.findLanguageById(languageId))
+                .thenReturn(languageVO);
         when(messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(lang)))
             .thenReturn("Restore password");
         service.sendSuccessRestorePasswordByEmail(email, languageId, userName, isUbs);
@@ -287,17 +299,20 @@ class EmailServiceImplTest {
         user.setEmail(EMAIL);
         user.setName(NAME);
         Long languageId = ModelUtils.getLanguageId();
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
         user.setLanguageId(languageId);
-        when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
         MimeMessage mimeMessage = mock(MimeMessage.class);
+        CountDownLatch latch = new CountDownLatch(1);
+        String subject = "Place Status Change Notification";
+
+        when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
+        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
         doNothing().when(javaMailSender).send(any(MimeMessage.class));
-        CountDownLatch latch = new CountDownLatch(1);
         doAnswer(invocation -> {
             latch.countDown();
             return null;
         }).when(javaMailSender).send(any(MimeMessage.class));
-        String subject = "Place Status Change Notification";
         when(messageSource.getMessage(eq(EmailConstants.UPDATE_STATUS), any(), eq(getLocale(ENGLISH_CODE))))
             .thenReturn(subject);
 
