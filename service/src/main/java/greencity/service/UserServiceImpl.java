@@ -310,7 +310,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Optional<UserVO> findNotDeactivatedById(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
         log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVO.class));
     }
@@ -773,8 +773,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserVO> getSixFriendsWithTheHighestRating(Long userId) {
         return userRepo.getSixFriendsWithTheHighestRating(userId).stream()
-                .map(user -> modelMapper.map(user, UserVO.class))
-                .toList();
+            .map(user -> modelMapper.map(user, UserVO.class))
+            .toList();
     }
 
     /**

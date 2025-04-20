@@ -66,7 +66,6 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -434,9 +433,9 @@ public class UserController {
      */
     @Operation(summary = "Get six user friends sorted by rating")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/{userId}/sixFriends/")
     public ResponseEntity<List<UserVO>> getSixFriendsWithTheHighestRating(@PathVariable Long userId) {
@@ -622,9 +621,9 @@ public class UserController {
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedById")
     public ResponseEntity<UserVO> findNotDeactivatedById(@RequestParam Long id) {
@@ -1125,15 +1124,15 @@ public class UserController {
     }
 
     /**
-     * Get user roles distribution
+     * Get user roles distribution.
      *
      * @return {@link List} of {@link UserRoleStatisticDto}.
      */
     @Operation(summary = "Get user roles distribution")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/roles-distribution")
     public ResponseEntity<List<UserRoleStatisticDto>> getUserRolesDistribution() {
@@ -1141,15 +1140,15 @@ public class UserController {
     }
 
     /**
-     * Get user statuses distribution
+     * Get user statuses distribution.
      *
      * @return {@link List} of {@link UserStatusStatisticDto}.
      */
     @Operation(summary = "Get user statuses distribution")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/statuses-distribution")
     public ResponseEntity<List<UserStatusStatisticDto>> getUserStatusesDistribution() {
@@ -1157,31 +1156,32 @@ public class UserController {
     }
 
     /**
-     * Get user locations distribution
+     * Get user locations distribution.
      *
      * @return {@link List} of {@link UserLocationStatisticDto}.
      */
     @Operation(summary = "Get user locations distribution")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/locations-distribution")
-    public ResponseEntity<List<UserLocationStatisticDto>> getUserLocationsDistribution(@RequestParam(name = "group-by") String groupBy) {
+    public ResponseEntity<List<UserLocationStatisticDto>> getUserLocationsDistribution(
+        @RequestParam(name = "group-by") String groupBy) {
         return ResponseEntity.ok().body(userService.getUserLocationsDistribution(groupBy));
     }
 
     /**
-     * Get user email preferences distribution
+     * Get user email preferences distribution.
      *
      * @return {@link List} of {@link UserEmailPreferencesStatisticDto}.
      */
     @Operation(summary = "Get user email preferences distribution")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/email-preferences-distribution")
     public ResponseEntity<List<UserEmailPreferencesStatisticDto>> getUserEmailPreferencesDistribution() {
@@ -1195,9 +1195,9 @@ public class UserController {
      */
     @Operation(summary = "Get user email preferences distribution")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/count-active-users")
     public ResponseEntity<Long> countActiveUsers() {

@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UserAdminRegistrationDtoMapper extends AbstractConverter<User, UserAdminRegistrationDto> {
-
     private final GreenCityRemoteClient greenCityRemoteClient;
 
     /**

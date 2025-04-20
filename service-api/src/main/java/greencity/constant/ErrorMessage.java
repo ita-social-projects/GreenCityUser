@@ -52,7 +52,8 @@ public class ErrorMessage {
         "You do not have permission to deactivate this user";
     public static final String SOCIAL_NETWORK_IMAGE_NOT_SAVED = "Social network image hasn't been saved";
     public static final String SOCIAL_NETWORK_IMAGE_FOUND_BY_ID = "Social network image doesn't exist by this id: ";
-    public static final String BAD_DEFAULT_SOCIAL_NETWORK_IMAGE_PATH = "Bad default social network image host path (Row in database doesn't exists)";
+    public static final String BAD_DEFAULT_SOCIAL_NETWORK_IMAGE_PATH =
+        "Bad default social network image host path (Row in database doesn't exists)";
     public static final String BASE64_DECODE_MESSAGE = "Can't decode from base64 format";
     public static final String BRUTEFORCE_PROTECTION_MESSAGE =
         "User account is blocked due to too many failed login attempts.";

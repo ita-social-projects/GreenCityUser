@@ -267,7 +267,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users where users.id in (:usersId)")
     List<User> getAllUsersByUsersId(List<Long> usersId);
-    
+
     /**
      * Find all {@link UserManagementVO}.
      *
@@ -275,7 +275,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param pageable pagination
      * @return list of all {@link UserManagementVO}
      */
-    @Query(" SELECT new greencity.dto.user.UserManagementVO(u.id, u.name, u.email, u.userCredo, u.role, u.userStatus) " + " FROM User u ")
+    @Query(" SELECT new greencity.dto.user.UserManagementVO(u.id, u.name, u.email, u.userCredo, u.role, u.userStatus) "
+        + " FROM User u ")
     Page<UserManagementVO> findAllManagementVo(Specification<User> filter, Pageable pageable);
 
     /**
@@ -285,11 +286,11 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         count of users with that role.
      */
     @Query("""
-     SELECT new greencity.dto.user.UserRoleStatisticDto(u.role, COUNT(u.id))
-     FROM User u
-     WHERE u.userStatus = 2
-     GROUP BY u.role
-     """)
+        SELECT new greencity.dto.user.UserRoleStatisticDto(u.role, COUNT(u.id))
+        FROM User u
+        WHERE u.userStatus = 2
+        GROUP BY u.role
+        """)
     List<UserRoleStatisticDto> getUserRolesDistribution();
 
     /**
@@ -299,10 +300,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         the count of users with that status.
      */
     @Query("""
-       SELECT new greencity.dto.user.UserStatusStatisticDto(u.userStatus, COUNT(u.id))
-       FROM User u
-       GROUP BY u.userStatus
-       """)
+        SELECT new greencity.dto.user.UserStatusStatisticDto(u.userStatus, COUNT(u.id))
+        FROM User u
+        GROUP BY u.userStatus
+        """)
     List<UserStatusStatisticDto> getUserStatusesDistribution();
 
     /**
@@ -312,13 +313,13 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         and the count of users in that city.
      */
     @Query("""
-       SELECT new greencity.dto.user.UserLocationStatisticDto(
-              COALESCE(ul.cityEn, 'No Location'), COUNT(u.id))
-       FROM User u
-       LEFT JOIN u.userLocation ul
-       WHERE u.userStatus = 2
-       GROUP BY ul.cityEn
-       """)
+        SELECT new greencity.dto.user.UserLocationStatisticDto(
+               COALESCE(ul.cityEn, 'No Location'), COUNT(u.id))
+        FROM User u
+        LEFT JOIN u.userLocation ul
+        WHERE u.userStatus = 2
+        GROUP BY ul.cityEn
+        """)
     List<UserLocationStatisticDto> getUserLocationsDistributionByCity();
 
     /**
@@ -328,13 +329,13 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         and the count of users in that region.
      */
     @Query("""
-       SELECT new greencity.dto.user.UserLocationStatisticDto(
-              COALESCE(ul.regionEn, 'No Location'), COUNT(u.id))
-       FROM User u
-       LEFT JOIN u.userLocation ul
-       WHERE u.userStatus = 2
-       GROUP BY ul.regionEn
-       """)
+        SELECT new greencity.dto.user.UserLocationStatisticDto(
+               COALESCE(ul.regionEn, 'No Location'), COUNT(u.id))
+        FROM User u
+        LEFT JOIN u.userLocation ul
+        WHERE u.userStatus = 2
+        GROUP BY ul.regionEn
+        """)
     List<UserLocationStatisticDto> getUserLocationsDistributionByRegion();
 
     /**
@@ -344,13 +345,13 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         name and the count of users in that country.
      */
     @Query("""
-       SELECT new greencity.dto.user.UserLocationStatisticDto(
-              COALESCE(ul.countryEn, 'No Location'), COUNT(u.id))
-       FROM User u
-       LEFT JOIN u.userLocation ul
-       WHERE u.userStatus = 2
-       GROUP BY ul.countryEn
-       """)
+        SELECT new greencity.dto.user.UserLocationStatisticDto(
+               COALESCE(ul.countryEn, 'No Location'), COUNT(u.id))
+        FROM User u
+        LEFT JOIN u.userLocation ul
+        WHERE u.userStatus = 2
+        GROUP BY ul.countryEn
+        """)
     List<UserLocationStatisticDto> getUserLocationsDistributionByCountry();
 
     /**
@@ -361,14 +362,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         combination.
      */
     @Query("""
-            SELECT new greencity.dto.user.UserEmailPreferencesStatisticDto(
-                uep.emailPreference, uep.periodicity, COUNT(uep.id)
-            )
-            FROM UserNotificationPreference uep
-            LEFT JOIN User u
-            WHERE u.userStatus = 2
-            GROUP BY uep.emailPreference, uep.periodicity
-       """)
+             SELECT new greencity.dto.user.UserEmailPreferencesStatisticDto(
+                 uep.emailPreference, uep.periodicity, COUNT(uep.id)
+             )
+             FROM UserNotificationPreference uep
+             LEFT JOIN User u
+             WHERE u.userStatus = 2
+             GROUP BY uep.emailPreference, uep.periodicity
+        """)
     List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution();
 
     /**

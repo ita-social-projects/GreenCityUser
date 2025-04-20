@@ -158,8 +158,10 @@ class OwnSecurityServiceImplTest {
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
 //        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 //        user.setUserAchievements(userAchievementList);
-        /*when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);*/
+        /*
+         * when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+         * }.getType())).thenReturn(achievementList);
+         */
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
@@ -183,8 +185,10 @@ class OwnSecurityServiceImplTest {
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
 //        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 //        user.setUserAchievements(userAchievementList);
-        /*when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);*/
+        /*
+         * when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+         * }.getType())).thenReturn(achievementList);
+         */
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
         when(userRepo.save(any(User.class))).thenReturn(user);
@@ -211,8 +215,10 @@ class OwnSecurityServiceImplTest {
 //        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 //        user.setUserAchievements(userAchievementList);
 
-        /*when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);*/
+        /*
+         * when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+         * }.getType())).thenReturn(achievementList);
+         */
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
         when(userRepo.save(any(User.class))).thenReturn(user);
@@ -239,8 +245,10 @@ class OwnSecurityServiceImplTest {
 //        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 //        user.setUserAchievements(userAchievementList);
 
-        /*when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);*/
+        /*
+         * when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+         * }.getType())).thenReturn(achievementList);
+         */
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
         when(userRepo.save(any(User.class))).thenReturn(user);
@@ -266,8 +274,10 @@ class OwnSecurityServiceImplTest {
 //        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 //        user.setUserAchievements(userAchievementList);
 
-        /*when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);*/
+        /*
+         * when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+         * }.getType())).thenReturn(achievementList);
+         */
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
 
@@ -291,8 +301,10 @@ class OwnSecurityServiceImplTest {
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
 //        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 //        user.setUserAchievements(userAchievementList);
-        /*when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);*/
+        /*
+         * when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+         * }.getType())).thenReturn(achievementList);
+         */
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
         when(userRepo.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
@@ -672,7 +684,7 @@ class OwnSecurityServiceImplTest {
         when(userRepo.findByEmail(anyString()))
             .thenReturn(Optional.ofNullable(userForBruteForceTest));
         when(greenCityRemoteClient.findLanguageById(languageId))
-                .thenReturn(languageVO);
+            .thenReturn(languageVO);
 
         assertThrows(UserBlockedException.class,
             () -> ownSecurityService.signIn(ownSignInDto));

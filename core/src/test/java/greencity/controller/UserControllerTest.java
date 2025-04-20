@@ -663,9 +663,9 @@ class UserControllerTest {
         Long languageId = 2L;
         userVO.setLanguageId(languageId);
         LanguageVO languageVO = LanguageVO.builder()
-                        .id(languageId)
-                                .code("en")
-                                        .build();
+            .id(languageId)
+            .code("en")
+            .build();
         String expectedLanguageCode = languageVO.getCode();
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);

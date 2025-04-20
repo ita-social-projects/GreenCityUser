@@ -16,17 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
-import java.util.Optional;
 
 @FeignClient(name = "greencity-remote-client",
-        url = "${greencity.server.address}",
-        configuration = GreenCityRemoteClientInterceptor.class,
-        fallbackFactory = GreenCityRemoteClientFallbackFactory.class)
+    url = "${greencity.server.address}",
+    configuration = GreenCityRemoteClientInterceptor.class,
+    fallbackFactory = GreenCityRemoteClientFallbackFactory.class)
 @Component
 public interface GreenCityRemoteClient {
-
     /**
      * Method for uploading files.
      *
@@ -54,7 +51,7 @@ public interface GreenCityRemoteClient {
     void deleteAllFiles(@RequestBody List<String> paths);
 
     /**
-     * Method returns all achievements
+     * Method returns all achievements.
      *
      * @return list of {@link AchievementVO}
      */
@@ -62,7 +59,7 @@ public interface GreenCityRemoteClient {
     List<AchievementVO> findAllAchievements();
 
     /**
-     * Method returns all user achievements by user id
+     * Method returns all user achievements by user id.
      *
      * @param userId id of the user
      *
@@ -72,7 +69,7 @@ public interface GreenCityRemoteClient {
     List<UserAchievementVO> findAllUserAchievementsByUserId(@PathVariable Long userId);
 
     /**
-     * Method returns all user actions by user id
+     * Method returns all user actions by user id.
      *
      * @param userId id of the user
      *

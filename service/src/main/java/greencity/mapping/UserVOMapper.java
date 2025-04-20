@@ -12,7 +12,6 @@ import java.util.Optional;
 
 @Component
 public class UserVOMapper extends AbstractConverter<User, UserVO> {
-
     @Override
     protected UserVO convert(User user) {
         Long userId = user.getId();

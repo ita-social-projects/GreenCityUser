@@ -34,7 +34,7 @@ class UserAdminRegistrationDtoMapperTest {
         user.setDateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47));
 
         when(greenCityRemoteClient.findLanguageById(languageId))
-                        .thenReturn(languageVO);
+            .thenReturn(languageVO);
 
         assertEquals(ModelUtils.getUserAdminRegistrationDto(), mapper.convert(user));
     }

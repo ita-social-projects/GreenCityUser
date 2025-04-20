@@ -168,7 +168,7 @@ class EmailServiceImplTest {
         Long languageId = ModelUtils.getLanguageId();
 
         when(greenCityRemoteClient.findLanguageById(languageId))
-                .thenThrow(new IllegalStateException());
+            .thenThrow(new IllegalStateException());
 
         assertThrows(IllegalStateException.class,
             () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", languageId, false));
@@ -232,7 +232,7 @@ class EmailServiceImplTest {
         boolean isUbs = false;
 
         when(greenCityRemoteClient.findLanguageById(languageId))
-                .thenReturn(languageVO);
+            .thenReturn(languageVO);
         when(messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(lang)))
             .thenReturn("Restore password");
         service.sendSuccessRestorePasswordByEmail(email, languageId, userName, isUbs);

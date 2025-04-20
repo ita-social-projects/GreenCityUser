@@ -637,7 +637,7 @@ class UserServiceImplTest {
             languageEn, addressTypes))
                 .thenReturn(ModelUtils.getGeocodingResult().getFirst());
         when(greenCityRemoteClient.findLanguageById(languageId))
-                .thenReturn(languageVO);
+            .thenReturn(languageVO);
 
         String actualResult = userService.saveUserProfile(request, "test@gmail.com");
 
@@ -1242,10 +1242,10 @@ class UserServiceImplTest {
         user.setUserStatus(ACTIVATED);
         LanguageVO languageVO = ModelUtils.getLanguageVO();
         UserActivationDto expectedResult = UserActivationDto.builder()
-                .email(user.getEmail())
-                .name(user.getName())
-                .lang(languageVO.getCode())
-                .build();
+            .email(user.getEmail())
+            .name(user.getName())
+            .lang(languageVO.getCode())
+            .build();
 
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(userRepo.save(user)).thenReturn(user);

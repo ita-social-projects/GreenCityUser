@@ -8,21 +8,20 @@ import greencity.repository.UserNotificationPreferenceRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserNotificationPreferenceServiceImpl implements UserNotificationPreferenceService {
-
     private final UserNotificationPreferenceRepo userNotificationPreferenceRepo;
     private final ModelMapper modelMapper;
 
     @Override
     public List<UserNotificationPreferenceVO> findAllByUserId(Long id) {
         return userNotificationPreferenceRepo.findAllByUserId(id).stream()
-                .map(userNotificationPreference -> modelMapper.map(userNotificationPreference, UserNotificationPreferenceVO.class))
-                .toList();
+            .map(userNotificationPreference -> modelMapper.map(userNotificationPreference,
+                UserNotificationPreferenceVO.class))
+            .toList();
     }
 
     @Override
@@ -30,6 +29,7 @@ public class UserNotificationPreferenceServiceImpl implements UserNotificationPr
         Long userId = emailPreferenceDto.userId();
         EmailPreference emailPreference = emailPreferenceDto.emailPreference();
         EmailPreferencePeriodicity periodicity = emailPreferenceDto.emailPreferencePeriodicity();
-        return userNotificationPreferenceRepo.existsByUserIdAndEmailPreferenceAndPeriodicity(userId, emailPreference, periodicity);
+        return userNotificationPreferenceRepo.existsByUserIdAndEmailPreferenceAndPeriodicity(userId, emailPreference,
+            periodicity);
     }
 }
