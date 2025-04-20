@@ -5,6 +5,7 @@ import greencity.annotations.CurrentUser;
 import greencity.annotations.CurrentUserId;
 import greencity.annotations.ImageValidation;
 import greencity.annotations.ValidBase64;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.HttpStatuses;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.PageableAdvancedDto;
@@ -12,6 +13,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
@@ -96,6 +98,7 @@ public class UserController {
     private final EmailService emailService;
     private final PositionService positionService;
     private final AuthorityService authorityService;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     /**
      * The method which update user status. Parameter principal are ignored because
@@ -723,7 +726,9 @@ public class UserController {
     })
     @GetMapping("/lang")
     public ResponseEntity<String> getUserLang(@Parameter(hidden = true) @CurrentUser UserVO userVO) {
-        return ResponseEntity.ok().body(userVO.getLanguageVO().getCode());
+        Long languageId = userVO.getLanguageId();
+        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
+        return ResponseEntity.ok().body(languageVO.getCode());
     }
 
     /**

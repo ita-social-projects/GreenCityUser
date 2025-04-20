@@ -1,37 +1,22 @@
 package greencity.mapping;
 
-import greencity.client.GreenCityRemoteClient;
-import greencity.dto.achievement.AchievementVO;
-import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.achievementcategory.AchievementCategoryVO;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserVO;
-import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
 import greencity.entity.UserLocation;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor
 public class UserVOMapper extends AbstractConverter<User, UserVO> {
-
-    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Override
     protected UserVO convert(User user) {
         Long userId = user.getId();
         Long languageId = user.getLanguageId();
-        List<UserAchievementVO> userAchievements = greenCityRemoteClient.findAllUserAchievementsByUserId(userId);
-        List<UserActionVO> userActions = greenCityRemoteClient.findAllUserActionsByUserId(userId);
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
 
         return UserVO.builder()
             .id(userId)
@@ -73,33 +58,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .showEcoPlace(user.getShowEcoPlace())
             .showLocation(user.getShowLocation())
             .lastActivityTime(user.getLastActivityTime())
-            .userAchievements(userAchievements
-                .stream().map(userAchievement -> UserAchievementVO.builder()
-                    .id(userAchievement.getId())
-                    .user(UserVO.builder()
-                        .id(userAchievement.getUser().getId())
-                        .build())
-                    .achievement(AchievementVO.builder()
-                        .id(userAchievement.getAchievement().getId())
-                        .build())
-                    .build())
-                .toList())
-            .userActions(userActions
-                .stream().map(userAction -> UserActionVO.builder()
-                    .id(userAction.getId())
-                    .achievementCategory(AchievementCategoryVO.builder()
-                        .id(userAction.getAchievementCategory().getId())
-                        .build())
-                    .count(userAction.getCount())
-                    .user(UserVO.builder()
-                        .id(userAction.getUser().getId())
-                        .build())
-                    .build())
-                .toList())
-            .languageVO(LanguageVO.builder()
-                .id(languageVO.getId())
-                .code(languageVO.getCode())
-                .build())
+            .languageId(languageId)
             .build();
     }
 
