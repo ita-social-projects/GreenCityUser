@@ -314,11 +314,6 @@ public class ModelUtils {
             .build();
     }
 
-    /*
-     * public static Language getLanguage() { return
-     * Language.builder().id(1L).code(AppConstant.DEFAULT_LANGUAGE_CODE).build(); }
-     */
-
     public static Long getLanguageId() {
         return 2L;
     }
@@ -334,22 +329,10 @@ public class ModelUtils {
         return new UserProfilePictureDto(1L, "name", "image");
     }
 
-    /*
-     * public static Achievement getAchievement() { return new Achievement(1L,
-     * "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
-     * "Acquired habit 14 days", Collections.emptyList(), new AchievementCategory(),
-     * 1); }
-     */
-
     public static AchievementVO getAchievementVO() {
         return new AchievementVO(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
             "Acquired habit 14 days", new AchievementCategoryVO(), 1);
     }
-
-    /*
-     * public static UserAchievement getUserAchievement() { return new
-     * UserAchievement(1L, getUser(), getAchievement(), false); }
-     */
 
     public static UserAchievementVO getUserAchievement() {
         return new UserAchievementVO(1L, getUserVO(), getAchievementVO(), false);

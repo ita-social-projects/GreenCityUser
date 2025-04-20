@@ -32,10 +32,6 @@ class UserVOAchievementMapperTest {
     void convert() {
         User user = ModelUtils.getUser();
         Long userId = user.getId();
-        /*
-         * UserAchievement userAchievements = ModelUtils.getUserAchievement();
-         * user.setUserAchievements(Collections.singletonList(userAchievements));
-         */
         List<UserAchievementVO> userAchievements = Collections.singletonList(ModelUtils.getUserAchievement());
 
         when(greenCityRemoteClient.findAllUserAchievementsByUserId(userId))
