@@ -37,13 +37,7 @@ public class GreenCityRemoteClientInterceptor implements RequestInterceptor {
      */
     @Override
     public void apply(RequestTemplate template) {
-        ServletRequestAttributes servletRequestAttributes =
-            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes());
-
-        String accessToken = servletRequestAttributes != null
-            ? servletRequestAttributes.getRequest().getHeader(AUTHORIZATION_HEADER)
-            : createAccessTokenForService();
-
+        String accessToken = createAccessTokenForService();
         template.header(AUTHORIZATION_HEADER, accessToken);
     }
 
