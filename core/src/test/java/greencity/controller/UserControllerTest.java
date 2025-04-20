@@ -3,6 +3,7 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.AppConstant;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.converters.UserArgumentResolver;
@@ -75,17 +76,25 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UserControllerTest {
-    private static final String userLink = "/user";
-    private MockMvc mockMvc;
+    static final String userLink = "/user";
+    MockMvc mockMvc;
+
     @InjectMocks
-    private UserController userController;
+    UserController userController;
+
     @Mock
-    private UserService userService;
+    UserService userService;
+
     @Mock
-    private AuthorityService authorityService;
+    AuthorityService authorityService;
+
     @Mock
-    private PositionService positionService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    PositionService positionService;
+
+    @Mock
+    GreenCityRemoteClient greenCityRemoteClient;
+
+    final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     void setup() {
@@ -650,16 +659,22 @@ class UserControllerTest {
     @Test
     void getUserLang() throws Exception {
         Principal principal = mock(Principal.class);
-        String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
         UserVO userVO = ModelUtils.TEST_USER_VO;
-        userVO.setLanguageId(2L);
+        Long languageId = 2L;
+        userVO.setLanguageId(languageId);
+        LanguageVO languageVO = LanguageVO.builder()
+                        .id(languageId)
+                                .code("en")
+                                        .build();
+        String expectedLanguageCode = languageVO.getCode();
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);
         when(userService.findByEmail(principal.getName())).thenReturn(userVO);
+        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
 
         this.mockMvc.perform(get(userLink + "/lang" + "?id=1")
             .principal(principal))
-            .andExpect(content().string(languageCode))
+            .andExpect(content().string(expectedLanguageCode))
             .andExpect(status().isOk());
     }
 
