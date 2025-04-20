@@ -631,14 +631,10 @@ class UserControllerTest {
     @Test
     void updateUserLanguageTest() throws Exception {
         Principal principal = mock(Principal.class);
-        String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
         long userId = 1L;
         UserVO userVO = UserVO.builder()
             .id(userId)
-            .languageVO(LanguageVO.builder()
-                .id(2L)
-                .code(languageCode)
-                .build())
+            .languageId(2L)
             .build();
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);
@@ -656,10 +652,7 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
         String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
         UserVO userVO = ModelUtils.TEST_USER_VO;
-        userVO.setLanguageVO(LanguageVO.builder()
-            .id(2L)
-            .code(languageCode)
-            .build());
+        userVO.setLanguageId(2L);
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);
         when(userService.findByEmail(principal.getName())).thenReturn(userVO);

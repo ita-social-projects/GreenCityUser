@@ -380,6 +380,10 @@ public class ModelUtils {
         return new UserAchievement(1L, getUser(), getAchievement(), false);
     }*/
 
+    public static UserAchievementVO getUserAchievement() {
+        return new UserAchievementVO(1L, getUserVO(), getAchievementVO(), false);
+    }
+
     public static List<SocialNetworkVO> getListSocialNetworkVO() {
         List<SocialNetworkVO> socialNetworkVO = new ArrayList<>();
         socialNetworkVO.add(SocialNetworkVO.builder().id(1L).url("url").build());
