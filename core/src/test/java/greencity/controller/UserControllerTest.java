@@ -18,19 +18,27 @@ import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
+import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserManagementViewDto;
 import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
+import greencity.enums.UserStatus;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
+import greencity.service.ManagementUserStatisticsService;
 import greencity.service.UserService;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -84,6 +92,9 @@ class UserControllerTest {
 
     @Mock
     UserService userService;
+
+    @Mock
+    ManagementUserStatisticsService managementUserStatisticsService;
 
     @Mock
     AuthorityService authorityService;
@@ -895,5 +906,79 @@ class UserControllerTest {
         var request = new UsersOnlineStatusRequestDto();
         userController.checkUsersOnlineStatus(request);
         verify(userService).checkUsersOnlineStatus(request);
+    }
+
+    @Test
+    void getUserRolesDistribution_returnsOkAndList() throws Exception {
+        Role role = Role.ROLE_ADMIN;
+        Long count = 10L;
+        List<UserRoleStatisticDto> roles = List.of(new UserRoleStatisticDto(role, count));
+
+        when(managementUserStatisticsService.getUserRolesDistribution()).thenReturn(roles);
+
+        mockMvc.perform(get(userLink + "/roles-distribution"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(roles.size()))
+                .andExpect(jsonPath("$[0].role").value(role.name()))
+                .andExpect(jsonPath("$[0].count").value(count));
+    }
+
+    @Test
+    void getUserStatusesDistribution_returnsOkAndList() throws Exception {
+        UserStatus userStatus = UserStatus.ACTIVATED;
+        Long count = 100L;
+        List<UserStatusStatisticDto> statuses = List.of(new UserStatusStatisticDto(userStatus, count));
+
+        when(managementUserStatisticsService.getUserStatusesDistribution()).thenReturn(statuses);
+
+        mockMvc.perform(get(userLink + "/statuses-distribution"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(statuses.size()))
+                .andExpect(jsonPath("$[0].status").value(userStatus.name()))
+                .andExpect(jsonPath("$[0].count").value(count));
+    }
+
+    @Test
+    void getUserLocationsDistribution_returnsOkAndList() throws Exception {
+        Long count = 30L;
+        String region = "Europe";
+        String groupBy = "region";
+        String groupByQueryParam = "group-by";
+        List<UserLocationStatisticDto> locations = List.of(new UserLocationStatisticDto(region, count));
+
+        when(managementUserStatisticsService.getUserLocationsDistribution(groupBy)).thenReturn(locations);
+
+        mockMvc.perform(get(userLink + "/locations-distribution").param(groupByQueryParam, groupBy))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(locations.size()))
+                .andExpect(jsonPath("$[0].location").value(region))
+                .andExpect(jsonPath("$[0].count").value(count));
+    }
+
+    @Test
+    void getUserEmailPreferencesDistributionTest() throws Exception {
+        Long count = 25L;
+        EmailPreference emailPreference = EmailPreference.LIKES;
+        List<UserEmailPreferencesStatisticDto> preferences = List.of(new UserEmailPreferencesStatisticDto(emailPreference, EmailPreferencePeriodicity.DAILY, count));
+
+        when(managementUserStatisticsService.getUserEmailPreferencesDistribution()).thenReturn(preferences);
+
+        mockMvc.perform(get(userLink + "/email-preferences-distribution"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()").value(preferences.size()))
+                .andExpect(jsonPath("$[0].emailPreference").value(emailPreference.name()))
+                .andExpect(jsonPath("$[0].count").value(count));
+    }
+
+    @Test
+    void countActiveUsersTest() throws Exception {
+        Long amountOfActiveUsers = 123L;
+        String amountOfActiveUsersStr = String.valueOf(amountOfActiveUsers);
+
+        when(managementUserStatisticsService.countActiveUsers()).thenReturn(amountOfActiveUsers);
+
+        mockMvc.perform(get(userLink + "/count-active-users"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(amountOfActiveUsersStr));
     }
 }
