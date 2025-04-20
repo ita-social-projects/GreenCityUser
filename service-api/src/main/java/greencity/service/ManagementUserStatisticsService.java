@@ -4,7 +4,6 @@ import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
-
 import java.util.List;
 
 public interface ManagementUserStatisticsService {

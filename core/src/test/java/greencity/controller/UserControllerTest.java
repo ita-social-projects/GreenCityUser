@@ -917,10 +917,10 @@ class UserControllerTest {
         when(managementUserStatisticsService.getUserRolesDistribution()).thenReturn(roles);
 
         mockMvc.perform(get(userLink + "/roles-distribution"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(roles.size()))
-                .andExpect(jsonPath("$[0].role").value(role.name()))
-                .andExpect(jsonPath("$[0].count").value(count));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(roles.size()))
+            .andExpect(jsonPath("$[0].role").value(role.name()))
+            .andExpect(jsonPath("$[0].count").value(count));
     }
 
     @Test
@@ -932,10 +932,10 @@ class UserControllerTest {
         when(managementUserStatisticsService.getUserStatusesDistribution()).thenReturn(statuses);
 
         mockMvc.perform(get(userLink + "/statuses-distribution"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(statuses.size()))
-                .andExpect(jsonPath("$[0].status").value(userStatus.name()))
-                .andExpect(jsonPath("$[0].count").value(count));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(statuses.size()))
+            .andExpect(jsonPath("$[0].status").value(userStatus.name()))
+            .andExpect(jsonPath("$[0].count").value(count));
     }
 
     @Test
@@ -949,25 +949,26 @@ class UserControllerTest {
         when(managementUserStatisticsService.getUserLocationsDistribution(groupBy)).thenReturn(locations);
 
         mockMvc.perform(get(userLink + "/locations-distribution").param(groupByQueryParam, groupBy))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(locations.size()))
-                .andExpect(jsonPath("$[0].location").value(region))
-                .andExpect(jsonPath("$[0].count").value(count));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(locations.size()))
+            .andExpect(jsonPath("$[0].location").value(region))
+            .andExpect(jsonPath("$[0].count").value(count));
     }
 
     @Test
     void getUserEmailPreferencesDistributionTest() throws Exception {
         Long count = 25L;
         EmailPreference emailPreference = EmailPreference.LIKES;
-        List<UserEmailPreferencesStatisticDto> preferences = List.of(new UserEmailPreferencesStatisticDto(emailPreference, EmailPreferencePeriodicity.DAILY, count));
+        List<UserEmailPreferencesStatisticDto> preferences =
+            List.of(new UserEmailPreferencesStatisticDto(emailPreference, EmailPreferencePeriodicity.DAILY, count));
 
         when(managementUserStatisticsService.getUserEmailPreferencesDistribution()).thenReturn(preferences);
 
         mockMvc.perform(get(userLink + "/email-preferences-distribution"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(preferences.size()))
-                .andExpect(jsonPath("$[0].emailPreference").value(emailPreference.name()))
-                .andExpect(jsonPath("$[0].count").value(count));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(preferences.size()))
+            .andExpect(jsonPath("$[0].emailPreference").value(emailPreference.name()))
+            .andExpect(jsonPath("$[0].count").value(count));
     }
 
     @Test
@@ -978,7 +979,7 @@ class UserControllerTest {
         when(managementUserStatisticsService.countActiveUsers()).thenReturn(amountOfActiveUsers);
 
         mockMvc.perform(get(userLink + "/count-active-users"))
-                .andExpect(status().isOk())
-                .andExpect(content().string(amountOfActiveUsersStr));
+            .andExpect(status().isOk())
+            .andExpect(content().string(amountOfActiveUsersStr));
     }
 }

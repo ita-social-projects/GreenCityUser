@@ -7,13 +7,11 @@ import greencity.dto.user.UserStatusStatisticDto;
 import greencity.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class ManagementUserStatisticsServiceImpl implements ManagementUserStatisticsService {
-
     private final UserRepo userRepo;
 
     /**
