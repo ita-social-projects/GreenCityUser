@@ -10,9 +10,7 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
 import greencity.entity.User;
-import greencity.entity.UserAchievement;
 import greencity.enums.EmailNotification;
 import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
@@ -144,15 +142,15 @@ class GoogleSecurityServiceImplTest {
         UserVO userVO = ModelUtils.getUserVO();
         User user = ModelUtils.getUser();
 
-        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        // List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
-        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        // List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 
         userVO.setId(null);
         userVO.setName(null);
         user.setId(null);
         user.setName(null);
-        user.setUserAchievements(userAchievementList);
+        // user.setUserAchievements(userAchievementList);
 
         when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
@@ -163,8 +161,8 @@ class GoogleSecurityServiceImplTest {
         when(modelMapper.map(any(), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any())).thenReturn(user);
         when(achievementService.findAll()).thenReturn(achievementVOList);
-        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);
+        /*when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);*/
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
         when(restClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
 

@@ -1,5 +1,6 @@
 package greencity.service;
 
+import greencity.client.GreenCityRemoteClient;
 import greencity.dto.PageableDto;
 import greencity.dto.socialnetwork.SocialNetworkImageRequestDTO;
 import greencity.dto.socialnetwork.SocialNetworkImageResponseDTO;
@@ -34,12 +35,16 @@ import static org.mockito.Mockito.*;
 class SocialNetworkImageServiceImplTest {
     @Mock
     SocialNetworkImageRepo socialNetworkImageRepo;
+
     @Mock
     ModelMapper modelMapper;
+
     @Mock
-    private FileService fileService;
+    GreenCityRemoteClient greenCityRemoteClient;
+
     @InjectMocks
     SocialNetworkImageServiceImpl socialNetworkImageService;
+
     private static final String URL_TO_CHECK = "HTTP://example.com/";
     private static final String DEFAULT_SOCIAL_NETWORK_IMAGE_HOST_PATH = "img/default_social_network_icon.png";
     private static final String DEFAULT_SOCIAL_NETWORK_IMAGE_PATH = "HTTP://img/default_social_network_icon.png/";
@@ -118,12 +123,14 @@ class SocialNetworkImageServiceImplTest {
     void testDelete() {
         Long idToDelete = 1L;
         SocialNetworkImage image = getSocialNetworkImage();
+        List<String> filesToDelete = List.of(image.getImagePath());
+
         when(socialNetworkImageRepo.findById(idToDelete)).thenReturn(Optional.of(image));
         socialNetworkImageService.delete(idToDelete);
 
         verify(socialNetworkImageRepo).findById(idToDelete);
         verify(socialNetworkImageRepo).deleteById(idToDelete);
-        verify(fileService).delete(image.getImagePath());
+        verify(greenCityRemoteClient).deleteAllFiles(filesToDelete);
     }
 
     @Test
@@ -149,9 +156,9 @@ class SocialNetworkImageServiceImplTest {
         verify(socialNetworkImageRepo).deleteById(listIds.get(1));
         verify(socialNetworkImageRepo).deleteById(listIds.get(2));
 
-        verify(fileService).delete(image1.getImagePath());
-        verify(fileService).delete(image2.getImagePath());
-        verify(fileService).delete(image3.getImagePath());
+        verify(greenCityRemoteClient).deleteAllFiles(List.of(image1.getImagePath()));
+        verify(greenCityRemoteClient).deleteAllFiles(List.of(image2.getImagePath()));
+        verify(greenCityRemoteClient).deleteAllFiles(List.of(image3.getImagePath()));
     }
 
     @Test
@@ -161,7 +168,7 @@ class SocialNetworkImageServiceImplTest {
         SocialNetworkImage savedEntity = new SocialNetworkImage();
         SocialNetworkImageResponseDTO expectedResponseDTO = new SocialNetworkImageResponseDTO();
 
-        when(fileService.upload(any(MultipartFile.class))).thenReturn("mockImagePath");
+        when(greenCityRemoteClient.uploadFile(any(MultipartFile.class))).thenReturn("mockImagePath");
         when(modelMapper.map(requestDTO, SocialNetworkImage.class)).thenReturn(savedEntity);
         when(modelMapper.map(savedEntity, SocialNetworkImageResponseDTO.class)).thenReturn(expectedResponseDTO);
         when(socialNetworkImageRepo.save(savedEntity)).thenReturn(savedEntity);
@@ -170,7 +177,7 @@ class SocialNetworkImageServiceImplTest {
 
         assertNotNull(result);
         assertEquals(expectedResponseDTO, result);
-        verify(fileService).upload(mockImage);
+        verify(greenCityRemoteClient).uploadFile(mockImage);
         verify(socialNetworkImageRepo).save(savedEntity);
         verify(modelMapper).map(requestDTO, SocialNetworkImage.class);
         verify(modelMapper).map(savedEntity, SocialNetworkImageResponseDTO.class);

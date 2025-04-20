@@ -24,7 +24,6 @@ public class AchievementServiceImpl implements AchievementService {
     @Cacheable(value = CacheConstants.ALL_ACHIEVEMENTS_CACHE_NAME)
     @Override
     public List<AchievementVO> findAll() {
-        return greenCityRemoteClient.findAllAchievements()
-                .orElseThrow((() -> new NotFoundException()));
+        return greenCityRemoteClient.findAllAchievements();
     }
 }

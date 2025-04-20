@@ -76,7 +76,7 @@ public class ModelUtils {
             .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
                 "Львівська", "Ukraine", "Україна", 20.000000,
                 20.000000, new ArrayList<>()))
-            .language(new Language(1L, "en", null))
+            .languageId(getLanguageId())
             .build();
     }
 
@@ -195,7 +195,7 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .language(ModelUtils.getLanguage())
+            .languageId(getLanguageId())
             .socialNetworks(socialNetwork)
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
@@ -276,7 +276,7 @@ public class ModelUtils {
                     .build())
                 .build())
             .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
-            .userAchievements(List.of(
+            /*.userAchievements(List.of(
                 UserAchievementVO.builder()
                     .id(47L)
                     .user(UserVO.builder()
@@ -294,8 +294,8 @@ public class ModelUtils {
                     .achievement(AchievementVO.builder()
                         .id(14L)
                         .build())
-                    .build()))
-            .userActions(Collections.singletonList(UserActionVO.builder()
+                    .build()))*/
+            /*.userActions(Collections.singletonList(UserActionVO.builder()
                 .id(13L)
                 .achievementCategory(AchievementCategoryVO.builder()
                     .id(1L)
@@ -308,7 +308,7 @@ public class ModelUtils {
             .languageVO(LanguageVO.builder()
                 .id(1L)
                 .code("ua")
-                .build())
+                .build())*/
             .build();
     }
 
@@ -346,28 +346,39 @@ public class ModelUtils {
             .build();
     }
 
-    public static Language getLanguage() {
+    /*public static Language getLanguage() {
         return Language.builder().id(1L).code(AppConstant.DEFAULT_LANGUAGE_CODE).build();
+    }*/
+
+    public static Long getLanguageId() {
+        return 2L;
+    }
+
+    public static LanguageVO getLanguageVO() {
+        return LanguageVO.builder()
+                .id(getLanguageId())
+                .code("en")
+                .build();
     }
 
     public static UserProfilePictureDto getUserProfilePictureDto() {
         return new UserProfilePictureDto(1L, "name", "image");
     }
 
-    public static Achievement getAchievement() {
+    /*public static Achievement getAchievement() {
         return new Achievement(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
             "Acquired habit 14 days", Collections.emptyList(),
             new AchievementCategory(), 1);
-    }
+    }*/
 
     public static AchievementVO getAchievementVO() {
         return new AchievementVO(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
             "Acquired habit 14 days", new AchievementCategoryVO(), 1);
     }
 
-    public static UserAchievement getUserAchievement() {
+    /*public static UserAchievement getUserAchievement() {
         return new UserAchievement(1L, getUser(), getAchievement(), false);
-    }
+    }*/
 
     public static List<SocialNetworkVO> getListSocialNetworkVO() {
         List<SocialNetworkVO> socialNetworkVO = new ArrayList<>();

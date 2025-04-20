@@ -2,13 +2,8 @@ package greencity.mapping;
 
 import greencity.ModelUtils;
 import greencity.dto.user.UserVO;
-import greencity.entity.Achievement;
-import greencity.entity.AchievementCategory;
-import greencity.entity.Language;
 import greencity.entity.OwnSecurity;
 import greencity.entity.User;
-import greencity.entity.UserAchievement;
-import greencity.entity.UserAction;
 import greencity.entity.UserLocation;
 import greencity.entity.VerifyEmail;
 import java.util.ArrayList;
@@ -79,7 +74,7 @@ class UserVOMapperTest {
                     .build())
                 .build() : null)
             .lastActivityTime(expected.getLastActivityTime())
-            .userAchievements(expected.getUserAchievements() != null ? expected.getUserAchievements()
+            /*.userAchievements(expected.getUserAchievements() != null ? expected.getUserAchievements()
                 .stream().map(userAchievement -> UserAchievement.builder()
                     .id(userAchievement.getId())
                     .user(User.builder()
@@ -89,8 +84,8 @@ class UserVOMapperTest {
                         .id(userAchievement.getAchievement().getId())
                         .build())
                     .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
-            .userActions(expected.getUserActions() != null ? expected.getUserActions()
+                .collect(Collectors.toList()) : new ArrayList<>())*/
+            /*.userActions(expected.getUserActions() != null ? expected.getUserActions()
                 .stream().map(userAction -> UserAction.builder()
                     .id(userAction.getId())
                     .achievementCategory(AchievementCategory.builder()
@@ -101,11 +96,8 @@ class UserVOMapperTest {
                         .id(userAction.getUser().getId())
                         .build())
                     .build())
-                .collect(Collectors.toList()) : new ArrayList<>())
-            .language(Language.builder()
-                .id(1L)
-                .code("ua")
-                .build())
+                .collect(Collectors.toList()) : new ArrayList<>())*/
+            .languageId(1L)
             .build();
 
         assertEquals(expected, mapper.convert(userToBeConverted));

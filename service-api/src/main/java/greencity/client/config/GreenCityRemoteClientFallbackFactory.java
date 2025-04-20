@@ -19,26 +19,23 @@ public class GreenCityRemoteClientFallbackFactory implements FallbackFactory<Gre
     public GreenCityRemoteClient create(Throwable throwable) {
         return new GreenCityRemoteClient() {
             @Override
-            public Optional<List<String>> uploadAllFiles(List<MultipartFile> files) {
-                //TODO: log
-                return Optional.empty();
+            public List<String> uploadAllFiles(List<MultipartFile> files) {
+                throw new RuntimeException("not implemented");
             }
 
             @Override
-            public Optional<String> uploadFile(MultipartFile file) {
-                //TODO: log
-                return Optional.empty();
+            public String uploadFile(MultipartFile file) {
+                throw new RuntimeException("not implemented");
             }
 
             @Override
             public void deleteAllFiles(List<String> paths) {
-                //TODO: log
+                throw new RuntimeException("not implemented");
             }
 
             @Override
-            public Optional<List<AchievementVO>> findAllAchievements() {
-                //TODO: throw exc
-                return Optional.empty();
+            public List<AchievementVO> findAllAchievements() {
+                throw new RuntimeException("not implemented");
             }
 
             @Override

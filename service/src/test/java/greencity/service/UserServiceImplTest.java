@@ -3,6 +3,7 @@ package greencity.service;
 import com.google.maps.model.AddressType;
 import greencity.ModelUtils;
 import greencity.TestConst;
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
@@ -12,6 +13,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
@@ -37,7 +39,6 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
-import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserLocation;
@@ -59,7 +60,6 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserDeactivationException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.filters.UserSpecification;
-import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
@@ -99,7 +99,6 @@ import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
 import static greencity.ModelUtils.TEST_ADMIN;
 import static greencity.ModelUtils.TEST_USER;
 import static greencity.ModelUtils.TEST_USER_VO;
-import static greencity.ModelUtils.getLanguage;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserLocation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -133,7 +132,7 @@ class UserServiceImplTest {
     UserDeactivationRepo userDeactivationRepo;
 
     @Mock
-    LanguageRepo languageRepo;
+    GreenCityRemoteClient greenCityRemoteClient;
 
     @Mock
     GoogleApiService googleApiService;
@@ -142,7 +141,8 @@ class UserServiceImplTest {
     UserLocationRepo userLocationRepo;
 
     @Mock
-    private SimpMessagingTemplate messagingTemplate;
+    SimpMessagingTemplate messagingTemplate;
+
     private final AddressType[] addressTypes =
         {AddressType.LOCALITY, AddressType.ADMINISTRATIVE_AREA_LEVEL_1, AddressType.COUNTRY};
     private final String languageUa = "uk"; // language for GeocodingApi it gets uk not ua.
@@ -1124,6 +1124,8 @@ class UserServiceImplTest {
         String uuid = "user-uuid";
         String reason = "Account closed by user request";
         DeactivateUserRequestDto request = new DeactivateUserRequestDto(reason);
+        Long languageId = ModelUtils.getLanguageId();
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
 
         User requestedUser = User.builder()
             .id(userVO.getId())
@@ -1133,14 +1135,14 @@ class UserServiceImplTest {
         User foundUser = User.builder()
             .id(2L)
             .role(ROLE_USER)
-            .language(getLanguage())
+            .languageId(languageId)
             .build();
 
         when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(foundUser));
-
         when(userDeactivationRepo.save(any())).thenReturn(null);
         when(userRepo.save(foundUser)).thenReturn(foundUser);
+        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
 
         UserDeactivationReasonDto result = userService.deactivateUser(uuid, request, userVO);
 
@@ -1148,17 +1150,14 @@ class UserServiceImplTest {
         assertEquals(foundUser.getEmail(), result.getEmail());
         assertEquals(foundUser.getName(), result.getName());
         assertEquals(reason, result.getDeactivationReason());
-        assertEquals(foundUser.getLanguage().getCode(), result.getLang());
+        assertEquals(languageVO.getCode(), result.getLang());
     }
 
     @Test
     void getDeactivationReason() {
-        List<String> test1 = List.of();
+        List<String> deactivationReaons = List.of();
         User myUser = ModelUtils.getUser();
-        user.setLanguage(Language.builder()
-            .id(1L)
-            .code("en")
-            .build());
+        user.setLanguageId(1L);
         UserDeactivationReason test = UserDeactivationReason.builder()
             .id(1L)
             .user(myUser)
@@ -1166,8 +1165,8 @@ class UserServiceImplTest {
             .dateTimeOfDeactivation(LocalDateTime.now())
             .build();
         when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
-        assertEquals(test1, userService.getDeactivationReason(1L, "en"));
-        assertEquals(test1, userService.getDeactivationReason(1L, "ua"));
+        assertEquals(deactivationReaons, userService.getDeactivationReason(1L, "en"));
+        assertEquals(deactivationReaons, userService.getDeactivationReason(1L, "ua"));
     }
 
     @Test
@@ -1178,51 +1177,62 @@ class UserServiceImplTest {
 
     @Test
     void setActivatedStatus() {
-        User myUser = ModelUtils.getUser();
-        myUser.setLanguage(Language.builder()
-            .id(1L)
-            .code("en")
-            .build());
-        when(userRepo.findById(1L)).thenReturn(Optional.of(myUser));
-        myUser.setUserStatus(ACTIVATED);
-        when(userRepo.save(myUser)).thenReturn(myUser);
-        assertEquals(UserActivationDto.builder()
-            .email(myUser.getEmail())
-            .name(myUser.getName())
-            .lang(myUser.getLanguage().getCode())
-            .build(), userService.setActivatedStatus(userId));
+        User user = ModelUtils.getUser();
+        Long languageId = ModelUtils.getLanguageId();
+        user.setLanguageId(languageId);
+        user.setUserStatus(ACTIVATED);
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
+        UserActivationDto expectedResult = UserActivationDto.builder()
+                .email(user.getEmail())
+                .name(user.getName())
+                .lang(languageVO.getCode())
+                .build();
+
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
+
+        UserActivationDto actualResult = userService.setActivatedStatus(userId);
+
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
     void updateUserLanguage() {
-        Language language = ModelUtils.getLanguage();
-        User myUser = ModelUtils.getUser();
-        myUser.setLanguage(language);
+        User user = ModelUtils.getUser();
+        Long languageId = ModelUtils.getLanguageId();
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
+        user.setLanguageId(languageId);
 
-        when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
-        when(userRepo.findById(1L)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
+        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepo.save(user)).thenReturn(user);
+
         userService.updateUserLanguage(1L, 1L);
-        verify(userRepo).save(myUser);
+
+        verify(userRepo).save(user);
     }
 
     @Test
     void updateUserLanguageNotFoundExeption() {
-        Language language = ModelUtils.getLanguage();
-        User myUser = ModelUtils.getUser();
-        myUser.setLanguage(language);
+        User user = ModelUtils.getUser();
+        Long languageId = ModelUtils.getLanguageId();
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
+        user.setLanguageId(languageId);
 
-        when(languageRepo.findById(10L)).thenThrow(NotFoundException.class);
+        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
+
         assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 10L));
     }
 
     @Test
     void updateUserLanguageUserNotFoundExeption() {
-        Language language = ModelUtils.getLanguage();
-        User myUser = ModelUtils.getUser();
-        myUser.setLanguage(language);
+        User user = ModelUtils.getUser();
+        Long languageId = ModelUtils.getLanguageId();
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
+        user.setLanguageId(languageId);
 
-        when(languageRepo.findById(1L)).thenReturn(Optional.of(language));
+        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
         when(userRepo.findById(1L)).thenThrow(NotFoundException.class);
         assertThrows(NotFoundException.class, () -> userService.updateUserLanguage(1L, 1L));
     }
@@ -1445,10 +1455,7 @@ class UserServiceImplTest {
     void getDeactivationReasonUkTest() {
         List<String> test1 = List.of();
         User myUser = ModelUtils.getUser();
-        myUser.setLanguage(Language.builder()
-            .id(1L)
-            .code("en")
-            .build());
+        myUser.setLanguageId(1L);
         UserDeactivationReason test = UserDeactivationReason.builder()
             .id(1L)
             .user(myUser)
@@ -1511,7 +1518,7 @@ class UserServiceImplTest {
         User requestedUser = User.builder()
             .id(userVO.getId())
             .role(ROLE_ADMIN)
-            .language(getLanguage())
+            .languageId(ModelUtils.getLanguageId())
             .build();
 
         when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));

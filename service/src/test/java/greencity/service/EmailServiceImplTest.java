@@ -1,6 +1,7 @@
 package greencity.service;
 
 import greencity.ModelUtils;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
@@ -9,7 +10,6 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.PlaceStatus;
@@ -17,7 +17,6 @@ import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
-import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -59,18 +58,24 @@ import org.thymeleaf.context.Context;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class EmailServiceImplTest {
-    private EmailService service;
+    EmailService service;
+
     @Mock
-    private JavaMailSender javaMailSender;
+    JavaMailSender javaMailSender;
+
     @Mock
-    private ITemplateEngine templateEngine;
+    ITemplateEngine templateEngine;
+
     @Mock
-    private MessageSource messageSource;
+    MessageSource messageSource;
+
     @Mock
-    private UserRepo userRepo;
+    UserRepo userRepo;
+
     @Mock
-    LanguageRepo languageRepo;
-    private static final Locale UA_LOCALE = Locale.of("uk", "UA");
+    GreenCityRemoteClient greenCityRemoteClient;
+
+    static final Locale UA_LOCALE = Locale.of("uk", "UA");
 
     @BeforeEach
     public void setup() {
@@ -82,7 +87,7 @@ class EmailServiceImplTest {
             "test@email.com",
             messageSource,
             userRepo,
-            languageRepo);
+            greenCityRemoteClient);
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
         when(templateEngine.process(any(String.class), any(Context.class))).thenReturn("<html></html>");
     }
@@ -145,19 +150,20 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
-        "1, Test, test@gmail.com, token, en, false"})
-    void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, 1, false",
+        "1, Test, test@gmail.com, token, en, 2, false"})
+    void sendRestoreEmail(Long id, String name, String email, String token, String language, Long languageId, Boolean isUbs) {
         when(messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)))
             .thenReturn("Confirm restoring password");
-        service.sendRestoreEmail(id, name, email, token, language, isUbs);
+        service.sendRestoreEmail(id, name, email, token, languageId, isUbs);
         verify(javaMailSender).createMimeMessage();
     }
 
     @Test
     void sendRestoreEmailLanguageNotFoundException() {
+        Long languageId = ModelUtils.getLanguageId();
         assertThrows(IllegalStateException.class,
-            () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
+            () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", languageId, false));
     }
 
     @Test
@@ -212,11 +218,12 @@ class EmailServiceImplTest {
     void sendSuccessRestorePasswordByEmailTest() {
         String email = "test@gmail.com";
         String lang = "en";
+        Long languageId = ModelUtils.getLanguageId();
         String userName = "Helgi";
         boolean isUbs = false;
         when(messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(lang)))
             .thenReturn("Restore password");
-        service.sendSuccessRestorePasswordByEmail(email, lang, userName, isUbs);
+        service.sendSuccessRestorePasswordByEmail(email, languageId, userName, isUbs);
 
         verify(javaMailSender).createMimeMessage();
     }
@@ -279,8 +286,8 @@ class EmailServiceImplTest {
         User user = new User();
         user.setEmail(EMAIL);
         user.setName(NAME);
-        Language language = new Language(SIMPLE_LONG_NUMBER, ENGLISH_CODE, List.of(user));
-        user.setLanguage(language);
+        Long languageId = ModelUtils.getLanguageId();
+        user.setLanguageId(languageId);
         when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
         MimeMessage mimeMessage = mock(MimeMessage.class);
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);

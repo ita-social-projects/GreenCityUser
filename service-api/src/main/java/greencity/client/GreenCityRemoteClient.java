@@ -34,7 +34,7 @@ public interface GreenCityRemoteClient {
      * @return urls of the saved files.
      */
     @PostMapping(path = "/files", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    Optional<List<String>> uploadAllFiles(@RequestPart List<MultipartFile> files);
+    List<String> uploadAllFiles(@RequestPart List<MultipartFile> files);
 
     /**
      * Method for uploading a file.
@@ -43,7 +43,7 @@ public interface GreenCityRemoteClient {
      * @return url of the saved file.
      */
     @PostMapping(path = "/files/single", produces = MediaType.MULTIPART_FORM_DATA_VALUE)
-    Optional<String> uploadFile(@RequestPart MultipartFile file);
+    String uploadFile(@RequestPart MultipartFile file);
 
     /**
      * Method for deleting files.
@@ -59,7 +59,7 @@ public interface GreenCityRemoteClient {
      * @return list of {@link AchievementVO}
      */
     @GetMapping("/achievements/all")
-    Optional<List<AchievementVO>> findAllAchievements();
+    List<AchievementVO> findAllAchievements();
 
     /**
      * Method returns all user achievements by user id
