@@ -50,6 +50,7 @@ import greencity.enums.UserStatus;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
 import greencity.service.EmailService;
+import greencity.service.ManagementUserStatisticsService;
 import greencity.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -94,6 +95,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final ManagementUserStatisticsService managementUserStatisticsService;
     private final EmailService emailService;
     private final PositionService positionService;
     private final AuthorityService authorityService;
@@ -1136,7 +1138,7 @@ public class UserController {
     })
     @GetMapping("/roles-distribution")
     public ResponseEntity<List<UserRoleStatisticDto>> getUserRolesDistribution() {
-        return ResponseEntity.ok().body(userService.getUserRolesDistribution());
+        return ResponseEntity.ok().body(managementUserStatisticsService.getUserRolesDistribution());
     }
 
     /**
@@ -1152,7 +1154,7 @@ public class UserController {
     })
     @GetMapping("/statuses-distribution")
     public ResponseEntity<List<UserStatusStatisticDto>> getUserStatusesDistribution() {
-        return ResponseEntity.ok().body(userService.getUserStatusesDistribution());
+        return ResponseEntity.ok().body(managementUserStatisticsService.getUserStatusesDistribution());
     }
 
     /**
@@ -1169,7 +1171,7 @@ public class UserController {
     @GetMapping("/locations-distribution")
     public ResponseEntity<List<UserLocationStatisticDto>> getUserLocationsDistribution(
         @RequestParam(name = "group-by") String groupBy) {
-        return ResponseEntity.ok().body(userService.getUserLocationsDistribution(groupBy));
+        return ResponseEntity.ok().body(managementUserStatisticsService.getUserLocationsDistribution(groupBy));
     }
 
     /**
@@ -1185,7 +1187,7 @@ public class UserController {
     })
     @GetMapping("/email-preferences-distribution")
     public ResponseEntity<List<UserEmailPreferencesStatisticDto>> getUserEmailPreferencesDistribution() {
-        return ResponseEntity.ok().body(userService.getUserEmailPreferencesDistribution());
+        return ResponseEntity.ok().body(managementUserStatisticsService.getUserEmailPreferencesDistribution());
     }
 
     /**
@@ -1201,6 +1203,6 @@ public class UserController {
     })
     @GetMapping("/count-active-users")
     public ResponseEntity<Long> countActiveUsers() {
-        return ResponseEntity.ok(userService.countActiveUsers());
+        return ResponseEntity.ok(managementUserStatisticsService.countActiveUsers());
     }
 }

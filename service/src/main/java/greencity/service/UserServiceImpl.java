@@ -1155,49 +1155,4 @@ public class UserServiceImpl implements UserService {
         LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
         return languageVO.getCode();
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserRoleStatisticDto> getUserRolesDistribution() {
-        return userRepo.getUserRolesDistribution();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserStatusStatisticDto> getUserStatusesDistribution() {
-        return userRepo.getUserStatusesDistribution();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserLocationStatisticDto> getUserLocationsDistribution(String groupBy) {
-        return switch (groupBy) {
-            case "city" -> userRepo.getUserLocationsDistributionByCity();
-            case "region" -> userRepo.getUserLocationsDistributionByRegion();
-            case "country" -> userRepo.getUserLocationsDistributionByCountry();
-            default -> userRepo.getUserLocationsDistributionByCity();
-        };
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution() {
-        return userRepo.getUserEmailPreferencesDistribution();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Long countActiveUsers() {
-        return userRepo.countActiveUsers();
-    }
 }
