@@ -6,6 +6,7 @@ import greencity.client.CloudFlareClient;
 import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.security.CloudFlareRequest;
 import greencity.dto.security.CloudFlareResponse;
@@ -663,10 +664,15 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void singInBlockedUser() {
+        Long languageId = userForBruteForceTest.getLanguageId();
+        LanguageVO languageVO = ModelUtils.getLanguageVO();
+
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
         when(userRepo.findByEmail(anyString()))
             .thenReturn(Optional.ofNullable(userForBruteForceTest));
+        when(greenCityRemoteClient.findLanguageById(languageId))
+                .thenReturn(languageVO);
 
         assertThrows(UserBlockedException.class,
             () -> ownSecurityService.signIn(ownSignInDto));
