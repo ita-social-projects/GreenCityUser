@@ -142,10 +142,11 @@ class FacebookSecurityServiceImplTest {
         userVO.setEmail("test@example.com");
         userVO.setName("Test User");
         userVO.setUserStatus(UserStatus.ACTIVATED);
+        userVO.setRole(Role.ROLE_USER);
 
         when(userService.findByEmail("test@example.com")).thenReturn(userVO);
-        when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+        when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
 
         SuccessSignInDto result = facebookSecurityService.authenticate(fbToken, "en");
 
@@ -176,10 +177,14 @@ class FacebookSecurityServiceImplTest {
         UserVO userVO = new UserVO();
         userVO.setEmail(email);
         userVO.setUserStatus(UserStatus.ACTIVATED);
+        userVO.setRole(Role.ROLE_USER);
+
         when(userService.findByEmail(email)).thenReturn(userVO);
-        when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+        when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
+
         SuccessSignInDto result = facebookSecurityService.processAuthentication(email, "Test User", "profile.jpg", "1");
+
         assertNotNull(result);
         assertEquals("accessToken", result.getAccessToken());
         assertEquals("refreshToken", result.getRefreshToken());
@@ -224,9 +229,13 @@ class FacebookSecurityServiceImplTest {
         userVO.setId(1L);
         userVO.setEmail("test@example.com");
         userVO.setName("Test User");
-        when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("accessToken");
-        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+        userVO.setRole(Role.ROLE_USER);
+
+        when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
+
         SuccessSignInDto result = facebookSecurityService.getSuccessSignInDto(userVO);
+
         assertNotNull(result);
         assertEquals(1L, result.getUserId());
         assertEquals("accessToken", result.getAccessToken());
@@ -294,6 +303,7 @@ class FacebookSecurityServiceImplTest {
         UserVO userVO = new UserVO();
         userVO.setId(1L);
         userVO.setName(userName);
+        userVO.getRole();
 
         UbsProfileCreationDto profileDto = new UbsProfileCreationDto();
 
@@ -301,8 +311,8 @@ class FacebookSecurityServiceImplTest {
         when(userRepo.save(any(User.class))).thenReturn(savedUser);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(User.class), eq(UbsProfileCreationDto.class))).thenReturn(profileDto);
-        when(jwtTool.createAccessToken(any(), any(Role.class))).thenReturn("accessToken");
-        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+        when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
 
         SuccessSignInDto result = facebookSecurityService.handleNewUser(email, userName, profilePicture, language);
 
