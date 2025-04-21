@@ -1,14 +1,11 @@
 package greencity.mapping;
 
 import greencity.dto.ownsecurity.OwnSecurityVO;
-import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
-import greencity.entity.UserLocation;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-import java.util.Optional;
 
 @Component
 public class UserVOMapper extends AbstractConverter<User, UserVO> {
@@ -51,7 +48,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                     .build())
                 .build() : null)
             .dateOfRegistration(user.getDateOfRegistration())
-            .userLocationDto(convertUserLocationToDto(user.getUserLocation()))
             .profilePicturePath(user.getProfilePicturePath())
             .showToDoList(user.getShowToDoList())
             .showEcoPlace(user.getShowEcoPlace())
@@ -59,21 +55,5 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .lastActivityTime(user.getLastActivityTime())
             .languageId(languageId)
             .build();
-    }
-
-    private UserLocationDto convertUserLocationToDto(UserLocation userLocation) {
-        return Optional.ofNullable(userLocation)
-            .map(ul -> UserLocationDto.builder()
-                .id(ul.getId())
-                .cityEn(ul.getCityEn())
-                .cityUk(ul.getCityUk())
-                .regionEn(ul.getRegionEn())
-                .regionUk(ul.getRegionUk())
-                .countryEn(ul.getCountryEn())
-                .countryUk(ul.getCountryUk())
-                .latitude(ul.getLatitude())
-                .longitude(ul.getLongitude())
-                .build())
-            .orElse(null);
     }
 }

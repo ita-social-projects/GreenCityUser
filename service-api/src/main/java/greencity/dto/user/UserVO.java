@@ -67,8 +67,6 @@ public class UserVO {
 
     private Long languageId;
 
-    private UserLocationDto userLocationDto;
-
     @JsonManagedReference
     private UserNotificationPreferenceDto userNotificationPreferenceDto;
 }

@@ -35,12 +35,14 @@ public class ManagementUserStatisticsServiceImpl implements ManagementUserStatis
      */
     @Override
     public List<UserLocationStatisticDto> getUserLocationsDistribution(String groupBy) {
-        return switch (groupBy) {
+        // TODO
+        /*return switch (groupBy) {
             case "city" -> userRepo.getUserLocationsDistributionByCity();
             case "region" -> userRepo.getUserLocationsDistributionByRegion();
             case "country" -> userRepo.getUserLocationsDistributionByCountry();
             default -> userRepo.getUserLocationsDistributionByCity();
-        };
+        };*/
+        return List.of();
     }
 
     /**

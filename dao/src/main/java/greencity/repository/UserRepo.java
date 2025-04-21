@@ -307,54 +307,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<UserStatusStatisticDto> getUserStatusesDistribution();
 
     /**
-     * Retrieves the distribution of users by city.
-     *
-     * @return A list of UserLocationStatisticDto objects containing the city name
-     *         and the count of users in that city.
-     */
-    @Query("""
-        SELECT new greencity.dto.user.UserLocationStatisticDto(
-               COALESCE(ul.cityEn, 'No Location'), COUNT(u.id))
-        FROM User u
-        LEFT JOIN u.userLocation ul
-        WHERE u.userStatus = 2
-        GROUP BY ul.cityEn
-        """)
-    List<UserLocationStatisticDto> getUserLocationsDistributionByCity();
-
-    /**
-     * Retrieves the distribution of users by region.
-     *
-     * @return A list of UserLocationStatisticDto objects containing the region name
-     *         and the count of users in that region.
-     */
-    @Query("""
-        SELECT new greencity.dto.user.UserLocationStatisticDto(
-               COALESCE(ul.regionEn, 'No Location'), COUNT(u.id))
-        FROM User u
-        LEFT JOIN u.userLocation ul
-        WHERE u.userStatus = 2
-        GROUP BY ul.regionEn
-        """)
-    List<UserLocationStatisticDto> getUserLocationsDistributionByRegion();
-
-    /**
-     * Retrieves the distribution of users by country.
-     *
-     * @return A list of UserLocationStatisticDto objects containing the country
-     *         name and the count of users in that country.
-     */
-    @Query("""
-        SELECT new greencity.dto.user.UserLocationStatisticDto(
-               COALESCE(ul.countryEn, 'No Location'), COUNT(u.id))
-        FROM User u
-        LEFT JOIN u.userLocation ul
-        WHERE u.userStatus = 2
-        GROUP BY ul.countryEn
-        """)
-    List<UserLocationStatisticDto> getUserLocationsDistributionByCountry();
-
-    /**
      * Retrieves the distribution of user email preferences and their periodicity.
      *
      * @return A list of UserEmailPreferencesStatisticDto objects containing the
