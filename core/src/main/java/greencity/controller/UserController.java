@@ -1158,23 +1158,6 @@ public class UserController {
     }
 
     /**
-     * Get user locations distribution.
-     *
-     * @return {@link List} of {@link UserLocationStatisticDto}.
-     */
-    @Operation(summary = "Get user locations distribution")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-    })
-    @GetMapping("/locations-distribution")
-    public ResponseEntity<List<UserLocationStatisticDto>> getUserLocationsDistribution(
-        @RequestParam(name = "group-by") String groupBy) {
-        return ResponseEntity.ok().body(managementUserStatisticsService.getUserLocationsDistribution(groupBy));
-    }
-
-    /**
      * Get user email preferences distribution.
      *
      * @return {@link List} of {@link UserEmailPreferencesStatisticDto}.

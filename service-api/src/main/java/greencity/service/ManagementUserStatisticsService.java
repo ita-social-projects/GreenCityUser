@@ -24,14 +24,6 @@ public interface ManagementUserStatisticsService {
     List<UserStatusStatisticDto> getUserStatusesDistribution();
 
     /**
-     * Method to get List of {@link UserLocationStatisticDto} to show distribution
-     * of statuses.
-     *
-     * @return {@link List} of {@link UserLocationStatisticDto}
-     */
-    List<UserLocationStatisticDto> getUserLocationsDistribution(String groupBy);
-
-    /**
      * Method to get List of {@link UserEmailPreferencesStatisticDto} to show
      * distribution of preferences by type and periodicity.
      *
