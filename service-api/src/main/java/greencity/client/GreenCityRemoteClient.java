@@ -6,6 +6,7 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.user.UserCityDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.useraction.UserActionVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -103,4 +104,13 @@ public interface GreenCityRemoteClient {
      */
     @GetMapping("/users/{id}/cities")
     UserCityDto findAllUsersCities(@PathVariable(name = "id") Long userId);
+
+    /**
+     * Method to find {@link UserLocationDto} by user id.
+     *
+     * @param userId id of the user
+     * @return {@link UserLocationDto}.
+     */
+    @GetMapping("/users/{id}/location")
+    UserLocationDto findUserLocationByUserId(@PathVariable(name = "id") Long userId);
 }

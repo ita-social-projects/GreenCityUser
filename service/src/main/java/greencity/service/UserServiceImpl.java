@@ -23,6 +23,7 @@ import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -611,12 +612,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileDtoResponse getUserProfileInformation(Long userId) {
         User user = findUserById(userId);
-
         UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
-        // TODO
-        /*if (user.getUserLocation() != null) {
-            userProfileDtoResponse.setUserLocationDto(modelMapper.map(user.getUserLocation(), UserLocationDto.class));
-        }*/
+        UserLocationDto userLocationDto = greenCityRemoteClient.findUserLocationByUserId(userId);
+
+        if (userLocationDto != null) {
+            userProfileDtoResponse.setUserLocationDto(userLocationDto);
+        }
+
         modelMapper.map(user, userProfileDtoResponse);
         return userProfileDtoResponse;
     }
