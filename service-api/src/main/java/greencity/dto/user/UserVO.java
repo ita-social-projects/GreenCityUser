@@ -49,8 +49,6 @@ public class UserVO {
 
     private List<SocialNetworkVO> socialNetworks;
 
-    private List<UserVO> userFriends = new ArrayList<>();
-
     private String refreshTokenKey;
 
     private OwnSecurityVO ownSecurity;
