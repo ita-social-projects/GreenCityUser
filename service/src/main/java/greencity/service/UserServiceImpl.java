@@ -1200,4 +1200,12 @@ public class UserServiceImpl implements UserService {
     public Long countActiveUsers() {
         return userRepo.countActiveUsers();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Long> findAllActivatedUserIds() {
+        return userRepo.findAllActivatedUserIds();
+    }
 }

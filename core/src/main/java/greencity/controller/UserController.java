@@ -1203,4 +1203,20 @@ public class UserController {
     public ResponseEntity<Long> countActiveUsers() {
         return ResponseEntity.ok(userService.countActiveUsers());
     }
+
+    /**
+     * Endpoint for retrieving IDs of all users with status {@code ACTIVATED}.
+     *
+     * @return a {@link ResponseEntity} containing a list of activated user IDs
+     */
+    @Operation(summary = "Get the list of activated user ids")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/activated-ids")
+    public ResponseEntity<List<Long>> getActivatedUsersIds() {
+        return ResponseEntity.ok(userService.findAllActivatedUserIds());
+    }
 }
