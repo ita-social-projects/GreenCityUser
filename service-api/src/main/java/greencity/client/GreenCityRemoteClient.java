@@ -7,12 +7,14 @@ import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
+import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.useraction.UserActionVO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -113,4 +115,16 @@ public interface GreenCityRemoteClient {
      */
     @GetMapping("/users/{id}/location")
     UserLocationDto findUserLocationByUserId(@PathVariable(name = "id") Long userId);
+
+    /**
+     * Method to update user location by user id.
+     *
+     * @param userId id of the user
+     * @param userProfileDtoRequest contains location data
+     */
+    @PatchMapping("/users/{id}/location")
+    void setLocationForUser(
+            @PathVariable(name = "id") Long userId,
+            @RequestBody UserProfileDtoRequest userProfileDtoRequest
+    );
 }

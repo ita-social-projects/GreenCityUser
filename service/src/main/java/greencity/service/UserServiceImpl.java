@@ -544,8 +544,8 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getUserCredo() != null) {
             user.setUserCredo(userProfileDtoRequest.getUserCredo());
         }
-        // TODO
-        // setLocationForUser(user, userProfileDtoRequest);
+        Long userId = user.getId();
+        greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
         if (userProfileDtoRequest.getSocialNetworks() != null) {
             socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));

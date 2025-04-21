@@ -7,6 +7,7 @@ import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
+import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.useraction.UserActionVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -66,6 +67,11 @@ public class GreenCityRemoteClientFallbackFactory implements FallbackFactory<Gre
 
             @Override
             public UserLocationDto findUserLocationByUserId(Long userId) {
+                throw new RuntimeException("not implemented");
+            }
+
+            @Override
+            public void setLocationForUser(Long userId, UserProfileDtoRequest userProfileDtoRequest) {
                 throw new RuntimeException("not implemented");
             }
         };
