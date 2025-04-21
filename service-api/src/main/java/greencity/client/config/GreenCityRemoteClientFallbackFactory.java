@@ -5,6 +5,7 @@ import greencity.client.GreenCityRemoteClient;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
+import greencity.dto.user.UserCityDto;
 import greencity.dto.useraction.UserActionVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -54,6 +55,11 @@ public class GreenCityRemoteClientFallbackFactory implements FallbackFactory<Gre
 
             @Override
             public Boolean languageExistsById(Long languageId) {
+                throw new RuntimeException("not implemented");
+            }
+
+            @Override
+            public UserCityDto findAllUsersCities(Long userId) {
                 throw new RuntimeException("not implemented");
             }
         };
