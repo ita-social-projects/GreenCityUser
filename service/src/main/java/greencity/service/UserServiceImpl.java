@@ -114,9 +114,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserRating(UserAddRatingDto userRatingDto) {
-        User user = findUserById(userRatingDto.getId());
+        // TODO
+        /*User user = findUserById(userRatingDto.getId());
         user.setRating(user.getRating() + userRatingDto.getRating());
-        userRepo.save(user);
+        userRepo.save(user);*/
     }
 
     /**

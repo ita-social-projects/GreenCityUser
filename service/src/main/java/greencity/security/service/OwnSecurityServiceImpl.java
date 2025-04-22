@@ -147,7 +147,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
-            .rating(AppConstant.DEFAULT_RATING)
             .languageId(modelMapper.map(language, Long.class))
             .build();
     }
@@ -537,7 +536,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
-            .rating(AppConstant.DEFAULT_RATING)
             .languageId(2L)
             .build();
     }

@@ -41,8 +41,6 @@ public class UserVO {
 
     private VerifyEmailVO verifyEmail;
 
-    private Double rating;
-
     private EmailNotification emailNotification;
 
     private LocalDateTime dateOfRegistration;

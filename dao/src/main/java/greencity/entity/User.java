@@ -105,9 +105,6 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicturePath;
 
-    @Column(name = "rating")
-    private Double rating;
-
     @Column(name = "first_name")
     private String firstName;
 

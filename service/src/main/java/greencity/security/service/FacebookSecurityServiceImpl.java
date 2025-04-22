@@ -177,7 +177,6 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-            .rating(DEFAULT_RATING)
             .languageId(modelMapper.map(language, Long.class))
             .build();
 
