@@ -665,16 +665,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVO> getSixFriendsWithTheHighestRating(Long userId) {
-        return userRepo.getSixFriendsWithTheHighestRating(userId).stream()
-            .map(user -> modelMapper.map(user, UserVO.class))
-            .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public UserAndFriendsWithOnlineStatusDto getUserAndSixFriendsWithOnlineStatus(Long userId) {
         UserWithOnlineStatusDto userWithOnlineStatusDto = UserWithOnlineStatusDto.builder()
             .id(userId)

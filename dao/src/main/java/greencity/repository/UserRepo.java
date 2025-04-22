@@ -113,45 +113,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     long countAllByUserStatus(UserStatus userStatus);
 
     /**
-     * Get all user friends{@link User}.
-     *
-     * @return list of {@link User}.
-     */
-    // TODO
-    @Query(nativeQuery = true, value = """
-        SELECT * FROM users WHERE users.id IN ( \
-        (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND')\
-        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'));\
-        """)
-    List<User> getAllUserFriends(Long userId);
-
-    /**
-     * Get all user friends{@link User}. by page.
-     *
-     * @param pageable pageable configuration.
-     * @return {@link Page}
-     */
-    // TODO
-    @Query(nativeQuery = true, value = """
-        SELECT * FROM users WHERE users.id IN ( \
-        (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND') \
-        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'))\
-        """)
-    Page<User> getAllUserFriends(Long userId, Pageable pageable);
-
-    /**
-     * Get six friends with the highest rating {@link User}.
-     */
-    // TODO
-    @Query(nativeQuery = true, value = """
-        SELECT * FROM users WHERE users.id IN ( \
-        (SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 'FRIEND') \
-        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 'FRIEND')) \
-        ORDER BY users.rating DESC LIMIT 6;\
-        """)
-    List<User> getSixFriendsWithTheHighestRating(Long userId);
-
-    /**
      * Find the last activity time by {@link User}'s id.
      *
      * @param userId - {@link User}'s id
