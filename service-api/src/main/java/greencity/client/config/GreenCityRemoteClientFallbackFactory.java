@@ -10,6 +10,8 @@ import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.useraction.UserActionVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -72,6 +74,21 @@ public class GreenCityRemoteClientFallbackFactory implements FallbackFactory<Gre
 
             @Override
             public void setLocationForUser(Long userId, UserProfileDtoRequest userProfileDtoRequest) {
+                throw new RuntimeException("not implemented");
+            }
+
+            @Override
+            public List<Long> getAllUserFriendsIds(Long userId) {
+                throw new RuntimeException("not implemented");
+            }
+
+            @Override
+            public Page<Long> getAllUserFriendsIds(Long userId, Pageable pageable) {
+                throw new RuntimeException("not implemented");
+            }
+
+            @Override
+            public List<Long> getSixFriendsIdsWithTheHighestRating(Long userId) {
                 throw new RuntimeException("not implemented");
             }
         };

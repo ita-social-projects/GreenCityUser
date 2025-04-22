@@ -10,6 +10,8 @@ import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.useraction.UserActionVO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -127,4 +129,14 @@ public interface GreenCityRemoteClient {
             @PathVariable(name = "id") Long userId,
             @RequestBody UserProfileDtoRequest userProfileDtoRequest
     );
+
+
+
+    List<Long> getAllUserFriendsIds(Long userId);
+
+    Page<Long> getAllUserFriendsIds(Long userId, Pageable pageable);
+
+    List<Long> getSixFriendsIdsWithTheHighestRating(Long userId);
+
+
 }

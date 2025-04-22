@@ -670,12 +670,12 @@ public class UserServiceImpl implements UserService {
             .id(userId)
             .onlineStatus(checkIfTheUserIsOnline(userId))
             .build();
-        List<User> sixFriendsWithTheHighestRating = userRepo.getSixFriendsWithTheHighestRating(userId);
+        List<Long> sixFriendsWithTheHighestRating = greenCityRemoteClient.getSixFriendsIdsWithTheHighestRating(userId);
         List<UserWithOnlineStatusDto> sixFriendsWithOnlineStatusDtos = new ArrayList<>();
         if (!sixFriendsWithTheHighestRating.isEmpty()) {
             sixFriendsWithOnlineStatusDtos = sixFriendsWithTheHighestRating
                 .stream()
-                .map(u -> new UserWithOnlineStatusDto(u.getId(), checkIfTheUserIsOnline(u.getId())))
+                .map(id -> new UserWithOnlineStatusDto(id, checkIfTheUserIsOnline(id)))
                 .toList();
         }
         return UserAndFriendsWithOnlineStatusDto.builder()
@@ -693,19 +693,19 @@ public class UserServiceImpl implements UserService {
             .id(userId)
             .onlineStatus(checkIfTheUserIsOnline(userId))
             .build();
-        Page<User> friends = userRepo.getAllUserFriends(userId, pageable);
+        Page<Long> friendsIds = greenCityRemoteClient.getAllUserFriendsIds(userId, pageable);
         List<UserWithOnlineStatusDto> friendsWithOnlineStatusDtos = new ArrayList<>();
-        if (!friends.isEmpty()) {
-            friendsWithOnlineStatusDtos = friends
+        if (!friendsIds.isEmpty()) {
+            friendsWithOnlineStatusDtos = friendsIds
                 .getContent()
                 .stream()
-                .map(u -> new UserWithOnlineStatusDto(u.getId(), checkIfTheUserIsOnline(u.getId())))
+                .map(friendId -> new UserWithOnlineStatusDto(friendId, checkIfTheUserIsOnline(friendId)))
                 .toList();
         }
         return UserAndAllFriendsWithOnlineStatusDto.builder()
             .user(userWithOnlineStatusDto)
-            .friends(new PageableDto<>(friendsWithOnlineStatusDtos, friends.getTotalElements(),
-                friends.getPageable().getPageNumber(), friends.getTotalPages()))
+            .friends(new PageableDto<>(friendsWithOnlineStatusDtos, friendsIds.getTotalElements(),
+                friendsIds.getPageable().getPageNumber(), friendsIds.getTotalPages()))
             .build();
     }
 
@@ -933,13 +933,13 @@ public class UserServiceImpl implements UserService {
 
     private List<UserAllFriendsDto> allUsersMutualFriendsRecommendedOrRequest(Long id,
         List<UserAllFriendsDto> recommendedFriends) {
-        List<User> allUserFriends = userRepo.getAllUserFriends(id);
+        List<Long> allUserFriendsIds = greenCityRemoteClient.getAllUserFriendsIds(id);
         for (UserAllFriendsDto currentFriend : recommendedFriends) {
             long mutualFriendsCount = 0;
-            List<User> allCurrentUserFriends = userRepo.getAllUserFriends(currentFriend.getId());
-            for (User friendUser : allCurrentUserFriends) {
-                for (User user : allUserFriends) {
-                    if (friendUser.getId().equals(user.getId())) {
+            List<Long> allCurrentUserFriendsIds = greenCityRemoteClient.getAllUserFriendsIds(currentFriend.getId());
+            for (Long friendUserId : allCurrentUserFriendsIds) {
+                for (Long userId : allUserFriendsIds) {
+                    if (friendUserId.equals(userId)) {
                         mutualFriendsCount++;
                     }
                 }
