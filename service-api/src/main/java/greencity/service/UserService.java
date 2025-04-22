@@ -407,6 +407,15 @@ public interface UserService {
     void updateUserLanguage(Long userId, Long languageId);
 
     /**
+     * Method that finds user ids by emailPreference and periodicity.
+     *
+     * @param emailPreference of user.
+     * @param periodicity     of notification.
+     * @return list of user ids.
+     */
+    List<UserVO> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
+
+    /**
      * Method that return UserVo by UUid.
      *
      * @return {@link UserVO}

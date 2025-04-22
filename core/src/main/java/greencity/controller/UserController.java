@@ -1188,4 +1188,25 @@ public class UserController {
     public ResponseEntity<Long> countActiveUsers() {
         return ResponseEntity.ok(managementUserStatisticsService.countActiveUsers());
     }
+
+    /**
+     * Find users by email preference and email periodicity.
+     *
+     * @param emailPreference user's email preference.
+     * @param periodicity     email periodicity.
+     * @return list of {@link UserVO}
+     */
+    @Operation(summary = "Find users by email preference and email periodicity.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/email")
+    public ResponseEntity<List<UserVO>> findAllByEmailPreferenceAndEmailPeriodicity(
+            @RequestParam("email-preference") String emailPreference,
+            @RequestParam("email-periodicity") String periodicity
+    ) {
+        return ResponseEntity.ok(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity));
+    }
 }

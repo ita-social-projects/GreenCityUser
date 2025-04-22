@@ -194,6 +194,21 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Page<User> searchBy(Pageable paging, String query);
 
     /**
+     * Method that finds user ids by emailPreference and periodicity.
+     *
+     * @param emailPreference of user.
+     * @param periodicity     of notification.
+     * @return list of user ids.
+     */
+    @Query(nativeQuery = true, value = """
+            SELECT u.*
+            FROM users u
+            LEFT JOIN user_email_preferences uep ON u.id = uep.user_id
+            WHERE uep.email_preference = :emailPreference AND uep.periodicity = :periodicity
+        """)
+    List<User> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
+
+    /**
      * Find and return all registration months. Runs an SQL Query which is described
      * in {@link User} under {@link NamedNativeQuery} annotation. Spring Data JPA
      * can run a named native query that follows the naming convention

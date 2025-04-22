@@ -859,6 +859,16 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
+    @Override
+    public List<UserVO> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity) {
+        return userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity).stream()
+                .map(user -> modelMapper.map(user, UserVO.class))
+                .toList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Transactional
     @Override
     public List<Long> deactivateAllUsers(List<Long> listId) {
