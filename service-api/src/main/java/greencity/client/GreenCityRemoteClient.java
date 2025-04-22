@@ -8,8 +8,10 @@ import greencity.dto.language.LanguageVO;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserVO;
 import greencity.dto.useraction.UserActionVO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
@@ -130,13 +132,31 @@ public interface GreenCityRemoteClient {
             @RequestBody UserProfileDtoRequest userProfileDtoRequest
     );
 
+    /**
+     * Get all user's friends ids by user id.
+     *
+     * @param userId id of the user.
+     * @return list of friends ids.
+     */
+    @GetMapping("/users/{id}/all-friends")
+    List<Long> getAllUserFriendsIds(@PathVariable("id") Long userId);
 
+    /**
+     * Get all user friends ids as a page.
+     *
+     * @param userId id of the user.
+     * @param pageable pageable configuration.
+     * @return {@link Page}
+     */
+    @GetMapping("/users/{id}/friends")
+    Page<Long> getAllUserFriendsIds(@PathVariable("id") Long userId, @SpringQueryMap Pageable pageable);
 
-    List<Long> getAllUserFriendsIds(Long userId);
-
-    Page<Long> getAllUserFriendsIds(Long userId, Pageable pageable);
-
-    List<Long> getSixFriendsIdsWithTheHighestRating(Long userId);
-
-
+    /**
+     * Get top 6 friends ids with the highest rating.
+     *
+     * @param userId - {@link UserVO}'s id
+     * @return {@link List} of friends ids
+     */
+    @GetMapping("/users/{id}/top-friends")
+    List<Long> getSixFriendsIdsWithTheHighestRating(@PathVariable("id") Long userId);
 }
