@@ -117,6 +117,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @return list of {@link User}.
      */
+    // TODO
     @Query(nativeQuery = true, value = """
         SELECT * FROM users WHERE users.id IN ( \
         (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND')\
@@ -130,6 +131,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param pageable pageable configuration.
      * @return {@link Page}
      */
+    // TODO
     @Query(nativeQuery = true, value = """
         SELECT * FROM users WHERE users.id IN ( \
         (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND') \
@@ -140,6 +142,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     /**
      * Get six friends with the highest rating {@link User}.
      */
+    // TODO
     @Query(nativeQuery = true, value = """
         SELECT * FROM users WHERE users.id IN ( \
         (SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 'FRIEND') \
@@ -166,7 +169,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      **/
     @Modifying
     @Query(nativeQuery = true, value = """
-        DELETE FROM users where status = 1 \
+        DELETE FROM users where user_status = 1 \
         AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP\
         """)
     int scheduleDeleteDeactivatedUsers();
