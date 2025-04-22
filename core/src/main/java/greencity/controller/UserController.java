@@ -36,6 +36,7 @@ import greencity.dto.user.UserManagementViewDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.dto.user.UserProfileStatisticsDto;
+import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
@@ -44,6 +45,7 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.DeactivateUserRequestDto;
+import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -61,6 +63,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1208,5 +1211,28 @@ public class UserController {
             @RequestParam("email-periodicity") String periodicity
     ) {
         return ResponseEntity.ok(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity));
+    }
+
+    /**
+     * Method to get list of dates and counts of registered users.
+     *
+     * @param startDate   {@code LocalDateTime} startDate.
+     * @param endDate     {@code LocalDateTime} endDate.
+     * @param granularity {@link DateGranularity} (eg. day, week, month, year).
+     * @return {@link List} of {@link UserRegistrationStatisticDto}.
+     */
+    @Operation(summary = "Get list of dates and counts of registered users.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/registration-statistics")
+    public ResponseEntity<List<UserRegistrationStatisticDto>> getUserRegistrationsByDateRange(
+            @RequestParam("start-date") LocalDateTime startDate,
+            @RequestParam("end-date") LocalDateTime endDate,
+            @RequestParam("granularity") DateGranularity granularity
+    ) {
+        return ResponseEntity.ok(managementUserStatisticsService.getUserRegistrationsByDateRange(startDate, endDate, granularity));
     }
 }

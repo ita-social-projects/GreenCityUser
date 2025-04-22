@@ -4,6 +4,7 @@ import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
 import greencity.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.NamedNativeQuery;
@@ -344,4 +346,29 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query("SELECT COUNT(u) FROM User u WHERE u.userStatus IN (greencity.enums.UserStatus.ACTIVATED) ")
     Long countActiveUsers();
+
+    /**
+     * Counts users grouped by their registration date within a specified date range
+     * and granularity.
+     *
+     * @param startDate   The start date of the range to consider (inclusive).
+     * @param endDate     The end date of the range to consider (inclusive).
+     * @param granularity The time unit for grouping results {@link greencity.enums.DateGranularity}
+     * @return A list of tuples containing the date group and the count of users
+     *         registered in that group.
+     */
+    @Query(value = """
+            SELECT new greencity.dto.user.UserRegistrationStatisticDto(
+                FUNCTION('DATE_TRUNC', :granularity, u.dateOfRegistration) as dateGroup,
+                COUNT(u.id))
+            FROM User u
+            WHERE u.dateOfRegistration >= :startDate
+            AND u.dateOfRegistration <= :endDate
+            GROUP BY dateGroup
+            ORDER BY dateGroup
+        """)
+    List<UserRegistrationStatisticDto> countUsersByRegistrationDateBetween(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("granularity") String granularity);
 }
