@@ -12,7 +12,6 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
      *
      * @return Set of {@link String}.
      */
-    // TODO
     @Query(value = """
         SELECT DISTINCT name from employee_authorities\
          inner join employee_authorities_mapping eam on employee_authorities.id = eam.authority_id \
