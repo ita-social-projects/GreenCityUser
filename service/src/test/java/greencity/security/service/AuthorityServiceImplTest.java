@@ -55,13 +55,13 @@ class AuthorityServiceImplTest {
     private AuthorityServiceImpl authorityService;
 
     @BeforeEach
-    public void initSecurityContext() {
+    void initSecurityContext() {
         when(auth.getName()).thenReturn(TEST_EMAIL);
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @AfterEach
-    public void clearSecurityContext() {
+    void clearSecurityContext() {
         SecurityContextHolder.clearContext();
     }
 
@@ -136,7 +136,7 @@ class AuthorityServiceImplTest {
             .email(TEST_EMAIL)
             .positions(List.of(PositionDto.builder()
                 .id(1L)
-                .name("Супер адмін")
+                .nameUk("Супер адмін")
                 .build()))
             .build());
         authority.getEmployees().add(createAdmin());
