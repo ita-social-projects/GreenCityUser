@@ -1184,15 +1184,14 @@ public class UserController {
      */
     @Operation(summary = "Find users by email preference and email periodicity.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/email")
     public ResponseEntity<List<UserVO>> findAllByEmailPreferenceAndEmailPeriodicity(
-            @RequestParam("email-preference") String emailPreference,
-            @RequestParam("email-periodicity") String periodicity
-    ) {
+        @RequestParam("email-preference") String emailPreference,
+        @RequestParam("email-periodicity") String periodicity) {
         return ResponseEntity.ok(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity));
     }
 
@@ -1206,16 +1205,16 @@ public class UserController {
      */
     @Operation(summary = "Get list of dates and counts of registered users.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/registration-statistics")
     public ResponseEntity<List<UserRegistrationStatisticDto>> getUserRegistrationsByDateRange(
-            @RequestParam("start-date") LocalDateTime startDate,
-            @RequestParam("end-date") LocalDateTime endDate,
-            @RequestParam("granularity") DateGranularity granularity
-    ) {
-        return ResponseEntity.ok(managementUserStatisticsService.getUserRegistrationsByDateRange(startDate, endDate, granularity));
+        @RequestParam("start-date") LocalDateTime startDate,
+        @RequestParam("end-date") LocalDateTime endDate,
+        @RequestParam("granularity") DateGranularity granularity) {
+        return ResponseEntity
+            .ok(managementUserStatisticsService.getUserRegistrationsByDateRange(startDate, endDate, granularity));
     }
 }

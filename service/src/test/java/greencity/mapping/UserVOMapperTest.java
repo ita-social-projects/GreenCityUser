@@ -38,28 +38,28 @@ class UserVOMapperTest {
                     .build())
                 .token(expectedResult.getVerifyEmail().getToken())
                 .build() : null)
-            /*.userFriends(expectedResult.getUserFriends() != null ? expectedResult.getUserFriends()
-                .stream().map(user1 -> User.builder()
-                    .id(user1.getId())
-                    .name(user1.getName())
-                    .build())
-                .collect(Collectors.toList()) : null)*/
+            /*
+             * .userFriends(expectedResult.getUserFriends() != null ?
+             * expectedResult.getUserFriends() .stream().map(user1 -> User.builder()
+             * .id(user1.getId()) .name(user1.getName()) .build())
+             * .collect(Collectors.toList()) : null)
+             */
             .refreshTokenKey(expectedResult.getRefreshTokenKey())
             .dateOfRegistration(expectedResult.getDateOfRegistration())
             .profilePicturePath(expectedResult.getProfilePicturePath())
-            /*.userLocation(
-                UserLocation.builder()
-                    .id(expectedResult.getUserLocationDto().getId())
-                    .cityEn(expectedResult.getUserLocationDto().getCityEn())
-                    .cityUk(expectedResult.getUserLocationDto().getCityUk())
-                    .regionEn(expectedResult.getUserLocationDto().getRegionEn())
-                    .regionUk(expectedResult.getUserLocationDto().getRegionUk())
-                    .countryEn(expectedResult.getUserLocationDto().getCountryEn())
-                    .countryUk(expectedResult.getUserLocationDto().getCountryUk())
-                    .latitude(expectedResult.getUserLocationDto().getLatitude())
-                    .longitude(expectedResult.getUserLocationDto().getLongitude())
-                    .users(null)
-                    .build())*/
+            /*
+             * .userLocation( UserLocation.builder()
+             * .id(expectedResult.getUserLocationDto().getId())
+             * .cityEn(expectedResult.getUserLocationDto().getCityEn())
+             * .cityUk(expectedResult.getUserLocationDto().getCityUk())
+             * .regionEn(expectedResult.getUserLocationDto().getRegionEn())
+             * .regionUk(expectedResult.getUserLocationDto().getRegionUk())
+             * .countryEn(expectedResult.getUserLocationDto().getCountryEn())
+             * .countryUk(expectedResult.getUserLocationDto().getCountryUk())
+             * .latitude(expectedResult.getUserLocationDto().getLatitude())
+             * .longitude(expectedResult.getUserLocationDto().getLongitude()) .users(null)
+             * .build())
+             */
             .showToDoList(expectedResult.getShowToDoList())
             .showEcoPlace(expectedResult.getShowEcoPlace())
             .showLocation(expectedResult.getShowLocation())

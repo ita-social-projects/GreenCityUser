@@ -1,17 +1,14 @@
 package greencity.service;
 
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
-import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
 import greencity.enums.DateGranularity;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ManagementUserStatisticsService {
-
     /**
      * Method to get list of dates and counts of registered users.
      *
@@ -21,7 +18,7 @@ public interface ManagementUserStatisticsService {
      * @return {@link List} of {@link UserRegistrationStatisticDto}.
      */
     List<UserRegistrationStatisticDto> getUserRegistrationsByDateRange(LocalDateTime startDate, LocalDateTime endDate,
-                                                                       DateGranularity granularity);
+        DateGranularity granularity);
 
     /**
      * Method to get List of {@link UserRoleStatisticDto} to show distribution of

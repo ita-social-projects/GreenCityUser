@@ -73,9 +73,10 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            /*.userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
-                "Львівська", "Ukraine", "Україна", 20.000000,
-                20.000000, new ArrayList<>()))*/
+            /*
+             * .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська",
+             * "Ukraine", "Україна", 20.000000, 20.000000, new ArrayList<>()))
+             */
             .languageId(getLanguageId())
             .build();
     }
@@ -253,18 +254,17 @@ public class ModelUtils {
                     .build())
                 .token("toooookkkeeeeen42324532542")
                 .build())
-            /*.userFriends(Collections.singletonList(
-                UserVO.builder()
-                    .id(75L)
-                    .name("Andrew")
-                    .build()))*/
+            /*
+             * .userFriends(Collections.singletonList( UserVO.builder() .id(75L)
+             * .name("Andrew") .build()))
+             */
             .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-            /*.userLocationDto(
-                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
-                    "Ukraine", "Україна", 20.000000,
-                    20.000000))*/
+            /*
+             * .userLocationDto( new UserLocationDto(1L, "Lviv", "Львів", "Lvivska",
+             * "Львівська", "Ukraine", "Україна", 20.000000, 20.000000))
+             */
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
@@ -556,35 +556,19 @@ public class ModelUtils {
             .build();
     }
 
-    /*public static UserLocation getUserLocation() {
-        return UserLocation.builder()
-            .id(1L)
-            .cityEn("Lviv")
-            .cityUk("Львів")
-            .countryEn("Ukraine")
-            .countryUk("Україна")
-            .regionUk("Львівська")
-            .regionEn("Lvivska")
-            .latitude(49.842957)
-            .longitude(24.031111)
-            .users(Collections.singletonList(getUser()))
-            .build();
-    }
-
-    public static UserLocation getUserLocation2() {
-        return UserLocation.builder()
-            .id(2L)
-            .cityEn("Ternopil")
-            .cityUk("Тернопіль")
-            .countryEn("Ukraine")
-            .countryUk("Україна")
-            .regionUk("Тернопільська")
-            .regionEn("Ternopilska")
-            .latitude(49.842957)
-            .longitude(24.031111)
-            .users(Collections.singletonList(getUser()))
-            .build();
-    }*/
+    /*
+     * public static UserLocation getUserLocation() { return UserLocation.builder()
+     * .id(1L) .cityEn("Lviv") .cityUk("Львів") .countryEn("Ukraine")
+     * .countryUk("Україна") .regionUk("Львівська") .regionEn("Lvivska")
+     * .latitude(49.842957) .longitude(24.031111)
+     * .users(Collections.singletonList(getUser())) .build(); }
+     * 
+     * public static UserLocation getUserLocation2() { return UserLocation.builder()
+     * .id(2L) .cityEn("Ternopil") .cityUk("Тернопіль") .countryEn("Ukraine")
+     * .countryUk("Україна") .regionUk("Тернопільська") .regionEn("Ternopilska")
+     * .latitude(49.842957) .longitude(24.031111)
+     * .users(Collections.singletonList(getUser())) .build(); }
+     */
 
     public static List<GeocodingResult> getGeocodingResult() {
         List<GeocodingResult> geocodingResults = new ArrayList<>();

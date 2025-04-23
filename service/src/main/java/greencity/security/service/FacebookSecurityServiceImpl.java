@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import static greencity.constant.AppConstant.DEFAULT_RATING;
 
 /**
  * {@inheritDoc}

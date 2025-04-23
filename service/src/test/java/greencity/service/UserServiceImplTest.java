@@ -222,7 +222,7 @@ class UserServiceImplTest {
         UserCityDto userCityDto = mock(UserCityDto.class);
 
         when(greenCityRemoteClient.findAllUsersCities(userId))
-                .thenReturn(userCityDto);
+            .thenReturn(userCityDto);
 
         UserCityDto actualResult = userService.findAllUsersCities(userId);
 
@@ -237,9 +237,8 @@ class UserServiceImplTest {
             .thenThrow(new RuntimeException());
 
         assertThrows(
-                RuntimeException.class,
-                () -> userService.findAllUsersCities(userId)
-        );
+            RuntimeException.class,
+            () -> userService.findAllUsersCities(userId));
 
         verify(greenCityRemoteClient).findAllUsersCities(userId);
     }
@@ -876,7 +875,7 @@ class UserServiceImplTest {
         response.setUserLocationDto(userLocationDto);
 
         when(greenCityRemoteClient.findUserLocationByUserId(userId))
-                .thenReturn(userLocationDto);
+            .thenReturn(userLocationDto);
 
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
@@ -991,7 +990,8 @@ class UserServiceImplTest {
         Timestamp userLastActivityTime = Timestamp.valueOf(LocalDateTime.now());
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(userRepo.findLastActivityTimeById(anyLong())).thenReturn(Optional.of(userLastActivityTime));
-        when(greenCityRemoteClient.getSixFriendsIdsWithTheHighestRating(userId)).thenReturn(Collections.singletonList(user.getId()));
+        when(greenCityRemoteClient.getSixFriendsIdsWithTheHighestRating(userId))
+            .thenReturn(Collections.singletonList(user.getId()));
         UserWithOnlineStatusDto userWithOnlineStatusDto = UserWithOnlineStatusDto.builder()
             .id(userId)
             .onlineStatus(true)
@@ -1009,12 +1009,11 @@ class UserServiceImplTest {
         Pageable pageable = PageRequest.of(0, 1);
         Page<User> usersPage = new PageImpl<>(Collections.singletonList(user), pageable, 1);
         Page<Long> usersIdsPage = new PageImpl<>(
-                usersPage.getContent().stream()
-                        .map(User::getId)
-                        .toList(),
-                pageable,
-                1
-        );
+            usersPage.getContent().stream()
+                .map(User::getId)
+                .toList(),
+            pageable,
+            1);
         UserWithOnlineStatusDto userWithOnlineStatusDto = UserWithOnlineStatusDto.builder()
             .id(userId)
             .onlineStatus(true)

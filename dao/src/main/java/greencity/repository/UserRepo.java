@@ -2,7 +2,6 @@ package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
-import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
@@ -317,7 +316,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *
      * @param startDate   The start date of the range to consider (inclusive).
      * @param endDate     The end date of the range to consider (inclusive).
-     * @param granularity The time unit for grouping results {@link greencity.enums.DateGranularity}
+     * @param granularity The time unit for grouping results
+     *                    {@link greencity.enums.DateGranularity}
      * @return A list of tuples containing the date group and the count of users
      *         registered in that group.
      */
@@ -332,7 +332,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
             ORDER BY dateGroup
         """)
     List<UserRegistrationStatisticDto> countUsersByRegistrationDateBetween(
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate,
-            @Param("granularity") String granularity);
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        @Param("granularity") String granularity);
 }

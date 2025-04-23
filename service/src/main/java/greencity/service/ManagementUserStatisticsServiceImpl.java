@@ -8,7 +8,6 @@ import greencity.enums.DateGranularity;
 import greencity.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class ManagementUserStatisticsServiceImpl implements ManagementUserStatis
      */
     @Override
     public List<UserRegistrationStatisticDto> getUserRegistrationsByDateRange(LocalDateTime startDate,
-                                                                              LocalDateTime endDate, DateGranularity granularity) {
+        LocalDateTime endDate, DateGranularity granularity) {
         String granularityStr = granularity.toString();
         return userRepo.countUsersByRegistrationDateBetween(startDate, endDate, granularityStr);
     }

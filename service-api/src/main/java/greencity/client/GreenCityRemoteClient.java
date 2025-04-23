@@ -124,14 +124,13 @@ public interface GreenCityRemoteClient {
     /**
      * Method to update user location by user id.
      *
-     * @param userId id of the user
+     * @param userId                id of the user
      * @param userProfileDtoRequest contains location data
      */
     @PatchMapping("/users/{id}/location")
     void setLocationForUser(
-            @PathVariable(name = "id") Long userId,
-            @RequestBody UserProfileDtoRequest userProfileDtoRequest
-    );
+        @PathVariable(name = "id") Long userId,
+        @RequestBody UserProfileDtoRequest userProfileDtoRequest);
 
     /**
      * Get all user's friends ids by user id.
@@ -145,7 +144,7 @@ public interface GreenCityRemoteClient {
     /**
      * Get all user friends ids as a page.
      *
-     * @param userId id of the user.
+     * @param userId   id of the user.
      * @param pageable pageable configuration.
      * @return {@link Page}
      */

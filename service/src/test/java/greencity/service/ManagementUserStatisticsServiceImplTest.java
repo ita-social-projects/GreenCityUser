@@ -49,15 +49,14 @@ public class ManagementUserStatisticsServiceImplTest {
     void testGetUserRegistrationsByDateRange() {
         DateGranularity granularity = DateGranularity.MONTH;
         List<UserRegistrationStatisticDto> expectedStats = Arrays.asList(
-                new UserRegistrationStatisticDto(LocalDateTime.now(), 10L),
-                new UserRegistrationStatisticDto(LocalDateTime.now(), 15L)
-        );
+            new UserRegistrationStatisticDto(LocalDateTime.now(), 10L),
+            new UserRegistrationStatisticDto(LocalDateTime.now(), 15L));
 
         when(userRepo.countUsersByRegistrationDateBetween(startDate, endDate, granularity.toString()))
-                .thenReturn(expectedStats);
+            .thenReturn(expectedStats);
 
         List<UserRegistrationStatisticDto> result = managementUserStatisticsService.getUserRegistrationsByDateRange(
-                startDate, endDate, granularity);
+            startDate, endDate, granularity);
 
         assertNotNull(result);
         assertEquals(expectedStats.size(), result.size());
@@ -68,9 +67,8 @@ public class ManagementUserStatisticsServiceImplTest {
     @Test
     void testGetUserRolesDistribution() {
         List<UserRoleStatisticDto> expectedStats = Arrays.asList(
-                new UserRoleStatisticDto(Role.ROLE_ADMIN, 5L),
-                new UserRoleStatisticDto(Role.ROLE_USER, 95L)
-        );
+            new UserRoleStatisticDto(Role.ROLE_ADMIN, 5L),
+            new UserRoleStatisticDto(Role.ROLE_USER, 95L));
 
         when(userRepo.getUserRolesDistribution()).thenReturn(expectedStats);
 
@@ -85,10 +83,9 @@ public class ManagementUserStatisticsServiceImplTest {
     @Test
     void testGetUserStatusesDistribution() {
         List<UserStatusStatisticDto> expectedStats = Arrays.asList(
-                new UserStatusStatisticDto(UserStatus.ACTIVATED, 80L),
-                new UserStatusStatisticDto(UserStatus.DEACTIVATED, 15L),
-                new UserStatusStatisticDto(UserStatus.ACTIVATED, 5L)
-        );
+            new UserStatusStatisticDto(UserStatus.ACTIVATED, 80L),
+            new UserStatusStatisticDto(UserStatus.DEACTIVATED, 15L),
+            new UserStatusStatisticDto(UserStatus.ACTIVATED, 5L));
 
         when(userRepo.getUserStatusesDistribution()).thenReturn(expectedStats);
 
@@ -103,14 +100,14 @@ public class ManagementUserStatisticsServiceImplTest {
     @Test
     void testGetUserEmailPreferencesDistribution() {
         List<UserEmailPreferencesStatisticDto> expectedStats = Arrays.asList(
-                new UserEmailPreferencesStatisticDto(EmailPreference.LIKES, EmailPreferencePeriodicity.DAILY, 5L),
-                new UserEmailPreferencesStatisticDto(EmailPreference.COMMENTS, EmailPreferencePeriodicity.MONTHLY, 1L),
-                new UserEmailPreferencesStatisticDto(EmailPreference.SYSTEM, EmailPreferencePeriodicity.DAILY, 7L)
-        );
+            new UserEmailPreferencesStatisticDto(EmailPreference.LIKES, EmailPreferencePeriodicity.DAILY, 5L),
+            new UserEmailPreferencesStatisticDto(EmailPreference.COMMENTS, EmailPreferencePeriodicity.MONTHLY, 1L),
+            new UserEmailPreferencesStatisticDto(EmailPreference.SYSTEM, EmailPreferencePeriodicity.DAILY, 7L));
 
         when(userRepo.getUserEmailPreferencesDistribution()).thenReturn(expectedStats);
 
-        List<UserEmailPreferencesStatisticDto> result = managementUserStatisticsService.getUserEmailPreferencesDistribution();
+        List<UserEmailPreferencesStatisticDto> result =
+            managementUserStatisticsService.getUserEmailPreferencesDistribution();
 
         assertNotNull(result);
         assertEquals(expectedStats.size(), result.size());
