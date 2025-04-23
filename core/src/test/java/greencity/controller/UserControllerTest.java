@@ -939,23 +939,6 @@ class UserControllerTest {
     }
 
     @Test
-    void getUserLocationsDistribution_returnsOkAndList() throws Exception {
-        Long count = 30L;
-        String region = "Europe";
-        String groupBy = "region";
-        String groupByQueryParam = "group-by";
-        List<UserLocationStatisticDto> locations = List.of(new UserLocationStatisticDto(region, count));
-
-        when(managementUserStatisticsService.getUserLocationsDistribution(groupBy)).thenReturn(locations);
-
-        mockMvc.perform(get(userLink + "/locations-distribution").param(groupByQueryParam, groupBy))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.size()").value(locations.size()))
-            .andExpect(jsonPath("$[0].location").value(region))
-            .andExpect(jsonPath("$[0].count").value(count));
-    }
-
-    @Test
     void getUserEmailPreferencesDistributionTest() throws Exception {
         Long count = 25L;
         EmailPreference emailPreference = EmailPreference.LIKES;

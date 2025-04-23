@@ -4,7 +4,6 @@ import greencity.ModelUtils;
 import greencity.dto.user.UserVO;
 import greencity.entity.OwnSecurity;
 import greencity.entity.User;
-import greencity.entity.UserLocation;
 import greencity.entity.VerifyEmail;
 import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +29,7 @@ class UserVOMapperTest {
             .userCredo(expectedResult.getUserCredo())
             .emailNotification(expectedResult.getEmailNotification())
             .userStatus(expectedResult.getUserStatus())
-            .rating(expectedResult.getRating())
+            // .rating(expectedResult.getRating())
             .verifyEmail(expectedResult.getVerifyEmail() != null ? VerifyEmail.builder()
                 .id(expectedResult.getVerifyEmail().getId())
                 .user(User.builder()
@@ -39,16 +38,16 @@ class UserVOMapperTest {
                     .build())
                 .token(expectedResult.getVerifyEmail().getToken())
                 .build() : null)
-            .userFriends(expectedResult.getUserFriends() != null ? expectedResult.getUserFriends()
+            /*.userFriends(expectedResult.getUserFriends() != null ? expectedResult.getUserFriends()
                 .stream().map(user1 -> User.builder()
                     .id(user1.getId())
                     .name(user1.getName())
                     .build())
-                .collect(Collectors.toList()) : null)
+                .collect(Collectors.toList()) : null)*/
             .refreshTokenKey(expectedResult.getRefreshTokenKey())
             .dateOfRegistration(expectedResult.getDateOfRegistration())
             .profilePicturePath(expectedResult.getProfilePicturePath())
-            .userLocation(
+            /*.userLocation(
                 UserLocation.builder()
                     .id(expectedResult.getUserLocationDto().getId())
                     .cityEn(expectedResult.getUserLocationDto().getCityEn())
@@ -60,7 +59,7 @@ class UserVOMapperTest {
                     .latitude(expectedResult.getUserLocationDto().getLatitude())
                     .longitude(expectedResult.getUserLocationDto().getLongitude())
                     .users(null)
-                    .build())
+                    .build())*/
             .showToDoList(expectedResult.getShowToDoList())
             .showEcoPlace(expectedResult.getShowEcoPlace())
             .showLocation(expectedResult.getShowLocation())

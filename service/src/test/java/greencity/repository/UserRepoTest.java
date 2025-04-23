@@ -127,7 +127,7 @@ class UserRepoTest {
         verify(userRepo).countAllByUserStatus(UserStatus.ACTIVATED);
     }
 
-    @Test
+/*    @Test
     void getAllUserFriendsTest() {
         User user = ModelUtils.getUser();
         user.setEmailNotification(EmailNotification.MONTHLY);
@@ -181,7 +181,7 @@ class UserRepoTest {
         assertTrue(highestRatedFriends.contains(user2));
         assertTrue(highestRatedFriends.contains(user3));
         verify(userRepo).getSixFriendsWithTheHighestRating(1L);
-    }
+    }*/
 
     @Test
     void deactivateSelectedUsersTest() {

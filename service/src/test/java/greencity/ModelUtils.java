@@ -73,9 +73,9 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
+            /*.userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
                 "Львівська", "Ukraine", "Україна", 20.000000,
-                20.000000, new ArrayList<>()))
+                20.000000, new ArrayList<>()))*/
             .languageId(getLanguageId())
             .build();
     }
@@ -200,7 +200,7 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            .userLocation(null)
+            // .userLocation(null)
             .build();
     }
 
@@ -244,7 +244,7 @@ public class ModelUtils {
             .userCredo("save the world")
             .emailNotification(EmailNotification.MONTHLY)
             .userStatus(UserStatus.ACTIVATED)
-            .rating(13.4)
+            // .rating(13.4)
             .verifyEmail(VerifyEmailVO.builder()
                 .id(32L)
                 .user(UserVO.builder()
@@ -253,18 +253,18 @@ public class ModelUtils {
                     .build())
                 .token("toooookkkeeeeen42324532542")
                 .build())
-            .userFriends(Collections.singletonList(
+            /*.userFriends(Collections.singletonList(
                 UserVO.builder()
                     .id(75L)
                     .name("Andrew")
-                    .build()))
+                    .build()))*/
             .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-            .userLocationDto(
+            /*.userLocationDto(
                 new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
                     "Ukraine", "Україна", 20.000000,
-                    20.000000))
+                    20.000000))*/
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
@@ -394,7 +394,7 @@ public class ModelUtils {
             .email("test@mail.com")
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_USER)
-            .rating(100D)
+            // .rating(100D)
             .build();
     }
 
@@ -556,7 +556,7 @@ public class ModelUtils {
             .build();
     }
 
-    public static UserLocation getUserLocation() {
+    /*public static UserLocation getUserLocation() {
         return UserLocation.builder()
             .id(1L)
             .cityEn("Lviv")
@@ -584,7 +584,7 @@ public class ModelUtils {
             .longitude(24.031111)
             .users(Collections.singletonList(getUser()))
             .build();
-    }
+    }*/
 
     public static List<GeocodingResult> getGeocodingResult() {
         List<GeocodingResult> geocodingResults = new ArrayList<>();
