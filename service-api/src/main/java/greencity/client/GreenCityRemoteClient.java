@@ -5,6 +5,7 @@ import greencity.client.config.GreenCityRemoteClientInterceptor;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserProfileDtoRequest;
@@ -159,4 +160,12 @@ public interface GreenCityRemoteClient {
      */
     @GetMapping("/users/{id}/top-friends")
     List<Long> getSixFriendsIdsWithTheHighestRating(@PathVariable("id") Long userId);
+
+    /**
+     * Increase user rating by amount specified in {@link UserAddRatingDto}.
+     *
+     * @param userAddRatingDto contains rating data.
+     */
+    @PatchMapping("/users/rating")
+    void updateUserRating(@RequestBody UserAddRatingDto userAddRatingDto);
 }

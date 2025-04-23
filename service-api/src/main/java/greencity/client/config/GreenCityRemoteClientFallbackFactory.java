@@ -5,6 +5,7 @@ import greencity.client.GreenCityRemoteClient;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
+import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserProfileDtoRequest;
@@ -89,6 +90,11 @@ public class GreenCityRemoteClientFallbackFactory implements FallbackFactory<Gre
 
             @Override
             public List<Long> getSixFriendsIdsWithTheHighestRating(Long userId) {
+                throw new RuntimeException("not implemented");
+            }
+
+            @Override
+            public void updateUserRating(UserAddRatingDto userAddRatingDto) {
                 throw new RuntimeException("not implemented");
             }
         };
