@@ -1610,4 +1610,24 @@ class UserServiceImplTest {
 
         assertThrows(UserDeactivationException.class, () -> userService.deactivateUser(uuid, request, userVO));
     }
+
+    @Test
+    void findAllActivatedUserIdsOkTest() {
+        when(userRepo.findAllActivatedUserIds()).thenReturn(List.of(1L, 2L, 3L));
+
+        List<Long> result = userService.findAllActivatedUserIds();
+
+        assertEquals(3, result.size());
+        verify(userRepo, times(1)).findAllActivatedUserIds();
+    }
+
+    @Test
+    void findAllActivatedUserIdsNoResultTest() {
+        when(userRepo.findAllActivatedUserIds()).thenReturn(List.of());
+
+        List<Long> result = userService.findAllActivatedUserIds();
+
+        assertEquals(0, result.size());
+        verify(userRepo, times(1)).findAllActivatedUserIds();
+    }
 }
