@@ -1205,7 +1205,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<Long> findAllActivatedUserIds() {
-        return userRepo.findAllActivatedUserIds();
+    public List<Long> findAllActivatedUserIdsFromList(List<Long> ids) {
+        return userRepo.findAllActivatedUserIdsFromList(ids);
     }
 }

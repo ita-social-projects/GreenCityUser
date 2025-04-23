@@ -66,7 +66,6 @@ import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -1205,7 +1204,7 @@ public class UserController {
     }
 
     /**
-     * Endpoint for retrieving IDs of all users with status {@code ACTIVATED}.
+     * Endpoint for retrieving IDs of all users from the list of ids with status {@code ACTIVATED}.
      *
      * @return a {@link ResponseEntity} containing a list of activated user IDs
      */
@@ -1216,7 +1215,7 @@ public class UserController {
             @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/activated-ids")
-    public ResponseEntity<List<Long>> getActivatedUsersIds() {
-        return ResponseEntity.ok(userService.findAllActivatedUserIds());
+    public ResponseEntity<List<Long>> getActivatedUsersIds(@RequestParam List<Long> ids) {
+        return ResponseEntity.ok(userService.findAllActivatedUserIdsFromList(ids));
     }
 }

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
-import greencity.constant.AppConstant;
+
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.EmployeePositionsDto;
@@ -902,9 +902,16 @@ class UserControllerTest {
 
     @Test
     void getActivatedUsersIdsOkTest() throws Exception {
-        when(userService.findAllActivatedUserIds()).thenReturn(List.of(1L, 2L, 3L));
+        List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
+        List<String> stringIds = input.stream()
+                .map(String::valueOf)
+                .toList();
 
-        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids"))
+        when(userService.findAllActivatedUserIdsFromList(input)).thenReturn(List.of(1L, 2L, 3L));
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("ids", stringIds.toArray(new String[0])))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -912,14 +919,21 @@ class UserControllerTest {
 
         List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
         assertEquals(3, activatedUserIds.size());
-        verify(userService, times(1)).findAllActivatedUserIds();
+        verify(userService, times(1)).findAllActivatedUserIdsFromList(input);
     }
 
     @Test
     void getActivatedUsersIdsNoResultsTest() throws Exception {
-        when(userService.findAllActivatedUserIds()).thenReturn(List.of());
+        List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
+        List<String> stringIds = input.stream()
+                .map(String::valueOf)
+                .toList();
 
-        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids"))
+        when(userService.findAllActivatedUserIdsFromList(input)).thenReturn(List.of());
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("ids", stringIds.toArray(new String[0])))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -927,6 +941,6 @@ class UserControllerTest {
 
         List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
         assertEquals(0, activatedUserIds.size());
-        verify(userService, times(1)).findAllActivatedUserIds();
+        verify(userService, times(1)).findAllActivatedUserIdsFromList(input);
     }
 }

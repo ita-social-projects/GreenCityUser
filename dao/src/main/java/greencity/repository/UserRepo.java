@@ -16,6 +16,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.NamedNativeQuery;
@@ -378,7 +379,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Long countActiveUsers();
 
     /**
-     * Retrieves the list of IDs of all users who have the {@code UserStatus} set to {@code ACTIVATED}.
+     * Retrieves the list of IDs of users from the given list who have the {@code UserStatus}
+     * set to {@code ACTIVATED}.
      * This method is typically used to filter active users for further processing or analysis.
      *
      * @return a list of {@code Long} values representing the IDs of all activated users
@@ -386,7 +388,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query("""
             SELECT u.id
             FROM User u
-            WHERE u.userStatus = 2
+            WHERE u.userStatus = 2 AND u.id IN :ids
             """)
-    List<Long> findAllActivatedUserIds();
+    List<Long> findAllActivatedUserIdsFromList(@Param("ids") List<Long> ids);
 }
