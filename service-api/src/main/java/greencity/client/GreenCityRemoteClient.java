@@ -65,7 +65,6 @@ public interface GreenCityRemoteClient {
      * Method returns all user achievements by user id
      *
      * @param userId id of the user
-     *
      * @return list of {@link UserAchievementVO}
      */
     @GetMapping("/achievements/user-achievements/{userId}")
@@ -75,7 +74,6 @@ public interface GreenCityRemoteClient {
      * Method returns all user actions by user id
      *
      * @param userId id of the user
-     *
      * @return list of {@link UserActionVO}
      */
     @GetMapping("/achievements/user-actions/{userId}")
