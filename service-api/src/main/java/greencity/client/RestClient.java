@@ -1,27 +1,31 @@
 package greencity.client;
 
-import static greencity.constant.AppConstant.AUTHORIZATION;
-import static greencity.constant.AppConstant.FILES;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
-import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import static greencity.constant.AppConstant.AUTHORIZATION;
+import static greencity.constant.AppConstant.FILES;
 
 @Slf4j
 @RequiredArgsConstructor
