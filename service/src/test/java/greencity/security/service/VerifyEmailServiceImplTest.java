@@ -67,7 +67,7 @@ class VerifyEmailServiceImplTest {
     }
 
     @Test
-    void verifyByTokenNotExpiredTokenTestWhenRestClientThrowsException() {
+    void verifyWhenTokenNotExpiredAndRestClientThrowsExceptionTest() {
         String exceptionMessage = "exception message";
         String token = "token";
         Long userId = 1L;
