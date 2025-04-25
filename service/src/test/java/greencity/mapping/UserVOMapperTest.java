@@ -74,6 +74,7 @@ class UserVOMapperTest {
                     .build())
                 .build() : null)
             .lastActivityTime(expected.getLastActivityTime())
+                .firstName(expected.getFirstName())
             /*.userAchievements(expected.getUserAchievements() != null ? expected.getUserAchievements()
                 .stream().map(userAchievement -> UserAchievement.builder()
                     .id(userAchievement.getId())
@@ -97,7 +98,7 @@ class UserVOMapperTest {
                         .build())
                     .build())
                 .collect(Collectors.toList()) : new ArrayList<>())*/
-            .languageId(1L)
+            .languageId(2L)
             .build();
 
         assertEquals(expected, mapper.convert(userToBeConverted));

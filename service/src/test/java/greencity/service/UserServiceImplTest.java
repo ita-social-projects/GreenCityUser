@@ -1612,24 +1612,44 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findAllActivatedUserIdsFromListOkTest() {
+    void findAllActivatedUserIdsOkTest() {
         List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
         when(userRepo.findAllActivatedUserIdsFromList(input)).thenReturn(List.of(1L, 2L, 3L));
 
-        List<Long> result = userService.findAllActivatedUserIdsFromList(input);
+        List<Long> result = userService.findAllActivatedUserIds(input);
 
         assertEquals(3, result.size());
         verify(userRepo, times(1)).findAllActivatedUserIdsFromList(input);
     }
 
     @Test
-    void findAllActivatedUserIdsFromListNoResultTest() {
+    void findAllActivatedUserIdsNoResultTest() {
         List<Long> input = List.of(1L, 2L, 3L);
         when(userRepo.findAllActivatedUserIdsFromList(input)).thenReturn(List.of());
 
-        List<Long> result = userService.findAllActivatedUserIdsFromList(input);
+        List<Long> result = userService.findAllActivatedUserIds(input);
 
         assertEquals(0, result.size());
         verify(userRepo, times(1)).findAllActivatedUserIdsFromList(input);
+    }
+
+    @Test
+    void findAllActivatedUserIdsNullInputTest() {
+        when(userRepo.findAllActivatedUserIds()).thenReturn(List.of(1L, 2L, 3L));
+
+        List<Long> result = userService.findAllActivatedUserIds(null);
+
+        assertEquals(3, result.size());
+        verify(userRepo, times(1)).findAllActivatedUserIds();
+    }
+
+    @Test
+    void findAllActivatedUserIdsNullInputNoResultTest() {
+        when(userRepo.findAllActivatedUserIds()).thenReturn(List.of());
+
+        List<Long> result = userService.findAllActivatedUserIds(null);
+
+        assertEquals(0, result.size());
+        verify(userRepo, times(1)).findAllActivatedUserIds();
     }
 }

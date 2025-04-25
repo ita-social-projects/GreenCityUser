@@ -69,6 +69,8 @@ public class UserVO {
 
     private UserLocationDto userLocationDto;
 
+    private String firstName;
+
     @JsonManagedReference
     private UserNotificationPreferenceDto userNotificationPreferenceDto;
 }

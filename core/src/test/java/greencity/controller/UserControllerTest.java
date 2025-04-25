@@ -907,7 +907,7 @@ class UserControllerTest {
                 .map(String::valueOf)
                 .toList();
 
-        when(userService.findAllActivatedUserIdsFromList(input)).thenReturn(List.of(1L, 2L, 3L));
+        when(userService.findAllActivatedUserIds(input)).thenReturn(List.of(1L, 2L, 3L));
 
         MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -919,7 +919,7 @@ class UserControllerTest {
 
         List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
         assertEquals(3, activatedUserIds.size());
-        verify(userService, times(1)).findAllActivatedUserIdsFromList(input);
+        verify(userService, times(1)).findAllActivatedUserIds(input);
     }
 
     @Test
@@ -929,7 +929,7 @@ class UserControllerTest {
                 .map(String::valueOf)
                 .toList();
 
-        when(userService.findAllActivatedUserIdsFromList(input)).thenReturn(List.of());
+        when(userService.findAllActivatedUserIds(input)).thenReturn(List.of());
 
         MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -941,6 +941,22 @@ class UserControllerTest {
 
         List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
         assertEquals(0, activatedUserIds.size());
-        verify(userService, times(1)).findAllActivatedUserIdsFromList(input);
+        verify(userService, times(1)).findAllActivatedUserIds(input);
+    }
+
+    @Test
+    void getActivatedUsersIdsWithNoArgsTest() throws Exception {
+        when(userService.findAllActivatedUserIds(null)).thenReturn(List.of(1L, 2L, 3L));
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+                        .contentType(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
+        assertEquals(3, activatedUserIds.size());
+        verify(userService, times(1)).findAllActivatedUserIds(null);
     }
 }

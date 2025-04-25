@@ -276,6 +276,8 @@ public class ModelUtils {
                     .build())
                 .build())
             .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
+                .firstName("Julia")
+                .languageId(getLanguageId())
             /*.userAchievements(List.of(
                 UserAchievementVO.builder()
                     .id(47L)
