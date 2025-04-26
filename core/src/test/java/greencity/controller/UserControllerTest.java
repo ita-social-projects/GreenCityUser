@@ -973,20 +973,21 @@ class UserControllerTest {
     void getActivatedUsersIdsOkTest() throws Exception {
         List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
         List<String> stringIds = input.stream()
-                .map(String::valueOf)
-                .toList();
+            .map(String::valueOf)
+            .toList();
 
         when(userService.findAllActivatedUserIds(input)).thenReturn(List.of(1L, 2L, 3L));
 
         MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("ids", stringIds.toArray(new String[0])))
-                .andExpect(status().isOk())
-                .andReturn();
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("ids", stringIds.toArray(new String[0])))
+            .andExpect(status().isOk())
+            .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
 
-        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
         assertEquals(3, activatedUserIds.size());
         verify(userService, times(1)).findAllActivatedUserIds(input);
     }
@@ -995,20 +996,21 @@ class UserControllerTest {
     void getActivatedUsersIdsNoResultsTest() throws Exception {
         List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
         List<String> stringIds = input.stream()
-                .map(String::valueOf)
-                .toList();
+            .map(String::valueOf)
+            .toList();
 
         when(userService.findAllActivatedUserIds(input)).thenReturn(List.of());
 
         MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("ids", stringIds.toArray(new String[0])))
-                .andExpect(status().isOk())
-                .andReturn();
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("ids", stringIds.toArray(new String[0])))
+            .andExpect(status().isOk())
+            .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
 
-        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
         assertEquals(0, activatedUserIds.size());
         verify(userService, times(1)).findAllActivatedUserIds(input);
     }
@@ -1018,13 +1020,14 @@ class UserControllerTest {
         when(userService.findAllActivatedUserIds(null)).thenReturn(List.of(1L, 2L, 3L));
 
         MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
-                        .contentType(MediaType.APPLICATION_JSON))
-                 .andExpect(status().isOk())
-                .andReturn();
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
 
         String responseBody = result.getResponse().getContentAsString();
 
-        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
         assertEquals(3, activatedUserIds.size());
         verify(userService, times(1)).findAllActivatedUserIds(null);
     }

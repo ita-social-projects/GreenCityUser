@@ -463,11 +463,12 @@ public interface UserService {
     String findUserLanguageByUuid(String uuid);
 
     /**
-     * Retrieves the list of IDs of all users who have the {@code UserStatus}
-     * set to {@code ACTIVATED}.
-     * This method is typically used to filter active users for further processing or analysis.
+     * Retrieves the list of IDs of all users who have the {@code UserStatus} set to
+     * {@code ACTIVATED}. This method is typically used to filter active users for
+     * further processing or analysis.
      *
-     * @return a list of {@code Long} values representing the IDs of all activated users
+     * @return a list of {@code Long} values representing the IDs of all activated
+     *         users
      */
     List<Long> findAllActivatedUserIds(List<Long> ids);
 }

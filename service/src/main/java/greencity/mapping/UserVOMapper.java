@@ -47,7 +47,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .showLocation(user.getShowLocation())
             .lastActivityTime(user.getLastActivityTime())
             .languageId(languageId)
-                .firstName(user.getFirstName())
+            .firstName(user.getFirstName())
             .build();
     }
 }

@@ -1221,18 +1221,20 @@ public class UserController {
     /**
      * Endpoint for retrieving IDs of all users with status {@code ACTIVATED}.
      *
-     * @param ids {@link List} of ids to search for users in this range, not required: if not
-     * specified - then the search is done through all existing users.
+     * @param ids {@link List} of ids to search for users in this range, not
+     *            required: if not specified - then the search is done through all
+     *            existing users.
      * @return a {@link ResponseEntity} containing a list of activated user IDs
      */
     @Operation(summary = "Get the list of activated user ids")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/activated-ids")
-    public ResponseEntity<List<Long>> getActivatedUsersIds(@RequestParam(value = "ids", required = false) List<Long> ids) {
+    public ResponseEntity<List<Long>> getActivatedUsersIds(
+        @RequestParam(value = "ids", required = false) List<Long> ids) {
         return ResponseEntity.ok(userService.findAllActivatedUserIds(ids));
     }
 }

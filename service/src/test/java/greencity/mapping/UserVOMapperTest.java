@@ -72,7 +72,7 @@ class UserVOMapperTest {
                     .build())
                 .build() : null)
             .lastActivityTime(expectedResult.getLastActivityTime())
-                .firstName(expectedResult.getFirstName())
+            .firstName(expectedResult.getFirstName())
             .languageId(1L)
             .build();
 
