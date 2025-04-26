@@ -154,7 +154,8 @@ public class SecurityConfig {
                     "/user/createUbsRecord",
                     "/user/{userId}/sixUserFriends/",
                     "/ownSecurity/password-status",
-                    "/user/emailNotifications")
+                    "/user/emailNotifications",
+                        "/user/activated-ids")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",

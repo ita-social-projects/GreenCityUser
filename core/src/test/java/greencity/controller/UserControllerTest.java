@@ -1,5 +1,6 @@
 package greencity.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
@@ -67,6 +68,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -80,6 +82,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -964,5 +967,65 @@ class UserControllerTest {
         mockMvc.perform(get(userLink + "/count-active-users"))
             .andExpect(status().isOk())
             .andExpect(content().string(amountOfActiveUsersStr));
+    }
+
+    @Test
+    void getActivatedUsersIdsOkTest() throws Exception {
+        List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
+        List<String> stringIds = input.stream()
+                .map(String::valueOf)
+                .toList();
+
+        when(userService.findAllActivatedUserIds(input)).thenReturn(List.of(1L, 2L, 3L));
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("ids", stringIds.toArray(new String[0])))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
+        assertEquals(3, activatedUserIds.size());
+        verify(userService, times(1)).findAllActivatedUserIds(input);
+    }
+
+    @Test
+    void getActivatedUsersIdsNoResultsTest() throws Exception {
+        List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
+        List<String> stringIds = input.stream()
+                .map(String::valueOf)
+                .toList();
+
+        when(userService.findAllActivatedUserIds(input)).thenReturn(List.of());
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("ids", stringIds.toArray(new String[0])))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
+        assertEquals(0, activatedUserIds.size());
+        verify(userService, times(1)).findAllActivatedUserIds(input);
+    }
+
+    @Test
+    void getActivatedUsersIdsWithNoArgsTest() throws Exception {
+        when(userService.findAllActivatedUserIds(null)).thenReturn(List.of(1L, 2L, 3L));
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+                        .contentType(MediaType.APPLICATION_JSON))
+                 .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {});
+        assertEquals(3, activatedUserIds.size());
+        verify(userService, times(1)).findAllActivatedUserIds(null);
     }
 }

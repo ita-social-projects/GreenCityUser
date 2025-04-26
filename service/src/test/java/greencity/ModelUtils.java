@@ -276,6 +276,7 @@ public class ModelUtils {
                     .build())
                 .build())
             .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
+                .firstName("Julia")
             .languageId(1L)
             .build();
     }
@@ -562,7 +563,7 @@ public class ModelUtils {
      * .countryUk("Україна") .regionUk("Львівська") .regionEn("Lvivska")
      * .latitude(49.842957) .longitude(24.031111)
      * .users(Collections.singletonList(getUser())) .build(); }
-     * 
+     *
      * public static UserLocation getUserLocation2() { return UserLocation.builder()
      * .id(2L) .cityEn("Ternopil") .cityUk("Тернопіль") .countryEn("Ukraine")
      * .countryUk("Україна") .regionUk("Тернопільська") .regionEn("Ternopilska")

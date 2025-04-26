@@ -62,6 +62,8 @@ public class UserVO {
 
     private Long languageId;
 
+    private String firstName;
+
     @JsonManagedReference
     private UserNotificationPreferenceDto userNotificationPreferenceDto;
 }

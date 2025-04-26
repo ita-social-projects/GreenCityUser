@@ -335,4 +335,31 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate,
         @Param("granularity") String granularity);
+
+    /**
+     * Retrieves the list of IDs of users from the given list who have the {@code UserStatus}
+     * set to {@code ACTIVATED}.
+     * This method is typically used to filter active users for further processing or analysis.
+     *
+     * @return a list of {@code Long} values representing the IDs of all activated users
+     */
+    @Query("""
+            SELECT u.id
+            FROM User u
+            WHERE u.userStatus = 2 AND u.id IN :ids
+            """)
+    List<Long> findAllActivatedUserIdsFromList(@Param("ids") List<Long> ids);
+
+    /**
+     * Retrieves the list of IDs of users who have the {@code UserStatus}
+     * set to {@code ACTIVATED}.
+     *
+     * @return a list of {@code Long} values representing the IDs of all activated users
+     */
+    @Query("""
+            SELECT u.id
+            FROM User u
+            WHERE u.userStatus = 2
+            """)
+    List<Long> findAllActivatedUserIds();
 }

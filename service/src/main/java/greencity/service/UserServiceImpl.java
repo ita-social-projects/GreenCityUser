@@ -1045,4 +1045,16 @@ public class UserServiceImpl implements UserService {
         LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
         return languageVO.getCode();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<Long> findAllActivatedUserIds(List<Long> ids) {
+        if (ids != null) {
+            return userRepo.findAllActivatedUserIdsFromList(ids);
+        } else {
+            return userRepo.findAllActivatedUserIds();
+        }
+    }
 }
