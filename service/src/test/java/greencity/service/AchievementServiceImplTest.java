@@ -27,7 +27,7 @@ class AchievementServiceImplTest {
         List<AchievementVO> expectedResult = List.of(mock(AchievementVO.class));
 
         when(greenCityRemoteClient.findAllAchievements())
-                .thenReturn(expectedResult);
+            .thenReturn(expectedResult);
 
         List<AchievementVO> actualResult = achievementService.findAll();
 

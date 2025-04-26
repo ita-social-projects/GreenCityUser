@@ -9,7 +9,6 @@ import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,15 +40,11 @@ public class UserVO {
 
     private VerifyEmailVO verifyEmail;
 
-    private Double rating;
-
     private EmailNotification emailNotification;
 
     private LocalDateTime dateOfRegistration;
 
     private List<SocialNetworkVO> socialNetworks;
-
-    private List<UserVO> userFriends = new ArrayList<>();
 
     private String refreshTokenKey;
 
@@ -66,8 +61,6 @@ public class UserVO {
     private LocalDateTime lastActivityTime;
 
     private Long languageId;
-
-    private UserLocationDto userLocationDto;
 
     private String firstName;
 

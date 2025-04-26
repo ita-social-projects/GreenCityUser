@@ -19,14 +19,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -106,22 +104,8 @@ public class User {
     @Column(name = "profile_picture")
     private String profilePicturePath;
 
-    @Builder.Default
-    @OneToMany
-    @JoinTable(name = "users_friends",
-        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
-    private List<User> userFriends = new ArrayList<>();
-
-    @Column(name = "rating")
-    private Double rating;
-
     @Column(name = "first_name")
     private String firstName;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_location")
-    private UserLocation userLocation;
 
     @Column(name = "user_credo")
     private String userCredo;

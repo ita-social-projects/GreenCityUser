@@ -9,13 +9,11 @@ import greencity.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class UserVOAchievementMapper extends AbstractConverter<User, UserVOAchievement> {
-
     private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Override

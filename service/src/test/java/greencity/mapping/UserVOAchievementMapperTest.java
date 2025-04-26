@@ -32,27 +32,25 @@ class UserVOAchievementMapperTest {
     void convert() {
         User user = ModelUtils.getUser();
         Long userId = user.getId();
-        /*UserAchievement userAchievements = ModelUtils.getUserAchievement();
-        user.setUserAchievements(Collections.singletonList(userAchievements));*/
         List<UserAchievementVO> userAchievements = Collections.singletonList(ModelUtils.getUserAchievement());
 
         when(greenCityRemoteClient.findAllUserAchievementsByUserId(userId))
-                .thenReturn(userAchievements);
+            .thenReturn(userAchievements);
 
         UserVOAchievement expected = UserVOAchievement.builder()
             .id(user.getId())
             .name(user.getName())
             .userAchievements(userAchievements
-                    .stream().map(userAchievement -> UserAchievementVO.builder()
-                            .id(userAchievement.getId())
-                            .user(UserVO.builder()
-                                    .id(userAchievement.getUser().getId())
-                                    .build())
-                            .achievement(AchievementVO.builder()
-                                    .id(userAchievement.getAchievement().getId())
-                                    .build())
-                            .build())
-                    .collect(Collectors.toList()))
+                .stream().map(userAchievement -> UserAchievementVO.builder()
+                    .id(userAchievement.getId())
+                    .user(UserVO.builder()
+                        .id(userAchievement.getUser().getId())
+                        .build())
+                    .achievement(AchievementVO.builder()
+                        .id(userAchievement.getAchievement().getId())
+                        .build())
+                    .build())
+                .collect(Collectors.toList()))
             .build();
         assertEquals(expected, userVOAchievementMapper.convert(user));
     }

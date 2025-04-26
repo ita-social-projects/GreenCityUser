@@ -37,24 +37,25 @@ class UserNotificationPreferenceVOMapperTest {
         EmailPreference emailPreference = EmailPreference.COMMENTS;
         EmailPreferencePeriodicity emailPreferencePeriodicity = EmailPreferencePeriodicity.DAILY;
         UserNotificationPreferenceVO expectedResult = UserNotificationPreferenceVO.builder()
-                .id(userNotificationPreferenceId)
-                .user(userVO)
-                .emailPreference(emailPreference)
-                .periodicity(emailPreferencePeriodicity)
-                .build();
+            .id(userNotificationPreferenceId)
+            .user(userVO)
+            .emailPreference(emailPreference)
+            .periodicity(emailPreferencePeriodicity)
+            .build();
 
         when(userNotificationPreference.getUser())
-                .thenReturn(user);
+            .thenReturn(user);
         when(modelMapper.map(user, UserVO.class))
-                .thenReturn(userVO);
+            .thenReturn(userVO);
         when(userNotificationPreference.getId())
-                .thenReturn(userNotificationPreferenceId);
+            .thenReturn(userNotificationPreferenceId);
         when(userNotificationPreference.getEmailPreference())
-                .thenReturn(emailPreference);
+            .thenReturn(emailPreference);
         when(userNotificationPreference.getPeriodicity())
-                .thenReturn(emailPreferencePeriodicity);
+            .thenReturn(emailPreferencePeriodicity);
 
-        UserNotificationPreferenceVO actualResult = userNotificationPreferenceVOMapper.convert(userNotificationPreference);
+        UserNotificationPreferenceVO actualResult =
+            userNotificationPreferenceVOMapper.convert(userNotificationPreference);
 
         assertEquals(expectedResult, actualResult);
     }

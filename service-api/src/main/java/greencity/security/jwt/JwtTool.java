@@ -98,13 +98,13 @@ public class JwtTool {
         calendar.setTime(now);
         calendar.add(Calendar.MINUTE, accessTokenValidTimeInMinutes);
         return Jwts.builder()
-                .claims(claims.build())
-                .issuedAt(now)
-                .expiration(calendar.getTime())
-                .signWith(Keys.hmacShaKeyFor(
-                                accessTokenKey.getBytes(StandardCharsets.UTF_8)),
-                        Jwts.SIG.HS256)
-                .compact();
+            .claims(claims.build())
+            .issuedAt(now)
+            .expiration(calendar.getTime())
+            .signWith(Keys.hmacShaKeyFor(
+                accessTokenKey.getBytes(StandardCharsets.UTF_8)),
+                Jwts.SIG.HS256)
+            .compact();
     }
 
     /**

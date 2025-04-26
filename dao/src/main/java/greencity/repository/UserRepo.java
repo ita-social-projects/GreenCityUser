@@ -2,8 +2,8 @@ package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
-import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
 import greencity.entity.User;
@@ -112,42 +112,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     long countAllByUserStatus(UserStatus userStatus);
 
     /**
-     * Get all user friends{@link User}.
-     *
-     * @return list of {@link User}.
-     */
-    @Query(nativeQuery = true, value = """
-        SELECT * FROM users WHERE users.id IN ( \
-        (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND')\
-        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'));\
-        """)
-    List<User> getAllUserFriends(Long userId);
-
-    /**
-     * Get all user friends{@link User}. by page.
-     *
-     * @param pageable pageable configuration.
-     * @return {@link Page}
-     */
-    @Query(nativeQuery = true, value = """
-        SELECT * FROM users WHERE users.id IN ( \
-        (SELECT user_id FROM users_friends WHERE friend_id = :userId and status = 'FRIEND') \
-        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId and status = 'FRIEND'))\
-        """)
-    Page<User> getAllUserFriends(Long userId, Pageable pageable);
-
-    /**
-     * Get six friends with the highest rating {@link User}.
-     */
-    @Query(nativeQuery = true, value = """
-        SELECT * FROM users WHERE users.id IN ( \
-        (SELECT user_id FROM users_friends WHERE friend_id = :userId AND status = 'FRIEND') \
-        UNION (SELECT friend_id FROM users_friends WHERE user_id = :userId AND status = 'FRIEND')) \
-        ORDER BY users.rating DESC LIMIT 6;\
-        """)
-    List<User> getSixFriendsWithTheHighestRating(Long userId);
-
-    /**
      * Find the last activity time by {@link User}'s id.
      *
      * @param userId - {@link User}'s id
@@ -165,7 +129,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      **/
     @Modifying
     @Query(nativeQuery = true, value = """
-        DELETE FROM users where status = 1 \
+        DELETE FROM users where user_status = 1 \
         AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP\
         """)
     int scheduleDeleteDeactivatedUsers();
@@ -193,6 +157,21 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         OR LOWER(u.userCredo) LIKE LOWER(CONCAT('%', :query, '%'))\
         """)
     Page<User> searchBy(Pageable paging, String query);
+
+    /**
+     * Method that finds user ids by emailPreference and periodicity.
+     *
+     * @param emailPreference of user.
+     * @param periodicity     of notification.
+     * @return list of user ids.
+     */
+    @Query(nativeQuery = true, value = """
+            SELECT u.*
+            FROM users u
+            LEFT JOIN user_email_preferences uep ON u.id = uep.user_id
+            WHERE uep.email_preference = :emailPreference AND uep.periodicity = :periodicity
+        """)
+    List<User> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described
@@ -268,7 +247,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users where users.id in (:usersId)")
     List<User> getAllUsersByUsersId(List<Long> usersId);
-    
+
     /**
      * Find all {@link UserManagementVO}.
      *
@@ -276,7 +255,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param pageable pagination
      * @return list of all {@link UserManagementVO}
      */
-    @Query(" SELECT new greencity.dto.user.UserManagementVO(u.id, u.name, u.email, u.userCredo, u.role, u.userStatus) " + " FROM User u ")
+    @Query(" SELECT new greencity.dto.user.UserManagementVO(u.id, u.name, u.email, u.userCredo, u.role, u.userStatus) "
+        + " FROM User u ")
     Page<UserManagementVO> findAllManagementVo(Specification<User> filter, Pageable pageable);
 
     /**
@@ -286,11 +266,11 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         count of users with that role.
      */
     @Query("""
-     SELECT new greencity.dto.user.UserRoleStatisticDto(u.role, COUNT(u.id))
-     FROM User u
-     WHERE u.userStatus = 2
-     GROUP BY u.role
-     """)
+        SELECT new greencity.dto.user.UserRoleStatisticDto(u.role, COUNT(u.id))
+        FROM User u
+        WHERE u.userStatus = 2
+        GROUP BY u.role
+        """)
     List<UserRoleStatisticDto> getUserRolesDistribution();
 
     /**
@@ -300,59 +280,11 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         the count of users with that status.
      */
     @Query("""
-       SELECT new greencity.dto.user.UserStatusStatisticDto(u.userStatus, COUNT(u.id))
-       FROM User u
-       GROUP BY u.userStatus
-       """)
+        SELECT new greencity.dto.user.UserStatusStatisticDto(u.userStatus, COUNT(u.id))
+        FROM User u
+        GROUP BY u.userStatus
+        """)
     List<UserStatusStatisticDto> getUserStatusesDistribution();
-
-    /**
-     * Retrieves the distribution of users by city.
-     *
-     * @return A list of UserLocationStatisticDto objects containing the city name
-     *         and the count of users in that city.
-     */
-    @Query("""
-       SELECT new greencity.dto.user.UserLocationStatisticDto(
-              COALESCE(ul.cityEn, 'No Location'), COUNT(u.id))
-       FROM User u
-       LEFT JOIN u.userLocation ul
-       WHERE u.userStatus = 2
-       GROUP BY ul.cityEn
-       """)
-    List<UserLocationStatisticDto> getUserLocationsDistributionByCity();
-
-    /**
-     * Retrieves the distribution of users by region.
-     *
-     * @return A list of UserLocationStatisticDto objects containing the region name
-     *         and the count of users in that region.
-     */
-    @Query("""
-       SELECT new greencity.dto.user.UserLocationStatisticDto(
-              COALESCE(ul.regionEn, 'No Location'), COUNT(u.id))
-       FROM User u
-       LEFT JOIN u.userLocation ul
-       WHERE u.userStatus = 2
-       GROUP BY ul.regionEn
-       """)
-    List<UserLocationStatisticDto> getUserLocationsDistributionByRegion();
-
-    /**
-     * Retrieves the distribution of users by country.
-     *
-     * @return A list of UserLocationStatisticDto objects containing the country
-     *         name and the count of users in that country.
-     */
-    @Query("""
-       SELECT new greencity.dto.user.UserLocationStatisticDto(
-              COALESCE(ul.countryEn, 'No Location'), COUNT(u.id))
-       FROM User u
-       LEFT JOIN u.userLocation ul
-       WHERE u.userStatus = 2
-       GROUP BY ul.countryEn
-       """)
-    List<UserLocationStatisticDto> getUserLocationsDistributionByCountry();
 
     /**
      * Retrieves the distribution of user email preferences and their periodicity.
@@ -362,14 +294,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      *         combination.
      */
     @Query("""
-            SELECT new greencity.dto.user.UserEmailPreferencesStatisticDto(
-                uep.emailPreference, uep.periodicity, COUNT(uep.id)
-            )
-            FROM UserNotificationPreference uep
-            LEFT JOIN User u
-            WHERE u.userStatus = 2
-            GROUP BY uep.emailPreference, uep.periodicity
-       """)
+             SELECT new greencity.dto.user.UserEmailPreferencesStatisticDto(
+                 uep.emailPreference, uep.periodicity, COUNT(uep.id)
+             )
+             FROM UserNotificationPreference uep
+             LEFT JOIN User u
+             WHERE u.userStatus = 2
+             GROUP BY uep.emailPreference, uep.periodicity
+        """)
     List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution();
 
     /**
@@ -377,6 +309,32 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query("SELECT COUNT(u) FROM User u WHERE u.userStatus IN (greencity.enums.UserStatus.ACTIVATED) ")
     Long countActiveUsers();
+
+    /**
+     * Counts users grouped by their registration date within a specified date range
+     * and granularity.
+     *
+     * @param startDate   The start date of the range to consider (inclusive).
+     * @param endDate     The end date of the range to consider (inclusive).
+     * @param granularity The time unit for grouping results
+     *                    {@link greencity.enums.DateGranularity}
+     * @return A list of tuples containing the date group and the count of users
+     *         registered in that group.
+     */
+    @Query(value = """
+            SELECT new greencity.dto.user.UserRegistrationStatisticDto(
+                FUNCTION('DATE_TRUNC', :granularity, u.dateOfRegistration) as dateGroup,
+                COUNT(u.id))
+            FROM User u
+            WHERE u.dateOfRegistration >= :startDate
+            AND u.dateOfRegistration <= :endDate
+            GROUP BY dateGroup
+            ORDER BY dateGroup
+        """)
+    List<UserRegistrationStatisticDto> countUsersByRegistrationDateBetween(
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate,
+        @Param("granularity") String granularity);
 
     /**
      * Retrieves the list of IDs of users from the given list who have the {@code UserStatus}

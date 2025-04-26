@@ -16,9 +16,7 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
@@ -27,9 +25,7 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.dto.user.UserProfileStatisticsDto;
 import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
@@ -311,14 +307,6 @@ public interface UserService {
     UserProfileStatisticsDto getUserProfileStatistics(Long userId);
 
     /**
-     * Get six friends with the highest rating.
-     *
-     * @param userId id of user whose friends we are getting
-     * @return list of {@link UserVO}
-     */
-    List<UserVO> getSixFriendsWithTheHighestRating(Long userId);
-
-    /**
      * Get user and six friends with the online status {@link UserVO}.
      *
      * @param userId {@link Long}
@@ -411,6 +399,15 @@ public interface UserService {
     void updateUserLanguage(Long userId, Long languageId);
 
     /**
+     * Method that finds user ids by emailPreference and periodicity.
+     *
+     * @param emailPreference of user.
+     * @param periodicity     of notification.
+     * @return list of user ids.
+     */
+    List<UserVO> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
+
+    /**
      * Method that return UserVo by UUid.
      *
      * @return {@link UserVO}
@@ -464,43 +461,6 @@ public interface UserService {
      * @return user language.
      */
     String findUserLanguageByUuid(String uuid);
-
-    /**
-     * Method to get List of {@link UserRoleStatisticDto} to show distribution of
-     * roles.
-     *
-     * @return {@link List} of {@link UserRoleStatisticDto}
-     */
-    List<UserRoleStatisticDto> getUserRolesDistribution();
-
-    /**
-     * Method to get List of {@link UserStatusStatisticDto} to show distribution of
-     * statuses.
-     *
-     * @return {@link List} of {@link UserStatusStatisticDto}
-     */
-    List<UserStatusStatisticDto> getUserStatusesDistribution();
-
-    /**
-     * Method to get List of {@link UserLocationStatisticDto} to show distribution
-     * of statuses.
-     *
-     * @return {@link List} of {@link UserLocationStatisticDto}
-     */
-    List<UserLocationStatisticDto> getUserLocationsDistribution(String groupBy);
-
-    /**
-     * Method to get List of {@link UserEmailPreferencesStatisticDto} to show
-     * distribution of preferences by type and periodicity.
-     *
-     * @return {@link List} of {@link UserEmailPreferencesStatisticDto}
-     */
-    List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution();
-
-    /**
-     * Count total active users in the system.
-     */
-    Long countActiveUsers();
 
     /**
      * Retrieves the list of IDs of all users who have the {@code UserStatus}

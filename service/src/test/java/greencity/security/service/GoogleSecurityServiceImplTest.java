@@ -142,15 +142,12 @@ class GoogleSecurityServiceImplTest {
         UserVO userVO = ModelUtils.getUserVO();
         User user = ModelUtils.getUser();
 
-        // List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
-        // List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 
         userVO.setId(null);
         userVO.setName(null);
         user.setId(null);
         user.setName(null);
-        // user.setUserAchievements(userAchievementList);
 
         when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
@@ -161,8 +158,6 @@ class GoogleSecurityServiceImplTest {
         when(modelMapper.map(any(), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any())).thenReturn(user);
         when(achievementService.findAll()).thenReturn(achievementVOList);
-        /*when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
-        }.getType())).thenReturn(achievementList);*/
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
         when(restClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
 
@@ -185,7 +180,7 @@ class GoogleSecurityServiceImplTest {
             assertNotNull(savedUser.getLastActivityTime(), "Last activity time should be set.");
             assertEquals(EmailNotification.DISABLED, savedUser.getEmailNotification(),
                 "Email notification should be DISABLED.");
-            assertEquals(DEFAULT_RATING, savedUser.getRating());
+            // assertEquals(DEFAULT_RATING, savedUser.getRating());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowLocation());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowEcoPlace());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowToDoList());

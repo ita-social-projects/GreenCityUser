@@ -7,7 +7,6 @@ import greencity.exception.exceptions.BadSocialNetworkLinksException;
 import greencity.exception.exceptions.BadUpdateRequestException;
 import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.InsufficientLocationDataException;
 import greencity.exception.exceptions.InvalidURLException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
@@ -18,7 +17,6 @@ import greencity.exception.exceptions.UserBlockedException;
 import greencity.exception.exceptions.WrongCaptchaException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
-import greencity.exception.exceptions.GoogleApiException;
 import greencity.exception.exceptions.UserDeactivationException;
 import greencity.exception.exceptions.Base64DecodedException;
 import greencity.exception.exceptions.ResourceNotFoundException;
@@ -302,7 +300,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             ex.getBindingResult().getFieldErrors().stream()
                 .map(ValidationExceptionDto::new)
                 .toList();
-        log.trace(ex.getMessage(), ex);
+        log.trace(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(collect);
     }
 
@@ -380,43 +378,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
-    }
-
-    /**
-     * Method interceptor exception {@link GoogleApiException}.
-     *
-     * @param googleApiException Exception witch should be intercepted
-     * @return ResponseEntity witch contain http status and body with message of
-     *         exception.
-     */
-    @ExceptionHandler(GoogleApiException.class)
-    public ResponseEntity<Object> handleGoogleApiException(GoogleApiException googleApiException) {
-        ValidationExceptionDto validationExceptionDto =
-            new ValidationExceptionDto(AppConstant.GOOGLE_API, googleApiException.getMessage());
-        if (googleApiException.getMessage() != null
-            && googleApiException.getMessage().contains("Geocoding result was not found")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationExceptionDto);
-        } else {
-            validationExceptionDto.setMessage(googleApiException.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
-        }
-    }
-
-    /**
-     * Exception handler for InsufficientLocationDataException.
-     *
-     * @param exception which is being intercepted
-     * @param request   contains details about occurred exception
-     * @return ResponseEntity which contains details about exception and 400 status
-     *         code
-     */
-    @ExceptionHandler(InsufficientLocationDataException.class)
-    public final ResponseEntity<Object> handleInsufficientLocationDataException(
-        InsufficientLocationDataException exception, WebRequest request) {
-        log.error(exception.getMessage());
-        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
     }
 

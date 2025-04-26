@@ -156,9 +156,8 @@ class SocialNetworkImageServiceImplTest {
         verify(socialNetworkImageRepo).deleteById(listIds.get(1));
         verify(socialNetworkImageRepo).deleteById(listIds.get(2));
 
-        verify(greenCityRemoteClient).deleteAllFiles(List.of(image1.getImagePath()));
-        verify(greenCityRemoteClient).deleteAllFiles(List.of(image2.getImagePath()));
-        verify(greenCityRemoteClient).deleteAllFiles(List.of(image3.getImagePath()));
+        verify(greenCityRemoteClient)
+            .deleteAllFiles(List.of(image1.getImagePath(), image2.getImagePath(), image3.getImagePath()));
     }
 
     @Test

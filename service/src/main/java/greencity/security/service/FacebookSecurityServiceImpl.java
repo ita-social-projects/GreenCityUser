@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import static greencity.constant.AppConstant.DEFAULT_RATING;
 
 /**
  * {@inheritDoc}
@@ -177,7 +176,6 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-            .rating(DEFAULT_RATING)
             .languageId(modelMapper.map(language, Long.class))
             .build();
 

@@ -40,11 +40,7 @@ public class ErrorMessage {
     public static final String USER_CREATED = "User is not activated";
     public static final String USER_DELETED = "User deleted";
     public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
-    public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
-    public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
     public static final String NOT_VALID_BOOLEAN_VALUE = "%s is not a valid Boolean value for %s";
-    public static final String INSUFFICIENT_LOCATION_DATA_FOUND =
-        "Insufficient location data found for the provided coordinates.";
     public static final String USER_CANNOT_DEACTIVATE_YOURSELF = "You cannot deactivate yourself if you are not a USER";
     public static final String USER_CANNOT_DEACTIVATE_OTHERS = "USER cannot deactivate other users";
     public static final String ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN = "ADMIN cannot deactivate other ADMIN users";
@@ -52,7 +48,8 @@ public class ErrorMessage {
         "You do not have permission to deactivate this user";
     public static final String SOCIAL_NETWORK_IMAGE_NOT_SAVED = "Social network image hasn't been saved";
     public static final String SOCIAL_NETWORK_IMAGE_FOUND_BY_ID = "Social network image doesn't exist by this id: ";
-    public static final String BAD_DEFAULT_SOCIAL_NETWORK_IMAGE_PATH = "Bad default social network image host path (Row in database doesn't exists)";
+    public static final String BAD_DEFAULT_SOCIAL_NETWORK_IMAGE_PATH =
+        "Bad default social network image host path (Row in database doesn't exists)";
     public static final String BASE64_DECODE_MESSAGE = "Can't decode from base64 format";
     public static final String BRUTEFORCE_PROTECTION_MESSAGE =
         "User account is blocked due to too many failed login attempts.";

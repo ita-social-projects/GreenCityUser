@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserNotificationPreferenceVOMapper extends AbstractConverter<UserNotificationPreference, UserNotificationPreferenceVO> {
-
+public class UserNotificationPreferenceVOMapper
+    extends AbstractConverter<UserNotificationPreference, UserNotificationPreferenceVO> {
     private final ModelMapper modelMapper;
 
     @Lazy
@@ -25,10 +25,10 @@ public class UserNotificationPreferenceVOMapper extends AbstractConverter<UserNo
         UserVO userVO = modelMapper.map(user, UserVO.class);
 
         return UserNotificationPreferenceVO.builder()
-                .id(userNotificationPreference.getId())
-                .user(userVO)
-                .emailPreference(userNotificationPreference.getEmailPreference())
-                .periodicity(userNotificationPreference.getPeriodicity())
-                .build();
+            .id(userNotificationPreference.getId())
+            .user(userVO)
+            .emailPreference(userNotificationPreference.getEmailPreference())
+            .periodicity(userNotificationPreference.getPeriodicity())
+            .build();
     }
 }

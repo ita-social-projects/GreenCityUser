@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 @RestController
@@ -28,7 +27,6 @@ import java.util.List;
 @Validated
 @Slf4j
 public class UserNotificationPreferenceController {
-
     private final UserNotificationPreferenceService userNotificationPreferenceService;
 
     /**
@@ -38,10 +36,10 @@ public class UserNotificationPreferenceController {
      */
     @Operation(summary = "Get user notification preferences by user id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-                    content = @Content(schema = @Schema(implementation = UserNotificationPreferenceVO.class))),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+            content = @Content(schema = @Schema(implementation = UserNotificationPreferenceVO.class))),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping
     public ResponseEntity<List<UserNotificationPreferenceVO>> findAllByUserId(@RequestParam Long userId) {
@@ -49,18 +47,20 @@ public class UserNotificationPreferenceController {
     }
 
     /**
-     * Check is user notification preference exists by params in EmailPreferenceDto
+     * Check is user notification preference exists by params in EmailPreferenceDto.
      *
      * @return boolean of whether UserNotificationPreference exists
      */
     @Operation(summary = "Check is user notification preference exists by params in EmailPreferenceDto.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @PostMapping("/search")
-    public ResponseEntity<Boolean> existsByUserIdAndEmailPreferenceAndPeriodicity(@RequestBody EmailPreferenceDto emailPreferenceDto) {
-        return ResponseEntity.ok().body(userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(emailPreferenceDto));
+    public ResponseEntity<Boolean> existsByUserIdAndEmailPreferenceAndPeriodicity(
+        @RequestBody EmailPreferenceDto emailPreferenceDto) {
+        return ResponseEntity.ok()
+            .body(userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(emailPreferenceDto));
     }
 }

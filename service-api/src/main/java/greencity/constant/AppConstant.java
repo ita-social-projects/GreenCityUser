@@ -30,6 +30,5 @@ public class AppConstant {
     public static final String DEFAULT_LANGUAGE_CODE = "en";
     public static final String PASSWORD = "password";
     public static final String USER_STATUS = "user_status";
-    public static final String GOOGLE_API = "Google API";
     public static final String DEFAULT_SOCIAL_NETWORK_IMAGE_HOST_PATH = "img/default_social_network_icon.png";
 }

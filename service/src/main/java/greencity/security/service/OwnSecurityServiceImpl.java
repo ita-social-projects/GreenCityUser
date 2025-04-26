@@ -2,7 +2,6 @@ package greencity.security.service;
 
 import greencity.client.CloudFlareClient;
 import greencity.client.GreenCityRemoteClient;
-import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.security.CloudFlareRequest;
@@ -147,7 +146,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
-            .rating(AppConstant.DEFAULT_RATING)
             .languageId(modelMapper.map(language, Long.class))
             .build();
     }
@@ -537,7 +535,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
-            .rating(AppConstant.DEFAULT_RATING)
             .languageId(2L)
             .build();
     }

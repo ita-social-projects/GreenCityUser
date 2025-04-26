@@ -4,7 +4,6 @@ import greencity.client.GreenCityRemoteClient;
 import greencity.constant.CacheConstants;
 import greencity.dto.achievement.AchievementVO;
 import java.util.List;
-import greencity.exception.exceptions.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.EnableCaching;

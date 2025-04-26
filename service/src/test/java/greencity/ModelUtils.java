@@ -73,9 +73,10 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
-                "Львівська", "Ukraine", "Україна", 20.000000,
-                20.000000, new ArrayList<>()))
+            /*
+             * .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska", "Львівська",
+             * "Ukraine", "Україна", 20.000000, 20.000000, new ArrayList<>()))
+             */
             .languageId(getLanguageId())
             .build();
     }
@@ -200,7 +201,7 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            .userLocation(null)
+            // .userLocation(null)
             .build();
     }
 
@@ -244,7 +245,7 @@ public class ModelUtils {
             .userCredo("save the world")
             .emailNotification(EmailNotification.MONTHLY)
             .userStatus(UserStatus.ACTIVATED)
-            .rating(13.4)
+            // .rating(13.4)
             .verifyEmail(VerifyEmailVO.builder()
                 .id(32L)
                 .user(UserVO.builder()
@@ -253,18 +254,17 @@ public class ModelUtils {
                     .build())
                 .token("toooookkkeeeeen42324532542")
                 .build())
-            .userFriends(Collections.singletonList(
-                UserVO.builder()
-                    .id(75L)
-                    .name("Andrew")
-                    .build()))
+            /*
+             * .userFriends(Collections.singletonList( UserVO.builder() .id(75L)
+             * .name("Andrew") .build()))
+             */
             .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-            .userLocationDto(
-                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
-                    "Ukraine", "Україна", 20.000000,
-                    20.000000))
+            /*
+             * .userLocationDto( new UserLocationDto(1L, "Lviv", "Львів", "Lvivska",
+             * "Львівська", "Ukraine", "Україна", 20.000000, 20.000000))
+             */
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
@@ -277,40 +277,7 @@ public class ModelUtils {
                 .build())
             .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
                 .firstName("Julia")
-                .languageId(getLanguageId())
-            /*.userAchievements(List.of(
-                UserAchievementVO.builder()
-                    .id(47L)
-                    .user(UserVO.builder()
-                        .id(13L)
-                        .build())
-                    .achievement(AchievementVO.builder()
-                        .id(56L)
-                        .build())
-                    .build(),
-                UserAchievementVO.builder()
-                    .id(39L)
-                    .user(UserVO.builder()
-                        .id(13L)
-                        .build())
-                    .achievement(AchievementVO.builder()
-                        .id(14L)
-                        .build())
-                    .build()))*/
-            /*.userActions(Collections.singletonList(UserActionVO.builder()
-                .id(13L)
-                .achievementCategory(AchievementCategoryVO.builder()
-                    .id(1L)
-                    .build())
-                .count(0)
-                .user(UserVO.builder()
-                    .id(13L)
-                    .build())
-                .build()))
-            .languageVO(LanguageVO.builder()
-                .id(1L)
-                .code("ua")
-                .build())*/
+            .languageId(1L)
             .build();
     }
 
@@ -348,39 +315,25 @@ public class ModelUtils {
             .build();
     }
 
-    /*public static Language getLanguage() {
-        return Language.builder().id(1L).code(AppConstant.DEFAULT_LANGUAGE_CODE).build();
-    }*/
-
     public static Long getLanguageId() {
         return 2L;
     }
 
     public static LanguageVO getLanguageVO() {
         return LanguageVO.builder()
-                .id(getLanguageId())
-                .code("en")
-                .build();
+            .id(getLanguageId())
+            .code("en")
+            .build();
     }
 
     public static UserProfilePictureDto getUserProfilePictureDto() {
         return new UserProfilePictureDto(1L, "name", "image");
     }
 
-    /*public static Achievement getAchievement() {
-        return new Achievement(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
-            "Acquired habit 14 days", Collections.emptyList(),
-            new AchievementCategory(), 1);
-    }*/
-
     public static AchievementVO getAchievementVO() {
         return new AchievementVO(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
             "Acquired habit 14 days", new AchievementCategoryVO(), 1);
     }
-
-    /*public static UserAchievement getUserAchievement() {
-        return new UserAchievement(1L, getUser(), getAchievement(), false);
-    }*/
 
     public static UserAchievementVO getUserAchievement() {
         return new UserAchievementVO(1L, getUserVO(), getAchievementVO(), false);
@@ -442,7 +395,7 @@ public class ModelUtils {
             .email("test@mail.com")
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_USER)
-            .rating(100D)
+            // .rating(100D)
             .build();
     }
 
@@ -571,26 +524,26 @@ public class ModelUtils {
 
     public static SocialNetworkImage getSocialNetworkImage() {
         return SocialNetworkImage.builder()
-                .id(1L)
-                .hostPath("hostPath")
-                .imagePath("imagePath")
-                .build();
+            .id(1L)
+            .hostPath("hostPath")
+            .imagePath("imagePath")
+            .build();
     }
 
     public static SocialNetworkImage getSocialNetworkImageId2() {
         return SocialNetworkImage.builder()
-                .id(2L)
-                .hostPath("hostPath2")
-                .imagePath("imagePath2")
-                .build();
+            .id(2L)
+            .hostPath("hostPath2")
+            .imagePath("imagePath2")
+            .build();
     }
 
     public static SocialNetworkImage getSocialNetworkImageId3() {
         return SocialNetworkImage.builder()
-                .id(3L)
-                .hostPath("hostPath3")
-                .imagePath("imagePath3")
-                .build();
+            .id(3L)
+            .hostPath("hostPath3")
+            .imagePath("imagePath3")
+            .build();
     }
 
     public static User getEmployeeWithPositionsAndRelatedAuthorities_Empty() {
@@ -604,35 +557,19 @@ public class ModelUtils {
             .build();
     }
 
-    public static UserLocation getUserLocation() {
-        return UserLocation.builder()
-            .id(1L)
-            .cityEn("Lviv")
-            .cityUk("Львів")
-            .countryEn("Ukraine")
-            .countryUk("Україна")
-            .regionUk("Львівська")
-            .regionEn("Lvivska")
-            .latitude(49.842957)
-            .longitude(24.031111)
-            .users(Collections.singletonList(getUser()))
-            .build();
-    }
-
-    public static UserLocation getUserLocation2() {
-        return UserLocation.builder()
-            .id(2L)
-            .cityEn("Ternopil")
-            .cityUk("Тернопіль")
-            .countryEn("Ukraine")
-            .countryUk("Україна")
-            .regionUk("Тернопільська")
-            .regionEn("Ternopilska")
-            .latitude(49.842957)
-            .longitude(24.031111)
-            .users(Collections.singletonList(getUser()))
-            .build();
-    }
+    /*
+     * public static UserLocation getUserLocation() { return UserLocation.builder()
+     * .id(1L) .cityEn("Lviv") .cityUk("Львів") .countryEn("Ukraine")
+     * .countryUk("Україна") .regionUk("Львівська") .regionEn("Lvivska")
+     * .latitude(49.842957) .longitude(24.031111)
+     * .users(Collections.singletonList(getUser())) .build(); }
+     *
+     * public static UserLocation getUserLocation2() { return UserLocation.builder()
+     * .id(2L) .cityEn("Ternopil") .cityUk("Тернопіль") .countryEn("Ukraine")
+     * .countryUk("Україна") .regionUk("Тернопільська") .regionEn("Ternopilska")
+     * .latitude(49.842957) .longitude(24.031111)
+     * .users(Collections.singletonList(getUser())) .build(); }
+     */
 
     public static List<GeocodingResult> getGeocodingResult() {
         List<GeocodingResult> geocodingResults = new ArrayList<>();
