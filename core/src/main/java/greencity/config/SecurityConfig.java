@@ -5,6 +5,7 @@ import static greencity.constant.AppConstant.EMPLOYEE;
 import static greencity.constant.AppConstant.MODERATOR;
 import static greencity.constant.AppConstant.UBS_EMPLOYEE;
 import static greencity.constant.AppConstant.USER;
+
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -12,10 +13,13 @@ import greencity.security.filters.AccessTokenAuthenticationFilter;
 import greencity.security.jwt.JwtTool;
 import greencity.security.providers.JwtAuthenticationProvider;
 import greencity.service.UserService;
+
 import static jakarta.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+
 import java.util.Arrays;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -31,7 +35,9 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -75,157 +81,158 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.cors(corsCustomizer -> corsCustomizer.configurationSource(request -> {
-            CorsConfiguration config = new CorsConfiguration();
-            config.setAllowedOriginPatterns(List.of(allowedOrigins));
-            config.setAllowedMethods(
-                Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"));
-            config.setAllowedHeaders(
-                Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Headers",
-                    "X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
-            config.setAllowCredentials(true);
-            config.setMaxAge(3600L);
-            return config;
-        })).csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
-            .addFilterBefore(
-                new AccessTokenAuthenticationFilter(jwtTool, authenticationManager(), userService),
-                UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint((req, resp, exc) -> resp.sendError(SC_UNAUTHORIZED, "Authorize first."))
-                .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities.")))
-            .authorizeHttpRequests(req -> req
-                .requestMatchers("/static/css/**", "/static/img/**").permitAll()
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/error").permitAll()
-                .requestMatchers(
-                    "/v2/api-docs/**",
-                    "/v3/api-docs/**",
-                    "/swagger.json",
-                    "/swagger-ui.html",
-                    "/swagger-ui/index.html",
-                    "/swagger-ui/**",
-                    "/swagger-resources/**",
-                    "/webjars/**")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET,
-                    "/ownSecurity/verifyEmail",
-                    "/ownSecurity/updateAccessToken",
-                    "/ownSecurity/restorePassword",
-                    "/googleSecurity",
-                    "/facebookSecurity/generateFacebookAuthorizeURL",
-                    "/facebookSecurity/facebook", "/user/emailNotifications",
-                    "/user/activatedUsersAmount",
-                    "/user/{userId}/habit/assign",
-                    "/token",
-                    "/socket/**",
-                    "/user/findAllByEmailNotification",
-                    "/user/checkByUuid",
-                    "/user/get-user-rating",
-                    COMMIT_INFO)
-                .permitAll()
-                .requestMatchers(HttpMethod.POST,
-                    "/ownSecurity/signUp",
-                    "/ownSecurity/signIn",
-                    "/ownSecurity/updatePassword",
-                    "/ownSecurity/unblockAccount",
-                    "/api/testers/sign-in")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, "/facebookSecurity/login").permitAll()
-                .requestMatchers(HttpMethod.POST, "/facebookSecurity/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/check-auth").permitAll()
-                .requestMatchers(HttpMethod.GET,
-                    "/user/to-do-list-items/habits/{habitId}/to-do-list",
-                    "/user/{userId}/{habitId}/custom-to-do-list-items/available",
-                    "/user/{userId}/profile/", "/user/isOnline/{userId}/",
-                    "/user/{userId}/profileStatistics/",
-                    "/user/userAndSixFriendsWithOnlineStatus",
-                    "/user/userAndAllFriendsWithOnlineStatus",
-                    "/user/usersOnlineStatus",
-                    "/user/findByIdForAchievement",
-                    "/user/findNotDeactivatedByEmail",
-                    "/user/findByEmail",
-                    "/user/findIdByEmail",
-                    "/user/findAllUsersCities",
-                    "/user/findById",
-                    "/user/findUserByName/**",
-                    "/user/findByUuId",
-                    "/user/findUuidByEmail",
-                    "/user/lang",
-                    "/user/createUbsRecord",
-                    "/user/{userId}/sixUserFriends/",
-                    "/ownSecurity/password-status",
-                    "/user/emailNotifications",
-                    "/user/activated-ids")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.POST, USER_LINK,
-                    "/user/to-do-list-items",
-                    "/user/{userId}/habit",
-                    "/ownSecurity/set-password")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.PUT,
-                    "/ownSecurity/changePassword",
-                    "/user/profile",
-                    "/user/{id}/updateUserLastActivityTime/{date}",
-                    "/user/updateUserLastActivityTime/{date}",
-                    "/user/language/{languageId}",
-                    "/user/employee-email",
-                    "/user/deactivate",
-                    "testers/unblockAccount")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.PUT,
-                    "/user/edit-authorities",
-                    "/user/authorities",
-                    "/user/deactivate-employee",
-                    "/user/markUserAsDeactivated",
-                    "/user/markUserAsActivated")
-                .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.GET,
-                    "/user/findUserLanguageByUuid",
-                    "/user/get-all-authorities",
-                    "/user/get-positions-authorities")
-                .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.PATCH,
-                    "/user/to-do-list-items/{userToDoListItemId}",
-                    "/user/profilePicture",
-                    "/user/deleteProfilePicture")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.DELETE,
-                    "/user/to-do-list-items/user-to-do-list-items",
-                    "/user/to-do-list-items",
-                    "/ownSecurity/user")
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.GET,
-                    USER_LINK,
-                    "/user/all",
-                    "/user/roles",
-                    "/user/findUserForManagement",
-                    "/user/searchBy",
-                    "/user/findAll")
-                .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.POST,
-                    "/ownSecurity/sign-up-employee")
-                .hasAnyRole(UBS_EMPLOYEE)
-                .requestMatchers(HttpMethod.POST,
-                    "/user/filter",
-                    "/ownSecurity/register",
-                    "/email/sendReport",
-                    "/email/sendHabitNotification",
-                    "/email/sendInterestingEcoNews")
-                .hasAnyRole(ADMIN)
-                .requestMatchers(HttpMethod.PATCH,
-                    "/user/status",
-                    "/user/role",
-                    "/user/update/role")
-                .hasAnyRole(ADMIN)
-                .requestMatchers(HttpMethod.POST, "/management/login")
-                .permitAll()
-                .requestMatchers(HttpMethod.GET, "/management/login")
-                .permitAll()
-                .requestMatchers("/css/**", "/img/**")
-                .permitAll()
-                .requestMatchers(HttpMethod.PUT, "/user/user-rating")
-                .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE, UBS_EMPLOYEE, USER)
-                .anyRequest().hasAnyRole(ADMIN));
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOriginPatterns(List.of(allowedOrigins));
+                    config.setAllowedMethods(
+                            Arrays.asList("GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"));
+                    config.setAllowedHeaders(
+                            Arrays.asList("Access-Control-Allow-Origin", "Access-Control-Allow-Headers",
+                                    "X-Requested-With", "Origin", "Content-Type", "Accept", "Authorization"));
+                    config.setAllowCredentials(true);
+                    config.setMaxAge(3600L);
+                    return config;
+                })).csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session -> session.sessionCreationPolicy(STATELESS))
+                .addFilterBefore(
+                        new AccessTokenAuthenticationFilter(jwtTool, authenticationManager(), userService),
+                        UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((req, resp, exc) -> resp.sendError(SC_UNAUTHORIZED, "Authorize first."))
+                        .accessDeniedHandler((req, resp, exc) -> resp.sendError(SC_FORBIDDEN, "You don't have authorities.")))
+                .authorizeHttpRequests(req -> req
+                        .requestMatchers("/static/css/**", "/static/img/**").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers(
+                                "/v2/api-docs/**",
+                                "/v3/api-docs/**",
+                                "/swagger.json",
+                                "/swagger-ui.html",
+                                "/swagger-ui/index.html",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**",
+                                "/webjars/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/ownSecurity/verifyEmail",
+                                "/ownSecurity/updateAccessToken",
+                                "/ownSecurity/restorePassword",
+                                "/googleSecurity",
+                                "/facebookSecurity/generateFacebookAuthorizeURL",
+                                "/facebookSecurity/facebook", "/user/emailNotifications",
+                                "/user/activatedUsersAmount",
+                                "/user/{userId}/habit/assign",
+                                "/token",
+                                "/socket/**",
+                                "/user/findAllByEmailNotification",
+                                "/user/checkByUuid",
+                                "/user/get-user-rating",
+                                COMMIT_INFO)
+                        .permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/ownSecurity/signUp",
+                                "/ownSecurity/signIn",
+                                "/ownSecurity/updatePassword",
+                                "/ownSecurity/unblockAccount",
+                                "/api/testers/sign-in")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/facebookSecurity/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/facebookSecurity/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/check-auth").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/user/to-do-list-items/habits/{habitId}/to-do-list",
+                                "/user/{userId}/{habitId}/custom-to-do-list-items/available",
+                                "/user/{userId}/profile/", "/user/isOnline/{userId}/",
+                                "/user/{userId}/profileStatistics/",
+                                "/user/userAndSixFriendsWithOnlineStatus",
+                                "/user/userAndAllFriendsWithOnlineStatus",
+                                "/user/usersOnlineStatus",
+                                "/user/findByIdForAchievement",
+                                "/user/findNotDeactivatedByEmail",
+                                "/user/findNotDeactivatedById",
+                                "/user/findByEmail",
+                                "/user/findIdByEmail",
+                                "/user/findAllUsersCities",
+                                "/user/findById",
+                                "/user/findUserByName/**",
+                                "/user/findByUuId",
+                                "/user/findUuidByEmail",
+                                "/user/lang",
+                                "/user/createUbsRecord",
+                                "/user/{userId}/sixUserFriends/",
+                                "/ownSecurity/password-status",
+                                "/user/emailNotifications",
+                                "/user/activated-ids")
+                        .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                        .requestMatchers(HttpMethod.POST, USER_LINK,
+                                "/user/to-do-list-items",
+                                "/user/{userId}/habit",
+                                "/ownSecurity/set-password")
+                        .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                        .requestMatchers(HttpMethod.PUT,
+                                "/ownSecurity/changePassword",
+                                "/user/profile",
+                                "/user/{id}/updateUserLastActivityTime/{date}",
+                                "/user/updateUserLastActivityTime/{date}",
+                                "/user/language/{languageId}",
+                                "/user/employee-email",
+                                "/user/deactivate",
+                                "testers/unblockAccount")
+                        .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                        .requestMatchers(HttpMethod.PUT,
+                                "/user/edit-authorities",
+                                "/user/authorities",
+                                "/user/deactivate-employee",
+                                "/user/markUserAsDeactivated",
+                                "/user/markUserAsActivated")
+                        .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                        .requestMatchers(HttpMethod.GET,
+                                "/user/findUserLanguageByUuid",
+                                "/user/get-all-authorities",
+                                "/user/get-positions-authorities")
+                        .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/user/to-do-list-items/{userToDoListItemId}",
+                                "/user/profilePicture",
+                                "/user/deleteProfilePicture")
+                        .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                        .requestMatchers(HttpMethod.DELETE,
+                                "/user/to-do-list-items/user-to-do-list-items",
+                                "/user/to-do-list-items",
+                                "/ownSecurity/user")
+                        .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                        .requestMatchers(HttpMethod.GET,
+                                USER_LINK,
+                                "/user/all",
+                                "/user/roles",
+                                "/user/findUserForManagement",
+                                "/user/searchBy",
+                                "/user/findAll")
+                        .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
+                        .requestMatchers(HttpMethod.POST,
+                                "/ownSecurity/sign-up-employee")
+                        .hasAnyRole(UBS_EMPLOYEE)
+                        .requestMatchers(HttpMethod.POST,
+                                "/user/filter",
+                                "/ownSecurity/register",
+                                "/email/sendReport",
+                                "/email/sendHabitNotification",
+                                "/email/sendInterestingEcoNews")
+                        .hasAnyRole(ADMIN)
+                        .requestMatchers(HttpMethod.PATCH,
+                                "/user/status",
+                                "/user/role",
+                                "/user/update/role")
+                        .hasAnyRole(ADMIN)
+                        .requestMatchers(HttpMethod.POST, "/management/login")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.GET, "/management/login")
+                        .permitAll()
+                        .requestMatchers("/css/**", "/img/**")
+                        .permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/user/user-rating")
+                        .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE, UBS_EMPLOYEE, USER)
+                        .anyRequest().hasAnyRole(ADMIN));
         return http.build();
     }
 
@@ -255,7 +262,7 @@ public class SecurityConfig {
     @Bean
     public GoogleIdTokenVerifier googleIdTokenVerifier() {
         return new GoogleIdTokenVerifier.Builder(new NetHttpTransport(),
-            GsonFactory.getDefaultInstance()).build();
+                GsonFactory.getDefaultInstance()).build();
     }
 
     /**
