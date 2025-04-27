@@ -1,7 +1,10 @@
 package greencity;
 
-import com.google.maps.model.*;
-import greencity.constant.AppConstant;
+import com.google.maps.model.AddressComponent;
+import com.google.maps.model.Geometry;
+import com.google.maps.model.AddressComponentType;
+import com.google.maps.model.LatLng;
+import com.google.maps.model.GeocodingResult;
 import greencity.dto.CoordinatesDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.AchievementVO;
@@ -13,11 +16,29 @@ import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.position.PositionDto;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.*;
-import greencity.dto.useraction.UserActionVO;
+import greencity.dto.user.UserVO;
+import greencity.dto.user.UserAllFriendsDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserProfilePictureDto;
+import greencity.dto.user.UserNotificationPreferenceDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserAdminRegistrationDto;
+import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserProfileStatisticsDto;
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserInfo;
+import greencity.dto.user.SubscriberDto;
+import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.entity.*;
+import greencity.entity.User;
+import greencity.entity.SocialNetwork;
+import greencity.entity.VerifyEmail;
+import greencity.entity.OwnSecurity;
+import greencity.entity.Authority;
+import greencity.entity.Position;
+import greencity.entity.RestorePasswordEmail;
+import greencity.entity.SocialNetworkImage;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
@@ -30,7 +51,6 @@ import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.TestersSignInRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -238,47 +258,48 @@ public class ModelUtils {
 
     public static UserVO getUserVOWithData() {
         return UserVO.builder()
-            .id(13L)
-            .name("user")
-            .email("namesurname1995@gmail.com")
-            .role(Role.ROLE_USER)
-            .userCredo("save the world")
-            .emailNotification(EmailNotification.MONTHLY)
-            .userStatus(UserStatus.ACTIVATED)
-            // .rating(13.4)
-            .verifyEmail(VerifyEmailVO.builder()
-                .id(32L)
-                .user(UserVO.builder()
-                    .id(13L)
-                    .name("user")
-                    .build())
-                .token("toooookkkeeeeen42324532542")
-                .build())
-            /*
-             * .userFriends(Collections.singletonList( UserVO.builder() .id(75L)
-             * .name("Andrew") .build()))
-             */
-            .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
-            .ownSecurity(null)
-            .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-            /*
-             * .userLocationDto( new UserLocationDto(1L, "Lviv", "Львів", "Lvivska",
-             * "Львівська", "Ukraine", "Україна", 20.000000, 20.000000))
-             */
-            .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-            .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
-            .showLocation(ProfilePrivacyPolicy.PUBLIC)
-            .ownSecurity(OwnSecurityVO.builder()
-                .id(1L)
-                .password("password")
-                .user(UserVO.builder()
-                    .id(13L)
-                    .build())
-                .build())
-            .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
-            .firstName("Julia")
-            .languageId(1L)
-            .build();
+                .id(13L)
+                .name("user")
+                .email("namesurname1995@gmail.com")
+                .role(Role.ROLE_USER)
+                .userCredo("save the world")
+                .emailNotification(EmailNotification.MONTHLY)
+                .userStatus(UserStatus.ACTIVATED)
+                // .rating(13.4)
+                .verifyEmail(VerifyEmailVO.builder()
+                        .id(32L)
+                        .user(UserVO.builder()
+                                .id(13L)
+                                .name("user")
+                                .build())
+                        .token("toooookkkeeeeen42324532542")
+                        .build())
+                /*
+                 * .userFriends(Collections.singletonList( UserVO.builder() .id(75L)
+                 * .name("Andrew") .build()))
+                 */
+                .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
+                .ownSecurity(null)
+                .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
+                /*
+                 * .userLocationDto( new UserLocationDto(1L, "Lviv", "Львів", "Lvivska",
+                 * "Львівська", "Ukraine", "Україна", 20.000000, 20.000000))
+                 */
+                .showToDoList(ProfilePrivacyPolicy.PUBLIC)
+                .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
+                .showLocation(ProfilePrivacyPolicy.PUBLIC)
+                .ownSecurity(OwnSecurityVO.builder()
+                        .id(1L)
+                        .password("password")
+                        .user(UserVO.builder()
+                                .id(13L)
+                                .build())
+                        .build())
+                .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
+                .firstName("Julia")
+                .languageId(1L)
+                .socialNetworks(getSocialNetworkVOs())
+                .build();
     }
 
     public static UserProfileDtoRequest getUserProfileDtoRequest() {
@@ -698,4 +719,62 @@ public class ModelUtils {
             .build();
     }
 
+    public static List<SocialNetwork> getSocialNetworks() {
+        SocialNetwork socialNetwork1 = SocialNetwork.builder()
+                .id(9L)
+                .url("http://test.com.ua")
+                .user(getUser())
+                .socialNetworkImage(getOneSocialNetworkImage())
+                .build();
+
+        SocialNetwork socialNetwork2 = SocialNetwork.builder()
+                .id(10L)
+                .url("http://test-test.com.ua")
+                .user(getUser())
+                .socialNetworkImage(getOneSocialNetworkImage())
+                .build();
+
+        return List.of(socialNetwork1, socialNetwork2);
+    }
+
+    public static List<SocialNetworkVO> getSocialNetworkVOs() {
+        SocialNetworkVO socialNetworkVO1 = SocialNetworkVO.builder()
+                .id(9L)
+                .url("http://test.com.ua")
+                .user(getUserVoShort())
+                .socialNetworkImage(getOneSocialNetworkImageVO())
+                .build();
+
+        SocialNetworkVO socialNetworkVO2 = SocialNetworkVO.builder()
+                .id(10L)
+                .url("http://test-test.com.ua")
+                .user(getUserVoShort())
+                .socialNetworkImage(getOneSocialNetworkImageVO())
+                .build();
+
+        return List.of(socialNetworkVO1, socialNetworkVO2);
+    }
+
+    public static SocialNetworkImageVO getOneSocialNetworkImageVO() {
+        return SocialNetworkImageVO.builder()
+                .id(13L)
+                .imagePath("http://test-test.com.ua")
+                .hostPath("hostPath2")
+                .build();
+    }
+
+    public static SocialNetworkImage getOneSocialNetworkImage() {
+        return SocialNetworkImage.builder()
+                .id(13L)
+                .imagePath("http://test-test.com.ua")
+                .hostPath("hostPath2")
+                .build();
+    }
+
+    public static UserVO getUserVoShort() {
+        return UserVO.builder()
+                .id(1L)
+                .email("taras@gmail.com")
+                .build();
+    }
 }
