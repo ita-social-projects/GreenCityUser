@@ -7,7 +7,7 @@ public class ValidationConstants {
     public static final String EMAIL_REGEXP = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
     public static final String INVALID_EMAIL = "{greenCity.validation.invalid.email}";
     public static final String USERNAME_MESSAGE = """
-        Name must start with a capital letter, \
+        Name must start with a letter, \
         cannot end with dot \
         or contain 2 consecutive dots, dashes and special symbols. \
         Use English or Ukrainian letters, \
