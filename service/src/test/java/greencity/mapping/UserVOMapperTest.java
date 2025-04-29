@@ -2,11 +2,13 @@ package greencity.mapping;
 
 import greencity.ModelUtils;
 import greencity.dto.user.UserVO;
-import greencity.entity.OwnSecurity;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
-import java.util.stream.Collectors;
+import greencity.entity.OwnSecurity;
+
+import static greencity.ModelUtils.getSocialNetworks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,7 +20,7 @@ class UserVOMapperTest {
     UserVOMapper mapper;
 
     @Test
-    void convert() {
+    void convertTest() {
         UserVO expectedResult = ModelUtils.getUserVOWithData();
 
         User userToBeConverted = User.builder()
@@ -74,6 +76,7 @@ class UserVOMapperTest {
             .lastActivityTime(expectedResult.getLastActivityTime())
             .firstName(expectedResult.getFirstName())
             .languageId(1L)
+            .socialNetworks(getSocialNetworks())
             .build();
 
         UserVO actualResult = mapper.convert(userToBeConverted);

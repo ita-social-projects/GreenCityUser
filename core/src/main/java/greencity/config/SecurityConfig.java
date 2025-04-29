@@ -143,6 +143,7 @@ public class SecurityConfig {
                     "/user/usersOnlineStatus",
                     "/user/findByIdForAchievement",
                     "/user/findNotDeactivatedByEmail",
+                    "/user/findNotDeactivatedById",
                     "/user/findByEmail",
                     "/user/findIdByEmail",
                     "/user/findAllUsersCities",
