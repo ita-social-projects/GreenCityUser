@@ -6,7 +6,6 @@ import greencity.dto.user.UpdateUserDto;
 import greencity.entity.User;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 
 @Component
@@ -14,11 +13,11 @@ public class UpdateUserDtoUserMapper extends AbstractConverter<User, UpdateUserD
     @Override
     protected UpdateUserDto convert(User user) {
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
-                .email(user.getEmail())
-                .name(user.getName())
-                .userCredo(user.getUserCredo())
-                .profilePicturePath(user.getProfilePicturePath())
-                .build();
+            .email(user.getEmail())
+            .name(user.getName())
+            .userCredo(user.getUserCredo())
+            .profilePicturePath(user.getProfilePicturePath())
+            .build();
         String languageCode;
         if (Objects.equals(user.getLanguageId(), 1L)) {
             languageCode = AppConstant.UA_LANGUAGE_CODE;
@@ -26,9 +25,9 @@ public class UpdateUserDtoUserMapper extends AbstractConverter<User, UpdateUserD
             languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
         }
         updateUserDto.setLanguage(LanguageVO.builder()
-                .code(languageCode)
-                .id(user.getLanguageId())
-                .build());
+            .code(languageCode)
+            .id(user.getLanguageId())
+            .build());
         return updateUserDto;
     }
 }

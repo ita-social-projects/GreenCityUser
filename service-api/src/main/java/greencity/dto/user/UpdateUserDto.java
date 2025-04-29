@@ -7,7 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * This class represents common fields for GreenCity and GreenCityUser user {@link UserVO} entity
+ * This class represents common fields for GreenCity and GreenCityUser user.
+ * {@link UserVO} entity
  */
 @Data
 @Builder

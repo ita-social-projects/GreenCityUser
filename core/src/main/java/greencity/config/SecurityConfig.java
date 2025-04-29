@@ -193,7 +193,7 @@ public class SecurityConfig {
                     "/user/to-do-list-items/user-to-do-list-items",
                     "/user/to-do-list-items",
                     "/ownSecurity/user",
-                     "/user/deleteProfilePicture")
+                    "/user/deleteProfilePicture")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     USER_LINK,

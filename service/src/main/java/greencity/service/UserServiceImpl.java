@@ -513,10 +513,10 @@ public class UserServiceImpl implements UserService {
             String profilePicturePath;
             profilePicturePath = restClient.uploadImage(image);
             greenCityRemoteClient.updateUser(UpdateUserDto.builder()
-                    .email(email)
-                    .profilePicturePath(profilePicturePath)
-                    .userUpdateType(UserUpdateType.REPLACE)
-                    .build());
+                .email(email)
+                .profilePicturePath(profilePicturePath)
+                .userUpdateType(UserUpdateType.REPLACE)
+                .build());
             user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
@@ -533,10 +533,10 @@ public class UserServiceImpl implements UserService {
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         greenCityRemoteClient.updateUser(UpdateUserDto.builder()
-                .profilePicturePath(AppConstant.EMPTY_STRING)
-                .email(email)
-                .userUpdateType(UserUpdateType.DELETE)
-                .build());
+            .profilePicturePath(AppConstant.EMPTY_STRING)
+            .email(email)
+            .userUpdateType(UserUpdateType.DELETE)
+            .build());
         user.setProfilePicturePath(null);
         userRepo.save(user);
     }

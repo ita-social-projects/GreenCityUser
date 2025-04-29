@@ -296,11 +296,11 @@ public class GreenCityRemoteClient {
         String path = "/users/update";
 
         return webClient.patch()
-                .uri(path)
-                .bodyValue(updateUserDto)
-                .retrieve()
-                .bodyToMono(Boolean.class)
-                .block();
+            .uri(path)
+            .bodyValue(updateUserDto)
+            .retrieve()
+            .bodyToMono(Boolean.class)
+            .block();
     }
 
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
