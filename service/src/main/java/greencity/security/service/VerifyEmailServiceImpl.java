@@ -17,7 +17,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClientException;
 
 /**
  * The class provides implementation of the {@code VerifyEmailService}.
@@ -41,18 +40,13 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED));
 
         User user = verifyEmail.getUser();
-        try {
-            Long ubsProfileId = restClient.createUbsProfile(modelMapper.map(user, UbsProfileCreationDto.class));
-            log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId, user.getUuid());
-        } catch (RestClientException e) {
-            log.warn("Ubs profile has not been created for user with uuid {}.", user.getUuid());
-            return false;
-        }
-
         user.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(user);
         verifyEmailRepo.deleteByTokenAndUserId(token, userId);
         log.info("User has successfully verify the email by token {}.", token);
+
+        Long ubsProfileId = restClient.createUbsProfile(modelMapper.map(user, UbsProfileCreationDto.class));
+        log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId, user.getUuid());
 
         return true;
     }

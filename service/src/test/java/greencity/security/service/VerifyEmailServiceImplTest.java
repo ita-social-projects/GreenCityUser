@@ -17,14 +17,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.web.client.RestClientException;
 import static greencity.ModelUtils.getUbsProfileCreationDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,30 +61,6 @@ class VerifyEmailServiceImplTest {
         verifyEmailService.verifyByToken(1L, "token");
         verify(verifyEmailRepo).deleteByTokenAndUserId("token", 1L);
         verify(restClient).createUbsProfile(ubsProfile);
-    }
-
-    @Test
-    void verifyWhenTokenNotExpiredAndRestClientThrowsExceptionTest() {
-        String exceptionMessage = "exception message";
-        String token = "token";
-        Long userId = 1L;
-        UbsProfileCreationDto ubsProfile = getUbsProfileCreationDto();
-        boolean expectedResult = false;
-        User mockUser = mock(User.class);
-        VerifyEmail mockVerifyEmail = mock(VerifyEmail.class);
-
-        when(verifyEmailRepo.findByTokenAndUserId(token, userId)).thenReturn(Optional.of(mockVerifyEmail));
-        when(mockVerifyEmail.getUser()).thenReturn(mockUser);
-        when(modelMapper.map(mockUser, UbsProfileCreationDto.class)).thenReturn(ubsProfile);
-        when(restClient.createUbsProfile(ubsProfile)).thenThrow(new RestClientException(exceptionMessage));
-
-        boolean actualResult = verifyEmailService.verifyByToken(1L, "token");
-
-        assertEquals(expectedResult, actualResult);
-        verify(restClient).createUbsProfile(ubsProfile);
-        verify(mockUser, never()).setUserStatus(UserStatus.ACTIVATED);
-        verify(userRepo, never()).save(any(User.class));
-        verify(verifyEmailRepo, never()).deleteByTokenAndUserId(token, userId);
     }
 
     @Test
