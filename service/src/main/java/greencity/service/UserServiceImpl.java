@@ -25,12 +25,10 @@ import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.dto.user.UserProfileStatisticsDto;
@@ -38,8 +36,11 @@ import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.dto.user.UserNotificationPreferenceDto;
+import greencity.dto.user.UserLocationDto;
+import greencity.dto.user.UserVOAdvancedDto;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
@@ -1069,5 +1070,17 @@ public class UserServiceImpl implements UserService {
         } else {
             return userRepo.findAllActivatedUserIds();
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id) {
+        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        log.info("user: {}", notDeactivatedById);
+        return Optional.of(modelMapper.map(notDeactivatedById, UserVOAdvancedDto.class));
     }
 }

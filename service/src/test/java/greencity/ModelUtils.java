@@ -16,18 +16,7 @@ import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.position.PositionDto;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserNotificationPreferenceDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserAdminRegistrationDto;
-import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserInfo;
-import greencity.dto.user.SubscriberDto;
+import greencity.dto.user.*;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
@@ -298,7 +287,6 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
             .firstName("Julia")
             .languageId(1L)
-            .socialNetworks(getSocialNetworkVOs())
             .build();
     }
 
@@ -776,5 +764,20 @@ public class ModelUtils {
             .id(1L)
             .email("taras@gmail.com")
             .build();
+    }
+
+    public static UserVOAdvancedDto getUserVOAdvancedDto() {
+        return UserVOAdvancedDto.builder()
+                .id(13L)
+                .name("user")
+                .email("namesurname1995@gmail.com")
+                .role(Role.ROLE_USER)
+                .userCredo("save the world")
+                .userStatus(UserStatus.ACTIVATED)
+                .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
+                .firstName("Julia")
+                .languageId(1L)
+                .socialNetworks(getSocialNetworkVOs())
+                .build();
     }
 }

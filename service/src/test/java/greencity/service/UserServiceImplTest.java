@@ -1,6 +1,5 @@
 package greencity.service;
 
-import com.google.maps.model.AddressType;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
@@ -40,6 +39,7 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.UserVOAdvancedDto;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserNotificationPreference;
@@ -82,7 +82,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import javax.naming.ServiceUnavailableException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -99,6 +98,7 @@ import static greencity.ModelUtils.TEST_ADMIN;
 import static greencity.ModelUtils.TEST_USER;
 import static greencity.ModelUtils.TEST_USER_VO;
 import static greencity.ModelUtils.getUser;
+import static greencity.ModelUtils.getUserVOAdvancedDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -160,7 +160,6 @@ class UserServiceImplTest {
         .emailNotification(EmailNotification.DISABLED)
         .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
-        .socialNetworks(new ArrayList<>())
         .build();
     private final User user2 = User.builder()
         .id(2L)
@@ -1574,5 +1573,35 @@ class UserServiceImplTest {
 
         assertEquals(0, result.size());
         verify(userRepo, times(1)).findAllActivatedUserIds();
+    }
+
+    @Test
+    void findNotDeactivatedByIdAdvancedTest() {
+        User actual = ModelUtils.getUser();
+        Long userId = 1L;
+
+        UserVOAdvancedDto expected = getUserVOAdvancedDto();
+
+        when(userRepo.findNotDeactivatedById(userId)).thenReturn(Optional.of(actual));
+        when(modelMapper.map(actual, UserVOAdvancedDto.class)).thenReturn(getUserVOAdvancedDto());
+
+        Optional<UserVOAdvancedDto> result = userService.findNotDeactivatedByIdAdvanced(userId);
+        assertEquals(result.get(),expected);
+        verify(userRepo, times(1)).findNotDeactivatedById(userId);
+    }
+
+    @Test
+    void findNotDeactivatedByIdAdvanced_NotFoundTest() {
+        Long userId = 1L;
+
+        when(userRepo.findNotDeactivatedById(userId)).thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> userService.findNotDeactivatedByIdAdvanced(userId)
+        );
+
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
+        verify(userRepo, times(1)).findNotDeactivatedById(userId);
     }
 }

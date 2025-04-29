@@ -1,15 +1,11 @@
 package greencity.mapping;
 
 import greencity.dto.ownsecurity.OwnSecurityVO;
-import greencity.dto.socialnetwork.SocialNetworkImageVO;
-import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class UserVOMapper extends AbstractConverter<User, UserVO> {
@@ -17,22 +13,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
     protected UserVO convert(User user) {
         Long userId = user.getId();
         Long languageId = user.getLanguageId();
-
-        List<SocialNetworkVO> socialNetworks = user.getSocialNetworks() != null ? user.getSocialNetworks()
-            .stream().map(socialNetwork -> SocialNetworkVO.builder()
-                .id(socialNetwork.getId())
-                .url(socialNetwork.getUrl())
-                .user(UserVO.builder()
-                    .id(socialNetwork.getUser().getId())
-                    .email(socialNetwork.getUser().getEmail())
-                    .build())
-                .socialNetworkImage(SocialNetworkImageVO.builder()
-                    .id(socialNetwork.getSocialNetworkImage().getId())
-                    .imagePath(socialNetwork.getSocialNetworkImage().getImagePath())
-                    .hostPath(socialNetwork.getSocialNetworkImage().getHostPath())
-                    .build())
-                .build())
-            .toList() : new ArrayList<>();
 
         return UserVO.builder()
             .id(userId)
@@ -68,7 +48,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .lastActivityTime(user.getLastActivityTime())
             .languageId(languageId)
             .firstName(user.getFirstName())
-            .socialNetworks(socialNetworks)
             .build();
     }
 }
