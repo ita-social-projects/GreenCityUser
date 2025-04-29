@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class RepositoryMethodListener {
-
     @Around("execution(* greencity.repository..*.*(..))")
     public Object measureExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = joinPoint.getSignature().getDeclaringTypeName();
