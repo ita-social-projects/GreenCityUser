@@ -18,7 +18,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,12 +29,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.validation.Valid;
 import java.util.List;
 import static greencity.dto.genericresponse.GenericResponseDto.buildGenericResponseDto;
 
-@Controller
+@RestController
 @AllArgsConstructor
 @RequestMapping("/management/socialnetworkimages")
 public class ManagementSocialNetworkImagesController {
@@ -139,5 +139,29 @@ public class ManagementSocialNetworkImagesController {
             socialNetworkImageService.update(socialNetworkImageResponseDTO, file);
         }
         return buildGenericResponseDto(bindingResult);
+    }
+
+    /**
+     * Method that returns page with all {@link SocialNetworkImageResponseDTO}.
+     *
+     * @param pageable {@link Pageable}.
+     * @return {@link PageableDto} of {@link SocialNetworkImageResponseDTO}.
+     */
+    @GetMapping("/get-all-remote")
+    public PageableDto<SocialNetworkImageResponseDTO> getAllSocialNetworkImagesRemote(Pageable pageable) {
+        return socialNetworkImageService.findAll(pageable);
+    }
+
+    /**
+     * Method for creating {@link SocialNetworkImageVO}.
+     *
+     * @param socialNetworkImageRequestDTO dto for {@link SocialNetworkImageVO}
+     *                                     entity.
+     * @param file                         of {@link MultipartFile}
+     */
+    @PostMapping("/save-remote")
+    public void saveRemote(@Valid @RequestPart SocialNetworkImageRequestDTO socialNetworkImageRequestDTO,
+        @ImageValidation @RequestParam(required = false, name = "file") MultipartFile file) {
+        socialNetworkImageService.save(socialNetworkImageRequestDTO, file);
     }
 }

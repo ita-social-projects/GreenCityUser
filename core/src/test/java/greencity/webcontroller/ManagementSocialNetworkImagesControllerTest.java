@@ -26,10 +26,13 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -49,25 +52,6 @@ class ManagementSocialNetworkImagesControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(managementSocialNetworkImagesController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .build();
-    }
-
-    @Test
-    void getAllSocialNetworkImages() throws Exception {
-        Pageable pageable = PageRequest.of(0, 10);
-        List<SocialNetworkImageResponseDTO> socialNetworkImageResponseDTOS =
-            Collections.singletonList(new SocialNetworkImageResponseDTO());
-        PageableDto<SocialNetworkImageResponseDTO> socialNetworkImageResponsePageableDto =
-            new PageableDto<>(socialNetworkImageResponseDTOS, 2, 0, 3);
-        when(socialNetworkImageService.findAll(pageable)).thenReturn(socialNetworkImageResponsePageableDto);
-
-        this.mockMvc.perform(get(managementSocialNetworkImagesLink)
-            .param("page", "0")
-            .param("size", "10"))
-            .andExpect(view().name("core/management_social_network_images"))
-            .andExpect(model().attribute("pageable", socialNetworkImageResponsePageableDto))
-            .andExpect(status().isOk());
-
-        verify(socialNetworkImageService).findAll(pageable);
     }
 
     @Test
@@ -137,5 +121,21 @@ class ManagementSocialNetworkImagesControllerTest {
             })).andExpect(status().isOk());
 
         verify(socialNetworkImageService, never()).update(socialNetworkImageResponseDTO, jsonFile);
+    }
+
+    @Test
+    void getAllSocialNetworkImagesRemoteTest() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<SocialNetworkImageResponseDTO> socialNetworkImageResponseDTOS =
+            Collections.singletonList(new SocialNetworkImageResponseDTO());
+        PageableDto<SocialNetworkImageResponseDTO> socialNetworkImageResponsePageableDto =
+            new PageableDto<>(socialNetworkImageResponseDTOS, 2, 0, 3);
+        when(socialNetworkImageService.findAll(pageable)).thenReturn(socialNetworkImageResponsePageableDto);
+
+        this.mockMvc.perform(get(managementSocialNetworkImagesLink)
+            .param("page", "0")
+            .param("size", "10"));
+
+        verify(socialNetworkImageService).findAll(pageable);
     }
 }

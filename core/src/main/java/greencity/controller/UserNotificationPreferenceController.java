@@ -42,8 +42,8 @@ public class UserNotificationPreferenceController {
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping
-    public ResponseEntity<List<UserNotificationPreferenceVO>> findAllByUserId(@RequestParam Long userId) {
-        return ResponseEntity.ok().body(userNotificationPreferenceService.findAllByUserId(userId));
+    public ResponseEntity<List<UserNotificationPreferenceVO>> findAllByUserId(@RequestParam Long id) {
+        return ResponseEntity.ok().body(userNotificationPreferenceService.findAllByUserId(id));
     }
 
     /**

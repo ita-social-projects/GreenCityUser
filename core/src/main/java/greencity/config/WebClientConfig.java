@@ -8,8 +8,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
-    @Bean
-    public WebClient webClient() {
+    @Bean("facebookWebClient")
+    public WebClient facebookWebClient() {
         return WebClient.builder()
             .baseUrl("https://graph.facebook.com")
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
