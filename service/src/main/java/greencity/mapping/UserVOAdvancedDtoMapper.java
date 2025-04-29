@@ -8,7 +8,6 @@ import greencity.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,20 +20,20 @@ public class UserVOAdvancedDtoMapper extends AbstractConverter<User, UserVOAdvan
         Long languageId = user.getLanguageId();
 
         List<SocialNetworkVO> socialNetworks = user.getSocialNetworks() != null ? user.getSocialNetworks()
-                .stream().map(socialNetwork -> SocialNetworkVO.builder()
-                        .id(socialNetwork.getId())
-                        .url(socialNetwork.getUrl())
-                        .user(UserVO.builder()
-                                .id(socialNetwork.getUser().getId())
-                                .email(socialNetwork.getUser().getEmail())
-                                .build())
-                        .socialNetworkImage(SocialNetworkImageVO.builder()
-                                .id(socialNetwork.getSocialNetworkImage().getId())
-                                .imagePath(socialNetwork.getSocialNetworkImage().getImagePath())
-                                .hostPath(socialNetwork.getSocialNetworkImage().getHostPath())
-                                .build())
-                        .build())
-                .toList() : new ArrayList<>();
+            .stream().map(socialNetwork -> SocialNetworkVO.builder()
+                .id(socialNetwork.getId())
+                .url(socialNetwork.getUrl())
+                .user(UserVO.builder()
+                    .id(socialNetwork.getUser().getId())
+                    .email(socialNetwork.getUser().getEmail())
+                    .build())
+                .socialNetworkImage(SocialNetworkImageVO.builder()
+                    .id(socialNetwork.getSocialNetworkImage().getId())
+                    .imagePath(socialNetwork.getSocialNetworkImage().getImagePath())
+                    .hostPath(socialNetwork.getSocialNetworkImage().getHostPath())
+                    .build())
+                .build())
+            .toList() : new ArrayList<>();
 
         UserVOAdvancedDto userVOAdvancedDto = new UserVOAdvancedDto();
         userVOAdvancedDto.setId(userId);

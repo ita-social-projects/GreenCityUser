@@ -1079,7 +1079,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
         log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVOAdvancedDto.class));
     }

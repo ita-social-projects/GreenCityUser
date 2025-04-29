@@ -474,7 +474,8 @@ public interface UserService {
     List<Long> findAllActivatedUserIds(List<Long> ids);
 
     /**
-     * Method that allows you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by id.
+     * Method that allows you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
+     * id.
      *
      * @param id - {@link UserVOAdvancedDto}'s id
      * @return {@link Optional} of found {@link UserVOAdvancedDto}.

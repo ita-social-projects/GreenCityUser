@@ -1586,7 +1586,7 @@ class UserServiceImplTest {
         when(modelMapper.map(actual, UserVOAdvancedDto.class)).thenReturn(getUserVOAdvancedDto());
 
         Optional<UserVOAdvancedDto> result = userService.findNotDeactivatedByIdAdvanced(userId);
-        assertEquals(result.get(),expected);
+        assertEquals(result.get(), expected);
         verify(userRepo, times(1)).findNotDeactivatedById(userId);
     }
 
@@ -1597,9 +1597,8 @@ class UserServiceImplTest {
         when(userRepo.findNotDeactivatedById(userId)).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> userService.findNotDeactivatedByIdAdvanced(userId)
-        );
+            NotFoundException.class,
+            () -> userService.findNotDeactivatedByIdAdvanced(userId));
 
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
         verify(userRepo, times(1)).findNotDeactivatedById(userId);

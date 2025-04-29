@@ -20,18 +20,18 @@ class UserVOAdvancedDtoMapperTest {
     void convertTest() {
         UserVOAdvancedDto expectedResult = getUserVOAdvancedDto();
         User userToBeConverted = User.builder()
-                .id(expectedResult.getId())
-                .name(expectedResult.getName())
-                .email(expectedResult.getEmail())
-                .role(expectedResult.getRole())
-                .userCredo(expectedResult.getUserCredo())
-                .userStatus(expectedResult.getUserStatus())
-                .dateOfRegistration(expectedResult.getDateOfRegistration())
-                .profilePicturePath(expectedResult.getProfilePicturePath())
-                .firstName(expectedResult.getFirstName())
-                .languageId(1L)
-                .socialNetworks(getSocialNetworks())
-                .build();
+            .id(expectedResult.getId())
+            .name(expectedResult.getName())
+            .email(expectedResult.getEmail())
+            .role(expectedResult.getRole())
+            .userCredo(expectedResult.getUserCredo())
+            .userStatus(expectedResult.getUserStatus())
+            .dateOfRegistration(expectedResult.getDateOfRegistration())
+            .profilePicturePath(expectedResult.getProfilePicturePath())
+            .firstName(expectedResult.getFirstName())
+            .languageId(1L)
+            .socialNetworks(getSocialNetworks())
+            .build();
 
         UserVOAdvancedDto actualResult = mapper.convert(userToBeConverted);
 

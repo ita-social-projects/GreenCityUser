@@ -768,16 +768,16 @@ public class ModelUtils {
 
     public static UserVOAdvancedDto getUserVOAdvancedDto() {
         return UserVOAdvancedDto.builder()
-                .id(13L)
-                .name("user")
-                .email("namesurname1995@gmail.com")
-                .role(Role.ROLE_USER)
-                .userCredo("save the world")
-                .userStatus(UserStatus.ACTIVATED)
-                .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-                .firstName("Julia")
-                .languageId(1L)
-                .socialNetworks(getSocialNetworkVOs())
-                .build();
+            .id(13L)
+            .name("user")
+            .email("namesurname1995@gmail.com")
+            .role(Role.ROLE_USER)
+            .userCredo("save the world")
+            .userStatus(UserStatus.ACTIVATED)
+            .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
+            .firstName("Julia")
+            .languageId(1L)
+            .socialNetworks(getSocialNetworkVOs())
+            .build();
     }
 }

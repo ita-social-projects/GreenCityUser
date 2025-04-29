@@ -60,49 +60,49 @@ public class ModelUtils {
 
     public static UserVOAdvancedDto getUserVOAdvancedDto() {
         return UserVOAdvancedDto.builder()
-                .id(13L)
-                .name("user")
-                .email("taras@gmail.com")
-                .role(Role.ROLE_USER)
-                .userCredo("save the world")
-                .userStatus(UserStatus.ACTIVATED)
-                .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-                .firstName("Taras")
-                .languageId(1L)
-                .socialNetworks(getSocialNetworkVOs())
-                .build();
+            .id(13L)
+            .name("user")
+            .email("taras@gmail.com")
+            .role(Role.ROLE_USER)
+            .userCredo("save the world")
+            .userStatus(UserStatus.ACTIVATED)
+            .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
+            .firstName("Taras")
+            .languageId(1L)
+            .socialNetworks(getSocialNetworkVOs())
+            .build();
     }
 
     public static List<SocialNetworkVO> getSocialNetworkVOs() {
         SocialNetworkVO socialNetworkVO1 = SocialNetworkVO.builder()
-                .id(9L)
-                .url("http://test.com.ua")
-                .user(getUserVoShort())
-                .socialNetworkImage(getOneSocialNetworkImageVO())
-                .build();
+            .id(9L)
+            .url("http://test.com.ua")
+            .user(getUserVoShort())
+            .socialNetworkImage(getOneSocialNetworkImageVO())
+            .build();
 
         SocialNetworkVO socialNetworkVO2 = SocialNetworkVO.builder()
-                .id(10L)
-                .url("http://test-test.com.ua")
-                .user(getUserVoShort())
-                .socialNetworkImage(getOneSocialNetworkImageVO())
-                .build();
+            .id(10L)
+            .url("http://test-test.com.ua")
+            .user(getUserVoShort())
+            .socialNetworkImage(getOneSocialNetworkImageVO())
+            .build();
 
         return List.of(socialNetworkVO1, socialNetworkVO2);
     }
 
     public static SocialNetworkImageVO getOneSocialNetworkImageVO() {
         return SocialNetworkImageVO.builder()
-                .id(13L)
-                .imagePath("http://test-test.com.ua")
-                .hostPath("hostPath2")
-                .build();
+            .id(13L)
+            .imagePath("http://test-test.com.ua")
+            .hostPath("hostPath2")
+            .build();
     }
 
     public static UserVO getUserVoShort() {
         return UserVO.builder()
-                .id(1L)
-                .email("taras@gmail.com")
-                .build();
+            .id(1L)
+            .email("taras@gmail.com")
+            .build();
     }
 }

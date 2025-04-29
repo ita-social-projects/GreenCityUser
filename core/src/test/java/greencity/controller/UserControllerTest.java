@@ -1036,11 +1036,11 @@ class UserControllerTest {
         UserVOAdvancedDto expected = ModelUtils.getUserVOAdvancedDto();
         when(userService.findNotDeactivatedByIdAdvanced(13L)).thenReturn(Optional.of(expected));
         mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
-                        .param("id", String.valueOf(13L)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value(expected.getName()))
-                .andExpect(jsonPath("$.id").value(13L))
-                .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+            .param("id", String.valueOf(13L)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value(expected.getName()))
+            .andExpect(jsonPath("$.id").value(13L))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
     }
 
     @Test
@@ -1048,8 +1048,8 @@ class UserControllerTest {
         Long userId = 999L;
         when(userService.findNotDeactivatedByIdAdvanced(userId)).thenReturn(Optional.empty());
         mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
-                        .param("id", String.valueOf(userId)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(""));
+            .param("id", String.valueOf(userId)))
+            .andExpect(status().isOk())
+            .andExpect(content().string(""));
     }
 }

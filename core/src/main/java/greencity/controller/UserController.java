@@ -1240,16 +1240,17 @@ public class UserController {
     }
 
     /**
-     * Method that allow you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by id.
+     * Method that allow you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
+     * id.
      *
      * @param id - {@link UserVOAdvancedDto}'s id
      * @return {@link UserVOAdvancedDto}.
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedByIdAdvanced")
     public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(@RequestParam Long id) {
