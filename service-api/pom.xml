@@ -15,6 +15,7 @@
         <apache.commons.version>4.4</apache.commons.version>
         <guava.version>32.0.0-jre</guava.version>
         <feign-hystrix.version>13.1</feign-hystrix.version>
+        <feign-okhttp.version>13.6</feign-okhttp.version>
     </properties>
 
     <artifactId>service-api</artifactId>
@@ -167,6 +168,11 @@
             <artifactId>spring-cloud-dependencies</artifactId>
             <version>2023.0.3</version>
             <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-okhttp</artifactId>
+            <version>${feign-okhttp.version}</version>
         </dependency>
         <dependency>
             <groupId>io.github.openfeign</groupId>

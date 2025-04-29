@@ -28,7 +28,9 @@ public class AppConstant {
     public static final String FACEBOOK_OBJECT_ID = "me";
     public static final String FILES = "files";
     public static final String DEFAULT_LANGUAGE_CODE = "en";
+    public static final String UA_LANGUAGE_CODE = "ua";
     public static final String PASSWORD = "password";
     public static final String USER_STATUS = "user_status";
     public static final String DEFAULT_SOCIAL_NETWORK_IMAGE_HOST_PATH = "img/default_social_network_icon.png";
+    public static final String EMPTY_STRING = "";
 }

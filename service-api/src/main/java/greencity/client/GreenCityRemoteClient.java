@@ -5,6 +5,7 @@ import greencity.client.config.GreenCityRemoteClientInterceptor;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
+import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
@@ -165,4 +166,12 @@ public interface GreenCityRemoteClient {
      */
     @PatchMapping("/users/rating")
     void updateUserRating(@RequestBody UserAddRatingDto userAddRatingDto);
+
+    /**
+     * Synchronize GreenCityUser and GreenCity user entity via update.
+     *
+     * @param updateUserDto {@link UpdateUserDto} contains data for PATCH-update.
+     */
+    @PatchMapping("/users/update")
+    boolean updateUser(@RequestBody UpdateUserDto updateUserDto);
 }

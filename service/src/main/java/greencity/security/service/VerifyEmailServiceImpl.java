@@ -1,12 +1,15 @@
 package greencity.security.service;
 
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
+import greencity.dto.user.UpdateUserDto;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.UserStatus;
+import greencity.enums.UserUpdateType;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import greencity.security.repository.VerifyEmailRepo;
@@ -31,6 +34,7 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final ModelMapper modelMapper;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     /**
      * {@inheritDoc}
@@ -50,6 +54,9 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
         }
 
         user.setUserStatus(UserStatus.ACTIVATED);
+        UpdateUserDto updateUserDto = modelMapper.map(user, UpdateUserDto.class);
+        updateUserDto.setUserUpdateType(UserUpdateType.CREATE);
+        greenCityRemoteClient.updateUser(updateUserDto);
         userRepo.save(user);
         verifyEmailRepo.deleteByTokenAndUserId(token, userId);
         log.info("User has successfully verify the email by token {}.", token);

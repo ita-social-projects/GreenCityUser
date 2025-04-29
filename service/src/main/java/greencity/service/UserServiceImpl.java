@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
+import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.constant.UpdateConstants;
@@ -15,6 +16,7 @@ import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.RoleDto;
+import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserAllFriendsDto;
@@ -47,6 +49,7 @@ import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
+import greencity.enums.UserUpdateType;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadUpdateRequestException;
@@ -509,6 +512,11 @@ public class UserServiceImpl implements UserService {
         if (image != null) {
             String profilePicturePath;
             profilePicturePath = restClient.uploadImage(image);
+            greenCityRemoteClient.updateUser(UpdateUserDto.builder()
+                    .email(email)
+                    .profilePicturePath(profilePicturePath)
+                    .userUpdateType(UserUpdateType.REPLACE)
+                    .build());
             user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
@@ -524,6 +532,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+        greenCityRemoteClient.updateUser(UpdateUserDto.builder()
+                .profilePicturePath(AppConstant.EMPTY_STRING)
+                .email(email)
+                .userUpdateType(UserUpdateType.DELETE)
+                .build());
         user.setProfilePicturePath(null);
         userRepo.save(user);
     }

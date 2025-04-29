@@ -52,10 +52,10 @@ public interface UserService {
     void updateUserRating(UserAddRatingDto userRatingDto);
 
     /**
-     * Find all {@link User}'s with {@link EmailNotification} type.
+     * Find all {@link UserVO}'s with {@link EmailNotification} type.
      *
      * @param emailNotification - type of {@link EmailNotification}
-     * @return list of {@link User}'s
+     * @return list of {@link UserVO}'s
      */
     List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
 
@@ -76,7 +76,7 @@ public interface UserService {
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described
-     * in {@link User} under {@link jakarta.persistence.NamedNativeQuery}
+     * in {@link UserVO} under {@link jakarta.persistence.NamedNativeQuery}
      * annotation. Spring Data JPA can run a named native query that follows the
      * naming convention {entityClass.repositoryMethodName}.
      *
