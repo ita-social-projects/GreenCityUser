@@ -156,12 +156,12 @@ public class ManagementSocialNetworkImagesController {
      * Method for creating {@link SocialNetworkImageVO}.
      *
      * @param socialNetworkImageRequestDTO dto for {@link SocialNetworkImageVO}
-     * entity.
-     * @param file of {@link MultipartFile}
+     *                                     entity.
+     * @param file                         of {@link MultipartFile}
      */
     @PostMapping("/save-remote")
     public void saveRemote(@Valid @RequestPart SocialNetworkImageRequestDTO socialNetworkImageRequestDTO,
-                                   @ImageValidation @RequestParam(required = false, name = "file") MultipartFile file) {
+        @ImageValidation @RequestParam(required = false, name = "file") MultipartFile file) {
         socialNetworkImageService.save(socialNetworkImageRequestDTO, file);
     }
 }
