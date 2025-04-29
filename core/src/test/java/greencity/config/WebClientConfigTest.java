@@ -11,20 +11,20 @@ class WebClientConfigTest {
     private final WebClientConfig webClientConfig = new WebClientConfig();
 
     @Test
-    void webClientBean_ShouldBeCreated() {
-        WebClient webClient = webClientConfig.webClient();
+    void facebookWebClientBean_ShouldBeCreated() {
+        WebClient webClient = webClientConfig.facebookWebClient();
         assertNotNull(webClient, "WebClient bean should not be null");
     }
 
     @Test
-    void webClientBean_ShouldBeInstanceOfWebClient() {
-        WebClient webClient = webClientConfig.webClient();
+    void webClientBean_ShouldBeInstanceOfFacebookWebClient() {
+        WebClient webClient = webClientConfig.facebookWebClient();
         assertTrue(webClient instanceof WebClient, "Returned object should be an instance of WebClient");
     }
 
     @Test
-    void webClientBean_ShouldNotBeNullAfterCreation() {
-        WebClient webClient = webClientConfig.webClient();
+    void facebookWebClientBean_ShouldNotBeNullAfterCreation() {
+        WebClient webClient = webClientConfig.facebookWebClient();
         assertNotNull(webClient, "WebClient should not be null after creation");
         assertTrue(webClient.getClass().getName().contains("WebClient"), "Should be a WebClient implementation");
     }
