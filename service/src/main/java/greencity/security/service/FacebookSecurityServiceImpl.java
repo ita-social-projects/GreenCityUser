@@ -15,9 +15,7 @@ import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.HttpClient;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,7 +41,6 @@ import java.util.stream.Collectors;
 public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final UserService userService;
     private final JwtTool jwtTool;
-    private final HttpClient httpClient;
     private final UserRepo userRepo;
     private final PlatformTransactionManager transactionManager;
     private final ModelMapper modelMapper;
@@ -61,19 +58,16 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private String userInfoUrl;
 
     public FacebookSecurityServiceImpl(
-            UserService userService,
-            JwtTool jwtTool,
-            HttpClient httpClient,
-            UserRepo userRepo,
-            PlatformTransactionManager transactionManager,
-            ModelMapper modelMapper,
-            RestClient restClient,
-            ObjectMapper objectMapper,
-            @Qualifier("facebookWebClient") WebClient webClient
-    ) {
+        UserService userService,
+        JwtTool jwtTool,
+        UserRepo userRepo,
+        PlatformTransactionManager transactionManager,
+        ModelMapper modelMapper,
+        RestClient restClient,
+        ObjectMapper objectMapper,
+        @Qualifier("facebookWebClient") WebClient webClient) {
         this.userService = userService;
         this.jwtTool = jwtTool;
-        this.httpClient = httpClient;
         this.userRepo = userRepo;
         this.transactionManager = transactionManager;
         this.modelMapper = modelMapper;

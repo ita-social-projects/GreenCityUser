@@ -20,17 +20,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import java.util.List;
 
 @Service
 public class GreenCityRemoteClient {
-
     private final WebClient webClient;
 
     public GreenCityRemoteClient(
-            @Qualifier("greenCityWebClient") WebClient webClient
-    ) {
+        @Qualifier("greenCityWebClient") WebClient webClient) {
         this.webClient = webClient;
     }
 
@@ -46,12 +43,13 @@ public class GreenCityRemoteClient {
         MultipartFile[] multipartFiles = files.toArray(new MultipartFile[0]);
 
         return webClient.post()
-                .uri(path)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(multipartInserter(multipartFiles))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<String>>() {})
-                .block();
+            .uri(path)
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .body(multipartInserter(multipartFiles))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<String>>() {
+            })
+            .block();
     }
 
     /**
@@ -64,12 +62,12 @@ public class GreenCityRemoteClient {
         String path = "/files/single";
 
         return webClient.post()
-                .uri(path)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(multipartInserter(file))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(path)
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .body(multipartInserter(file))
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
     }
 
     /**
@@ -81,11 +79,11 @@ public class GreenCityRemoteClient {
         String path = "/files";
 
         webClient.method(HttpMethod.DELETE)
-                .uri(path)
-                .bodyValue(paths)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+            .uri(path)
+            .bodyValue(paths)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
     }
 
     /**
@@ -97,10 +95,11 @@ public class GreenCityRemoteClient {
         String path = "/achievements/all";
 
         return webClient.get()
-                .uri(path)
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<AchievementVO>>() {})
-                .block();
+            .uri(path)
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<AchievementVO>>() {
+            })
+            .block();
     }
 
     /**
@@ -113,10 +112,11 @@ public class GreenCityRemoteClient {
         String path = "/achievements/user-achievements/{userId}";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<UserAchievementVO>>() {})
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<UserAchievementVO>>() {
+            })
+            .block();
     }
 
     /**
@@ -129,10 +129,11 @@ public class GreenCityRemoteClient {
         String path = "/achievements/user-actions/{userId}";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<UserActionVO>>() {})
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<UserActionVO>>() {
+            })
+            .block();
     }
 
     /**
@@ -144,10 +145,10 @@ public class GreenCityRemoteClient {
         String path = "/languages/{id}";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path).build(id))
-                .retrieve()
-                .bodyToMono(LanguageVO.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(id))
+            .retrieve()
+            .bodyToMono(LanguageVO.class)
+            .block();
     }
 
     /**
@@ -159,10 +160,10 @@ public class GreenCityRemoteClient {
         String path = "/languages/{id}/exists";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path).build(id))
-                .retrieve()
-                .bodyToMono(Boolean.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(id))
+            .retrieve()
+            .bodyToMono(Boolean.class)
+            .block();
     }
 
     /**
@@ -175,10 +176,10 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/cities";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-                .retrieve()
-                .bodyToMono(UserCityDto.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .retrieve()
+            .bodyToMono(UserCityDto.class)
+            .block();
     }
 
     /**
@@ -191,10 +192,10 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/location";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-                .retrieve()
-                .bodyToMono(UserLocationDto.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .retrieve()
+            .bodyToMono(UserLocationDto.class)
+            .block();
     }
 
     /**
@@ -207,11 +208,11 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/location";
 
         webClient.patch()
-                .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-                .bodyValue(userProfileDtoRequest)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .bodyValue(userProfileDtoRequest)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
     }
 
     /**
@@ -224,10 +225,11 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/all-friends";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Long>>() {})
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
+            })
+            .block();
     }
 
     /**
@@ -241,15 +243,14 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/friends";
 
         return webClient.get()
-                .uri(uriBuilder ->
-                        uriBuilder.path(path)
-                                .queryParam("page", pageable.getPageNumber())
-                                .queryParam("size", pageable.getPageSize())
-                                .build(userId)
-                )
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<Page<Long>>() {})
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .queryParam("page", pageable.getPageNumber())
+                .queryParam("size", pageable.getPageSize())
+                .build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<Page<Long>>() {
+            })
+            .block();
     }
 
     /**
@@ -262,10 +263,11 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/top-friends";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Long>>() {})
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
+            })
+            .block();
     }
 
     /**
@@ -277,11 +279,11 @@ public class GreenCityRemoteClient {
         String path = "/users/rating";
 
         webClient.patch()
-                .uri(path)
-                .bodyValue(userAddRatingDto)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+            .uri(path)
+            .bodyValue(userAddRatingDto)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
     }
 
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
