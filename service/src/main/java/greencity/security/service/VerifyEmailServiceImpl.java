@@ -54,10 +54,12 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
         }
 
         user.setUserStatus(UserStatus.ACTIVATED);
+        user = userRepo.save(user);
+
         UpdateUserDto updateUserDto = modelMapper.map(user, UpdateUserDto.class);
         updateUserDto.setUserUpdateType(UserUpdateType.CREATE);
         greenCityRemoteClient.updateUser(updateUserDto);
-        userRepo.save(user);
+
         verifyEmailRepo.deleteByTokenAndUserId(token, userId);
         log.info("User has successfully verify the email by token {}.", token);
 

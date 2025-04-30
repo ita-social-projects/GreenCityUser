@@ -13,10 +13,11 @@ public class UpdateUserDtoUserMapper extends AbstractConverter<User, UpdateUserD
     @Override
     protected UpdateUserDto convert(User user) {
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
-            .email(user.getEmail())
+            .id(user.getId())
             .name(user.getName())
-            .userCredo(user.getUserCredo())
+            .email(user.getEmail())
             .profilePicturePath(user.getProfilePicturePath())
+            .userCredo(user.getUserCredo())
             .build();
         String languageCode;
         if (Objects.equals(user.getLanguageId(), 1L)) {
