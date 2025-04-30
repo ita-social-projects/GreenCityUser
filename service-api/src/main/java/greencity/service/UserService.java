@@ -29,6 +29,7 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.UserVOAdvancedDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -471,4 +472,13 @@ public interface UserService {
      *         users
      */
     List<Long> findAllActivatedUserIds(List<Long> ids);
+
+    /**
+     * Method that allows you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
+     * id.
+     *
+     * @param id - {@link UserVOAdvancedDto}'s id
+     * @return {@link Optional} of found {@link UserVOAdvancedDto}.
+     */
+    Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id);
 }

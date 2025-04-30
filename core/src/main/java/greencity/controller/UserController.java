@@ -44,6 +44,7 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.DeactivateUserRequestDto;
+import greencity.dto.user.UserVOAdvancedDto;
 import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -1236,5 +1237,23 @@ public class UserController {
     public ResponseEntity<List<Long>> getActivatedUsersIds(
         @RequestParam(value = "ids", required = false) List<Long> ids) {
         return ResponseEntity.ok(userService.findAllActivatedUserIds(ids));
+    }
+
+    /**
+     * Method that allow you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
+     * id.
+     *
+     * @param id - {@link UserVOAdvancedDto}'s id
+     * @return {@link UserVOAdvancedDto}.
+     */
+    @Operation(summary = "Get find not 'DEACTIVATED' User by id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/findNotDeactivatedByIdAdvanced")
+    public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(@RequestParam Long id) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdAdvanced(id).orElse(null));
     }
 }

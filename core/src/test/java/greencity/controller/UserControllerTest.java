@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
-import greencity.constant.AppConstant;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.EmployeePositionsDto;
@@ -21,7 +20,6 @@ import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
-import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserManagementViewDto;
@@ -32,6 +30,7 @@ import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.UserVOAdvancedDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
@@ -1030,5 +1029,27 @@ class UserControllerTest {
         });
         assertEquals(3, activatedUserIds.size());
         verify(userService, times(1)).findAllActivatedUserIds(null);
+    }
+
+    @Test
+    void findNotDeactivatedByIdAdvancedTest() throws Exception {
+        UserVOAdvancedDto expected = ModelUtils.getUserVOAdvancedDto();
+        when(userService.findNotDeactivatedByIdAdvanced(13L)).thenReturn(Optional.of(expected));
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
+            .param("id", String.valueOf(13L)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value(expected.getName()))
+            .andExpect(jsonPath("$.id").value(13L))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findNotDeactivatedByIdAdvanced_NoResultTest() throws Exception {
+        Long userId = 999L;
+        when(userService.findNotDeactivatedByIdAdvanced(userId)).thenReturn(Optional.empty());
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
+            .param("id", String.valueOf(userId)))
+            .andExpect(status().isOk())
+            .andExpect(content().string(""));
     }
 }

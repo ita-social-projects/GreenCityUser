@@ -2,14 +2,12 @@ package greencity.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import greencity.dto.ownsecurity.OwnSecurityVO;
-import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.enums.EmailNotification;
 import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -43,8 +41,6 @@ public class UserVO {
     private EmailNotification emailNotification;
 
     private LocalDateTime dateOfRegistration;
-
-    private List<SocialNetworkVO> socialNetworks;
 
     private String refreshTokenKey;
 
