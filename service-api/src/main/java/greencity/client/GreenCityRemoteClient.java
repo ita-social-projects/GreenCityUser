@@ -14,6 +14,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import greencity.dto.user.UserVO;
@@ -21,7 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GreenCityRemoteClient {
@@ -189,13 +193,18 @@ public class GreenCityRemoteClient {
      * @param userId id of the user
      * @return {@link UserLocationDto}.
      */
-    public UserLocationDto findUserLocationByUserId(Long userId) {
+    public Optional<UserLocationDto> findUserLocationByUserId(Long userId) {
         String path = "/users/{userId}/location";
 
         return webClient.get()
             .uri(uriBuilder -> uriBuilder.path(path).build(userId))
             .retrieve()
+            .onStatus(
+                    httpStatusCode -> httpStatusCode.isSameCodeAs(HttpStatus.NOT_FOUND),
+                    clientResponse -> Mono.empty())
             .bodyToMono(UserLocationDto.class)
+            .map(Optional::of)
+            .switchIfEmpty(Mono.just(Optional.empty()))
             .block();
     }
 

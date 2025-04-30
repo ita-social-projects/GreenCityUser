@@ -874,7 +874,7 @@ class UserServiceImplTest {
         response.setUserLocationDto(userLocationDto);
 
         when(greenCityRemoteClient.findUserLocationByUserId(userId))
-            .thenReturn(userLocationDto);
+            .thenReturn(Optional.of(userLocationDto));
 
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);

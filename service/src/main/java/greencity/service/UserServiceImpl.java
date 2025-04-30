@@ -625,11 +625,9 @@ public class UserServiceImpl implements UserService {
     public UserProfileDtoResponse getUserProfileInformation(Long userId) {
         User user = findUserById(userId);
         UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
-        UserLocationDto userLocationDto = greenCityRemoteClient.findUserLocationByUserId(userId);
+        Optional<UserLocationDto> userLocationDtoOptional = greenCityRemoteClient.findUserLocationByUserId(userId);
 
-        if (userLocationDto != null) {
-            userProfileDtoResponse.setUserLocationDto(userLocationDto);
-        }
+        userLocationDtoOptional.ifPresent(userProfileDtoResponse::setUserLocationDto);
 
         modelMapper.map(user, userProfileDtoResponse);
         return userProfileDtoResponse;
