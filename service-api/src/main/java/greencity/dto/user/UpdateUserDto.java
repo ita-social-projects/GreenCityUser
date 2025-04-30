@@ -14,14 +14,11 @@ import lombok.Data;
 @Builder
 public class UpdateUserDto {
     private Long id;
-    private String name;
     @NotNull
     private String email;
+    private String name;
     private String profilePicturePath;
     private String userCredo;
-    private Double rating;
-    private UserLocationDto userLocation;
-    private Double eventOrganizerRating;
     private LanguageVO language;
     private UserUpdateType userUpdateType;
 }

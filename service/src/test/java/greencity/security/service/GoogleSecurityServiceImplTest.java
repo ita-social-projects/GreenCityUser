@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import static greencity.ModelUtils.getUserInfo;
-import static greencity.constant.AppConstant.DEFAULT_RATING;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
