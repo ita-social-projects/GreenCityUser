@@ -298,7 +298,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
                  uep.emailPreference, uep.periodicity, COUNT(uep.id)
              )
              FROM UserNotificationPreference uep
-             LEFT JOIN User u
+             JOIN uep.user u
              WHERE u.userStatus = 2
              GROUP BY uep.emailPreference, uep.periodicity
         """)
