@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -200,8 +199,8 @@ public class GreenCityRemoteClient {
             .uri(uriBuilder -> uriBuilder.path(path).build(userId))
             .retrieve()
             .onStatus(
-                    httpStatusCode -> httpStatusCode.isSameCodeAs(HttpStatus.NOT_FOUND),
-                    clientResponse -> Mono.empty())
+                httpStatusCode -> httpStatusCode.isSameCodeAs(HttpStatus.NOT_FOUND),
+                clientResponse -> Mono.empty())
             .bodyToMono(UserLocationDto.class)
             .map(Optional::of)
             .switchIfEmpty(Mono.just(Optional.empty()))
