@@ -2,6 +2,8 @@ package greencity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.socialnetwork.SocialNetworkImageRequestDTO;
+import greencity.dto.socialnetwork.SocialNetworkImageResponseDTO;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserVO;
@@ -103,6 +105,21 @@ public class ModelUtils {
         return UserVO.builder()
             .id(1L)
             .email("taras@gmail.com")
+            .build();
+    }
+
+    public static SocialNetworkImageRequestDTO getSocialNetworkImageRequestDTO() {
+        return SocialNetworkImageRequestDTO.builder()
+            .imagePath("http://someimage.ua")
+            .hostPath("somehost")
+            .build();
+    }
+
+    public static SocialNetworkImageResponseDTO getSocialNetworkImageResponseDTO() {
+        return SocialNetworkImageResponseDTO.builder()
+            .imagePath("http://someimage.ua")
+            .hostPath("somehost")
+            .id(5L)
             .build();
     }
 }
