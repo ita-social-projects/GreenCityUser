@@ -140,11 +140,11 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    /**
+/*    *//**
      * Method for finding Language by id.
      *
      * @return {@link LanguageVO}
-     */
+     *//*
     public LanguageVO findLanguageById(Long id) {
         String path = "/languages/{id}";
 
@@ -155,11 +155,11 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    /**
+    *//**
      * Check whether Language exists by id.
      *
      * @return boolean of whether language exists by that id
-     */
+     *//*
     public Boolean languageExistsById(Long id) {
         String path = "/languages/{id}/exists";
 
@@ -168,7 +168,7 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(Boolean.class)
             .block();
-    }
+    }*/
 
     /**
      * Method to find {@link UserCityDto} by user id.
