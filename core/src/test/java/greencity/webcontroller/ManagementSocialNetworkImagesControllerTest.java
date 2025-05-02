@@ -1,6 +1,7 @@
 package greencity.webcontroller;
 
 import com.google.gson.Gson;
+import greencity.ModelUtils;
 import greencity.dto.PageableDto;
 import greencity.dto.socialnetwork.SocialNetworkImageRequestDTO;
 import greencity.dto.socialnetwork.SocialNetworkImageResponseDTO;
@@ -20,12 +21,17 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
@@ -137,5 +143,35 @@ class ManagementSocialNetworkImagesControllerTest {
             .param("size", "10"));
 
         verify(socialNetworkImageService).findAll(pageable);
+    }
+
+    @Test
+    void saveRemoteTest() throws Exception {
+        SocialNetworkImageRequestDTO imageToSave = ModelUtils.getSocialNetworkImageRequestDTO();
+        SocialNetworkImageResponseDTO expected = ModelUtils.getSocialNetworkImageResponseDTO();
+
+        Gson gson = new Gson();
+        String json = gson.toJson(imageToSave);
+
+        MockMultipartFile dtoPart = new MockMultipartFile(
+                "socialNetworkImageRequestDTO",
+                "socialNetworkImageRequestDTO.json",
+                MediaType.APPLICATION_JSON_VALUE,
+                json.getBytes(StandardCharsets.UTF_8)
+        );
+
+        when(socialNetworkImageService.save(imageToSave, null)).thenReturn(expected);
+
+        MvcResult result = mockMvc.perform(multipart(managementSocialNetworkImagesLink + "/save-remote")
+                        .file(dtoPart)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String resultString = result.getResponse().getContentAsString();
+        SocialNetworkImageResponseDTO responseDTO = gson.fromJson(resultString, SocialNetworkImageResponseDTO.class);
+
+        verify(socialNetworkImageService).save(imageToSave, null);
+        assertEquals(expected, responseDTO);
     }
 }
