@@ -20,7 +20,8 @@ public class UpdateUserDtoUserMapper extends AbstractConverter<User, UpdateUserD
             .userCredo(user.getUserCredo())
             .build();
         String languageCode;
-        if (Objects.equals(user.getLanguageId(), 1L)) {
+        // TODO
+        /*if (Objects.equals(user.getLanguageId(), 1L)) {
             languageCode = AppConstant.UA_LANGUAGE_CODE;
         } else {
             languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
@@ -28,7 +29,7 @@ public class UpdateUserDtoUserMapper extends AbstractConverter<User, UpdateUserD
         updateUserDto.setLanguage(LanguageVO.builder()
             .code(languageCode)
             .id(user.getLanguageId())
-            .build());
+            .build());*/
         return updateUserDto;
     }
 }

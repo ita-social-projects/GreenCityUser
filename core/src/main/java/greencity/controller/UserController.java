@@ -714,9 +714,7 @@ public class UserController {
     })
     @GetMapping("/lang")
     public ResponseEntity<String> getUserLang(@Parameter(hidden = true) @CurrentUser UserVO userVO) {
-        Long languageId = userVO.getLanguageId();
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-        return ResponseEntity.ok().body(languageVO.getCode());
+        return ResponseEntity.ok().body(userVO.getLanguageVO().getCode());
     }
 
     /**

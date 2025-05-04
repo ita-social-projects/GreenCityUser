@@ -5,7 +5,6 @@ import greencity.constant.EmailConstants;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.dto.econews.InterestingEcoNewsDto;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
@@ -14,6 +13,7 @@ import greencity.entity.User;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
+import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import jakarta.mail.MessagingException;
@@ -49,18 +49,17 @@ public class EmailServiceImpl implements EmailService {
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
     private final UserRepo userRepo;
-    private final GreenCityRemoteClient greenCityRemoteClient;
 
     /**
      * Constructor.
      */
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender,
-        ITemplateEngine templateEngine,
-        @Qualifier("sendEmailExecutor") Executor executor,
-        @Value("${client.address}") String clientLink,
-        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo,
-        GreenCityRemoteClient greenCityRemoteClient) {
+                            ITemplateEngine templateEngine,
+                            @Qualifier("sendEmailExecutor") Executor executor,
+                            @Value("${client.address}") String clientLink,
+                            @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo,
+                            GreenCityRemoteClient greenCityRemoteClient, LanguageRepo languageRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
@@ -68,7 +67,6 @@ public class EmailServiceImpl implements EmailService {
         this.senderEmailAddress = senderEmailAddress;
         this.messageSource = messageSource;
         this.userRepo = userRepo;
-        this.greenCityRemoteClient = greenCityRemoteClient;
     }
 
     /**
@@ -150,11 +148,8 @@ public class EmailServiceImpl implements EmailService {
      * {@inheritDoc}
      */
     @Override
-    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, Long languageId,
+    public void sendRestoreEmail(Long userId, String userName, String userEmail, String token, String language,
         boolean isUbs) {
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-        String language = languageVO.getCode();
-
         Map<String, Object> model = buildModelMapForPasswordRestore(userId, userName, token, language, isUbs);
         String template = createEmailTemplate(model, EmailConstants.RESTORE_EMAIL_PAGE);
         sendEmail(userEmail, messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null,
@@ -245,10 +240,7 @@ public class EmailServiceImpl implements EmailService {
      * {@inheritDoc}
      */
     @Override
-    public void sendSuccessRestorePasswordByEmail(String email, Long languageId, String userName, boolean isUbs) {
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-        String language = languageVO.getCode();
-
+    public void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs) {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
         model.put(EmailConstants.USER_NAME, userName);
@@ -340,9 +332,7 @@ public class EmailServiceImpl implements EmailService {
         String userEmail = dto.getEmail();
         User user = userRepo.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + userEmail));
-        Long languageId = user.getLanguageId();
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-        String userLanguageCode = languageVO.getCode();
+        String userLanguageCode = user.getLanguage().getCode();
         model.put(EmailConstants.CLIENT_LINK, clientLink);
         model.put(EmailConstants.USER_NAME, dto.getUserName());
         model.put(EmailConstants.PLACE_NAME, dto.getPlaceName());

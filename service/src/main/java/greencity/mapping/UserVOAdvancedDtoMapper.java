@@ -1,23 +1,21 @@
 package greencity.mapping;
 
+import greencity.dto.language.LanguageVO;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.entity.User;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-@RequiredArgsConstructor
 public class UserVOAdvancedDtoMapper extends AbstractConverter<User, UserVOAdvancedDto> {
     @Override
     protected UserVOAdvancedDto convert(User user) {
         Long userId = user.getId();
-        Long languageId = user.getLanguageId();
 
         List<SocialNetworkVO> socialNetworks = user.getSocialNetworks() != null ? user.getSocialNetworks()
             .stream().map(socialNetwork -> SocialNetworkVO.builder()
@@ -44,7 +42,10 @@ public class UserVOAdvancedDtoMapper extends AbstractConverter<User, UserVOAdvan
         userVOAdvancedDto.setUserStatus(user.getUserStatus());
         userVOAdvancedDto.setDateOfRegistration(user.getDateOfRegistration());
         userVOAdvancedDto.setProfilePicturePath(user.getProfilePicturePath());
-        userVOAdvancedDto.setLanguageId(languageId);
+        userVOAdvancedDto.setLanguageVO(LanguageVO.builder()
+                .id(user.getLanguage().getId())
+                .code(user.getLanguage().getCode())
+                .build());
         userVOAdvancedDto.setFirstName(user.getFirstName());
         userVOAdvancedDto.setSocialNetworks(socialNetworks);
 

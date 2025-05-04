@@ -41,6 +41,7 @@ import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
@@ -61,6 +62,7 @@ import greencity.exception.exceptions.UserDeactivationException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
+import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
@@ -96,6 +98,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RestClient restClient;
+    private final LanguageRepo languageRepo;
     private final GreenCityRemoteClient greenCityRemoteClient;
     private final UserDeactivationRepo userDeactivationRepo;
     private final SimpMessagingTemplate messagingTemplate;
@@ -578,9 +581,7 @@ public class UserServiceImpl implements UserService {
         setNotificationPreferencesForUser(user, userProfileDtoRequest);
         userRepo.save(user);
 
-        Long languageId = user.getLanguageId();
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-        return UpdateConstants.getResultByLanguageCode(languageVO.getCode());
+        return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
 
     private void setNotificationPreferencesForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
@@ -783,14 +784,11 @@ public class UserServiceImpl implements UserService {
             .user(foundUser)
             .build());
 
-        Long languageId = foundUser.getLanguageId();
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-
         return UserDeactivationReasonDto.builder()
             .email(foundUser.getEmail())
             .name(foundUser.getName())
             .deactivationReason(reason)
-            .lang(languageVO.getCode())
+            .lang(foundUser.getLanguage().getCode())
             .build();
     }
 
@@ -832,13 +830,10 @@ public class UserServiceImpl implements UserService {
         foundUser.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(foundUser);
 
-        Long languageId = foundUser.getLanguageId();
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-
         return UserActivationDto.builder()
             .email(foundUser.getEmail())
             .name(foundUser.getName())
-            .lang(languageVO.getCode())
+            .lang(foundUser.getLanguage().getCode())
             .build();
     }
 
@@ -847,12 +842,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserLanguage(Long userId, Long languageId) {
-        if (!greenCityRemoteClient.languageExistsById(languageId)) {
-            throw new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId);
-        }
+        Language language = languageRepo.findById(languageId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
 
         User user = findUserById(userId);
-        user.setLanguageId(languageId);
+        user.setLanguage(language);
         userRepo.save(user);
     }
 
@@ -1052,10 +1046,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String findUserLanguageByUuid(String uuid) {
-        User user = findUserByUuid(uuid);
-        Long languageId = user.getLanguageId();
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-        return languageVO.getCode();
+        return findUserByUuid(uuid).getLanguage().getCode();
     }
 
     /**
