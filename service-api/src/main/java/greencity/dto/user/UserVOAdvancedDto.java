@@ -44,5 +44,5 @@ public class UserVOAdvancedDto {
 
     private UserLocationDto userLocation;
 
-    private LanguageVO languageVO;
+    private LanguageVO language;
 }

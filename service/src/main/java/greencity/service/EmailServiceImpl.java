@@ -58,8 +58,9 @@ public class EmailServiceImpl implements EmailService {
                             ITemplateEngine templateEngine,
                             @Qualifier("sendEmailExecutor") Executor executor,
                             @Value("${client.address}") String clientLink,
-                            @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo,
-                            GreenCityRemoteClient greenCityRemoteClient, LanguageRepo languageRepo) {
+                            @Value("${sender.email.address}") String senderEmailAddress,
+                            MessageSource messageSource,
+                            UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;

@@ -844,7 +844,6 @@ public class UserServiceImpl implements UserService {
     public void updateUserLanguage(Long userId, Long languageId) {
         Language language = languageRepo.findById(languageId)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
-
         User user = findUserById(userId);
         user.setLanguage(language);
         userRepo.save(user);
