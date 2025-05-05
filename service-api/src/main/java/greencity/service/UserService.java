@@ -30,6 +30,7 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -481,4 +482,10 @@ public interface UserService {
      * @return {@link Optional} of found {@link UserVOAdvancedDto}.
      */
     Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id);
+
+    Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email);
+
+    UserVOReducedDto findByEmailReduced(String email);
+
+    Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id);
 }

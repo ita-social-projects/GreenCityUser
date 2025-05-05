@@ -45,6 +45,7 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -1255,5 +1256,15 @@ public class UserController {
     @GetMapping("/findNotDeactivatedByIdAdvanced")
     public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(@RequestParam Long id) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByIdAdvanced(id).orElse(null));
+    }
+
+    @GetMapping("/findNotDeactivatedByEmailRemote")
+    public ResponseEntity<UserVOReducedDto> findNotDeactivatedByEmailReduced(@RequestParam String email) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailReduced(email).orElse(null));
+    }
+
+    @GetMapping("/findNotDeactivatedByIdRemote")
+    public ResponseEntity<UserVOReducedDto> findNotDeactivatedByIdRemote(@RequestParam Long id) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdReduced(id).orElse(null));
     }
 }

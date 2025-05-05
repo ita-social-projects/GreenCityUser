@@ -125,7 +125,7 @@ public class ManagementSocialNetworkImagesController {
      * @param file                          of {@link MultipartFile}.
      * @return {@link GenericResponseDto} with of operation and errors fields.
      */
-    @Operation(summary = "Update Econews.")
+    @Operation(summary = "Update SocialNetworkImage.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)

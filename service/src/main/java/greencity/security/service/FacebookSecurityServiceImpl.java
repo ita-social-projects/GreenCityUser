@@ -178,7 +178,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .build();
     }
 
-    User createNewUser(String email, String userName, String profilePicture, String language) {
+    User createNewUser(String email, String userName, String language) {
         User user = User.builder()
             .email(email)
             .name(userName)
@@ -188,7 +188,6 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
-            .profilePicturePath(profilePicture)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
@@ -208,6 +207,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
 
     User saveNewUser(User newUser) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
+        //here we need to add greencity_user creation and set the image
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
@@ -248,7 +248,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         UserVO userVO = userService.findByEmail(email);
         if (userVO == null) {
             log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "{}", email);
-            return handleNewUser(email, userName, profilePicture, language);
+            return handleNewUser(email, userName, language);
         } else {
             if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {
                 throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
@@ -257,8 +257,8 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         }
     }
 
-    SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
-        User newUser = createNewUser(email, userName, profilePicture, language);
+    SuccessSignInDto handleNewUser(String email, String userName, String language) {
+        User newUser = createNewUser(email, userName, language);
         User savedUser = saveNewUser(newUser);
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));

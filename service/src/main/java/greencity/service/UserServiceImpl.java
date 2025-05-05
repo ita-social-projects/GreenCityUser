@@ -2,7 +2,6 @@ package greencity.service;
 
 import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
-import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.constant.UpdateConstants;
@@ -41,6 +40,7 @@ import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
@@ -518,7 +518,7 @@ public class UserServiceImpl implements UserService {
                 .profilePicturePath(profilePicturePath)
                 .userUpdateType(UserUpdateType.REPLACE)
                 .build());
-            user.setProfilePicturePath(profilePicturePath);
+            updateUserProfilePicturePath(user.getId(), profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
         }
@@ -534,11 +534,10 @@ public class UserServiceImpl implements UserService {
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         greenCityRemoteClient.updateUser(UpdateUserDto.builder()
-            .profilePicturePath(AppConstant.EMPTY_STRING)
+            .profilePicturePath(null)
             .email(email)
             .userUpdateType(UserUpdateType.DELETE)
             .build());
-        user.setProfilePicturePath(null);
         userRepo.save(user);
     }
 
@@ -630,6 +629,7 @@ public class UserServiceImpl implements UserService {
         userLocationDtoOptional.ifPresent(userProfileDtoResponse::setUserLocationDto);
 
         modelMapper.map(user, userProfileDtoResponse);
+        userProfileDtoResponse.setProfilePicturePath(greenCityRemoteClient.getUserPicturePath(userId));
         return userProfileDtoResponse;
     }
 
@@ -1080,5 +1080,34 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
         log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVOAdvancedDto.class));
+    }
+
+    private void updateUserProfilePicturePath(Long userId, String profilePicturePath) {
+        greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
+    }
+
+    @Override
+    @Transactional
+    public Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email) {
+        log.info("email {}", email);
+        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        log.info("user: {}", notDeactivatedByEmail);
+        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOReducedDto.class));
+    }
+
+    @Override
+    public UserVOReducedDto findByEmailReduced(String email) {
+        Optional<User> optionalUser = userRepo.findByEmail(email);
+        return optionalUser.map(user -> modelMapper.map(user, UserVOReducedDto.class)).orElse(null);
+    }
+
+    @Override
+    @Transactional
+    public Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id) {
+        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        log.info("user: {}", notDeactivatedById);
+        return Optional.of(modelMapper.map(notDeactivatedById, UserVOReducedDto.class));
     }
 }

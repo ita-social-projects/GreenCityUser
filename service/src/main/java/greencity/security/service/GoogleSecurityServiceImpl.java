@@ -9,6 +9,7 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
@@ -77,8 +78,8 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             }
             String email = googleIdToken.getPayload().getEmail();
             String userName = (String) googleIdToken.getPayload().get(USERNAME);
-            String profilePicture = (String) googleIdToken.getPayload().get(GOOGLE_PICTURE);
-            return processAuthentication(email, userName, profilePicture, language);
+           // String profilePicture = (String) googleIdToken.getPayload().get(GOOGLE_PICTURE);
+            return processAuthentication(email, userName, language);
         } catch (IllegalArgumentException e) {
             return authenticateByGoogleAccessToken(googleToken, language);
         } catch (GeneralSecurityException | IOException e) {
@@ -94,19 +95,18 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             }
             String email = userInfo.getEmail();
             String userName = userInfo.getName();
-            String profilePicture = userInfo.getPicture();
-            return processAuthentication(email, userName, profilePicture, language);
+            return processAuthentication(email, userName, language);
         } catch (IOException e) {
             throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN + e.getMessage());
         }
     }
 
-    private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture,
+    private SuccessSignInDto processAuthentication(String email, String userName,
         String language) {
-        UserVO userVO = userService.findByEmail(email);
+        UserVOReducedDto userVO = userService.findByEmailReduced(email);
         if (userVO == null) {
             log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "{}", email);
-            return handleNewUser(email, userName, profilePicture, language);
+            return handleNewUser(email, userName, language);
         } else {
             if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {
                 throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
@@ -116,8 +116,8 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         }
     }
 
-    private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
-        User newUser = createNewUser(email, userName, profilePicture, language);
+    private SuccessSignInDto handleNewUser(String email, String userName, String language) {
+        User newUser = createNewUser(email, userName, language);
         User savedUser = saveNewUser(newUser);
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
@@ -130,7 +130,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         return getSuccessSignInDto(userVO);
     }
 
-    private User createNewUser(String email, String userName, String profilePicture, String language) {
+    private User createNewUser(String email, String userName, String language) {
         User user = User.builder()
             .email(email)
             .name(userName)
@@ -140,7 +140,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
-            .profilePicturePath(profilePicture)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
@@ -158,6 +157,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     }
 
     private User saveNewUser(User newUser) {
+        //Maybe somewhere here we need to add greencity_user creation and set picturePath
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
@@ -167,7 +167,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         });
     }
 
-    private SuccessSignInDto getSuccessSignInDto(UserVO user) {
+    private SuccessSignInDto getSuccessSignInDto(UserVOReducedDto user) {
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);

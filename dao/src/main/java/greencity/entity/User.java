@@ -101,8 +101,8 @@ public class User {
     @Column(name = "refresh_token_key", nullable = false)
     private String refreshTokenKey;
 
-    @Column(name = "profile_picture")
-    private String profilePicturePath;
+//    @Column(name = "profile_picture")
+//    private String profilePicturePath;
 
     @Column(name = "first_name")
     private String firstName;
