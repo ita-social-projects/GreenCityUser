@@ -163,17 +163,6 @@ public class RestClient {
     }
 
     /**
-     * Method for finding all language code.
-     *
-     * @return list of {@link String}
-     */
-    public List<String> getAllLanguageCodes() {
-        String[] restTemplateForObject = restTemplate.getForObject(greenCityServerAddress
-            + RestTemplateLinks.LANGUAGES + RestTemplateLinks.CODES, String[].class);
-        return List.of(restTemplateForObject);
-    }
-
-    /**
      * Method for creating an ubs profile for a user.
      *
      * @param ubsProfile of {@link UbsProfileCreationDto};
