@@ -5,9 +5,7 @@ import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -49,9 +47,9 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .showLocation(user.getShowLocation())
             .lastActivityTime(user.getLastActivityTime())
             .languageVO(LanguageVO.builder()
-                    .id(user.getLanguage().getId())
-                    .code(user.getLanguage().getCode())
-                    .build())
+                .id(user.getLanguage().getId())
+                .code(user.getLanguage().getCode())
+                .build())
             .firstName(user.getFirstName())
             .build();
     }

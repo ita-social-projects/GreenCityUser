@@ -141,15 +141,15 @@ class OwnSecurityServiceImplTest {
             .userStatus(UserStatus.BLOCKED)
             .build();
         userForBruteForceTest = User.builder()
+            .id(1L)
+            .email("test@somemail.com")
+            .name("Test")
+            .language(Language.builder()
                 .id(1L)
-                .email("test@somemail.com")
-                .name("Test")
-                .language(Language.builder()
-                        .id(1L)
-                        .code("en")
-                        .build())
-                .userStatus(UserStatus.ACTIVATED)
-                .build();
+                .code("en")
+                .build())
+            .userStatus(UserStatus.ACTIVATED)
+            .build();
         request = ModelUtils.getTestersSignInRequest();
     }
 
@@ -637,10 +637,10 @@ class OwnSecurityServiceImplTest {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
         when(userRepo.findByEmail(anyString()))
-                .thenReturn(Optional.ofNullable(userForBruteForceTest));
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
 
         assertThrows(UserBlockedException.class,
-                () -> ownSecurityService.signIn(ownSignInDto));
+            () -> ownSecurityService.signIn(ownSignInDto));
     }
 
     @Test

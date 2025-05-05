@@ -1,6 +1,5 @@
 package greencity.service;
 
-import greencity.client.GreenCityRemoteClient;
 import greencity.constant.EmailConstants;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -13,7 +12,6 @@ import greencity.entity.User;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
-import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import jakarta.mail.MessagingException;
@@ -55,12 +53,12 @@ public class EmailServiceImpl implements EmailService {
      */
     @Autowired
     public EmailServiceImpl(JavaMailSender javaMailSender,
-                            ITemplateEngine templateEngine,
-                            @Qualifier("sendEmailExecutor") Executor executor,
-                            @Value("${client.address}") String clientLink,
-                            @Value("${sender.email.address}") String senderEmailAddress,
-                            MessageSource messageSource,
-                            UserRepo userRepo) {
+        ITemplateEngine templateEngine,
+        @Qualifier("sendEmailExecutor") Executor executor,
+        @Value("${client.address}") String clientLink,
+        @Value("${sender.email.address}") String senderEmailAddress,
+        MessageSource messageSource,
+        UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;

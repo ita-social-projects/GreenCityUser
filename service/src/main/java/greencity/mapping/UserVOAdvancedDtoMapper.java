@@ -43,9 +43,9 @@ public class UserVOAdvancedDtoMapper extends AbstractConverter<User, UserVOAdvan
         userVOAdvancedDto.setDateOfRegistration(user.getDateOfRegistration());
         userVOAdvancedDto.setProfilePicturePath(user.getProfilePicturePath());
         userVOAdvancedDto.setLanguage(LanguageVO.builder()
-                .id(user.getLanguage().getId())
-                .code(user.getLanguage().getCode())
-                .build());
+            .id(user.getLanguage().getId())
+            .code(user.getLanguage().getCode())
+            .build());
         userVOAdvancedDto.setFirstName(user.getFirstName());
         userVOAdvancedDto.setSocialNetworks(socialNetworks);
 

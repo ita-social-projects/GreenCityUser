@@ -1056,15 +1056,15 @@ class UserServiceImplTest {
         List<String> test1 = List.of();
         User myUser = ModelUtils.getUser();
         user.setLanguage(Language.builder()
-                .id(1L)
-                .code("en")
-                .build());
+            .id(1L)
+            .code("en")
+            .build());
         UserDeactivationReason test = UserDeactivationReason.builder()
-                .id(1L)
-                .user(myUser)
-                .reason("test")
-                .dateTimeOfDeactivation(LocalDateTime.now())
-                .build();
+            .id(1L)
+            .user(myUser)
+            .reason("test")
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .build();
         when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
         assertEquals(test1, userService.getDeactivationReason(1L, "en"));
         assertEquals(test1, userService.getDeactivationReason(1L, "ua"));
@@ -1080,17 +1080,17 @@ class UserServiceImplTest {
     void setActivatedStatus() {
         User myUser = ModelUtils.getUser();
         myUser.setLanguage(Language.builder()
-                .id(1L)
-                .code("en")
-                .build());
+            .id(1L)
+            .code("en")
+            .build());
         when(userRepo.findById(1L)).thenReturn(Optional.of(myUser));
         myUser.setUserStatus(ACTIVATED);
         when(userRepo.save(myUser)).thenReturn(myUser);
         assertEquals(UserActivationDto.builder()
-                .email(myUser.getEmail())
-                .name(myUser.getName())
-                .lang(myUser.getLanguage().getCode())
-                .build(), userService.setActivatedStatus(userId));
+            .email(myUser.getEmail())
+            .name(myUser.getName())
+            .lang(myUser.getLanguage().getCode())
+            .build(), userService.setActivatedStatus(userId));
     }
 
     @Test
@@ -1345,15 +1345,15 @@ class UserServiceImplTest {
         List<String> test1 = List.of();
         User myUser = ModelUtils.getUser();
         myUser.setLanguage(Language.builder()
-                .id(1L)
-                .code("en")
-                .build());
+            .id(1L)
+            .code("en")
+            .build());
         UserDeactivationReason test = UserDeactivationReason.builder()
-                .id(1L)
-                .user(myUser)
-                .reason("test")
-                .dateTimeOfDeactivation(LocalDateTime.now())
-                .build();
+            .id(1L)
+            .user(myUser)
+            .reason("test")
+            .dateTimeOfDeactivation(LocalDateTime.now())
+            .build();
         when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
         assertEquals(test1, userService.getDeactivationReason(1L, "uk"));
     }
@@ -1408,10 +1408,10 @@ class UserServiceImplTest {
         DeactivateUserRequestDto request = new DeactivateUserRequestDto("Reason");
 
         User requestedUser = User.builder()
-                .id(userVO.getId())
-                .role(ROLE_ADMIN)
-                .language(getLanguage())
-                .build();
+            .id(userVO.getId())
+            .role(ROLE_ADMIN)
+            .language(getLanguage())
+            .build();
 
         when(userRepo.findById(userVO.getId())).thenReturn(Optional.of(requestedUser));
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(requestedUser));

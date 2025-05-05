@@ -95,7 +95,7 @@ public interface EmailService {
     /**
      * Method for send information about success restoring password.
      *
-     * @param email      letter is sent to this email.
+     * @param email    letter is sent to this email.
      * @param language language which will be used in letter.
      */
     void sendSuccessRestorePasswordByEmail(String email, String language, String userName, boolean isUbs);

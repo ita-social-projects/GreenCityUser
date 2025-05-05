@@ -147,10 +147,10 @@ class EmailServiceImplTest {
 
     @ParameterizedTest
     @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
-            "1, Test, test@gmail.com, token, en, false"})
+        "1, Test, test@gmail.com, token, en, false"})
     void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
         when(messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)))
-                .thenReturn("Confirm restoring password");
+            .thenReturn("Confirm restoring password");
         service.sendRestoreEmail(id, name, email, token, language, isUbs);
         verify(javaMailSender).createMimeMessage();
     }
@@ -158,7 +158,7 @@ class EmailServiceImplTest {
     @Test
     void sendRestoreEmailLanguageNotFoundException() {
         assertThrows(IllegalStateException.class,
-                () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
+            () -> service.sendRestoreEmail(1L, "Test", "test@gmail.com", "token", "enuaru", false));
     }
 
     @Test
@@ -216,7 +216,7 @@ class EmailServiceImplTest {
         String userName = "Helgi";
         boolean isUbs = false;
         when(messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null, getLocale(lang)))
-                .thenReturn("Restore password");
+            .thenReturn("Restore password");
         service.sendSuccessRestorePasswordByEmail(email, lang, userName, isUbs);
 
         verify(javaMailSender).createMimeMessage();
@@ -293,7 +293,7 @@ class EmailServiceImplTest {
         }).when(javaMailSender).send(any(MimeMessage.class));
         String subject = "Place Status Change Notification";
         when(messageSource.getMessage(eq(EmailConstants.UPDATE_STATUS), any(), eq(getLocale(ENGLISH_CODE))))
-                .thenReturn(subject);
+            .thenReturn(subject);
 
         service.sendPlaceStatusChangeNotification(dto);
         latch.await();

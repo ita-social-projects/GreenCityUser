@@ -3,7 +3,6 @@ package greencity.security.service;
 import greencity.client.CloudFlareClient;
 import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.security.CloudFlareRequest;
 import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
@@ -148,8 +147,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
             .language(Language.builder()
-                    .id(modelMapper.map(language, Long.class))
-                    .build())
+                .id(modelMapper.map(language, Long.class))
+                .build())
             .build();
     }
 
@@ -537,9 +536,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
             .language(Language.builder()
-                    .id(2L)
-                    .code("en")
-                    .build())
+                .id(2L)
+                .code("en")
+                .build())
             .build();
     }
 

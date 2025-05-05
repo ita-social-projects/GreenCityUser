@@ -1,19 +1,17 @@
 package greencity.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Entity
 @Table(name = "languages")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@EqualsAndHashCode(
-    exclude = {"adviceTranslations", "toDoListItemTranslations", "habitTranslations", "factOfTheDayTranslations"})
-@ToString(
-    exclude = {"adviceTranslations", "toDoListItemTranslations", "habitTranslations", "factOfTheDayTranslations"})
 @Builder
 public class Language {
     @Id

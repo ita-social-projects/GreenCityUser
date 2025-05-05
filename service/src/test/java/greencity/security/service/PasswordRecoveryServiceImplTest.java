@@ -119,7 +119,7 @@ class PasswordRecoveryServiceImplTest {
         when(ownSecurityRepo.findByUserId(2L)).thenReturn(ofNullable(TEST_OWN_SECURITY));
         when(ownSecurityRepo.save(TEST_OWN_SECURITY)).thenReturn(TEST_OWN_SECURITY);
         doNothing().when(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(),
-                user.getLanguage().getCode(), user.getName(), true);
+            user.getLanguage().getCode(), user.getName(), true);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         doNothing().when(restorePasswordEmailRepo).delete(TEST_RESTORE_PASSWORD_EMAIL);
 

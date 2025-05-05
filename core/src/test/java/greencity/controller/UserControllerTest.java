@@ -658,19 +658,19 @@ class UserControllerTest {
         String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
         long userId = 1L;
         UserVO userVO = UserVO.builder()
-                .id(userId)
-                .languageVO(LanguageVO.builder()
-                        .id(2L)
-                        .code(languageCode)
-                        .build())
-                .build();
+            .id(userId)
+            .languageVO(LanguageVO.builder()
+                .id(2L)
+                .code(languageCode)
+                .build())
+            .build();
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);
         when(userService.findByEmail(principal.getName())).thenReturn(userVO);
 
         mockMvc.perform(put(userLink + "/language/{languageId}", 1)
-                        .principal(principal))
-                .andExpect(status().isOk());
+            .principal(principal))
+            .andExpect(status().isOk());
 
         verify(userService).updateUserLanguage(userId, 1L);
     }
@@ -681,17 +681,17 @@ class UserControllerTest {
         String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
         UserVO userVO = ModelUtils.TEST_USER_VO;
         userVO.setLanguageVO(LanguageVO.builder()
-                .id(2L)
-                .code(languageCode)
-                .build());
+            .id(2L)
+            .code(languageCode)
+            .build());
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);
         when(userService.findByEmail(principal.getName())).thenReturn(userVO);
 
         this.mockMvc.perform(get(userLink + "/lang" + "?id=1")
-                        .principal(principal))
-                .andExpect(content().string(languageCode))
-                .andExpect(status().isOk());
+            .principal(principal))
+            .andExpect(content().string(languageCode))
+            .andExpect(status().isOk());
     }
 
     @Test

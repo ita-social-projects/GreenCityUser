@@ -72,9 +72,9 @@ public class ModelUtils {
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
             .firstName("Taras")
             .language(LanguageVO.builder()
-                    .id(2L)
-                    .code("en")
-                    .build())
+                .id(2L)
+                .code("en")
+                .build())
             .socialNetworks(getSocialNetworkVOs())
             .build();
     }

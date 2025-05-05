@@ -2,7 +2,6 @@ package greencity.client;
 
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
