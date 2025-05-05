@@ -18,13 +18,13 @@ class LanguageVOMapperTest {
     @Test
     void convertTest() {
         Language languageToConvert = Language.builder()
-                .id(2L)
-                .code("code")
-                .build();
+            .id(2L)
+            .code("code")
+            .build();
         LanguageVO expectedResult = LanguageVO.builder()
-                .id(languageToConvert.getId())
-                .code(languageToConvert.getCode())
-                .build();
+            .id(languageToConvert.getId())
+            .code(languageToConvert.getCode())
+            .build();
 
         LanguageVO actualResult = languageVOMapper.convert(languageToConvert);
 

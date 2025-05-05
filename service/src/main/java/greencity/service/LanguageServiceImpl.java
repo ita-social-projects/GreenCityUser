@@ -7,7 +7,6 @@ import greencity.repository.LanguageRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -22,8 +21,8 @@ public class LanguageServiceImpl implements LanguageService {
     @Override
     public List<LanguageVO> getAllLanguages() {
         return languageRepo.findAll().stream()
-                .map(language -> modelMapper.map(language, LanguageVO.class))
-                .toList();
+            .map(language -> modelMapper.map(language, LanguageVO.class))
+            .toList();
     }
 
     /**
@@ -32,8 +31,8 @@ public class LanguageServiceImpl implements LanguageService {
     @Override
     public LanguageVO findLanguageByCode(String code) {
         return languageRepo.findByCode(code)
-                .map(language -> modelMapper.map(language, LanguageVO.class))
-                .orElseThrow(() -> new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_CODE + code));
+            .map(language -> modelMapper.map(language, LanguageVO.class))
+            .orElseThrow(() -> new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_CODE + code));
     }
 
     /**
@@ -42,8 +41,8 @@ public class LanguageServiceImpl implements LanguageService {
     @Override
     public LanguageVO findLanguageById(Long id) {
         return languageRepo.findById(id)
-                .map(language -> modelMapper.map(language, LanguageVO.class))
-                .orElseThrow(() -> new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + id));
+            .map(language -> modelMapper.map(language, LanguageVO.class))
+            .orElseThrow(() -> new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + id));
     }
 
     /**

@@ -100,9 +100,8 @@ public class LanguageServiceImplTest {
         when(languageRepo.findByCode(code)).thenReturn(Optional.empty());
 
         LanguageNotFoundException exception = assertThrows(
-                LanguageNotFoundException.class,
-                () -> languageService.findLanguageByCode(code)
-        );
+            LanguageNotFoundException.class,
+            () -> languageService.findLanguageByCode(code));
 
         assertTrue(exception.getMessage().contains(ErrorMessage.LANGUAGE_NOT_FOUND_BY_CODE + code));
         verify(languageRepo, times(1)).findByCode(code);
@@ -129,9 +128,8 @@ public class LanguageServiceImplTest {
         when(languageRepo.findById(id)).thenReturn(Optional.empty());
 
         LanguageNotFoundException exception = assertThrows(
-                LanguageNotFoundException.class,
-                () -> languageService.findLanguageById(id)
-        );
+            LanguageNotFoundException.class,
+            () -> languageService.findLanguageById(id));
 
         assertTrue(exception.getMessage().contains(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + id));
         verify(languageRepo, times(1)).findById(id);

@@ -41,8 +41,9 @@ class LanguageControllerTest {
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(languageController)
-                .setControllerAdvice(new CustomExceptionHandler(new DefaultErrorAttributes())) // Assuming you have a global exception handler
-                .build();
+            .setControllerAdvice(new CustomExceptionHandler(new DefaultErrorAttributes())) // Assuming you have a global
+                                                                                           // exception handler
+            .build();
 
         languageVO1 = new LanguageVO();
         languageVO1.setId(1L);
@@ -59,14 +60,14 @@ class LanguageControllerTest {
         when(languageService.getAllLanguages()).thenReturn(languages);
 
         mockMvc.perform(get("/lang")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].code", is("en")))
-                .andExpect(jsonPath("$[1].id", is(2)))
-                .andExpect(jsonPath("$[1].code", is("fr")));
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0].id", is(1)))
+            .andExpect(jsonPath("$[0].code", is("en")))
+            .andExpect(jsonPath("$[1].id", is(2)))
+            .andExpect(jsonPath("$[1].code", is("fr")));
 
         verify(languageService, times(1)).getAllLanguages();
         verifyNoMoreInteractions(languageService);
@@ -78,11 +79,11 @@ class LanguageControllerTest {
         when(languageService.findLanguageByCode(code)).thenReturn(languageVO1);
 
         mockMvc.perform(get("/lang/codes/{code}", code)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.code", is("en")));
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.code", is("en")));
 
         verify(languageService, times(1)).findLanguageByCode(code);
         verifyNoMoreInteractions(languageService);
@@ -92,11 +93,11 @@ class LanguageControllerTest {
     void findLanguageByCodeTestReturns400WhenLanguageNotFoundException() throws Exception {
         String code = "invalid";
         when(languageService.findLanguageByCode(code))
-                .thenThrow(new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_CODE + code));
+            .thenThrow(new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_CODE + code));
 
         mockMvc.perform(get("/lang/codes/{code}", code)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
 
         verify(languageService, times(1)).findLanguageByCode(code);
         verifyNoMoreInteractions(languageService);
@@ -108,11 +109,11 @@ class LanguageControllerTest {
         when(languageService.findLanguageById(id)).thenReturn(languageVO1);
 
         mockMvc.perform(get("/lang/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.code", is("en")));
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id", is(1)))
+            .andExpect(jsonPath("$.code", is("en")));
 
         verify(languageService, times(1)).findLanguageById(id);
         verifyNoMoreInteractions(languageService);
@@ -122,11 +123,11 @@ class LanguageControllerTest {
     void findLanguageByIdTestReturns400WhenLanguageNotFoundException() throws Exception {
         Long id = 999L;
         when(languageService.findLanguageById(id))
-                .thenThrow(new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + id));
+            .thenThrow(new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + id));
 
         mockMvc.perform(get("/lang/{id}", id)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
 
         verify(languageService, times(1)).findLanguageById(id);
         verifyNoMoreInteractions(languageService);
@@ -138,13 +139,13 @@ class LanguageControllerTest {
         when(languageService.findAllLanguageCodes()).thenReturn(codes);
 
         mockMvc.perform(get("/lang/codes")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0]", is("en")))
-                .andExpect(jsonPath("$[1]", is("fr")))
-                .andExpect(jsonPath("$[2]", is("de")));
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$", hasSize(3)))
+            .andExpect(jsonPath("$[0]", is("en")))
+            .andExpect(jsonPath("$[1]", is("fr")))
+            .andExpect(jsonPath("$[2]", is("de")));
 
         verify(languageService, times(1)).findAllLanguageCodes();
         verifyNoMoreInteractions(languageService);

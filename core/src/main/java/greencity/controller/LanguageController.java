@@ -17,19 +17,18 @@ import java.util.List;
 @RequestMapping("/lang")
 @RequiredArgsConstructor
 public class LanguageController {
-
     private final LanguageService languageService;
 
     /**
-     * Method to get all languages as {@link LanguageVO}
+     * Method to get all languages as {@link LanguageVO}.
      *
      * @return {@link List} of {@link LanguageVO}
      */
     @Operation(summary = "Find all languages")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping
     public List<LanguageVO> getAllLanguages() {
@@ -37,17 +36,17 @@ public class LanguageController {
     }
 
     /**
-     * Find language {@link LanguageVO} by code
+     * Find language {@link LanguageVO} by code.
      *
      * @param code language code
      * @return language {@link LanguageVO}
      */
     @Operation(summary = "Find language by code")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/codes/{code}")
     public LanguageVO findLanguageByCode(@PathVariable String code) {
@@ -55,17 +54,17 @@ public class LanguageController {
     }
 
     /**
-     * Find language {@link LanguageVO} by id
+     * Find language {@link LanguageVO} by id.
      *
      * @param id language id
      * @return language {@link LanguageVO}
      */
     @Operation(summary = "Find language by id")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/{id}")
     public LanguageVO findLanguageById(@PathVariable Long id) {
@@ -73,15 +72,15 @@ public class LanguageController {
     }
 
     /**
-     * Method to get all language codes
+     * Method to get all language codes.
      *
      * @return {@link List} of {@link String} language codes
      */
     @Operation(summary = "Find all language codes")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-            @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/codes")
     public List<String> findAllLanguageCodes() {
