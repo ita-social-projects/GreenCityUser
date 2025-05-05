@@ -354,7 +354,7 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
-    @DeleteMapping(path = "/deleteProfilePicture")
+    @PatchMapping(path = "/deleteProfilePicture")
     public ResponseEntity<HttpStatus> deleteUserProfilePicture(Principal principal) {
         userService.deleteUserProfilePicture(principal.getName());
         return ResponseEntity.ok().build();

@@ -533,12 +533,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        greenCityRemoteClient.updateUser(UpdateUserDto.builder()
-            .profilePicturePath(null)
-            .email(email)
-            .userUpdateType(UserUpdateType.DELETE)
-            .build());
-        userRepo.save(user);
+        updateUserProfilePicturePath(user.getId(), null);
     }
 
     /**
