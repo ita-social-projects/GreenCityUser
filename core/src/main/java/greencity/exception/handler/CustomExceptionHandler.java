@@ -392,7 +392,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler({LanguageNotFoundException.class})
     public ResponseEntity<ExceptionResponse> handleLanguageNotFoundException(LanguageNotFoundException ex,
-                                                                      WebRequest request) {
+        WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);

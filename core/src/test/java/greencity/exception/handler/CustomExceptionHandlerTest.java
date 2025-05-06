@@ -238,7 +238,8 @@ class CustomExceptionHandlerTest {
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(eq(webRequest),
             any(ErrorAttributeOptions.class))).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleLanguageNotSupportedException(languageNotSupportedException, webRequest),
+        assertEquals(
+            customExceptionHandler.handleLanguageNotSupportedException(languageNotSupportedException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
         verify(errorAttributes).getErrorAttributes(eq(webRequest),
             any(ErrorAttributeOptions.class));
@@ -249,11 +250,11 @@ class CustomExceptionHandlerTest {
         LanguageNotFoundException languageNotFoundException = new LanguageNotFoundException();
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(eq(webRequest),
-                any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
         assertEquals(customExceptionHandler.handleLanguageNotFoundException(languageNotFoundException, webRequest),
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
+            ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
         verify(errorAttributes).getErrorAttributes(eq(webRequest),
-                any(ErrorAttributeOptions.class));
+            any(ErrorAttributeOptions.class));
     }
 
     @Test
