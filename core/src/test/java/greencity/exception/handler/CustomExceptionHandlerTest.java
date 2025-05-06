@@ -5,6 +5,7 @@ import greencity.exception.exceptions.BadSocialNetworkLinksException;
 import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.EmailNotVerified;
 import greencity.exception.exceptions.InvalidURLException;
+import greencity.exception.exceptions.LanguageNotFoundException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserAlreadyRegisteredException;
@@ -232,15 +233,27 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleLanguageNotFoundException() {
+    void handleLanguageNotSupportedException() {
         LanguageNotSupportedException languageNotSupportedException = new LanguageNotSupportedException();
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
         when(errorAttributes.getErrorAttributes(eq(webRequest),
             any(ErrorAttributeOptions.class))).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleLanguageNotFoundException(languageNotSupportedException, webRequest),
+        assertEquals(customExceptionHandler.handleLanguageNotSupportedException(languageNotSupportedException, webRequest),
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
         verify(errorAttributes).getErrorAttributes(eq(webRequest),
             any(ErrorAttributeOptions.class));
+    }
+
+    @Test
+    void handleLanguageNotFoundException() {
+        LanguageNotFoundException languageNotFoundException = new LanguageNotFoundException();
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        when(errorAttributes.getErrorAttributes(eq(webRequest),
+                any(ErrorAttributeOptions.class))).thenReturn(objectMap);
+        assertEquals(customExceptionHandler.handleLanguageNotFoundException(languageNotFoundException, webRequest),
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse));
+        verify(errorAttributes).getErrorAttributes(eq(webRequest),
+                any(ErrorAttributeOptions.class));
     }
 
     @Test

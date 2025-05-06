@@ -9,6 +9,7 @@ import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.EmailNotVerified;
 import greencity.exception.exceptions.InvalidURLException;
 import greencity.exception.exceptions.LanguageNotSupportedException;
+import greencity.exception.exceptions.LanguageNotFoundException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.PasswordsDoNotMatchesException;
 import greencity.exception.exceptions.UserAlreadyHasPasswordException;
@@ -374,11 +375,27 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler({LanguageNotSupportedException.class})
-    public ResponseEntity<Object> handleLanguageNotFoundException(LanguageNotSupportedException ex,
+    public ResponseEntity<Object> handleLanguageNotSupportedException(LanguageNotSupportedException ex,
         WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
+     * Method intercept exception {@link LanguageNotFoundException}.
+     *
+     * @param ex      Exception witch should be intercepted.
+     * @param request contain detail about occur exception
+     * @return ResponseEntity witch contain http status and body with message of
+     *         exception.
+     */
+    @ExceptionHandler({LanguageNotFoundException.class})
+    public ResponseEntity<ExceptionResponse> handleLanguageNotFoundException(LanguageNotFoundException ex,
+                                                                      WebRequest request) {
+        log.info(ex.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
     }
 
     /**
