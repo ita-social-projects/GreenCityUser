@@ -144,7 +144,10 @@ class OwnSecurityServiceImplTest {
             .id(1L)
             .email("test@somemail.com")
             .name("Test")
-            .languageId(1L)
+            .language(Language.builder()
+                .id(1L)
+                .code("en")
+                .build())
             .userStatus(UserStatus.ACTIVATED)
             .build();
         request = ModelUtils.getTestersSignInRequest();
@@ -489,7 +492,7 @@ class OwnSecurityServiceImplTest {
     void managementRegisterUserTest() {
         User user = ModelUtils.getUser();
         user.setUserStatus(UserStatus.BLOCKED);
-        user.setLanguageId(2L);
+        user.setLanguage(Language.builder().id(2L).code("en").build());
         user.setDateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47));
 
         UserAdminRegistrationDto dto = ModelUtils.getUserAdminRegistrationDto();
@@ -631,15 +634,10 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void singInBlockedUser() {
-        Long languageId = userForBruteForceTest.getLanguageId();
-        LanguageVO languageVO = ModelUtils.getLanguageVO();
-
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
         when(userRepo.findByEmail(anyString()))
             .thenReturn(Optional.ofNullable(userForBruteForceTest));
-        when(greenCityRemoteClient.findLanguageById(languageId))
-            .thenReturn(languageVO);
 
         assertThrows(UserBlockedException.class,
             () -> ownSecurityService.signIn(ownSignInDto));

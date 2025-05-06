@@ -184,17 +184,6 @@ class RestClientTest {
     }
 
     @Test
-    void getAllLanguageCodes() {
-        String[] allLanguageCodes = new String[2];
-        allLanguageCodes[0] = "en";
-        allLanguageCodes[1] = "uk";
-        when(restTemplate.getForObject(greenCityServerAddress
-            + RestTemplateLinks.LANGUAGES + RestTemplateLinks.CODES, String[].class)).thenReturn(allLanguageCodes);
-
-        assertEquals(Arrays.asList(allLanguageCodes), restClient.getAllLanguageCodes());
-    }
-
-    @Test
     void createUbsProfileTest() {
         UbsProfileCreationDto ubsProfileCreationDto =
             UbsProfileCreationDto.builder()

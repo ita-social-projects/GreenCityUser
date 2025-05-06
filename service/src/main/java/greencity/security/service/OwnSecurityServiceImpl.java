@@ -3,12 +3,12 @@ package greencity.security.service;
 import greencity.client.CloudFlareClient;
 import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.security.CloudFlareRequest;
 import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
+import greencity.entity.Language;
 import greencity.entity.OwnSecurity;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
@@ -146,7 +146,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
-            .languageId(modelMapper.map(language, Long.class))
+            .language(Language.builder()
+                .id(modelMapper.map(language, Long.class))
+                .build())
             .build();
     }
 
@@ -362,9 +364,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * @return "ua" or "en" depending on user language code
      */
     private String getLanguageFromUser(User user) {
-        Long languageId = user.getLanguageId();
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-        return languageVO.getCode();
+        return user.getLanguage().getCode();
     }
 
     private boolean isPasswordCorrect(OwnSignInDto signInDto, UserVO user) {
@@ -535,7 +535,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
-            .languageId(2L)
+            .language(Language.builder()
+                .id(2L)
+                .code("en")
+                .build())
             .build();
     }
 

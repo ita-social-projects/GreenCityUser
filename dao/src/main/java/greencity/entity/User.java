@@ -19,6 +19,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.NamedNativeQuery;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -132,7 +133,8 @@ public class User {
     @Column(columnDefinition = "varchar(60)")
     private String uuid;
 
-    private Long languageId;
+    @ManyToOne
+    private Language language;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<UserDeactivationReason> userDeactivationReasons;

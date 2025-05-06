@@ -156,7 +156,9 @@ public class SecurityConfig {
                     "/user/{userId}/sixUserFriends/",
                     "/ownSecurity/password-status",
                     "/user/emailNotifications",
-                    "/user/activated-ids")
+                    "/user/activated-ids",
+                    "/lang",
+                    "/lang/*")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",

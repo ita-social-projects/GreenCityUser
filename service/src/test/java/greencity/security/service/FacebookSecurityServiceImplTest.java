@@ -99,7 +99,7 @@ class FacebookSecurityServiceImplTest {
         assertEquals(EmailNotification.DISABLED, user.getEmailNotification());
         assertEquals(profilePicture, user.getProfilePicturePath());
         assertEquals(ProfilePrivacyPolicy.PUBLIC, user.getShowLocation());
-        assertEquals(1L, user.getLanguageId());
+        assertEquals(1L, user.getLanguage().getId());
     }
 
     @Test

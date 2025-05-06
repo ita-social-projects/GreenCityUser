@@ -1,6 +1,7 @@
 package greencity.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.enums.EmailNotification;
@@ -56,7 +57,7 @@ public class UserVO {
 
     private LocalDateTime lastActivityTime;
 
-    private Long languageId;
+    private LanguageVO languageVO;
 
     private String firstName;
 

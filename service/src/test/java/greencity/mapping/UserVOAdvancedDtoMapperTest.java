@@ -1,5 +1,6 @@
 package greencity.mapping;
 
+import greencity.ModelUtils;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.entity.User;
 import org.junit.jupiter.api.Test;
@@ -29,7 +30,7 @@ class UserVOAdvancedDtoMapperTest {
             .dateOfRegistration(expectedResult.getDateOfRegistration())
             .profilePicturePath(expectedResult.getProfilePicturePath())
             .firstName(expectedResult.getFirstName())
-            .languageId(1L)
+            .language(ModelUtils.getLanguage())
             .socialNetworks(getSocialNetworks())
             .build();
 

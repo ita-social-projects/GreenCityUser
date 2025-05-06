@@ -80,9 +80,8 @@ class PasswordRecoveryServiceImplTest {
     void sendPasswordRecoveryEmailToSimpleTest() {
         String email = "foo";
         boolean isUbs = true;
-        Long languageId = 2L;
         User user = new User();
-        user.setLanguageId(languageId);
+        user.setLanguage(ModelUtils.getLanguage());
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
         String token = "bar";
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn(token);
@@ -99,7 +98,7 @@ class PasswordRecoveryServiceImplTest {
             user.getName(),
             user.getEmail(),
             token,
-            languageId,
+            user.getLanguage().getCode(),
             true);
     }
 
@@ -112,8 +111,6 @@ class PasswordRecoveryServiceImplTest {
     @Test
     void testUpdatePasswordUsingToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
-        Long languageId = ModelUtils.getLanguageId();
-        user.setLanguageId(languageId);
         TEST_OWN_RESTORE_DTO.setIsUbs(true);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
@@ -122,13 +119,13 @@ class PasswordRecoveryServiceImplTest {
         when(ownSecurityRepo.findByUserId(2L)).thenReturn(ofNullable(TEST_OWN_SECURITY));
         when(ownSecurityRepo.save(TEST_OWN_SECURITY)).thenReturn(TEST_OWN_SECURITY);
         doNothing().when(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(),
-            languageId, user.getName(), true);
+            user.getLanguage().getCode(), user.getName(), true);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         doNothing().when(restorePasswordEmailRepo).delete(TEST_RESTORE_PASSWORD_EMAIL);
 
         passwordRecoveryService.updatePasswordUsingToken(TEST_OWN_RESTORE_DTO);
 
-        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), languageId,
+        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(),
             user.getName(), true);
         verify(restorePasswordEmailRepo).findByToken(TEST_OWN_RESTORE_DTO.getToken());
         verify(passwordEncoder).encode(TEST_OWN_RESTORE_DTO.getPassword());
@@ -141,8 +138,6 @@ class PasswordRecoveryServiceImplTest {
     @Test
     void testUpdatePasswordUsingGoogleToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
-        Long languageId = ModelUtils.getLanguageId();
-        user.setLanguageId(languageId);
         TEST_OWN_RESTORE_DTO.setIsUbs(false);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
@@ -151,13 +146,13 @@ class PasswordRecoveryServiceImplTest {
         when(ownSecurityRepo.findByUserId(2L)).thenReturn(empty());
         when(userRepo.findById(2L)).thenReturn(ofNullable(TEST_USER));
         doNothing().when(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(),
-            languageId, user.getName(), false);
+            user.getLanguage().getCode(), user.getName(), false);
         doNothing().when(applicationEventPublisher).publishEvent(any());
         doNothing().when(restorePasswordEmailRepo).delete(TEST_RESTORE_PASSWORD_EMAIL);
 
         passwordRecoveryService.updatePasswordUsingToken(TEST_OWN_RESTORE_DTO);
 
-        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), languageId,
+        verify(emailService).sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(),
             user.getName(), false);
         verify(restorePasswordEmailRepo).findByToken(TEST_OWN_RESTORE_DTO.getToken());
         verify(passwordEncoder).encode(TEST_OWN_RESTORE_DTO.getPassword());

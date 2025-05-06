@@ -2,7 +2,6 @@ package greencity.client;
 
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
@@ -137,36 +136,6 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<UserActionVO>>() {
             })
-            .block();
-    }
-
-    /**
-     * Method for finding Language by id.
-     *
-     * @return {@link LanguageVO}
-     */
-    public LanguageVO findLanguageById(Long id) {
-        String path = "/languages/{id}";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(id))
-            .retrieve()
-            .bodyToMono(LanguageVO.class)
-            .block();
-    }
-
-    /**
-     * Check whether Language exists by id.
-     *
-     * @return boolean of whether language exists by that id
-     */
-    public Boolean languageExistsById(Long id) {
-        String path = "/languages/{id}/exists";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(id))
-            .retrieve()
-            .bodyToMono(Boolean.class)
             .block();
     }
 

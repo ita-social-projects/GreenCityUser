@@ -32,6 +32,7 @@ public class ErrorMessage {
     public static final String SELECT_CORRECT_LANGUAGE = "Select correct language: 'en' or 'ua'";
     public static final String TOKEN_FOR_RESTORE_IS_INVALID = "Token is null or it doesn't exist.";
     public static final String LANGUAGE_NOT_FOUND_BY_ID = "The language does not exist by this id: ";
+    public static final String LANGUAGE_NOT_FOUND_BY_CODE = "The language does not exist by this code: ";
     public static final String USER_DEACTIVATION_REASON_IS_EMPTY = "The User deactivation reasons list is empty";
     public static final String USER_ALREADY_HAS_PASSWORD = "User already has password";
     public static final String USER_HAS_NO_PERMISSION = "Current user has no permission for this action";

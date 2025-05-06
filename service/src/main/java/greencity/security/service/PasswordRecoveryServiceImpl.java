@@ -79,7 +79,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         UserStatus userStatus = restorePasswordEmail.getUser().getUserStatus();
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {
             updatePassword(form.getPassword(), restorePasswordEmail.getUser().getId());
-            emailService.sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguageId(),
+            emailService.sendSuccessRestorePasswordByEmail(user.getEmail(), user.getLanguage().getCode(),
                 user.getName(), form.getIsUbs());
             applicationEventPublisher.publishEvent(
                 new UpdatePasswordEvent(this, form.getPassword(), restorePasswordEmail.getUser().getId()));
@@ -117,7 +117,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             user.getFirstName(),
             user.getEmail(),
             token,
-            user.getLanguageId(),
+            user.getLanguage().getCode(),
             isUbs);
     }
 

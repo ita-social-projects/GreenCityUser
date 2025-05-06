@@ -1,7 +1,7 @@
 package greencity.validator;
 
 import greencity.annotations.ValidLanguage;
-import greencity.client.RestClient;
+import greencity.service.LanguageService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.List;
@@ -12,13 +12,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class LanguageValidator implements ConstraintValidator<ValidLanguage, Locale> {
-    private final RestClient restClient;
+    private final LanguageService languageService;
     private List<String> codes;
 
     @Override
     public void initialize(ValidLanguage constraintAnnotation) {
         try {
-            codes = restClient.getAllLanguageCodes();
+            codes = languageService.findAllLanguageCodes();
         } catch (Exception e) {
             log.warn("Occurred error during processing request: {}", e.getMessage());
             codes = List.of("en", "ua");

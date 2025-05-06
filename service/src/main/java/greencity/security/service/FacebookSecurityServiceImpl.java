@@ -7,6 +7,7 @@ import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
+import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.*;
@@ -174,7 +175,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
-            .languageId(1L)
+            .language(Language.builder().id(1L).build())
             .build();
     }
 
@@ -192,7 +193,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-            .languageId(modelMapper.map(language, Long.class))
+            .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
 
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
