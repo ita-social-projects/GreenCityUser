@@ -54,24 +54,6 @@ public class LanguageController {
     }
 
     /**
-     * Find language {@link LanguageVO} by id.
-     *
-     * @param id language id
-     * @return language {@link LanguageVO}
-     */
-    @Operation(summary = "Find language by id")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/{id}")
-    public LanguageVO findLanguageById(@PathVariable Long id) {
-        return languageService.findLanguageById(id);
-    }
-
-    /**
      * Method to get all language codes.
      *
      * @return {@link List} of {@link String} language codes

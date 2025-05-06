@@ -20,14 +20,6 @@ public interface LanguageService {
     LanguageVO findLanguageByCode(String code);
 
     /**
-     * Find language {@link LanguageVO} by id.
-     *
-     * @param id language id
-     * @return language {@link LanguageVO}
-     */
-    LanguageVO findLanguageById(Long id);
-
-    /**
      * Method to get all language codes.
      *
      * @return {@link List} of {@link String} language codes

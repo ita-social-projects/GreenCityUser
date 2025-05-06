@@ -39,16 +39,6 @@ public class LanguageServiceImpl implements LanguageService {
      * {@inheritDoc}
      */
     @Override
-    public LanguageVO findLanguageById(Long id) {
-        return languageRepo.findById(id)
-            .map(language -> modelMapper.map(language, LanguageVO.class))
-            .orElseThrow(() -> new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + id));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public List<String> findAllLanguageCodes() {
         return languageRepo.findAllLanguageCodes();
     }

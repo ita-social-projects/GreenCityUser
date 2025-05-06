@@ -104,36 +104,6 @@ class LanguageControllerTest {
     }
 
     @Test
-    void findLanguageByIdTest() throws Exception {
-        Long id = 1L;
-        when(languageService.findLanguageById(id)).thenReturn(languageVO1);
-
-        mockMvc.perform(get("/lang/{id}", id)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.id", is(1)))
-            .andExpect(jsonPath("$.code", is("en")));
-
-        verify(languageService, times(1)).findLanguageById(id);
-        verifyNoMoreInteractions(languageService);
-    }
-
-    @Test
-    void findLanguageByIdTestReturns400WhenLanguageNotFoundException() throws Exception {
-        Long id = 999L;
-        when(languageService.findLanguageById(id))
-            .thenThrow(new LanguageNotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + id));
-
-        mockMvc.perform(get("/lang/{id}", id)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound());
-
-        verify(languageService, times(1)).findLanguageById(id);
-        verifyNoMoreInteractions(languageService);
-    }
-
-    @Test
     void findAllLanguageCodesTest() throws Exception {
         List<String> codes = Arrays.asList("en", "fr", "de");
         when(languageService.findAllLanguageCodes()).thenReturn(codes);

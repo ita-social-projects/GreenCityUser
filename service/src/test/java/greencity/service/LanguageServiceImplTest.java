@@ -109,34 +109,6 @@ public class LanguageServiceImplTest {
     }
 
     @Test
-    void findLanguageByIdTest() {
-        Long id = 1L;
-        when(languageRepo.findById(id)).thenReturn(Optional.of(language1));
-        when(modelMapper.map(language1, LanguageVO.class)).thenReturn(languageVO1);
-
-        LanguageVO result = languageService.findLanguageById(id);
-
-        assertNotNull(result);
-        assertEquals(languageVO1, result);
-        verify(languageRepo, times(1)).findById(id);
-        verify(modelMapper, times(1)).map(language1, LanguageVO.class);
-    }
-
-    @Test
-    void findLanguageByIdTestThrowsLanguageNotFoundException() {
-        Long id = 999L;
-        when(languageRepo.findById(id)).thenReturn(Optional.empty());
-
-        LanguageNotFoundException exception = assertThrows(
-            LanguageNotFoundException.class,
-            () -> languageService.findLanguageById(id));
-
-        assertTrue(exception.getMessage().contains(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + id));
-        verify(languageRepo, times(1)).findById(id);
-        verify(modelMapper, never()).map(any(), any());
-    }
-
-    @Test
     void findAllLanguageCodesTest() {
         List<String> expectedCodes = Arrays.asList("en", "fr", "de");
         when(languageRepo.findAllLanguageCodes()).thenReturn(expectedCodes);
