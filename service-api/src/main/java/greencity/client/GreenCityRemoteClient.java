@@ -268,7 +268,7 @@ public class GreenCityRemoteClient {
     /**
      * Update user credo by user id.
      *
-     * @param userId user id
+     * @param userId    user id
      * @param userCredo new user credo
      **/
     public void updateUserCredo(Long userId, String userCredo) {
@@ -276,11 +276,11 @@ public class GreenCityRemoteClient {
         UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(userId, userCredo);
 
         webClient.patch()
-                .uri(path)
-                .bodyValue(updateUserCredoDto)
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+            .uri(path)
+            .bodyValue(updateUserCredoDto)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
     }
 
     /**

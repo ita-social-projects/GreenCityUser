@@ -2,7 +2,6 @@ package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
-import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
@@ -11,7 +10,6 @@ import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
