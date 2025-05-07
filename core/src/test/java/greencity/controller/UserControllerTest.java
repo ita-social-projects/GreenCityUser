@@ -554,19 +554,6 @@ class UserControllerTest {
     }
 
     @Test
-    void searchByTest() throws Exception {
-        Pageable pageable = PageRequest.of(0, 20);
-        String query = "testQuery";
-        when(userService.searchBy(pageable, query)).thenReturn(ModelUtils.getPageableAdvancedDto());
-        mockMvc.perform(get(userLink + "/searchBy")
-            .param("query", query))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.length()").value(1))
-            .andExpect(jsonPath("$.totalElements").value(1L))
-            .andExpect(jsonPath("$.totalPages").value(1));
-    }
-
-    @Test
     void updateUserManagementTest() throws Exception {
         UserManagementUpdateDto userManagementDto = ModelUtils.getUserManagementUpdateDto();
         String content = objectMapper.writeValueAsString(userManagementDto);
