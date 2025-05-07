@@ -872,27 +872,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public PageableAdvancedDto<UserManagementDto> searchBy(Pageable paging, String query) {
-        Page<User> page = userRepo.searchBy(paging, query);
-        List<UserManagementDto> users = page.stream()
-            .map(user -> modelMapper.map(user, UserManagementDto.class))
-            .toList();
-        return new PageableAdvancedDto<>(
-            users,
-            page.getTotalElements(),
-            page.getPageable().getPageNumber(),
-            page.getTotalPages(),
-            page.getNumber(),
-            page.hasPrevious(),
-            page.hasNext(),
-            page.isFirst(),
-            page.isLast());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
         return userRepo.findAllByEmailNotification(emailNotification).stream()
             .map(user -> modelMapper.map(user, UserVO.class))

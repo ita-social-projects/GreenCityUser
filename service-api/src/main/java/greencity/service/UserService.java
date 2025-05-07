@@ -337,15 +337,6 @@ public interface UserService {
     UserActivationDto setActivatedStatus(Long id);
 
     /**
-     * Method for getting UserVO by search query.
-     *
-     * @param paging {@link Pageable}.
-     * @param query  query to search,
-     * @return {@link PageableAdvancedDto} of {@link UserManagementDto} instances.
-     */
-    PageableAdvancedDto<UserManagementDto> searchBy(Pageable paging, String query);
-
-    /**
      * Method for getting all Users.
      *
      * @return {@link List} of {@link UserVO} instances.
