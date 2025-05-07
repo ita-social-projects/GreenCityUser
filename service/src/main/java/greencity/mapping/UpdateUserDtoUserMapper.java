@@ -9,10 +9,8 @@ import org.springframework.stereotype.Component;
 public class UpdateUserDtoUserMapper extends AbstractConverter<User, UpdateUserDto> {
     @Override
     protected UpdateUserDto convert(User user) {
-        Long userId = user.getId();
-
         UpdateUserDto updateUserDto = UpdateUserDto.builder()
-            .id(userId)
+            .id(user.getId())
             .name(user.getName())
             .email(user.getEmail())
             .profilePicturePath(user.getProfilePicturePath())
