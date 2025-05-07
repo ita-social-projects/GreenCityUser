@@ -266,23 +266,6 @@ public class GreenCityRemoteClient {
     }
 
     /**
-     * Find and return user credo by user id.
-     *
-     * @param userId id of the user
-     * @return {@link String} user credo
-     **/
-    public String findUserCredoByUserId(Long userId) {
-        String path = "/users/{userId}/credo";
-
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path)
-                        .build(userId))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-    }
-
-    /**
      * Update user credo by user id.
      *
      * @param userId user id

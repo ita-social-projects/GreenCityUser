@@ -17,6 +17,5 @@ public class UpdateUserDto {
     private String email;
     private String name;
     private String profilePicturePath;
-    private String userCredo;
     private UserUpdateType userUpdateType;
 }
