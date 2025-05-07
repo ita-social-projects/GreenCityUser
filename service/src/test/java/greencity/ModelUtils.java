@@ -260,7 +260,6 @@ public class ModelUtils {
             .name("user")
             .email("namesurname1995@gmail.com")
             .role(Role.ROLE_USER)
-            .userCredo("save the world")
             .emailNotification(EmailNotification.MONTHLY)
             .userStatus(UserStatus.ACTIVATED)
             .verifyEmail(VerifyEmailVO.builder()
