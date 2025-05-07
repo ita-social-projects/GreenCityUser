@@ -255,17 +255,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<User> getAllUsersByUsersId(List<Long> usersId);
 
     /**
-     * Find all {@link UserManagementVO}.
-     *
-     * @param filter   filter parameters
-     * @param pageable pagination
-     * @return list of all {@link UserManagementVO}
-     */
-    @Query(" SELECT new greencity.dto.user.UserManagementVO(u.id, u.name, u.email, u.userCredo, u.role, u.userStatus) "
-        + " FROM User u ")
-    Page<UserManagementVO> findAllManagementVo(Specification<User> filter, Pageable pageable);
-
-    /**
      * Retrieves the distribution of user roles for active users.
      *
      * @return A list of UserRoleStatisticDto objects containing the role and the
