@@ -200,7 +200,7 @@ public class UserServiceImpl implements UserService {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
-        user.setUserCredo(dto.getUserCredo());
+        greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
         user.setUserStatus(dto.getUserStatus());
     }
 
@@ -555,9 +555,9 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        if (userProfileDtoRequest.getUserCredo() != null) {
+        /*if (userProfileDtoRequest.getUserCredo() != null) {
             user.setUserCredo(userProfileDtoRequest.getUserCredo());
-        }
+        }*/
         Long userId = user.getId();
         greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();

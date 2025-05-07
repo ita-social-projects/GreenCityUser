@@ -150,11 +150,17 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @param query  query to search.
      * @return list of {@link User}.
      */
-    @Query("""
+    /*@Query("""
         SELECT u FROM User u WHERE CONCAT(u.id,'') LIKE LOWER(CONCAT('%', :query, '%')) \
         OR LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))\
         OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) \
         OR LOWER(u.userCredo) LIKE LOWER(CONCAT('%', :query, '%'))\
+        """)*/
+    // TODO: first retrieve user credo in the service, pass here as param, then filter by it
+    @Query("""
+        SELECT u FROM User u WHERE CONCAT(u.id,'') LIKE LOWER(CONCAT('%', :query, '%')) \
+        OR LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))\
+        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) \
         """)
     Page<User> searchBy(Pageable paging, String query);
 

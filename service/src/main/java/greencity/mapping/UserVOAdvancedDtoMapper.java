@@ -1,18 +1,23 @@
 package greencity.mapping;
 
+import greencity.client.GreenCityRemoteClient;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class UserVOAdvancedDtoMapper extends AbstractConverter<User, UserVOAdvancedDto> {
+    private final GreenCityRemoteClient greenCityRemoteClient;
+
     @Override
     protected UserVOAdvancedDto convert(User user) {
         Long userId = user.getId();
@@ -38,7 +43,7 @@ public class UserVOAdvancedDtoMapper extends AbstractConverter<User, UserVOAdvan
         userVOAdvancedDto.setName(user.getName());
         userVOAdvancedDto.setEmail(user.getEmail());
         userVOAdvancedDto.setRole(user.getRole());
-        userVOAdvancedDto.setUserCredo(user.getUserCredo());
+        userVOAdvancedDto.setUserCredo(greenCityRemoteClient.findUserCredoByUserId(userId));
         userVOAdvancedDto.setUserStatus(user.getUserStatus());
         userVOAdvancedDto.setDateOfRegistration(user.getDateOfRegistration());
         userVOAdvancedDto.setProfilePicturePath(user.getProfilePicturePath());

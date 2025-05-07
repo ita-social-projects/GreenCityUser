@@ -1,15 +1,20 @@
 package greencity.mapping;
 
+import greencity.client.GreenCityRemoteClient;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class UserVOMapper extends AbstractConverter<User, UserVO> {
+    private final GreenCityRemoteClient greenCityRemoteClient;
+
     @Override
     protected UserVO convert(User user) {
         Long userId = user.getId();
@@ -19,7 +24,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .name(user.getName())
             .email(user.getEmail())
             .role(user.getRole())
-            .userCredo(user.getUserCredo())
+            .userCredo(greenCityRemoteClient.findUserCredoByUserId(userId))
             .emailNotification(user.getEmailNotification())
             .userStatus(user.getUserStatus())
             .verifyEmail(user.getVerifyEmail() != null ? VerifyEmailVO.builder()

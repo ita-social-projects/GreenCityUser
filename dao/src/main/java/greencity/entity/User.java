@@ -108,8 +108,8 @@ public class User {
     @Column(name = "first_name")
     private String firstName;
 
-    @Column(name = "user_credo")
-    private String userCredo;
+/*    @Column(name = "user_credo")
+    private String userCredo;*/
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
     @Column(name = "social_networks")
