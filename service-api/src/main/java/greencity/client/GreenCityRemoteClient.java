@@ -2,6 +2,7 @@ package greencity.client;
 
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.user.UpdateUserCredoDto;
 import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
@@ -264,12 +265,39 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    /**
+     * Find and return user credo by user id.
+     *
+     * @param userId id of the user
+     * @return {@link String} user credo
+     **/
     public String findUserCredoByUserId(Long userId) {
-        return "userCredo";
+        String path = "/users/{userId}/credo";
+
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path(path)
+                        .build(userId))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 
+    /**
+     * Update user credo by user id.
+     *
+     * @param userId user id
+     * @param userCredo new user credo
+     **/
     public void updateUserCredo(Long userId, String userCredo) {
+        String path = "/users/credo";
+        UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(userId, userCredo);
 
+        webClient.patch()
+                .uri(path)
+                .bodyValue(updateUserCredoDto)
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 
     /**
