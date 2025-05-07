@@ -555,9 +555,9 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getName() != null) {
             user.setName(userProfileDtoRequest.getName());
         }
-        /*if (userProfileDtoRequest.getUserCredo() != null) {
-            user.setUserCredo(userProfileDtoRequest.getUserCredo());
-        }*/
+        if (userProfileDtoRequest.getUserCredo() != null) {
+            greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
+        }
         Long userId = user.getId();
         greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
