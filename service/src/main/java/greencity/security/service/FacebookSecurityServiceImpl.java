@@ -2,15 +2,18 @@ package greencity.security.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
+import greencity.dto.user.UserDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.*;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
@@ -20,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -27,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -48,6 +54,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
     private final WebClient webClient;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${address}")
     private String address;
@@ -66,7 +73,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         ModelMapper modelMapper,
         RestClient restClient,
         ObjectMapper objectMapper,
-        @Qualifier("facebookWebClient") WebClient webClient) {
+        @Qualifier("facebookWebClient") WebClient webClient, GreenCityRemoteClient greenCityRemoteClient) {
         this.userService = userService;
         this.jwtTool = jwtTool;
         this.userRepo = userRepo;
@@ -75,6 +82,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
         this.webClient = webClient;
+        this.greenCityRemoteClient = greenCityRemoteClient;
     }
 
     @Override
@@ -155,7 +163,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         if (byEmail == null) {
             log.info("User with email {} not found. Creating a new one.", email);
             User newUser = createNewUser(email, name);
-            User savedUser = saveNewUser(newUser);
+            User savedUser = saveNewUser(newUser, null);
             byEmail = modelMapper.map(savedUser, UserVO.class);
             log.info("Created new user with ID: {}", byEmail.getId());
         } else {
@@ -207,13 +215,27 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         return user;
     }
 
-    User saveNewUser(User newUser) {
+    User saveNewUser(User newUser, String profilePicture) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
             log.info("User saved with ID: {}", id);
+            try {
+                greenCityRemoteClient.createUser(UserDto.builder()
+                        .id(newUser.getId())
+                        .email(newUser.getEmail())
+                        .name(newUser.getName())
+                        .profilePicturePath(profilePicture)
+                        .build());
+            } catch (DataIntegrityViolationException e) {
+                throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
+            } catch (WebClientRequestException | WebClientResponseException e) {
+                log.warn("GreenCity service is unavailable: {}", e.getMessage());
+            } catch (RuntimeException e) {
+                log.error("Unexpected error when calling GreenCity: {}", e.getMessage(), e);
+            }
             return newUser;
         });
     }
@@ -260,7 +282,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
 
     SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, profilePicture, language);
-        User savedUser = saveNewUser(newUser);
+        User savedUser = saveNewUser(newUser, profilePicture);
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {

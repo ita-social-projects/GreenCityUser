@@ -5,22 +5,25 @@ import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.UpdateUserDto;
+import greencity.dto.user.UserDto;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.UserStatus;
-import greencity.enums.UserUpdateType;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.repository.UserRepo;
 import greencity.security.repository.VerifyEmailRepo;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * The class provides implementation of the {@code VerifyEmailService}.
@@ -56,9 +59,19 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
         user.setUserStatus(UserStatus.ACTIVATED);
         user = userRepo.save(user);
 
-        UpdateUserDto updateUserDto = modelMapper.map(user, UpdateUserDto.class);
-        updateUserDto.setUserUpdateType(UserUpdateType.CREATE);
-        greenCityRemoteClient.updateUser(updateUserDto);
+        try {
+            greenCityRemoteClient.createUser(UserDto.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .build());
+        } catch (DataIntegrityViolationException e) {
+            throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
+        } catch (WebClientRequestException | WebClientResponseException e) {
+            log.warn("GreenCity service is unavailable: {}", e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("Unexpected error when calling GreenCity: {}", e.getMessage(), e);
+        }
 
         verifyEmailRepo.deleteByTokenAndUserId(token, userId);
         log.info("User has successfully verify the email by token {}.", token);

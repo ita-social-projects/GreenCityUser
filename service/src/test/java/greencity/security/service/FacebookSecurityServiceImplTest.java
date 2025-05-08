@@ -217,7 +217,7 @@ class FacebookSecurityServiceImplTest {
             return user;
         });
 
-        User result = facebookSecurityService.saveNewUser(newUser);
+        User result = facebookSecurityService.saveNewUser(newUser, null);
         assertNotNull(result);
         assertNotNull(result.getUuid());
         assertEquals(1L, result.getId());

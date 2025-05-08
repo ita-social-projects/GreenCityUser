@@ -3,10 +3,12 @@ package greencity.security.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import static greencity.constant.AppConstant.*;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
+import greencity.dto.user.UserDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
@@ -19,6 +21,7 @@ import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.IdTokenExpiredException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
@@ -40,10 +43,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 /**
  * {@inheritDoc}
@@ -62,6 +68,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final PlatformTransactionManager transactionManager;
     private final HttpClient googleAccessTokenVerifier;
     private final ObjectMapper objectMapper;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${google.resource.userInfoUri}")
     private String userInfoUrl;
@@ -119,7 +126,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
 
     private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, profilePicture, language);
-        User savedUser = saveNewUser(newUser);
+        User savedUser = saveNewUser(newUser, profilePicture);
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {
@@ -158,12 +165,26 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         return user;
     }
 
-    private User saveNewUser(User newUser) {
+    private User saveNewUser(User newUser, String profilePicture) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
+            try {
+                greenCityRemoteClient.createUser(UserDto.builder()
+                        .id(newUser.getId())
+                        .email(newUser.getEmail())
+                        .name(newUser.getName())
+                        .profilePicturePath(profilePicture)
+                        .build());
+            } catch (DataIntegrityViolationException e) {
+                throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
+            } catch (WebClientRequestException | WebClientResponseException e) {
+                log.warn("GreenCity service is unavailable: {}", e.getMessage());
+            } catch (RuntimeException e) {
+                log.error("Unexpected error when calling GreenCity: {}", e.getMessage(), e);
+            }
             return newUser;
         });
     }
