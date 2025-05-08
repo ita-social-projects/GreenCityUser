@@ -224,11 +224,11 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             log.info("User saved with ID: {}", id);
             try {
                 greenCityRemoteClient.createUser(UserDto.builder()
-                        .id(newUser.getId())
-                        .email(newUser.getEmail())
-                        .name(newUser.getName())
-                        .profilePicturePath(profilePicture)
-                        .build());
+                    .id(newUser.getId())
+                    .email(newUser.getEmail())
+                    .name(newUser.getName())
+                    .profilePicturePath(profilePicture)
+                    .build());
             } catch (DataIntegrityViolationException e) {
                 throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
             } catch (WebClientRequestException | WebClientResponseException e) {

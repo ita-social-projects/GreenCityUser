@@ -295,11 +295,10 @@ public class GreenCityRemoteClient {
         String path = "/users/create";
 
         return Boolean.TRUE.equals(webClient.post()
-                .uri(path)
-                .bodyValue(createUserDto)
-                .retrieve()
-                .bodyToMono(Boolean.class)
-                .block());
+            .uri(path)
+            .bodyValue(createUserDto)
+            .retrieve()
+            .bodyToMono(Boolean.class)
+            .block());
     }
-
 }

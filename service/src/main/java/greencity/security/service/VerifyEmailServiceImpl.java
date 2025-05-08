@@ -61,10 +61,10 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
 
         try {
             greenCityRemoteClient.createUser(UserDto.builder()
-                    .id(user.getId())
-                    .email(user.getEmail())
-                    .name(user.getName())
-                    .build());
+                .id(user.getId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .build());
         } catch (DataIntegrityViolationException e) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         } catch (WebClientRequestException | WebClientResponseException e) {
