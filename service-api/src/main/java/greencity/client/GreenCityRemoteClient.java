@@ -284,7 +284,14 @@ public class GreenCityRemoteClient {
     }
 
     public String findUserCredoByUserId(Long userId) {
-        return "usercredo";
+        String path = "/users/{userId}/credo";
+
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path(path)
+                        .build(userId))
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
     }
 
     /**
