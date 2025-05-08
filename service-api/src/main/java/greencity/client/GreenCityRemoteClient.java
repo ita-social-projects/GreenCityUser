@@ -283,6 +283,10 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    public String findUserCredoByUserId(Long userId) {
+        return "usercredo";
+    }
+
     /**
      * Synchronize GreenCityUser and GreenCity user entity via update.
      *
