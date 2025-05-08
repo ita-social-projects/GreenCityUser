@@ -2,6 +2,7 @@ package greencity.client;
 
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.user.UpdateUserCredoDto;
 import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserAddRatingDto;
@@ -262,6 +263,46 @@ public class GreenCityRemoteClient {
             .bodyValue(userAddRatingDto)
             .retrieve()
             .bodyToMono(Void.class)
+            .block();
+    }
+
+    public Double findUserRatingByUserId(Long userId) {
+        String path = "/users/{userId}/rating";
+
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .build(userId))
+            .retrieve()
+            .bodyToMono(Double.class)
+            .block();
+    }
+
+    /**
+     * Update user credo by user id.
+     *
+     * @param userId    user id
+     * @param userCredo new user credo
+     **/
+    public void updateUserCredo(Long userId, String userCredo) {
+        String path = "/users/credo";
+        UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(userId, userCredo);
+
+        webClient.patch()
+            .uri(path)
+            .bodyValue(updateUserCredoDto)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
+    }
+
+    public String findUserCredoByUserId(Long userId) {
+        String path = "/users/{userId}/credo";
+
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .build(userId))
+            .retrieve()
+            .bodyToMono(String.class)
             .block();
     }
 

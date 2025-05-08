@@ -25,7 +25,6 @@ class UserVOAdvancedDtoMapperTest {
             .name(expectedResult.getName())
             .email(expectedResult.getEmail())
             .role(expectedResult.getRole())
-            .userCredo(expectedResult.getUserCredo())
             .userStatus(expectedResult.getUserStatus())
             .dateOfRegistration(expectedResult.getDateOfRegistration())
             .profilePicturePath(expectedResult.getProfilePicturePath())

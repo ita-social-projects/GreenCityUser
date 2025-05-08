@@ -2,7 +2,6 @@ package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
-import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
@@ -11,7 +10,6 @@ import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -144,21 +142,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     void deactivateSelectedUsers(List<Long> ids);
 
     /**
-     * Method returns {@link User} by search query and page.
-     *
-     * @param paging {@link Pageable}.
-     * @param query  query to search.
-     * @return list of {@link User}.
-     */
-    @Query("""
-        SELECT u FROM User u WHERE CONCAT(u.id,'') LIKE LOWER(CONCAT('%', :query, '%')) \
-        OR LOWER(u.name) LIKE LOWER(CONCAT('%', :query, '%'))\
-        OR LOWER(u.email) LIKE LOWER(CONCAT('%', :query, '%')) \
-        OR LOWER(u.userCredo) LIKE LOWER(CONCAT('%', :query, '%'))\
-        """)
-    Page<User> searchBy(Pageable paging, String query);
-
-    /**
      * Method that finds user ids by emailPreference and periodicity.
      *
      * @param emailPreference of user.
@@ -247,17 +230,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query(nativeQuery = true, value = "SELECT * FROM users where users.id in (:usersId)")
     List<User> getAllUsersByUsersId(List<Long> usersId);
-
-    /**
-     * Find all {@link UserManagementVO}.
-     *
-     * @param filter   filter parameters
-     * @param pageable pagination
-     * @return list of all {@link UserManagementVO}
-     */
-    @Query(" SELECT new greencity.dto.user.UserManagementVO(u.id, u.name, u.email, u.userCredo, u.role, u.userStatus) "
-        + " FROM User u ")
-    Page<UserManagementVO> findAllManagementVo(Specification<User> filter, Pageable pageable);
 
     /**
      * Retrieves the distribution of user roles for active users.

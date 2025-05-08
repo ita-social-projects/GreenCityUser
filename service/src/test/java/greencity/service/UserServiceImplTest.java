@@ -567,33 +567,8 @@ class UserServiceImplTest {
     }
 
     @Test
-    void searchBy() {
-        Pageable pageable = PageRequest.of(1, 3);
-        user.setUserCredo("credo");
-        Page<User> userPages = new PageImpl<>(List.of(user, user, user), pageable, 3);
-        when(userRepo.searchBy(pageable, "query"))
-            .thenReturn(userPages);
-        when(modelMapper.map(user, UserManagementDto.class)).thenReturn(ModelUtils.CREATE_USER_MANAGER_DTO);
-        List<UserManagementDto> users = userPages.stream()
-            .map(myUser -> modelMapper.map(myUser, UserManagementDto.class))
-            .collect(Collectors.toList());
-        PageableAdvancedDto<UserManagementDto> pageableAdvancedDto = new PageableAdvancedDto<>(
-            users,
-            userPages.getTotalElements(),
-            userPages.getPageable().getPageNumber(),
-            userPages.getTotalPages(),
-            userPages.getNumber(),
-            userPages.hasPrevious(),
-            userPages.hasNext(),
-            userPages.isFirst(),
-            userPages.isLast());
-        assertEquals(pageableAdvancedDto, userService.searchBy(pageable, "query"));
-    }
-
-    @Test
     void findUserByName() {
         Pageable pageable = PageRequest.of(1, 3);
-        user.setUserCredo("credo");
         Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
         when(userRepo.findAllUsersByName("martin", pageable, 1L))
             .thenReturn(pages);
@@ -929,7 +904,6 @@ class UserServiceImplTest {
         excepted.setName(userManagementUpdateDto.getName());
         excepted.setEmail(userManagementUpdateDto.getEmail());
         excepted.setRole(userManagementUpdateDto.getRole());
-        excepted.setUserCredo(userManagementUpdateDto.getUserCredo());
         excepted.setUserStatus(userManagementUpdateDto.getUserStatus());
         when(userRepo.findById(1L)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
