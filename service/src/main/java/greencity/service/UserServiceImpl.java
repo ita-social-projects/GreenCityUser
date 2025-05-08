@@ -38,7 +38,6 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
-import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;

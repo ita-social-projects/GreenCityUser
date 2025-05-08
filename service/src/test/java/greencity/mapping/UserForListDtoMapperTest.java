@@ -29,17 +29,17 @@ class UserForListDtoMapperTest {
         Long userId = user.getId();
         String userCredo = TestConst.CREDO;
         UserForListDto expectedResult = UserForListDto.builder()
-                .id(userId)
-                .name(user.getName())
-                .dateOfRegistration(user.getDateOfRegistration())
-                .email(user.getEmail())
-                .userStatus(user.getUserStatus())
-                .role(user.getRole())
-                .userCredo(userCredo)
-                .build();
+            .id(userId)
+            .name(user.getName())
+            .dateOfRegistration(user.getDateOfRegistration())
+            .email(user.getEmail())
+            .userStatus(user.getUserStatus())
+            .role(user.getRole())
+            .userCredo(userCredo)
+            .build();
 
         when(greenCityRemoteClient.findUserCredoByUserId(userId))
-                .thenReturn(userCredo);
+            .thenReturn(userCredo);
 
         UserForListDto actualResult = userForListDtoMapper.convert(user);
 

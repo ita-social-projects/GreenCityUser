@@ -16,11 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,29 +51,29 @@ class UserProfileDtoResponseMapperTest {
         Set<UserNotificationPreferenceDto> expectedNotificationPreferences = Set.of(userNotificationPreferenceDto);
 
         UserProfileDtoResponse expectedResult = UserProfileDtoResponse.builder()
-                .profilePicturePath(user.getProfilePicturePath())
-                .name(user.getName())
-                .userCredo(userCredo)
-                .socialNetworks(expectedSocialNetworks)
-                .showLocation(user.getShowLocation())
-                .showEcoPlace(user.getShowEcoPlace())
-                .showToDoList(user.getShowToDoList())
-                .rating(userRating)
-                .role(user.getRole())
-                .userLocationDto(userLocationDto)
-                .notificationPreferences(expectedNotificationPreferences)
-                .build();
+            .profilePicturePath(user.getProfilePicturePath())
+            .name(user.getName())
+            .userCredo(userCredo)
+            .socialNetworks(expectedSocialNetworks)
+            .showLocation(user.getShowLocation())
+            .showEcoPlace(user.getShowEcoPlace())
+            .showToDoList(user.getShowToDoList())
+            .rating(userRating)
+            .role(user.getRole())
+            .userLocationDto(userLocationDto)
+            .notificationPreferences(expectedNotificationPreferences)
+            .build();
 
         when(modelMapper.map(any(SocialNetwork.class), eq(SocialNetworkResponseDTO.class)))
-                .thenReturn(socialNetworkResponseDTO);
+            .thenReturn(socialNetworkResponseDTO);
         when(modelMapper.map(any(UserNotificationPreference.class), eq(UserNotificationPreferenceDto.class)))
-                .thenReturn(userNotificationPreferenceDto);
+            .thenReturn(userNotificationPreferenceDto);
         when(greenCityRemoteClient.findUserCredoByUserId(userId))
-                .thenReturn(userCredo);
+            .thenReturn(userCredo);
         when(greenCityRemoteClient.findUserRatingByUserId(userId))
-                .thenReturn(userRating);
+            .thenReturn(userRating);
         when(greenCityRemoteClient.findUserLocationByUserId(userId))
-                .thenReturn(Optional.of(userLocationDto));
+            .thenReturn(Optional.of(userLocationDto));
 
         UserProfileDtoResponse actualResult = userProfileDtoResponseMapper.convert(user);
 

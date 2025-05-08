@@ -269,11 +269,11 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/rating";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path)
-                        .build(userId))
-                .retrieve()
-                .bodyToMono(Double.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .build(userId))
+            .retrieve()
+            .bodyToMono(Double.class)
+            .block();
     }
 
     /**
@@ -298,11 +298,11 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/credo";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path)
-                        .build(userId))
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .build(userId))
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
     }
 
     /**

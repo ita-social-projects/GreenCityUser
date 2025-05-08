@@ -17,13 +17,13 @@ public class UserForListDtoMapper extends AbstractConverter<User, UserForListDto
         Long userId = user.getId();
 
         return UserForListDto.builder()
-                .id(userId)
-                .name(user.getName())
-                .dateOfRegistration(user.getDateOfRegistration())
-                .email(user.getEmail())
-                .userStatus(user.getUserStatus())
-                .role(user.getRole())
-                .userCredo(greenCityRemoteClient.findUserCredoByUserId(userId))
-                .build();
+            .id(userId)
+            .name(user.getName())
+            .dateOfRegistration(user.getDateOfRegistration())
+            .email(user.getEmail())
+            .userStatus(user.getUserStatus())
+            .role(user.getRole())
+            .userCredo(greenCityRemoteClient.findUserCredoByUserId(userId))
+            .build();
     }
 }

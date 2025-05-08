@@ -9,7 +9,6 @@ import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,25 +29,26 @@ public class UserProfileDtoResponseMapper extends AbstractConverter<User, UserPr
         Long userId = user.getId();
 
         List<SocialNetworkResponseDTO> socialNetworks = user.getSocialNetworks().stream()
-                .map(socialNetwork -> modelMapper.map(socialNetwork, SocialNetworkResponseDTO.class))
-                .toList();
+            .map(socialNetwork -> modelMapper.map(socialNetwork, SocialNetworkResponseDTO.class))
+            .toList();
 
         Set<UserNotificationPreferenceDto> userNotificationPreferences = user.getNotificationPreferences().stream()
-                .map(userNotificationPreference -> modelMapper.map(userNotificationPreference, UserNotificationPreferenceDto.class))
-                .collect(Collectors.toSet());
+            .map(userNotificationPreference -> modelMapper.map(userNotificationPreference,
+                UserNotificationPreferenceDto.class))
+            .collect(Collectors.toSet());
 
         return UserProfileDtoResponse.builder()
-                .profilePicturePath(user.getProfilePicturePath())
-                .name(user.getName())
-                .userCredo(greenCityRemoteClient.findUserCredoByUserId(userId))
-                .socialNetworks(socialNetworks)
-                .showLocation(user.getShowLocation())
-                .showEcoPlace(user.getShowEcoPlace())
-                .showToDoList(user.getShowToDoList())
-                .rating(greenCityRemoteClient.findUserRatingByUserId(userId))
-                .role(user.getRole())
-                .userLocationDto(greenCityRemoteClient.findUserLocationByUserId(userId).orElse(null))
-                .notificationPreferences(userNotificationPreferences)
-                .build();
+            .profilePicturePath(user.getProfilePicturePath())
+            .name(user.getName())
+            .userCredo(greenCityRemoteClient.findUserCredoByUserId(userId))
+            .socialNetworks(socialNetworks)
+            .showLocation(user.getShowLocation())
+            .showEcoPlace(user.getShowEcoPlace())
+            .showToDoList(user.getShowToDoList())
+            .rating(greenCityRemoteClient.findUserRatingByUserId(userId))
+            .role(user.getRole())
+            .userLocationDto(greenCityRemoteClient.findUserLocationByUserId(userId).orElse(null))
+            .notificationPreferences(userNotificationPreferences)
+            .build();
     }
 }
