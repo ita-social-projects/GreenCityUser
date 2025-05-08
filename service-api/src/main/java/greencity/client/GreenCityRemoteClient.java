@@ -265,8 +265,15 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    public Float findUserRatingByUserId(Long userId) {
-        return 0f;
+    public Double findUserRatingByUserId(Long userId) {
+        String path = "/users/{userId}/rating";
+
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path(path)
+                        .build(userId))
+                .retrieve()
+                .bodyToMono(Double.class)
+                .block();
     }
 
     /**
