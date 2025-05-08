@@ -36,8 +36,6 @@ public class UserVOAdvancedDto {
 
     private Role role;
 
-    private String userCredo;
-
     private UserStatus userStatus;
 
     private String profilePicturePath;

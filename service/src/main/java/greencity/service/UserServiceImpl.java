@@ -38,7 +38,6 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
-import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
@@ -200,7 +199,7 @@ public class UserServiceImpl implements UserService {
         user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
-        user.setUserCredo(dto.getUserCredo());
+        greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
         user.setUserStatus(dto.getUserStatus());
     }
 
@@ -556,7 +555,7 @@ public class UserServiceImpl implements UserService {
             user.setName(userProfileDtoRequest.getName());
         }
         if (userProfileDtoRequest.getUserCredo() != null) {
-            user.setUserCredo(userProfileDtoRequest.getUserCredo());
+            greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
         }
         Long userId = user.getId();
         greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
@@ -624,13 +623,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileDtoResponse getUserProfileInformation(Long userId) {
         User user = findUserById(userId);
-        UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
-        Optional<UserLocationDto> userLocationDtoOptional = greenCityRemoteClient.findUserLocationByUserId(userId);
-
-        userLocationDtoOptional.ifPresent(userProfileDtoResponse::setUserLocationDto);
-
-        modelMapper.map(user, userProfileDtoResponse);
-        return userProfileDtoResponse;
+        return modelMapper.map(user, UserProfileDtoResponse.class);
     }
 
     /**
@@ -866,27 +859,6 @@ public class UserServiceImpl implements UserService {
     public List<Long> deactivateAllUsers(List<Long> listId) {
         userRepo.deactivateSelectedUsers(listId);
         return listId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PageableAdvancedDto<UserManagementDto> searchBy(Pageable paging, String query) {
-        Page<User> page = userRepo.searchBy(paging, query);
-        List<UserManagementDto> users = page.stream()
-            .map(user -> modelMapper.map(user, UserManagementDto.class))
-            .toList();
-        return new PageableAdvancedDto<>(
-            users,
-            page.getTotalElements(),
-            page.getPageable().getPageNumber(),
-            page.getTotalPages(),
-            page.getNumber(),
-            page.hasPrevious(),
-            page.hasNext(),
-            page.isFirst(),
-            page.isLast());
     }
 
     /**

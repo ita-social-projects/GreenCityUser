@@ -67,7 +67,6 @@ public class ModelUtils {
             .name("user")
             .email("taras@gmail.com")
             .role(Role.ROLE_USER)
-            .userCredo("save the world")
             .userStatus(UserStatus.ACTIVATED)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
             .firstName("Taras")

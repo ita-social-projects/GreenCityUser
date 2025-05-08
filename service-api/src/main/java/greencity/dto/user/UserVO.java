@@ -33,8 +33,6 @@ public class UserVO {
 
     private Role role;
 
-    private String userCredo;
-
     private UserStatus userStatus;
 
     private VerifyEmailVO verifyEmail;
