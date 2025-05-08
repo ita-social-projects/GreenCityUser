@@ -14,7 +14,6 @@ public class UpdateUserDtoUserMapper extends AbstractConverter<User, UpdateUserD
             .name(user.getName())
             .email(user.getEmail())
             .profilePicturePath(user.getProfilePicturePath())
-            .userCredo(user.getUserCredo())
             .build();
         return updateUserDto;
     }

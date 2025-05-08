@@ -205,28 +205,6 @@ class UserRepoTest {
     }
 
     @Test
-    void searchByTest() {
-        Pageable pageable = PageRequest.of(0, 3);
-        User user3 = ModelUtils.getUser();
-        user3.setId(3L);
-        List<User> users = Arrays.asList(user3);
-        Page<User> expectedPage = new PageImpl<>(users, pageable, users.size());
-
-        when(userRepo.searchBy(any(Pageable.class), anyString())).thenReturn(expectedPage);
-
-        Page<User> actualPage = userRepo.searchBy(pageable, "test3@email.com");
-
-        List<Long> actualIds = actualPage.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-        List<Long> expectedIds = expectedPage.getContent().stream().map(User::getId)
-            .collect(Collectors.toList());
-
-        assertEquals(1, expectedPage.getContent().size());
-        assertEquals(expectedIds, actualIds);
-        verify(userRepo).searchBy(pageable, "test3@email.com");
-    }
-
-    @Test
     void findUserForAchievementTest() {
         User expectedUser = ModelUtils.getUser();
         expectedUser.setId(1L);
