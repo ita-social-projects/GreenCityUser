@@ -8,7 +8,7 @@ import greencity.client.RestClient;
 import static greencity.constant.AppConstant.*;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.UserDto;
+import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
@@ -171,20 +171,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
-            try {
-                greenCityRemoteClient.createUser(UserDto.builder()
-                    .id(newUser.getId())
-                    .email(newUser.getEmail())
-                    .name(newUser.getName())
-                    .profilePicturePath(profilePicture)
-                    .build());
-            } catch (DataIntegrityViolationException e) {
-                throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
-            } catch (WebClientRequestException | WebClientResponseException e) {
-                log.warn("GreenCity service is unavailable: {}", e.getMessage());
-            } catch (RuntimeException e) {
-                log.error("Unexpected error when calling GreenCity: {}", e.getMessage(), e);
-            }
+            userService.createGreenCityUser(newUser.getId(), profilePicture);
             return newUser;
         });
     }

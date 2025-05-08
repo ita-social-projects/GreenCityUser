@@ -16,7 +16,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class UpdateUserDto extends UserDto {
+public class UpdateUserDto extends CreateGreenCityUserDto {
     private String userCredo;
     private UserUpdateType userUpdateType;
 }

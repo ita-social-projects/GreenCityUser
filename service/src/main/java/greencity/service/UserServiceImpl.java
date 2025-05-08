@@ -40,6 +40,7 @@ import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
@@ -77,6 +78,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -1069,5 +1073,25 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
         log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVOAdvancedDto.class));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createGreenCityUser(Long newUserId, String profilePicture) {
+        User newUser = userRepo.findById(newUserId).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        try {
+            greenCityRemoteClient.createUser(CreateGreenCityUserDto.builder()
+                    .id(newUser.getId())
+                    .email(newUser.getEmail())
+                    .name(newUser.getName())
+                    .profilePicturePath(profilePicture)
+                    .build());
+        } catch (WebClientRequestException | WebClientResponseException e) {
+            log.warn("GreenCity service is unavailable: {}", e.getMessage());
+        } catch (RuntimeException e) {
+            log.error("Unexpected error when calling GreenCity: {}", e.getMessage(), e);
+        }
     }
 }
