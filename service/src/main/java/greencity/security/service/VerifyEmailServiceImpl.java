@@ -12,7 +12,6 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import greencity.security.repository.VerifyEmailRepo;
 import java.util.List;
-
 import greencity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

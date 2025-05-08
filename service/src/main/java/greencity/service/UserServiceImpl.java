@@ -80,7 +80,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -1080,14 +1079,15 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void createGreenCityUser(Long newUserId, String profilePicture) {
-        User newUser = userRepo.findById(newUserId).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        User newUser =
+            userRepo.findById(newUserId).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
         try {
             greenCityRemoteClient.createUser(CreateGreenCityUserDto.builder()
-                    .id(newUser.getId())
-                    .email(newUser.getEmail())
-                    .name(newUser.getName())
-                    .profilePicturePath(profilePicture)
-                    .build());
+                .id(newUser.getId())
+                .email(newUser.getEmail())
+                .name(newUser.getName())
+                .profilePicturePath(profilePicture)
+                .build());
         } catch (WebClientRequestException | WebClientResponseException e) {
             log.warn("GreenCity service is unavailable: {}", e.getMessage());
         } catch (RuntimeException e) {
