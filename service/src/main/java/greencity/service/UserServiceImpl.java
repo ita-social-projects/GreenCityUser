@@ -1088,7 +1088,7 @@ public class UserServiceImpl implements UserService {
                 .name(newUser.getName())
                 .profilePicturePath(profilePicture)
                 .build());
-        } catch (WebClientRequestException e ) {
+        } catch (WebClientRequestException e) {
             log.warn("GreenCity service is unavailable: {}", e.getMessage());
         } catch (WebClientResponseException e) {
             log.warn("Bad response from GreenCity: {}", e.getMessage());
