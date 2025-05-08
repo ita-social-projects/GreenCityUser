@@ -472,4 +472,12 @@ public interface UserService {
      * @return {@link Optional} of found {@link UserVOAdvancedDto}.
      */
     Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id);
+
+    /**
+     * Method that allows you to create a user on the GreenCity microservice.
+     *
+     * @param newUserId      - {@link Long} user's id on GreenCityUser.
+     * @param profilePicture - {@link String} of user's profilePicture.
+     */
+    void createGreenCityUser(Long newUserId, String profilePicture);
 }

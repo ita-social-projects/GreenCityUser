@@ -2,6 +2,7 @@ package greencity.security.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
@@ -48,6 +49,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
     private final WebClient webClient;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${address}")
     private String address;
@@ -66,7 +68,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         ModelMapper modelMapper,
         RestClient restClient,
         ObjectMapper objectMapper,
-        @Qualifier("facebookWebClient") WebClient webClient) {
+        @Qualifier("facebookWebClient") WebClient webClient, GreenCityRemoteClient greenCityRemoteClient) {
         this.userService = userService;
         this.jwtTool = jwtTool;
         this.userRepo = userRepo;
@@ -75,6 +77,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
         this.webClient = webClient;
+        this.greenCityRemoteClient = greenCityRemoteClient;
     }
 
     @Override
@@ -155,7 +158,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         if (byEmail == null) {
             log.info("User with email {} not found. Creating a new one.", email);
             User newUser = createNewUser(email, name);
-            User savedUser = saveNewUser(newUser);
+            User savedUser = saveNewUser(newUser, null);
             byEmail = modelMapper.map(savedUser, UserVO.class);
             log.info("Created new user with ID: {}", byEmail.getId());
         } else {
@@ -207,13 +210,14 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         return user;
     }
 
-    User saveNewUser(User newUser) {
+    User saveNewUser(User newUser, String profilePicture) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
             log.info("User saved with ID: {}", id);
+            userService.createGreenCityUser(newUser.getId(), profilePicture);
             return newUser;
         });
     }
@@ -260,7 +264,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
 
     SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, profilePicture, language);
-        User savedUser = saveNewUser(newUser);
+        User savedUser = saveNewUser(newUser, profilePicture);
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {

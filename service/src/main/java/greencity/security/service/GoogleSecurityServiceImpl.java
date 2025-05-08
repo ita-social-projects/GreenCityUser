@@ -3,6 +3,7 @@ package greencity.security.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import static greencity.constant.AppConstant.*;
 import greencity.constant.ErrorMessage;
@@ -62,6 +63,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final PlatformTransactionManager transactionManager;
     private final HttpClient googleAccessTokenVerifier;
     private final ObjectMapper objectMapper;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${google.resource.userInfoUri}")
     private String userInfoUrl;
@@ -119,7 +121,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
 
     private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, profilePicture, language);
-        User savedUser = saveNewUser(newUser);
+        User savedUser = saveNewUser(newUser, profilePicture);
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {
@@ -158,12 +160,13 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         return user;
     }
 
-    private User saveNewUser(User newUser) {
+    private User saveNewUser(User newUser, String profilePicture) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
+            userService.createGreenCityUser(newUser.getId(), profilePicture);
             return newUser;
         });
     }

@@ -4,6 +4,7 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.user.UpdateUserCredoDto;
 import greencity.dto.user.UpdateUserDto;
+import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
@@ -329,5 +330,16 @@ public class GreenCityRemoteClient {
         }
 
         return BodyInserters.fromMultipartData(multipartBodyBuilder.build());
+    }
+
+    public boolean createUser(CreateGreenCityUserDto createUserDto) {
+        String path = "/users/create";
+
+        return Boolean.TRUE.equals(webClient.post()
+            .uri(path)
+            .bodyValue(createUserDto)
+            .retrieve()
+            .bodyToMono(Boolean.class)
+            .block());
     }
 }
