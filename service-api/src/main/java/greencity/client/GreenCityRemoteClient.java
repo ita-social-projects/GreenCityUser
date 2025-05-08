@@ -265,6 +265,10 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    public Float findUserRatingByUserId(Long userId) {
+        return 0f;
+    }
+
     /**
      * Update user credo by user id.
      *
