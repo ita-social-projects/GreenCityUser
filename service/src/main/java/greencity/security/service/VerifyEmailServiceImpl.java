@@ -1,6 +1,5 @@
 package greencity.security.service;
 
-import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
@@ -33,7 +32,6 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final ModelMapper modelMapper;
-    private final GreenCityRemoteClient greenCityRemoteClient;
     private final UserService userService;
 
     /**

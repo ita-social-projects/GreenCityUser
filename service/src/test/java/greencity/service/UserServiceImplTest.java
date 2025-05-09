@@ -12,7 +12,6 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
@@ -40,6 +39,7 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
@@ -110,6 +110,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -119,6 +120,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -1546,5 +1548,30 @@ class UserServiceImplTest {
 
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
         verify(userRepo, times(1)).findNotDeactivatedById(userId);
+    }
+
+    @Test
+    void createGreenCityUserTest() {
+        User user = ModelUtils.getUser();
+        CreateGreenCityUserDto createGreenCityUserDto = ModelUtils.getCreateGreenCityDto();
+
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+        when(greenCityRemoteClient.createUser(createGreenCityUserDto)).thenReturn(true);
+
+        assertDoesNotThrow(
+            () -> userService.createGreenCityUser(user.getId(), createGreenCityUserDto.getProfilePicturePath()));
+        verify(greenCityRemoteClient, times(1)).createUser(createGreenCityUserDto);
+    }
+
+    @Test
+    void createGreenCityUserNotFoundTest() {
+        Long userId = 66L;
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+            () -> userService.createGreenCityUser(user.getId(), "http://anypath.com.ua"));
+
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
+        verifyNoInteractions(greenCityRemoteClient);
     }
 }

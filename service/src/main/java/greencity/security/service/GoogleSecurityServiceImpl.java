@@ -3,7 +3,6 @@ package greencity.security.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import static greencity.constant.AppConstant.*;
 import greencity.constant.ErrorMessage;
@@ -63,7 +62,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final PlatformTransactionManager transactionManager;
     private final HttpClient googleAccessTokenVerifier;
     private final ObjectMapper objectMapper;
-    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${google.resource.userInfoUri}")
     private String userInfoUrl;
