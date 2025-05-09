@@ -30,6 +30,8 @@ import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UpdateUserDto;
+import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
@@ -71,6 +73,7 @@ public class ModelUtils {
     public static final UserManagementDto CREATE_USER_MANAGER_DTO = createUserManagerDto();
     public static final List<UserAllFriendsDto> CREATE_USER_ALL_FRIENDS_DTO = createUserAllFriendsDto();
     public static final String TEST_EMAIL = "taras@gmail.com";
+    public static final String PICTURE_PATH = "http://testpicture.com.ua";
 
     public static User getUser() {
         return User.builder()
@@ -781,5 +784,23 @@ public class ModelUtils {
             .language(getLanguageVO())
             .socialNetworks(getSocialNetworkVOs())
             .build();
+    }
+
+    public static UpdateUserDto getUpdateUserDto() {
+        return UpdateUserDto.builder()
+                .id(1L)
+                .email(TestConst.EMAIL)
+                .name(TestConst.NAME)
+                .profilePicturePath(PICTURE_PATH)
+                .build();
+    }
+
+    public static CreateGreenCityUserDto getCreateGreenCityDto() {
+        return CreateGreenCityUserDto.builder()
+                .id(1L)
+                .email(TestConst.EMAIL)
+                .name(TestConst.NAME)
+                .profilePicturePath(PICTURE_PATH)
+                .build();
     }
 }

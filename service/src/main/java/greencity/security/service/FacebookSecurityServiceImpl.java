@@ -49,7 +49,6 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
     private final WebClient webClient;
-    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${address}")
     private String address;
@@ -77,7 +76,6 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
         this.webClient = webClient;
-        this.greenCityRemoteClient = greenCityRemoteClient;
     }
 
     @Override
