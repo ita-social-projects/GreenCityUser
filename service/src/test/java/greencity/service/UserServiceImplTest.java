@@ -1558,7 +1558,8 @@ class UserServiceImplTest {
         when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
         when(greenCityRemoteClient.createUser(createGreenCityUserDto)).thenReturn(true);
 
-        assertDoesNotThrow(() -> userService.createGreenCityUser(user.getId(), createGreenCityUserDto.getProfilePicturePath()));
+        assertDoesNotThrow(
+            () -> userService.createGreenCityUser(user.getId(), createGreenCityUserDto.getProfilePicturePath()));
         verify(greenCityRemoteClient, times(1)).createUser(createGreenCityUserDto);
     }
 
@@ -1568,7 +1569,7 @@ class UserServiceImplTest {
         when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> userService.createGreenCityUser(user.getId(), "http://anypath.com.ua"));
+            () -> userService.createGreenCityUser(user.getId(), "http://anypath.com.ua"));
 
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
         verifyNoInteractions(greenCityRemoteClient);
