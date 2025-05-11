@@ -70,7 +70,8 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(token, null));
-                Optional<UserVOReducedDto> user = userService.findNotDeactivatedByEmailReduced((String) authentication.getPrincipal());
+                Optional<UserVOReducedDto> user =
+                    userService.findNotDeactivatedByEmailReduced((String) authentication.getPrincipal());
                 log.info("user {}", user);
                 if (user.isPresent()) {
                     log.debug("User successfully authenticate - {}", authentication.getPrincipal());

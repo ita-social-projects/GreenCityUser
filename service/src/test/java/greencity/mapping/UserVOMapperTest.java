@@ -84,7 +84,8 @@ class UserVOMapperTest {
             .socialNetworks(getSocialNetworks())
             .build();
 
-        when(greenCityRemoteClient.getUserPicturePath(userToBeConverted.getId())).thenReturn("http://testpicture.com.ua");
+        when(greenCityRemoteClient.getUserPicturePath(userToBeConverted.getId()))
+            .thenReturn("http://testpicture.com.ua");
 
         UserVO actualResult = mapper.convert(userToBeConverted);
 

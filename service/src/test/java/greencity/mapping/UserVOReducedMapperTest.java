@@ -21,17 +21,17 @@ class UserVOReducedMapperTest {
         UserVOReducedDto expectedResult = ModelUtils.getUserVOReducedDto();
 
         User userToBeConverted = User.builder()
-                .id(expectedResult.getId())
-                .name(expectedResult.getName())
-                .email(expectedResult.getEmail())
-                .role(expectedResult.getRole())
-                .userStatus(expectedResult.getUserStatus())
-                .dateOfRegistration(expectedResult.getDateOfRegistration())
-                .firstName(expectedResult.getFirstName())
-                .language(ModelUtils.getLanguage())
-                .socialNetworks(getSocialNetworks())
-                .lastActivityTime(expectedResult.getLastActivityTime())
-                .build();
+            .id(expectedResult.getId())
+            .name(expectedResult.getName())
+            .email(expectedResult.getEmail())
+            .role(expectedResult.getRole())
+            .userStatus(expectedResult.getUserStatus())
+            .dateOfRegistration(expectedResult.getDateOfRegistration())
+            .firstName(expectedResult.getFirstName())
+            .language(ModelUtils.getLanguage())
+            .socialNetworks(getSocialNetworks())
+            .lastActivityTime(expectedResult.getLastActivityTime())
+            .build();
 
         UserVOReducedDto actualResult = mapper.convert(userToBeConverted);
         assertEquals(expectedResult, actualResult);

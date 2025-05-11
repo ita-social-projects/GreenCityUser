@@ -585,7 +585,8 @@ class UserControllerTest {
 
     @Test
     void findNotDeactivatedByEmailTest() throws Exception {
-        when(userService.findNotDeactivatedByEmailReduced(TestConst.EMAIL)).thenReturn(Optional.of(ModelUtils.getUserVO()));
+        when(userService.findNotDeactivatedByEmailReduced(TestConst.EMAIL))
+            .thenReturn(Optional.of(ModelUtils.getUserVO()));
         mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
             .param("email", TestConst.EMAIL))
             .andExpect(status().isOk())

@@ -143,8 +143,8 @@ public class SecurityConfig {
                     "/user/usersOnlineStatus",
                     "/user/findByIdForAchievement",
                     "/user/findNotDeactivatedByEmail",
-                        "/user/findNotDeactivatedByEmailRemote",
-                           "/user/findNotDeactivatedByIdRemote",
+                    "/user/findNotDeactivatedByEmailRemote",
+                    "/user/findNotDeactivatedByIdRemote",
                     "/user/findNotDeactivatedById",
                     "/user/findByEmail",
                     "/user/findIdByEmail",
@@ -192,7 +192,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/to-do-list-items/{userToDoListItemId}",
                     "/user/profilePicture",
-                        "/user/deleteProfilePicture")
+                    "/user/deleteProfilePicture")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.DELETE,
                     "/user/to-do-list-items/user-to-do-list-items",

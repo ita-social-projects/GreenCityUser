@@ -1077,7 +1077,7 @@ public class UserServiceImpl implements UserService {
     public Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email) {
         log.info("email {}", email);
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         log.info("user: {}", notDeactivatedByEmail);
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOReducedDto.class));
     }
@@ -1098,7 +1098,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
         log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVOReducedDto.class));
     }

@@ -356,24 +356,24 @@ public class GreenCityRemoteClient {
         String path = "/users/picturePath";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path)
-                        .queryParam(USER_ID_QUERY_PARAM, userId)
-                        .build())
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .queryParam(USER_ID_QUERY_PARAM, userId)
+                .build())
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
     }
 
     public void updateUserPicturePath(Long userId, String profilePicturePath) {
         String path = "/users/picturePath";
 
         webClient.put()
-                .uri(uriBuilder -> uriBuilder.path(path)
-                        .queryParam(USER_ID_QUERY_PARAM, userId)
-                        .queryParam(PROFILE_PICTURE_PATH_QUERY_PARAM, profilePicturePath)
-                        .build())
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .queryParam(USER_ID_QUERY_PARAM, userId)
+                .queryParam(PROFILE_PICTURE_PATH_QUERY_PARAM, profilePicturePath)
+                .build())
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
     }
 }

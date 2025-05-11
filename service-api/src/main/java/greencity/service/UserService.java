@@ -483,7 +483,8 @@ public interface UserService {
     void createGreenCityUser(Long newUserId, String profilePicture);
 
     /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOReducedDto} by email.
+     * Method that allows to find not 'DEACTIVATED' {@link UserVOReducedDto} by
+     * email.
      *
      * @param email - user's email
      * @return {@link Optional} of found {@link UserVOReducedDto}.
