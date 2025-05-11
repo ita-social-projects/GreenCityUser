@@ -13,7 +13,6 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
@@ -535,26 +534,6 @@ public class UserController {
     }
 
     /**
-     * Method that allow you to find {@link UserVO} by Id.
-     *
-     * @return {@link UserUpdateDto}.
-     */
-    @Operation(summary = "Get User by id")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/searchBy")
-    @ApiPageable
-    public ResponseEntity<PageableAdvancedDto<UserManagementDto>> searchBy(
-        @RequestParam(required = false, name = "query") String query,
-        @Parameter(hidden = true) Pageable pageable) {
-        return ResponseEntity.ok().body(userService.searchBy(pageable, query));
-    }
-
-    /**
      * Method that updates user data.
      *
      * @param userDto dto with updated fields.
@@ -715,9 +694,7 @@ public class UserController {
     })
     @GetMapping("/lang")
     public ResponseEntity<String> getUserLang(@Parameter(hidden = true) @CurrentUser UserVO userVO) {
-        Long languageId = userVO.getLanguageId();
-        LanguageVO languageVO = greenCityRemoteClient.findLanguageById(languageId);
-        return ResponseEntity.ok().body(languageVO.getCode());
+        return ResponseEntity.ok().body(userVO.getLanguageVO().getCode());
     }
 
     /**

@@ -2,8 +2,9 @@ package greencity.client;
 
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.language.LanguageVO;
+import greencity.dto.user.UpdateUserCredoDto;
 import greencity.dto.user.UpdateUserDto;
+import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
@@ -144,36 +145,6 @@ public class GreenCityRemoteClient {
     }
 
     /**
-     * Method for finding Language by id.
-     *
-     * @return {@link LanguageVO}
-     */
-    public LanguageVO findLanguageById(Long id) {
-        String path = "/languages/{id}";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(id))
-            .retrieve()
-            .bodyToMono(LanguageVO.class)
-            .block();
-    }
-
-    /**
-     * Check whether Language exists by id.
-     *
-     * @return boolean of whether language exists by that id
-     */
-    public Boolean languageExistsById(Long id) {
-        String path = "/languages/{id}/exists";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(id))
-            .retrieve()
-            .bodyToMono(Boolean.class)
-            .block();
-    }
-
-    /**
      * Method to find {@link UserCityDto} by user id.
      *
      * @param userId id of the user
@@ -298,6 +269,46 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    public Double findUserRatingByUserId(Long userId) {
+        String path = "/users/{userId}/rating";
+
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .build(userId))
+            .retrieve()
+            .bodyToMono(Double.class)
+            .block();
+    }
+
+    /**
+     * Update user credo by user id.
+     *
+     * @param userId    user id
+     * @param userCredo new user credo
+     **/
+    public void updateUserCredo(Long userId, String userCredo) {
+        String path = "/users/credo";
+        UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(userId, userCredo);
+
+        webClient.patch()
+            .uri(path)
+            .bodyValue(updateUserCredoDto)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
+    }
+
+    public String findUserCredoByUserId(Long userId) {
+        String path = "/users/{userId}/credo";
+
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .build(userId))
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
+    }
+
     /**
      * Synchronize GreenCityUser and GreenCity user entity via update.
      *
@@ -322,6 +333,17 @@ public class GreenCityRemoteClient {
         }
 
         return BodyInserters.fromMultipartData(multipartBodyBuilder.build());
+    }
+
+    public boolean createUser(CreateGreenCityUserDto createUserDto) {
+        String path = "/users/create";
+
+        return Boolean.TRUE.equals(webClient.post()
+            .uri(path)
+            .bodyValue(createUserDto)
+            .retrieve()
+            .bodyToMono(Boolean.class)
+            .block());
     }
 
     /**

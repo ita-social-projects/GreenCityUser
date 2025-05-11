@@ -2,6 +2,7 @@ package greencity;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.socialnetwork.SocialNetworkImageRequestDTO;
 import greencity.dto.socialnetwork.SocialNetworkImageResponseDTO;
 import greencity.dto.user.UserManagementDto;
@@ -66,11 +67,13 @@ public class ModelUtils {
             .name("user")
             .email("taras@gmail.com")
             .role(Role.ROLE_USER)
-            .userCredo("save the world")
             .userStatus(UserStatus.ACTIVATED)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
             .firstName("Taras")
-            .languageId(1L)
+            .language(LanguageVO.builder()
+                .id(2L)
+                .code("en")
+                .build())
             .socialNetworks(getSocialNetworkVOs())
             .build();
     }

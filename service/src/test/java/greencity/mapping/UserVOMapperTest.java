@@ -2,6 +2,7 @@ package greencity.mapping;
 
 import greencity.ModelUtils;
 import greencity.dto.user.UserVO;
+import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.entity.OwnSecurity;
@@ -28,7 +29,6 @@ class UserVOMapperTest {
             .name(expectedResult.getName())
             .email(expectedResult.getEmail())
             .role(expectedResult.getRole())
-            .userCredo(expectedResult.getUserCredo())
             .emailNotification(expectedResult.getEmailNotification())
             .userStatus(expectedResult.getUserStatus())
             // .rating(expectedResult.getRating())
@@ -75,7 +75,7 @@ class UserVOMapperTest {
                 .build() : null)
             .lastActivityTime(expectedResult.getLastActivityTime())
             .firstName(expectedResult.getFirstName())
-            .languageId(1L)
+            .language(ModelUtils.getLanguage())
             .socialNetworks(getSocialNetworks())
             .build();
 

@@ -1,6 +1,7 @@
 package greencity.mapping;
 
 import greencity.client.GreenCityRemoteClient;
+import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
@@ -17,7 +18,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
     @Override
     protected UserVO convert(User user) {
         Long userId = user.getId();
-        Long languageId = user.getLanguageId();
         String profilePicturePath = greenCityRemoteClient.getUserPicturePath(userId);
 
         return UserVO.builder()
@@ -25,7 +25,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .name(user.getName())
             .email(user.getEmail())
             .role(user.getRole())
-            .userCredo(user.getUserCredo())
             .emailNotification(user.getEmailNotification())
             .userStatus(user.getUserStatus())
             .verifyEmail(user.getVerifyEmail() != null ? VerifyEmailVO.builder()
@@ -52,7 +51,10 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
             .showEcoPlace(user.getShowEcoPlace())
             .showLocation(user.getShowLocation())
             .lastActivityTime(user.getLastActivityTime())
-            .languageId(languageId)
+            .languageVO(LanguageVO.builder()
+                .id(user.getLanguage().getId())
+                .code(user.getLanguage().getCode())
+                .build())
             .firstName(user.getFirstName())
             .build();
     }

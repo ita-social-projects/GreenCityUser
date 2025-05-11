@@ -98,7 +98,7 @@ class FacebookSecurityServiceImplTest {
         assertEquals(UserStatus.ACTIVATED, user.getUserStatus());
         assertEquals(EmailNotification.DISABLED, user.getEmailNotification());
         assertEquals(ProfilePrivacyPolicy.PUBLIC, user.getShowLocation());
-        assertEquals(1L, user.getLanguageId());
+        assertEquals(1L, user.getLanguage().getId());
     }
 
     @Test
@@ -216,7 +216,7 @@ class FacebookSecurityServiceImplTest {
             return user;
         });
 
-        User result = facebookSecurityService.saveNewUser(newUser);
+        User result = facebookSecurityService.saveNewUser(newUser, null);
         assertNotNull(result);
         assertNotNull(result.getUuid());
         assertEquals(1L, result.getId());

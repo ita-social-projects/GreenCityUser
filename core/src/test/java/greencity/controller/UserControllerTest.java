@@ -6,6 +6,8 @@ import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
 import static greencity.constant.AppConstant.AUTHORIZATION;
+
+import greencity.constant.AppConstant;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.PageableAdvancedDto;
@@ -552,19 +554,6 @@ class UserControllerTest {
     }
 
     @Test
-    void searchByTest() throws Exception {
-        Pageable pageable = PageRequest.of(0, 20);
-        String query = "testQuery";
-        when(userService.searchBy(pageable, query)).thenReturn(ModelUtils.getPageableAdvancedDto());
-        mockMvc.perform(get(userLink + "/searchBy")
-            .param("query", query))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.length()").value(1))
-            .andExpect(jsonPath("$.totalElements").value(1L))
-            .andExpect(jsonPath("$.totalPages").value(1));
-    }
-
-    @Test
     void updateUserManagementTest() throws Exception {
         UserManagementUpdateDto userManagementDto = ModelUtils.getUserManagementUpdateDto();
         String content = objectMapper.writeValueAsString(userManagementDto);
@@ -653,10 +642,14 @@ class UserControllerTest {
     @Test
     void updateUserLanguageTest() throws Exception {
         Principal principal = mock(Principal.class);
+        String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
         long userId = 1L;
         UserVO userVO = UserVO.builder()
             .id(userId)
-            .languageId(2L)
+            .languageVO(LanguageVO.builder()
+                .id(2L)
+                .code(languageCode)
+                .build())
             .build();
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);
@@ -672,22 +665,19 @@ class UserControllerTest {
     @Test
     void getUserLang() throws Exception {
         Principal principal = mock(Principal.class);
+        String languageCode = AppConstant.DEFAULT_LANGUAGE_CODE;
         UserVO userVO = ModelUtils.TEST_USER_VO;
-        Long languageId = 2L;
-        userVO.setLanguageId(languageId);
-        LanguageVO languageVO = LanguageVO.builder()
-            .id(languageId)
-            .code("en")
-            .build();
-        String expectedLanguageCode = languageVO.getCode();
+        userVO.setLanguageVO(LanguageVO.builder()
+            .id(2L)
+            .code(languageCode)
+            .build());
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);
         when(userService.findByEmail(principal.getName())).thenReturn(userVO);
-        when(greenCityRemoteClient.findLanguageById(languageId)).thenReturn(languageVO);
 
         this.mockMvc.perform(get(userLink + "/lang" + "?id=1")
             .principal(principal))
-            .andExpect(content().string(expectedLanguageCode))
+            .andExpect(content().string(languageCode))
             .andExpect(status().isOk());
     }
 

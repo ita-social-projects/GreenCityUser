@@ -10,6 +10,7 @@ import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserVOReducedDto;
+import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
@@ -78,8 +79,8 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             }
             String email = googleIdToken.getPayload().getEmail();
             String userName = (String) googleIdToken.getPayload().get(USERNAME);
-           // String profilePicture = (String) googleIdToken.getPayload().get(GOOGLE_PICTURE);
-            return processAuthentication(email, userName, language);
+            String profilePicture = (String) googleIdToken.getPayload().get(GOOGLE_PICTURE);
+            return processAuthentication(email, userName, profilePicture, language);
         } catch (IllegalArgumentException e) {
             return authenticateByGoogleAccessToken(googleToken, language);
         } catch (GeneralSecurityException | IOException e) {
@@ -95,18 +96,19 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             }
             String email = userInfo.getEmail();
             String userName = userInfo.getName();
-            return processAuthentication(email, userName, language);
+            String profilePicture = userInfo.getPicture();
+            return processAuthentication(email, userName, profilePicture, language);
         } catch (IOException e) {
             throw new IllegalArgumentException(ErrorMessage.BAD_GOOGLE_TOKEN + e.getMessage());
         }
     }
 
-    private SuccessSignInDto processAuthentication(String email, String userName,
+    private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture,
         String language) {
-        UserVOReducedDto userVO = userService.findByEmailReduced(email);
+        UserVO userVO = userService.findByEmail(email);
         if (userVO == null) {
             log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "{}", email);
-            return handleNewUser(email, userName, language);
+            return handleNewUser(email, userName, profilePicture, language);
         } else {
             if (userVO.getUserStatus() == UserStatus.DEACTIVATED) {
                 throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
@@ -116,9 +118,9 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         }
     }
 
-    private SuccessSignInDto handleNewUser(String email, String userName, String language) {
+    private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
         User newUser = createNewUser(email, userName, language);
-        User savedUser = saveNewUser(newUser);
+        User savedUser = saveNewUser(newUser, profilePicture);
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {
@@ -143,7 +145,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-            .languageId(modelMapper.map(language, Long.class))
+            .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
             .map(emailPreference -> UserNotificationPreference.builder()
@@ -156,13 +158,13 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         return user;
     }
 
-    private User saveNewUser(User newUser) {
-        //Maybe somewhere here we need to add greencity_user creation and set picturePath
+    private User saveNewUser(User newUser, String profilePicture) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
+            userService.createGreenCityUser(newUser.getId(), profilePicture);
             return newUser;
         });
     }

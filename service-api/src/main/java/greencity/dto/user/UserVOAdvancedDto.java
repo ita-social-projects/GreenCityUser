@@ -1,5 +1,6 @@
 package greencity.dto.user;
 
+import greencity.dto.language.LanguageVO;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -35,11 +36,9 @@ public class UserVOAdvancedDto {
 
     private Role role;
 
-    private String userCredo;
-
     private UserStatus userStatus;
 
     private UserLocationDto userLocation;
 
-    private Long languageId;
+    private LanguageVO language;
 }

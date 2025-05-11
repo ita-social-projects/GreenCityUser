@@ -338,15 +338,6 @@ public interface UserService {
     UserActivationDto setActivatedStatus(Long id);
 
     /**
-     * Method for getting UserVO by search query.
-     *
-     * @param paging {@link Pageable}.
-     * @param query  query to search,
-     * @return {@link PageableAdvancedDto} of {@link UserManagementDto} instances.
-     */
-    PageableAdvancedDto<UserManagementDto> searchBy(Pageable paging, String query);
-
-    /**
      * Method for getting all Users.
      *
      * @return {@link List} of {@link UserVO} instances.
@@ -482,6 +473,14 @@ public interface UserService {
      * @return {@link Optional} of found {@link UserVOAdvancedDto}.
      */
     Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id);
+
+    /**
+     * Method that allows you to create a user on the GreenCity microservice.
+     *
+     * @param newUserId      - {@link Long} user's id on GreenCityUser.
+     * @param profilePicture - {@link String} of user's profilePicture.
+     */
+    void createGreenCityUser(Long newUserId, String profilePicture);
 
     Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email);
 
