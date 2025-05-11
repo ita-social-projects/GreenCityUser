@@ -50,8 +50,10 @@ class UserProfileDtoResponseMapperTest {
         UserNotificationPreferenceDto userNotificationPreferenceDto = new UserNotificationPreferenceDto();
         Set<UserNotificationPreferenceDto> expectedNotificationPreferences = Set.of(userNotificationPreferenceDto);
 
+        when(greenCityRemoteClient.getUserPicturePath(userId)).thenReturn("http://testpicture.com.ua");
+
         UserProfileDtoResponse expectedResult = UserProfileDtoResponse.builder()
-            .profilePicturePath(user.getProfilePicturePath())
+            .profilePicturePath("http://testpicture.com.ua")
             .name(user.getName())
             .userCredo(userCredo)
             .socialNetworks(expectedSocialNetworks)

@@ -313,7 +313,7 @@ class FacebookSecurityServiceImplTest {
         when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
         when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
 
-        SuccessSignInDto result = facebookSecurityService.handleNewUser(email, userName, language);
+        SuccessSignInDto result = facebookSecurityService.handleNewUser(email, userName, profilePicture, language);
 
         assertNotNull(result);
         assertEquals(1L, result.getUserId());
@@ -357,7 +357,7 @@ class FacebookSecurityServiceImplTest {
         when(restClient.createUbsProfile(any())).thenThrow(new RestClientException("Failed to create UBS profile"));
 
         RestClientException exception = assertThrows(RestClientException.class,
-            () -> facebookSecurityService.handleNewUser(email, userName, language));
+            () -> facebookSecurityService.handleNewUser(email, userName, profilePicture, language));
         assertTrue(exception.getMessage().contains(ErrorMessage.TRANSACTION_FAILED));
     }
 

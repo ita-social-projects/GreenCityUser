@@ -1069,6 +1069,9 @@ public class UserServiceImpl implements UserService {
         greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email) {
@@ -1079,12 +1082,18 @@ public class UserServiceImpl implements UserService {
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOReducedDto.class));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public UserVOReducedDto findByEmailReduced(String email) {
         Optional<User> optionalUser = userRepo.findByEmail(email);
         return optionalUser.map(user -> modelMapper.map(user, UserVOReducedDto.class)).orElse(null);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @Transactional
     public Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id) {

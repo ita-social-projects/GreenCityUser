@@ -348,7 +348,7 @@ class UserControllerTest {
     void deleteUserProfilePictureTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@email.com");
-        mockMvc.perform(delete(userLink + "/deleteProfilePicture")
+        mockMvc.perform(patch(userLink + "/deleteProfilePicture")
             .principal(principal))
             .andExpect(status().isOk());
 
@@ -585,7 +585,7 @@ class UserControllerTest {
 
     @Test
     void findNotDeactivatedByEmailTest() throws Exception {
-        when(userService.findNotDeactivatedByEmail(TestConst.EMAIL)).thenReturn(Optional.of(ModelUtils.getUserVO()));
+        when(userService.findNotDeactivatedByEmailReduced(TestConst.EMAIL)).thenReturn(Optional.of(ModelUtils.getUserVO()));
         mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
             .param("email", TestConst.EMAIL))
             .andExpect(status().isOk())
