@@ -2,7 +2,6 @@ package greencity.security.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
@@ -67,7 +66,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         ModelMapper modelMapper,
         RestClient restClient,
         ObjectMapper objectMapper,
-        @Qualifier("facebookWebClient") WebClient webClient, GreenCityRemoteClient greenCityRemoteClient) {
+        @Qualifier("facebookWebClient") WebClient webClient) {
         this.userService = userService;
         this.jwtTool = jwtTool;
         this.userRepo = userRepo;
@@ -180,7 +179,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .build();
     }
 
-    User createNewUser(String email, String userName, String profilePicture, String language) {
+    User createNewUser(String email, String userName, String language) {
         User user = User.builder()
             .email(email)
             .name(userName)
@@ -260,7 +259,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     }
 
     SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
-        User newUser = createNewUser(email, userName, profilePicture, language);
+        User newUser = createNewUser(email, userName, language);
         User savedUser = saveNewUser(newUser, profilePicture);
         try {
             restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));

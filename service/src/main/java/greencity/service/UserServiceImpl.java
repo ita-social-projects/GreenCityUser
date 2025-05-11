@@ -2,7 +2,6 @@ package greencity.service;
 
 import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
-import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.constant.UpdateConstants;
