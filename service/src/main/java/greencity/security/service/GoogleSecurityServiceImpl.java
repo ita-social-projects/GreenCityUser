@@ -105,7 +105,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
 
     private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture,
         String language) {
-        UserVO userVO = userService.findByEmail(email);
+        UserVOReducedDto userVO = userService.findByEmailReduced(email);
         if (userVO == null) {
             log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "{}", email);
             return handleNewUser(email, userName, profilePicture, language);
@@ -127,7 +127,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             log.error("Failed to create UBS profile for user - {}", savedUser.getEmail(), e);
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
         }
-        UserVO userVO = modelMapper.map(savedUser, UserVO.class);
+        UserVOReducedDto userVO = modelMapper.map(savedUser, UserVOReducedDto.class);
         log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
         return getSuccessSignInDto(userVO);
     }

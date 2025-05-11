@@ -1,5 +1,6 @@
 package greencity.mapping;
 
+import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserVOReducedDto;
@@ -13,14 +14,12 @@ public class UserVOReducedMapper extends AbstractConverter<User, UserVOReducedDt
     @Override
     protected UserVOReducedDto convert(User user) {
         Long userId = user.getId();
-        Long languageId = user.getLanguageId();
 
         return UserVOReducedDto.builder()
                 .id(userId)
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
-                .userCredo(user.getUserCredo())
                 .emailNotification(user.getEmailNotification())
                 .userStatus(user.getUserStatus())
                 .verifyEmail(user.getVerifyEmail() != null ? VerifyEmailVO.builder()
@@ -46,7 +45,10 @@ public class UserVOReducedMapper extends AbstractConverter<User, UserVOReducedDt
                 .showEcoPlace(user.getShowEcoPlace())
                 .showLocation(user.getShowLocation())
                 .lastActivityTime(user.getLastActivityTime())
-                .languageId(languageId)
+                .languageVO(LanguageVO.builder()
+                        .id(user.getLanguage().getId())
+                        .code(user.getLanguage().getCode())
+                        .build())
                 .firstName(user.getFirstName())
                 .build();
     }

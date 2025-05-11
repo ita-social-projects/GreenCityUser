@@ -569,7 +569,7 @@ public class UserController {
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
      *
      * @param email - {@link UserVO}'s email
-     * @return {@link UserVO}.
+     * @return {@link UserVOReducedDto}.
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by email")
     @ApiResponses(value = {
@@ -578,15 +578,15 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedByEmail")
-    public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmail(email).orElse(null));
+    public ResponseEntity<UserVOReducedDto> findNotDeactivatedByEmail(@RequestParam String email) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailReduced(email).orElse(null));
     }
 
     /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by id.
      *
      * @param id - {@link UserVO}'s id
-     * @return {@link UserVO}.
+     * @return {@link UserVOReducedDto}.
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by id")
     @ApiResponses(value = {
@@ -595,8 +595,8 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedById")
-    public ResponseEntity<UserVO> findNotDeactivatedById(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedById(id).orElse(null));
+    public ResponseEntity<UserVOReducedDto> findNotDeactivatedById(@RequestParam Long id) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdReduced(id).orElse(null));
     }
 
     /**
@@ -1233,15 +1233,5 @@ public class UserController {
     @GetMapping("/findNotDeactivatedByIdAdvanced")
     public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(@RequestParam Long id) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByIdAdvanced(id).orElse(null));
-    }
-
-    @GetMapping("/findNotDeactivatedByEmailRemote")
-    public ResponseEntity<UserVOReducedDto> findNotDeactivatedByEmailReduced(@RequestParam String email) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailReduced(email).orElse(null));
-    }
-
-    @GetMapping("/findNotDeactivatedByIdRemote")
-    public ResponseEntity<UserVOReducedDto> findNotDeactivatedByIdRemote(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdReduced(id).orElse(null));
     }
 }
