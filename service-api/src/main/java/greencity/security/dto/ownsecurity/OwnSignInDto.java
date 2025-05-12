@@ -19,4 +19,6 @@ public class OwnSignInDto {
 
     @NotBlank
     private String password;
+
+    private String captchaToken;
 }

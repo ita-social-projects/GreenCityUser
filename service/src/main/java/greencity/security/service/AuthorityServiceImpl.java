@@ -60,7 +60,7 @@ public class AuthorityServiceImpl implements AuthorityService {
             () -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail()));
 
         List<String> positionNames = dto.getPositions().stream()
-            .map(PositionDto::getName).toList();
+            .map(PositionDto::getNameUk).toList();
 
         List<Position> positions = positionRepo.findPositionsByNames(positionNames);
         List<Authority> list = authorityRepo.findAuthoritiesByPositions(positionNames);
