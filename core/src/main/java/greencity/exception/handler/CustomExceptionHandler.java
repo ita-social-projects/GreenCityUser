@@ -302,7 +302,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             ex.getBindingResult().getFieldErrors().stream()
                 .map(ValidationExceptionDto::new)
                 .toList();
-        log.trace(ex.getMessage(), ex);
+        log.trace(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(collect);
     }
 
