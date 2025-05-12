@@ -2,7 +2,6 @@ package greencity.service;
 
 import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
-import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.constant.UpdateConstants;
@@ -39,6 +38,7 @@ import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
@@ -522,7 +522,7 @@ public class UserServiceImpl implements UserService {
                 .profilePicturePath(profilePicturePath)
                 .userUpdateType(UserUpdateType.REPLACE)
                 .build());
-            user.setProfilePicturePath(profilePicturePath);
+            updateUserProfilePicturePath(user.getId(), profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
         }
@@ -537,13 +537,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        greenCityRemoteClient.updateUser(UpdateUserDto.builder()
-            .profilePicturePath(AppConstant.EMPTY_STRING)
-            .email(email)
-            .userUpdateType(UserUpdateType.DELETE)
-            .build());
-        user.setProfilePicturePath(null);
-        userRepo.save(user);
+        updateUserProfilePicturePath(user.getId(), null);
     }
 
     /**
@@ -972,6 +966,8 @@ public class UserServiceImpl implements UserService {
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
         allFriends.forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
+        // This line has to be improved by one call to greenCityRemoteClient
+        allFriends.forEach(f -> f.setProfilePicturePath(greenCityRemoteClient.getUserPicturePath(f.getId())));
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
             allUsers.getTotalElements(),
@@ -1067,5 +1063,43 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e) {
             log.error("Unexpected error when calling GreenCity: {}", e.getMessage(), e);
         }
+    }
+
+    private void updateUserProfilePicturePath(Long userId, String profilePicturePath) {
+        greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email) {
+        log.info("email {}", email);
+        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+        log.info("user: {}", notDeactivatedByEmail);
+        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOReducedDto.class));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserVOReducedDto findByEmailReduced(String email) {
+        Optional<User> optionalUser = userRepo.findByEmail(email);
+        return optionalUser.map(user -> modelMapper.map(user, UserVOReducedDto.class)).orElse(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Transactional
+    public Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id) {
+        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        log.info("user: {}", notDeactivatedById);
+        return Optional.of(modelMapper.map(notDeactivatedById, UserVOReducedDto.class));
     }
 }

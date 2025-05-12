@@ -10,6 +10,7 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.ProfilePrivacyPolicy;
@@ -55,7 +56,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @ExtendWith(MockitoExtension.class)
@@ -98,7 +98,7 @@ class GoogleSecurityServiceImplTest {
         when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("test@mail.com");
-        when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
+        when(userService.findByEmailReduced("test@mail.com")).thenReturn(userVO);
 
         SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
         assertEquals(user.getName(), result.getName());
@@ -107,7 +107,7 @@ class GoogleSecurityServiceImplTest {
         verify(googleIdTokenVerifier).verify("token");
         verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
-        verify(userService).findByEmail("test@mail.com");
+        verify(userService).findByEmailReduced("test@mail.com");
     }
 
     @Test
@@ -122,7 +122,7 @@ class GoogleSecurityServiceImplTest {
         when(googleAccessTokenVerifier.execute(any(HttpGet.class))).thenReturn(httpResponse);
         when(httpResponse.getEntity()).thenReturn(httpEntity);
         when(objectMapper.readValue(expectedJsonResponse, UserInfo.class)).thenReturn(userInfo);
-        when(userService.findByEmail(userInfo.getEmail())).thenReturn(userVO);
+        when(userService.findByEmailReduced(userInfo.getEmail())).thenReturn(userVO);
 
         SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
 
@@ -133,7 +133,7 @@ class GoogleSecurityServiceImplTest {
         verify(googleAccessTokenVerifier).execute(any(HttpGet.class));
         verify(httpResponse).getEntity();
         verify(objectMapper).readValue(expectedJsonResponse, UserInfo.class);
-        verify(userService).findByEmail(userInfo.getEmail());
+        verify(userService).findByEmailReduced(userInfo.getEmail());
     }
 
     @Test
@@ -152,9 +152,9 @@ class GoogleSecurityServiceImplTest {
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("taras@mail.com");
 
-        when(userService.findByEmail("taras@mail.com")).thenReturn(null);
+        when(userService.findByEmailReduced("taras@mail.com")).thenReturn(null);
 
-        when(modelMapper.map(any(), eq(UserVO.class))).thenReturn(userVO);
+        when(modelMapper.map(any(), eq(UserVOReducedDto.class))).thenReturn(userVO);
         when(userRepo.save(any())).thenReturn(user);
         when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
@@ -169,9 +169,9 @@ class GoogleSecurityServiceImplTest {
         verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
 
-        verify(userService).findByEmail("taras@mail.com");
+        verify(userService).findByEmailReduced("taras@mail.com");
 
-        verify(modelMapper).map(any(), eq(UserVO.class));
+        verify(modelMapper).map(any(), eq(UserVOReducedDto.class));
         verify(userRepo).save(argThat(savedUser -> {
             assertEquals(Role.ROLE_USER, savedUser.getRole(), "Role should be USER.");
             assertEquals(UserStatus.ACTIVATED, savedUser.getUserStatus(), "User status should be ACTIVATED.");
@@ -200,7 +200,7 @@ class GoogleSecurityServiceImplTest {
         when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("test@mail.com");
-        when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
+        when(userService.findByEmailReduced("test@mail.com")).thenReturn(userVO);
 
         assertThrows(UserDeactivatedException.class,
             () -> googleSecurityService.authenticate("token", "ua"));
@@ -208,7 +208,7 @@ class GoogleSecurityServiceImplTest {
         verify(googleIdTokenVerifier).verify("token");
         verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
-        verify(userService).findByEmail("test@mail.com");
+        verify(userService).findByEmailReduced("test@mail.com");
     }
 
     @Test

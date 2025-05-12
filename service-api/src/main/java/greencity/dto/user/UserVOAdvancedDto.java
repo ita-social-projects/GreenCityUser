@@ -38,8 +38,6 @@ public class UserVOAdvancedDto {
 
     private UserStatus userStatus;
 
-    private String profilePicturePath;
-
     private UserLocationDto userLocation;
 
     private LanguageVO language;

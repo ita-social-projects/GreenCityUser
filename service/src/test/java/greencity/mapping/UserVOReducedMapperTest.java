@@ -1,7 +1,7 @@
 package greencity.mapping;
 
 import greencity.ModelUtils;
-import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,17 +9,17 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static greencity.ModelUtils.getSocialNetworks;
-import static greencity.ModelUtils.getUserVOAdvancedDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-class UserVOAdvancedDtoMapperTest {
+class UserVOReducedMapperTest {
     @InjectMocks
-    private UserVOAdvancedDtoMapper mapper;
+    private UserVOReducedMapper mapper;
 
     @Test
     void convertTest() {
-        UserVOAdvancedDto expectedResult = getUserVOAdvancedDto();
+        UserVOReducedDto expectedResult = ModelUtils.getUserVOReducedDto();
+
         User userToBeConverted = User.builder()
             .id(expectedResult.getId())
             .name(expectedResult.getName())
@@ -30,10 +30,10 @@ class UserVOAdvancedDtoMapperTest {
             .firstName(expectedResult.getFirstName())
             .language(ModelUtils.getLanguage())
             .socialNetworks(getSocialNetworks())
+            .lastActivityTime(expectedResult.getLastActivityTime())
             .build();
 
-        UserVOAdvancedDto actualResult = mapper.convert(userToBeConverted);
-
+        UserVOReducedDto actualResult = mapper.convert(userToBeConverted);
         assertEquals(expectedResult, actualResult);
     }
 }

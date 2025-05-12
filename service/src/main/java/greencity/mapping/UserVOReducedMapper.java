@@ -1,26 +1,21 @@
 package greencity.mapping;
 
-import greencity.client.GreenCityRemoteClient;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.entity.User;
-import lombok.RequiredArgsConstructor;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
-public class UserVOMapper extends AbstractConverter<User, UserVO> {
-    private final GreenCityRemoteClient greenCityRemoteClient;
-
+public class UserVOReducedMapper extends AbstractConverter<User, UserVOReducedDto> {
     @Override
-    protected UserVO convert(User user) {
+    protected UserVOReducedDto convert(User user) {
         Long userId = user.getId();
-        String profilePicturePath = greenCityRemoteClient.getUserPicturePath(userId);
 
-        return UserVO.builder()
+        return UserVOReducedDto.builder()
             .id(userId)
             .name(user.getName())
             .email(user.getEmail())
@@ -46,7 +41,6 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                     .build())
                 .build() : null)
             .dateOfRegistration(user.getDateOfRegistration())
-            .profilePicturePath(profilePicturePath)
             .showToDoList(user.getShowToDoList())
             .showEcoPlace(user.getShowEcoPlace())
             .showLocation(user.getShowLocation())

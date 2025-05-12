@@ -1,28 +1,34 @@
 package greencity.mapping;
 
 import greencity.ModelUtils;
+import greencity.client.GreenCityRemoteClient;
 import greencity.dto.user.UserVO;
-import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.entity.OwnSecurity;
 
 import static greencity.ModelUtils.getSocialNetworks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class UserVOMapperTest {
+    @Mock
+    GreenCityRemoteClient greenCityRemoteClient;
+
     @InjectMocks
     UserVOMapper mapper;
 
     @Test
     void convertTest() {
         UserVO expectedResult = ModelUtils.getUserVOWithData();
+        expectedResult.setProfilePicturePath("http://testpicture.com.ua");
 
         User userToBeConverted = User.builder()
             .id(expectedResult.getId())
@@ -48,7 +54,6 @@ class UserVOMapperTest {
              */
             .refreshTokenKey(expectedResult.getRefreshTokenKey())
             .dateOfRegistration(expectedResult.getDateOfRegistration())
-            .profilePicturePath(expectedResult.getProfilePicturePath())
             /*
              * .userLocation( UserLocation.builder()
              * .id(expectedResult.getUserLocationDto().getId())
@@ -78,6 +83,9 @@ class UserVOMapperTest {
             .language(ModelUtils.getLanguage())
             .socialNetworks(getSocialNetworks())
             .build();
+
+        when(greenCityRemoteClient.getUserPicturePath(userToBeConverted.getId()))
+            .thenReturn("http://testpicture.com.ua");
 
         UserVO actualResult = mapper.convert(userToBeConverted);
 

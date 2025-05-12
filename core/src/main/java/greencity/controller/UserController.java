@@ -44,6 +44,7 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -76,7 +77,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -352,7 +352,7 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
-    @DeleteMapping(path = "/deleteProfilePicture")
+    @PatchMapping(path = "/deleteProfilePicture")
     public ResponseEntity<HttpStatus> deleteUserProfilePicture(Principal principal) {
         userService.deleteUserProfilePicture(principal.getName());
         return ResponseEntity.ok().build();
@@ -568,7 +568,7 @@ public class UserController {
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
      *
      * @param email - {@link UserVO}'s email
-     * @return {@link UserVO}.
+     * @return {@link UserVOReducedDto}.
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by email")
     @ApiResponses(value = {
@@ -577,15 +577,15 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedByEmail")
-    public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmail(email).orElse(null));
+    public ResponseEntity<UserVOReducedDto> findNotDeactivatedByEmail(@RequestParam String email) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailReduced(email).orElse(null));
     }
 
     /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by id.
      *
      * @param id - {@link UserVO}'s id
-     * @return {@link UserVO}.
+     * @return {@link UserVOReducedDto}.
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by id")
     @ApiResponses(value = {
@@ -594,8 +594,8 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedById")
-    public ResponseEntity<UserVO> findNotDeactivatedById(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedById(id).orElse(null));
+    public ResponseEntity<UserVOReducedDto> findNotDeactivatedById(@RequestParam Long id) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdReduced(id).orElse(null));
     }
 
     /**

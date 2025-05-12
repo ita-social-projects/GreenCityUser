@@ -40,6 +40,7 @@ import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.CreateGreenCityUserDto;
+import greencity.dto.user.UserVOReducedDto;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
@@ -103,14 +104,15 @@ import static greencity.ModelUtils.TEST_USER;
 import static greencity.ModelUtils.TEST_USER_VO;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserVOAdvancedDto;
+import static greencity.ModelUtils.getUserVOReducedDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -1227,14 +1229,13 @@ class UserServiceImplTest {
     @Test
     void deleteUserProfilePictureTest() {
         String email = "test@gmail.com";
-        String picture = "picture";
         User myUser = new User();
         myUser.setEmail(email);
-        myUser.setProfilePicturePath(picture);
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
         when(modelMapper.map(myUser, UserVO.class)).thenReturn(userVO);
         userService.deleteUserProfilePicture(email);
-        assertNull(myUser.getProfilePicturePath());
+        verify(userRepo).findByEmail(email);
+        verify(greenCityRemoteClient).updateUserPicturePath(myUser.getId(), null);
     }
 
     @Test
@@ -1573,5 +1574,65 @@ class UserServiceImplTest {
 
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
         verifyNoInteractions(greenCityRemoteClient);
+    }
+
+    @Test
+    void findNotDeactivatedByEmailReducedTest() {
+        User user = getUser();
+        user.setUserStatus(ACTIVATED);
+        UserVOReducedDto userVOReducedDto = getUserVOReducedDto();
+
+        when(userRepo.findNotDeactivatedByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVOReducedDto.class)).thenReturn(userVOReducedDto);
+
+        assertEquals(userVOReducedDto, userService.findNotDeactivatedByEmailReduced(user.getEmail()).get());
+    }
+
+    @Test
+    void findNotDeactivatedByEmailReducedNotFoundTest() {
+        String nonexistentEmail = "bad_email@gmail.com";
+        when(userRepo.findNotDeactivatedByEmail(nonexistentEmail)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.findNotDeactivatedByEmailReduced(nonexistentEmail));
+    }
+
+    @Test
+    void findNotDeactivatedByIdReducedTest() {
+        User user = getUser();
+        user.setUserStatus(ACTIVATED);
+        UserVOReducedDto userVOReducedDto = getUserVOReducedDto();
+
+        when(userRepo.findNotDeactivatedById(user.getId())).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVOReducedDto.class)).thenReturn(userVOReducedDto);
+
+        assertEquals(userVOReducedDto, userService.findNotDeactivatedByIdReduced(user.getId()).get());
+    }
+
+    @Test
+    void findNotDeactivatedByIdReducedNotFoundTest() {
+        Long nonexistentId = 777L;
+        when(userRepo.findNotDeactivatedById(nonexistentId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> userService.findNotDeactivatedByIdReduced(nonexistentId));
+    }
+
+    @Test
+    void findByEmailReducedTest() {
+        User user = getUser();
+        user.setUserStatus(ACTIVATED);
+        UserVOReducedDto userVOReducedDto = getUserVOReducedDto();
+
+        when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVOReducedDto.class)).thenReturn(userVOReducedDto);
+
+        assertEquals(userVOReducedDto, userService.findByEmailReduced(user.getEmail()));
+    }
+
+    @Test
+    void findByEmailReducedNotFoundTest() {
+        String nonexistentEmail = "bad_email@gmail.com";
+        when(userRepo.findByEmail(nonexistentEmail)).thenReturn(Optional.empty());
+
+        assertNull(userService.findByEmailReduced(nonexistentEmail));
     }
 }

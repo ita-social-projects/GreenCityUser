@@ -27,6 +27,7 @@ public class UserProfileDtoResponseMapper extends AbstractConverter<User, UserPr
     @Override
     protected UserProfileDtoResponse convert(User user) {
         Long userId = user.getId();
+        String profilePicture = greenCityRemoteClient.getUserPicturePath(userId);
 
         List<SocialNetworkResponseDTO> socialNetworks = user.getSocialNetworks().stream()
             .map(socialNetwork -> modelMapper.map(socialNetwork, SocialNetworkResponseDTO.class))
@@ -38,7 +39,7 @@ public class UserProfileDtoResponseMapper extends AbstractConverter<User, UserPr
             .collect(Collectors.toSet());
 
         return UserProfileDtoResponse.builder()
-            .profilePicturePath(user.getProfilePicturePath())
+            .profilePicturePath(profilePicture)
             .name(user.getName())
             .userCredo(greenCityRemoteClient.findUserCredoByUserId(userId))
             .socialNetworks(socialNetworks)

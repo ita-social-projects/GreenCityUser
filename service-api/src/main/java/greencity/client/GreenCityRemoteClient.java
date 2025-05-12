@@ -31,6 +31,9 @@ import java.util.Optional;
 public class GreenCityRemoteClient {
     private final WebClient webClient;
 
+    private static final String USER_ID_QUERY_PARAM = "userId";
+    private static final String PROFILE_PICTURE_PATH_QUERY_PARAM = "profilePicturePath";
+
     public GreenCityRemoteClient(
         @Qualifier("greenCityWebClient") WebClient webClient) {
         this.webClient = webClient;
@@ -341,5 +344,36 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(Boolean.class)
             .block());
+    }
+
+    /**
+     * Method to get user's picture path.
+     *
+     * @param userId {@link Long} user's id.
+     * @return {@link String} user's profilePicturePath
+     */
+    public String getUserPicturePath(Long userId) {
+        String path = "/users/picturePath";
+
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .queryParam(USER_ID_QUERY_PARAM, userId)
+                .build())
+            .retrieve()
+            .bodyToMono(String.class)
+            .block();
+    }
+
+    public void updateUserPicturePath(Long userId, String profilePicturePath) {
+        String path = "/users/picturePath";
+
+        webClient.put()
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .queryParam(USER_ID_QUERY_PARAM, userId)
+                .queryParam(PROFILE_PICTURE_PATH_QUERY_PARAM, profilePicturePath)
+                .build())
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
     }
 }

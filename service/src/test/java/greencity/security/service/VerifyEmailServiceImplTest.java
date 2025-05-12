@@ -75,7 +75,7 @@ class VerifyEmailServiceImplTest {
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(ubsProfile);
         doReturn(1L).when(restClient).createUbsProfile(ubsProfile);
         when(userRepo.save(any(User.class))).thenReturn(user);
-        doNothing().when(userService).createGreenCityUser(user.getId(), user.getProfilePicturePath());
+        doNothing().when(userService).createGreenCityUser(user.getId(), null);
 
         verifyEmailService.verifyByToken(1L, "token");
 
