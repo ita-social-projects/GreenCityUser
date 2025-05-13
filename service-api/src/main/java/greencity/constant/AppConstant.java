@@ -14,6 +14,7 @@ public class AppConstant {
     public static final String EMPLOYEE = "EMPLOYEE";
     public static final String UBS_EMPLOYEE = "UBS_EMPLOYEE";
     public static final String ROLE = "role";
+    public static final String JWT_USER_ID_CLAIM = "userId";
     public static final String AUTHORIZATION = "Authorization";
     public static final String VALIDATION_EMAIL_REGEXP =
         """
