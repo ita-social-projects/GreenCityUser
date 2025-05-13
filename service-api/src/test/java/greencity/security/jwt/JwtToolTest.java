@@ -56,7 +56,7 @@ class JwtToolTest {
         SecretKey key = Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes());
 
         when(jwtService.findUserIdByEmail(expectedEmail))
-                .thenReturn(expectedUserId);
+            .thenReturn(expectedUserId);
 
         final String accessToken = jwtTool.createAccessToken(expectedEmail, expectedRole);
 
@@ -76,11 +76,11 @@ class JwtToolTest {
             .get(ROLE);
         assertEquals(expectedRole, Role.valueOf(authorities.getFirst()));
         Long actualUserId = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(accessToken)
-                .getPayload()
-                .get(AppConstant.JWT_USER_ID_CLAIM, Long.class);
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(accessToken)
+            .getPayload()
+            .get(AppConstant.JWT_USER_ID_CLAIM, Long.class);
         assertEquals(expectedUserId, actualUserId);
     }
 
@@ -93,7 +93,7 @@ class JwtToolTest {
         userVO.setRefreshTokenKey(s);
 
         when(jwtService.findUserIdByEmail(expectedEmail))
-                .thenReturn(expectedUserId);
+            .thenReturn(expectedUserId);
 
         SecretKey key = Keys.hmacShaKeyFor(userVO.getRefreshTokenKey().getBytes());
         String refreshToken = jwtTool.createRefreshToken(userVO);
@@ -113,11 +113,11 @@ class JwtToolTest {
             .get(ROLE);
         assertEquals(expectedRole, Role.valueOf(authorities.getFirst()));
         Long actualUserId = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(refreshToken)
-                .getPayload()
-                .get(AppConstant.JWT_USER_ID_CLAIM, Long.class);
+            .verifyWith(key)
+            .build()
+            .parseSignedClaims(refreshToken)
+            .getPayload()
+            .get(AppConstant.JWT_USER_ID_CLAIM, Long.class);
         assertEquals(expectedUserId, actualUserId);
     }
 

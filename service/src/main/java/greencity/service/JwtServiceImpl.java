@@ -17,6 +17,6 @@ public class JwtServiceImpl implements JwtService {
      */
     public Long findUserIdByEmail(String email) {
         return userRepo.findIdByEmail(email).orElseThrow(
-                () -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+            () -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
     }
 }

@@ -29,7 +29,7 @@ public class JwtServiceImplTest {
         Long expectedResult = 4L;
 
         when(userRepo.findIdByEmail(email))
-                .thenReturn(Optional.of(expectedResult));
+            .thenReturn(Optional.of(expectedResult));
 
         Long actualResult = jwtService.findUserIdByEmail(email);
 
@@ -42,12 +42,11 @@ public class JwtServiceImplTest {
         String expectedExceptionMessage = ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email;
 
         when(userRepo.findIdByEmail(email))
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.empty());
 
         WrongEmailException wrongEmailException = assertThrows(
-                WrongEmailException.class,
-                () -> jwtService.findUserIdByEmail(email)
-        );
+            WrongEmailException.class,
+            () -> jwtService.findUserIdByEmail(email));
         String actualExceptionMessage = wrongEmailException.getMessage();
         assertEquals(expectedExceptionMessage, actualExceptionMessage);
     }
