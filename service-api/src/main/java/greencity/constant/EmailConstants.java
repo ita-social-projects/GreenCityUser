@@ -57,4 +57,5 @@ public class EmailConstants {
     public static final String RECEIVE_INTERESTING_NEWS_EMAIL_PAGE = "receive-interesting-news-email-page";
     public static final String BLOCKED_USER_PAGE = "blocked-user-page";
     public static final String PLACE_STATUS_CHANGE_PAGE = "place-status-change";
+    public static final String GREEN_OFFICE_REQUEST_PAGE = "green-office-request";
 }

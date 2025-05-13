@@ -148,4 +148,12 @@ public interface EmailService {
      *            APPROVED, DELETED).
      */
     void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto);
+
+    /**
+     * Sends an email notification to a manager about request for green office from
+     * user.
+     *
+     * @param message {@link ScheduledEmailMessage}.
+     */
+    void sendGreenOfficeRequestEmailToManager(ScheduledEmailMessage message);
 }
