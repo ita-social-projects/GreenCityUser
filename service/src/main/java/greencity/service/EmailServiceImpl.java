@@ -9,6 +9,7 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
@@ -288,8 +289,12 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.BODY, message.getBody());
         model.put(EmailConstants.PROFILE_LINK, getProfileLink());
 
+        Long userId = message.getUserId();
+        String userEmail = userRepo.findEmailById(userId)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+
         String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
-        sendEmail(message.getEmail(), message.getSubject(), template);
+        sendEmail(userEmail, message.getSubject(), template);
     }
 
     @Override

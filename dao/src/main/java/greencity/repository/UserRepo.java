@@ -57,6 +57,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Optional<Long> findIdByEmail(String email);
 
     /**
+     * Find email by id.
+     *
+     * @param id - User's id
+     * @return User's email
+     */
+    @Query("SELECT email FROM User WHERE id=:id")
+    Optional<String> findEmailById(Long id);
+
+    /**
      * Find uuid by email.
      *
      * @param email - User email
