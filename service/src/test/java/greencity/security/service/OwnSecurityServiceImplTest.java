@@ -2,12 +2,9 @@ package greencity.security.service;
 
 import greencity.ModelUtils;
 import greencity.TestConst;
-import greencity.client.CloudFlareClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
-import greencity.dto.security.CloudFlareRequest;
-import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
