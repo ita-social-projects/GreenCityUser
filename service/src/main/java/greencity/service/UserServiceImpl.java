@@ -1109,7 +1109,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserVO> findAllByEmailIn(List<String> emails) {
         return userRepo.findAllByEmailIn(emails).stream()
-                .map(user -> modelMapper.map(user, UserVO.class))
-                .toList();
+            .map(user -> modelMapper.map(user, UserVO.class))
+            .toList();
     }
 }

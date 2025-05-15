@@ -247,7 +247,7 @@ class EmailServiceImplTest {
             .build();
 
         when(userRepo.findEmailById(userId))
-                .thenReturn(emailOptional);
+            .thenReturn(emailOptional);
 
         service.sendScheduledNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
@@ -259,17 +259,17 @@ class EmailServiceImplTest {
         String uuid = "uuid";
         Optional<String> emailOptional = Optional.of("email@email.com");
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-                .body("test body")
-                .username("test user")
-                .userId(absentUserId)
-                .userUuid(uuid)
-                .subject("test subject")
-                .baseLink("test link")
-                .language("en")
-                .build();
+            .body("test body")
+            .username("test user")
+            .userId(absentUserId)
+            .userUuid(uuid)
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
 
         when(userRepo.findEmailByUuid(uuid))
-                .thenReturn(emailOptional);
+            .thenReturn(emailOptional);
 
         service.sendScheduledNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
@@ -281,22 +281,21 @@ class EmailServiceImplTest {
         String absentUuid = null;
         Optional<String> emptyEmailOptional = Optional.empty();
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-                .body("test body")
-                .username("test user")
-                .userId(userId)
-                .userUuid(absentUuid)
-                .subject("test subject")
-                .baseLink("test link")
-                .language("en")
-                .build();
+            .body("test body")
+            .username("test user")
+            .userId(userId)
+            .userUuid(absentUuid)
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
 
         when(userRepo.findEmailById(userId))
-                .thenReturn(emptyEmailOptional);
+            .thenReturn(emptyEmailOptional);
 
         assertThrows(
-                NotFoundException.class,
-                () -> service.sendScheduledNotificationEmail(message)
-        );
+            NotFoundException.class,
+            () -> service.sendScheduledNotificationEmail(message));
         verify(javaMailSender, never()).createMimeMessage();
     }
 
@@ -306,22 +305,21 @@ class EmailServiceImplTest {
         String uuid = "uuid";
         Optional<String> emptyEmailOptional = Optional.empty();
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-                .body("test body")
-                .username("test user")
-                .userId(absentUserId)
-                .userUuid(uuid)
-                .subject("test subject")
-                .baseLink("test link")
-                .language("en")
-                .build();
+            .body("test body")
+            .username("test user")
+            .userId(absentUserId)
+            .userUuid(uuid)
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
 
         when(userRepo.findEmailByUuid(uuid))
-                .thenReturn(emptyEmailOptional);
+            .thenReturn(emptyEmailOptional);
 
         assertThrows(
-                NotFoundException.class,
-                () -> service.sendScheduledNotificationEmail(message)
-        );
+            NotFoundException.class,
+            () -> service.sendScheduledNotificationEmail(message));
         verify(javaMailSender, never()).createMimeMessage();
     }
 

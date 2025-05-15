@@ -508,7 +508,7 @@ public interface UserService {
     Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id);
 
     /**
-     * Method to find all {@link UserVO} users by emails
+     * Method to find all {@link UserVO} users by emails.
      *
      * @param emails {@link List} of emails to search for
      * @return {@link List} of {@link UserVO} with matching emails

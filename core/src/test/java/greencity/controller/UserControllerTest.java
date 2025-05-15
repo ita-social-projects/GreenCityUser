@@ -1049,8 +1049,8 @@ class UserControllerTest {
         List<String> emails = List.of("email1", "email2");
 
         mockMvc.perform(get(userLink + "/email/findAll")
-                .param("emails", String.join(", ", emails)))
-                .andExpect(status().isOk());
+            .param("emails", String.join(", ", emails)))
+            .andExpect(status().isOk());
 
         verify(userService).findAllByEmailIn(emails);
     }

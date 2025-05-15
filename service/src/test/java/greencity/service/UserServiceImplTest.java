@@ -1647,11 +1647,11 @@ class UserServiceImplTest {
         List<UserVO> expectedResult = List.of(firstMockUserVO, secondMockUserVO);
 
         when(userRepo.findAllByEmailIn(emails))
-                .thenReturn(userRepoResponse);
+            .thenReturn(userRepoResponse);
         when(modelMapper.map(firstMockUser, UserVO.class))
-                .thenReturn(firstMockUserVO);
+            .thenReturn(firstMockUserVO);
         when(modelMapper.map(secondMockUser, UserVO.class))
-                .thenReturn(secondMockUserVO);
+            .thenReturn(secondMockUserVO);
 
         List<UserVO> actualResult = userService.findAllByEmailIn(emails);
 
