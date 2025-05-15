@@ -5,6 +5,7 @@ import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
+import greencity.dto.user.UserVO;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
@@ -38,6 +39,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return {@link User}
      */
     Optional<User> findByEmail(String email);
+
+    /**
+     * Method to find all {@link User} users by emails
+     *
+     * @param emails {@link List} of emails to search for
+     * @return {@link List} of {@link User} with matching emails
+     */
+    List<User> findAllByEmailIn(List<String> emails);
 
     /**
      * Find {@link User} by page.
