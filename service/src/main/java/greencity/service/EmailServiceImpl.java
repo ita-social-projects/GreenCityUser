@@ -20,6 +20,7 @@ import jakarta.mail.internet.MimeMessage;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -290,11 +291,25 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.PROFILE_LINK, getProfileLink());
 
         Long userId = message.getUserId();
-        String userEmail = userRepo.findEmailById(userId)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+        String userUuid = message.getUserUuid();
 
-        String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
-        sendEmail(userEmail, message.getSubject(), template);
+        Optional<String> userEmailOptional;
+        if (userId != null) {
+            userEmailOptional = userRepo.findEmailById(userId);
+        } else {
+            userEmailOptional = userRepo.findEmailByUuid(userUuid);
+        }
+
+        userEmailOptional.ifPresentOrElse(userEmail -> {
+            String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
+            sendEmail(userEmail, message.getSubject(), template);
+        }, () -> {
+            if (userId != null) {
+                throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId);
+            } else {
+                throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + userUuid);
+            }
+        });
     }
 
     @Override
