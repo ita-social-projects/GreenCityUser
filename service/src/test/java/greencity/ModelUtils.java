@@ -33,6 +33,7 @@ import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserVOReducedDto;
+import greencity.dto.user.UserVOShort;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
@@ -808,7 +809,6 @@ public class ModelUtils {
     public static UserVOReducedDto getUserVOReducedDto() {
         return UserVOReducedDto.builder()
             .id(1L)
-            .id(1L)
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
@@ -817,5 +817,16 @@ public class ModelUtils {
             .dateOfRegistration(LocalDateTime.now())
             .languageVO(getLanguageVO())
             .build();
+    }
+
+    public static UserVOShort getUserVOForGreenCity() {
+        return UserVOShort.builder()
+                .id(1L)
+                .email(TestConst.EMAIL)
+                .name(TestConst.NAME)
+                .role(Role.ROLE_USER)
+                .userStatus(UserStatus.DEACTIVATED)
+                .languageVO(getLanguageVO())
+                .build();
     }
 }

@@ -44,7 +44,7 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
-import greencity.dto.user.UserVOReducedDto;
+import greencity.dto.user.UserVOShort;
 import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
@@ -565,10 +565,10 @@ public class UserController {
     }
 
     /**
-     * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
+     * Method that allow you to find not 'DEACTIVATED' {@link UserVOShort} by email.
      *
      * @param email - {@link UserVO}'s email
-     * @return {@link UserVOReducedDto}.
+     * @return {@link UserVOShort}.
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by email")
     @ApiResponses(value = {
@@ -577,15 +577,15 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedByEmail")
-    public ResponseEntity<UserVOReducedDto> findNotDeactivatedByEmail(@RequestParam String email) {
+    public ResponseEntity<UserVOShort> findNotDeactivatedByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailReduced(email).orElse(null));
     }
 
     /**
-     * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by id.
+     * Method that allow you to find not 'DEACTIVATED' {@link UserVOShort} by id.
      *
      * @param id - {@link UserVO}'s id
-     * @return {@link UserVOReducedDto}.
+     * @return {@link UserVOShort}.
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by id")
     @ApiResponses(value = {
@@ -594,7 +594,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findNotDeactivatedById")
-    public ResponseEntity<UserVOReducedDto> findNotDeactivatedById(@RequestParam Long id) {
+    public ResponseEntity<UserVOShort> findNotDeactivatedById(@RequestParam Long id) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByIdReduced(id).orElse(null));
     }
 
@@ -1158,7 +1158,7 @@ public class UserController {
      *
      * @param emailPreference user's email preference.
      * @param periodicity     email periodicity.
-     * @return list of {@link UserVO}
+     * @return list of {@link UserVOShort}
      */
     @Operation(summary = "Find users by email preference and email periodicity.")
     @ApiResponses(value = {
@@ -1167,7 +1167,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/email")
-    public ResponseEntity<List<UserVO>> findAllByEmailPreferenceAndEmailPeriodicity(
+    public ResponseEntity<List<UserVOShort>> findAllByEmailPreferenceAndEmailPeriodicity(
         @RequestParam("email-preference") String emailPreference,
         @RequestParam("email-periodicity") String periodicity) {
         return ResponseEntity.ok(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity));

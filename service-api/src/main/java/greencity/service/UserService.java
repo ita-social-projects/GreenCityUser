@@ -31,6 +31,7 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.UserVOReducedDto;
+import greencity.dto.user.UserVOShort;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -396,9 +397,9 @@ public interface UserService {
      *
      * @param emailPreference of user.
      * @param periodicity     of notification.
-     * @return list of user ids.
+     * @return list of {@link UserVOShort}.
      */
-    List<UserVO> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
+    List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
 
     /**
      * Method that return UserVo by UUid.
@@ -483,13 +484,13 @@ public interface UserService {
     void createGreenCityUser(Long newUserId, String profilePicture);
 
     /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOReducedDto} by
+     * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by
      * email.
      *
      * @param email - user's email
-     * @return {@link Optional} of found {@link UserVOReducedDto}.
+     * @return {@link Optional} of found {@link UserVOShort}.
      */
-    Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email);
+    Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email);
 
     /**
      * Method that allows to find {@link UserVOReducedDto} by email.
@@ -500,10 +501,10 @@ public interface UserService {
     UserVOReducedDto findByEmailReduced(String email);
 
     /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOReducedDto} by id.
+     * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by id.
      *
      * @param id - user's id
-     * @return {@link Optional} of found {@link UserVOReducedDto}.
+     * @return {@link Optional} of found {@link UserVOShort}.
      */
-    Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id);
+    Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id);
 }
