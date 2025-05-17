@@ -211,9 +211,9 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserVOShort findByEmail(String email) {
+    public UserVO findByEmail(String email) {
         Optional<User> optionalUser = userRepo.findByEmail(email);
-        return optionalUser.map(user -> modelMapper.map(user, UserVOShort.class)).orElse(null);
+        return optionalUser.map(user -> modelMapper.map(user, UserVO.class)).orElse(null);
     }
 
     /**
@@ -460,7 +460,7 @@ public class UserServiceImpl implements UserService {
      * @param email email of admin/moderator.
      */
     private void checkUpdatableUser(Long id, String email) {
-        UserVOShort user = findByEmail(email);
+        UserVO user = findByEmail(email);
         if (id.equals(user.getId())) {
             throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_THEMSELVES);
         }
@@ -474,7 +474,7 @@ public class UserServiceImpl implements UserService {
      * @param email email of admin/moderator.
      */
     private void accessForUpdateUserStatus(Long id, String email) {
-        UserVOShort user = findByEmail(email);
+        UserVO user = findByEmail(email);
         if (user.getRole() == Role.ROLE_MODERATOR) {
             Role role = findById(id).getRole();
             if ((role == Role.ROLE_MODERATOR) || (role == Role.ROLE_ADMIN)) {

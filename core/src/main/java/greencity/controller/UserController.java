@@ -477,7 +477,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findByEmail")
-    public ResponseEntity<UserVOShort> findByEmail(@RequestParam String email) {
+    public ResponseEntity<UserVO> findByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.findByEmail(email));
     }
 

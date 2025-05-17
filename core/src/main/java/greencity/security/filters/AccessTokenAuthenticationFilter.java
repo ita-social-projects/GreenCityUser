@@ -1,6 +1,7 @@
 package greencity.security.filters;
 
 import greencity.dto.user.UserVOReducedDto;
+import greencity.dto.user.UserVOShort;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -70,7 +71,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(token, null));
-                Optional<UserVOReducedDto> user =
+                Optional<UserVOShort> user =
                     userService.findNotDeactivatedByEmailReduced((String) authentication.getPrincipal());
                 log.info("user {}", user);
                 if (user.isPresent()) {

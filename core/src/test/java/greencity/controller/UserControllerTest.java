@@ -33,6 +33,7 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOShort;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
@@ -504,14 +505,14 @@ class UserControllerTest {
 
     @Test
     void findByIdTest() throws Exception {
-        UserVO userVO = ModelUtils.getUserVO();
+        UserVOShort userVO = ModelUtils.getUserVOShortDto();
         when(userService.findById(1L)).thenReturn(userVO);
         mockMvc.perform(get(userLink + "/findById")
             .param("id", "1"))
             .andExpect(status().isOk())
             .andExpect(content().contentType("application/json"))
-            .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.id").value(13L))
+            .andExpect(jsonPath("$.name").value("user"))
             .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
     }
 
@@ -574,24 +575,24 @@ class UserControllerTest {
 
     @Test
     void findAllTest() throws Exception {
-        when(userService.findAll()).thenReturn(List.of(ModelUtils.getUserVO()));
+        when(userService.findAll()).thenReturn(List.of(ModelUtils.getUserVOShortDto()));
         mockMvc.perform(get(userLink + "/findAll"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].name").value(TestConst.NAME))
-            .andExpect(jsonPath("$[0].id").value(1L))
+            .andExpect(jsonPath("$[0].name").value("user"))
+            .andExpect(jsonPath("$[0].id").value(13L))
             .andExpect(jsonPath("$[0].email").value(TestConst.EMAIL));
     }
 
     @Test
     void findNotDeactivatedByEmailTest() throws Exception {
         when(userService.findNotDeactivatedByEmailReduced(TestConst.EMAIL))
-            .thenReturn(Optional.of(ModelUtils.getUserVO()));
+            .thenReturn(Optional.of(ModelUtils.getUserVOShortDto()));
         mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
             .param("email", TestConst.EMAIL))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.name").value(TestConst.NAME))
-            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value("user"))
+            .andExpect(jsonPath("$.id").value(13L))
             .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
     }
 
@@ -723,12 +724,12 @@ class UserControllerTest {
     void findAllByEmailNotificationTest() throws Exception {
         EmailNotification notification = EmailNotification.DAILY;
         when(userService.findAllByEmailNotification(notification))
-            .thenReturn(List.of(ModelUtils.getUserVO()));
+            .thenReturn(List.of(ModelUtils.getUserVOShortDto()));
         mockMvc.perform(get(userLink + "/findAllByEmailNotification")
             .param("emailNotification", notification.toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].id").value(1L));
+            .andExpect(jsonPath("$[0].id").value(13L));
 
     }
 

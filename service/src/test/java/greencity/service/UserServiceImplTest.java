@@ -41,6 +41,7 @@ import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserVOReducedDto;
+import greencity.dto.user.UserVOShort;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
@@ -49,7 +50,6 @@ import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
-
 import static greencity.ModelUtils.getLanguage;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.Role.ROLE_ADMIN;
@@ -105,6 +105,7 @@ import static greencity.ModelUtils.TEST_USER_VO;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserVOAdvancedDto;
 import static greencity.ModelUtils.getUserVOReducedDto;
+import static greencity.ModelUtils.getUserVOShortDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -213,10 +214,11 @@ class UserServiceImplTest {
 
     @Test
     void findAllByEmailNotification() {
+        UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
         when(userRepo.findAllByEmailNotification(any(EmailNotification.class)))
             .thenReturn(Collections.singletonList(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        assertEquals(Collections.singletonList(userVO),
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
+        assertEquals(Collections.singletonList(userVOShort),
             userService.findAllByEmailNotification(EmailNotification.IMMEDIATELY));
     }
 
@@ -315,12 +317,14 @@ class UserServiceImplTest {
 
     @Test
     void updateUserStatusDeactivatedTest() {
+        UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
+
         when(userRepo.findById(userId2)).thenReturn(Optional.of(user2));
         when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
         when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
         when(modelMapper.map(Optional.of(user2), UserVO.class)).thenReturn(userVO2);
         when(userRepo.findById(userId)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
         when(userRepo.save(any())).thenReturn(user);
 
         UserStatusDto value = new UserStatusDto();
@@ -333,10 +337,12 @@ class UserServiceImplTest {
     void updateUserStatusLowRoleLevelException() {
         user.setRole(Role.ROLE_MODERATOR);
         userVO.setRole(Role.ROLE_MODERATOR);
+        UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
+        userVOShort.setRole(Role.ROLE_MODERATOR);
         when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
         when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
         when(userRepo.findById(any())).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
         assertThrows(LowRoleLevelException.class, () -> userService.updateStatus(userId, DEACTIVATED, "email"));
     }
 
@@ -372,10 +378,11 @@ class UserServiceImplTest {
     @Test
     void findByIdTest() {
         Long id = 1L;
+        UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
 
         when(userRepo.findById(id)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        assertEquals(userVO, userService.findById(id));
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
+        assertEquals(userVOShort, userService.findById(id));
         verify(userRepo, times(1)).findById(id);
     }
 
@@ -415,10 +422,10 @@ class UserServiceImplTest {
 
     @Test
     void findAllTest() {
-        List<UserVO> userVOList = List.of(ModelUtils.getUserVO(), ModelUtils.getUserVO(), ModelUtils.getUserVO());
-        when(modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVO>>() {
-        }.getType())).thenReturn(userVOList);
-        assertEquals(userVOList, userService.findAll());
+        List<UserVOShort> userVOShortList = List.of(ModelUtils.getUserVOShortDto(), ModelUtils.getUserVOShortDto(), ModelUtils.getUserVOShortDto());
+        when(modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVOShort>>() {
+        }.getType())).thenReturn(userVOShortList);
+        assertEquals(userVOShortList, userService.findAll());
 
     }
 
@@ -1580,12 +1587,12 @@ class UserServiceImplTest {
     void findNotDeactivatedByEmailReducedTest() {
         User user = getUser();
         user.setUserStatus(ACTIVATED);
-        UserVOReducedDto userVOReducedDto = getUserVOReducedDto();
+        UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
 
         when(userRepo.findNotDeactivatedByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVOReducedDto.class)).thenReturn(userVOReducedDto);
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
 
-        assertEquals(userVOReducedDto, userService.findNotDeactivatedByEmailReduced(user.getEmail()).get());
+        assertEquals(userVOShort, userService.findNotDeactivatedByEmailReduced(user.getEmail()).get());
     }
 
     @Test
@@ -1600,12 +1607,12 @@ class UserServiceImplTest {
     void findNotDeactivatedByIdReducedTest() {
         User user = getUser();
         user.setUserStatus(ACTIVATED);
-        UserVOReducedDto userVOReducedDto = getUserVOReducedDto();
+        UserVOShort userVOShort = getUserVOShortDto();
 
         when(userRepo.findNotDeactivatedById(user.getId())).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVOReducedDto.class)).thenReturn(userVOReducedDto);
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
 
-        assertEquals(userVOReducedDto, userService.findNotDeactivatedByIdReduced(user.getId()).get());
+        assertEquals(userVOShort, userService.findNotDeactivatedByIdReduced(user.getId()).get());
     }
 
     @Test

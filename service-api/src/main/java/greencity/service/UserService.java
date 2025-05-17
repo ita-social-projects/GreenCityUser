@@ -111,12 +111,12 @@ public interface UserService {
     UserVOAchievement findUserForAchievement(Long id);
 
     /**
-     * Method that allow you to find {@link UserVOShort} by email.
+     * Method that allow you to find {@link UserVO} by email.
      *
      * @param email a value of {@link String}
-     * @return {@link UserVOShort} with this email.
+     * @return {@link UserVO} with this email.
      */
-    UserVOShort findByEmail(String email);
+    UserVO findByEmail(String email);
 
     /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
