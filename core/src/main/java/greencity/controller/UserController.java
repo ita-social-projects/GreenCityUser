@@ -235,7 +235,7 @@ public class UserController {
     }
 
     /**
-     * Get {@link UserVO} dto by principal (email) from access token.
+     * Get {@link UserUpdateDto} dto by principal (email) from access token.
      *
      * @return {@link UserUpdateDto}.
      */
@@ -253,7 +253,7 @@ public class UserController {
     }
 
     /**
-     * Update {@link UserVO}.
+     * Update {@link UserUpdateDto}.
      *
      * @return {@link ResponseEntity}.
      */
@@ -477,14 +477,14 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findByEmail")
-    public ResponseEntity<UserVO> findByEmail(@RequestParam String email) {
+    public ResponseEntity<UserVOShort> findByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.findByEmail(email));
     }
 
     /**
-     * Get {@link UserVO} by id.
+     * Get {@link UserVOShort} by id.
      *
-     * @return {@link UserUpdateDto}.
+     * @return {@link UserVOShort}.
      */
     @Operation(summary = "Get User by id")
     @ApiResponses(value = {
@@ -493,7 +493,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findById")
-    public ResponseEntity<UserVO> findById(@RequestParam Long id) {
+    public ResponseEntity<UserVOShort> findById(@RequestParam Long id) {
         return ResponseEntity.ok().body(userService.findById(id));
     }
 
@@ -548,9 +548,9 @@ public class UserController {
     }
 
     /**
-     * Method that allow you to find all users {@link UserVO}.
+     * Method that allow you to find all users {@link UserVOShort}.
      *
-     * @return {@link UserVO list}.
+     * @return {@link UserVOShort list}.
      */
     @Operation(summary = "Get all Users")
     @ApiResponses(value = {
@@ -560,7 +560,7 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/findAll")
-    public ResponseEntity<List<UserVO>> findAll() {
+    public ResponseEntity<List<UserVOShort>> findAll() {
         return ResponseEntity.ok().body(userService.findAll());
     }
 
@@ -816,7 +816,7 @@ public class UserController {
      * Method that allow search users by their email notification.
      *
      * @param emailNotification enum with notification value.
-     * @return {@link List} of {@link UserVO}
+     * @return {@link List} of {@link UserVOShort}
      */
     @Operation(summary = "Search Users by email notification")
     @ApiResponses(value = {
@@ -824,7 +824,7 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
     })
     @GetMapping("/findAllByEmailNotification")
-    public ResponseEntity<List<UserVO>> findAllByEmailNotification(@RequestParam EmailNotification emailNotification) {
+    public ResponseEntity<List<UserVOShort>> findAllByEmailNotification(@RequestParam EmailNotification emailNotification) {
         return ResponseEntity.ok().body(userService.findAllByEmailNotification(emailNotification));
     }
 

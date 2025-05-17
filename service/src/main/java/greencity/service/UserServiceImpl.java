@@ -130,8 +130,8 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserVO findById(Long id) {
-        return modelMapper.map(findUserById(id), UserVO.class);
+    public UserVOShort findById(Long id) {
+        return modelMapper.map(findUserById(id), UserVOShort.class);
     }
 
     /**
@@ -211,17 +211,17 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserVO findByEmail(String email) {
+    public UserVOShort findByEmail(String email) {
         Optional<User> optionalUser = userRepo.findByEmail(email);
-        return optionalUser.map(user -> modelMapper.map(user, UserVO.class)).orElse(null);
+        return optionalUser.map(user -> modelMapper.map(user, UserVOShort.class)).orElse(null);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public List<UserVO> findAll() {
-        return modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVO>>() {
+    public List<UserVOShort> findAll() {
+        return modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVOShort>>() {
         }.getType());
     }
 
@@ -460,7 +460,7 @@ public class UserServiceImpl implements UserService {
      * @param email email of admin/moderator.
      */
     private void checkUpdatableUser(Long id, String email) {
-        UserVO user = findByEmail(email);
+        UserVOShort user = findByEmail(email);
         if (id.equals(user.getId())) {
             throw new BadUpdateRequestException(ErrorMessage.USER_CANT_UPDATE_THEMSELVES);
         }
@@ -474,7 +474,7 @@ public class UserServiceImpl implements UserService {
      * @param email email of admin/moderator.
      */
     private void accessForUpdateUserStatus(Long id, String email) {
-        UserVO user = findByEmail(email);
+        UserVOShort user = findByEmail(email);
         if (user.getRole() == Role.ROLE_MODERATOR) {
             Role role = findById(id).getRole();
             if ((role == Role.ROLE_MODERATOR) || (role == Role.ROLE_ADMIN)) {
@@ -863,9 +863,9 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
+    public List<UserVOShort> findAllByEmailNotification(EmailNotification emailNotification) {
         return userRepo.findAllByEmailNotification(emailNotification).stream()
-            .map(user -> modelMapper.map(user, UserVO.class))
+            .map(user -> modelMapper.map(user, UserVOShort.class))
             .toList();
     }
 

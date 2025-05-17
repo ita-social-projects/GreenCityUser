@@ -55,12 +55,12 @@ public interface UserService {
     void updateUserRating(UserAddRatingDto userRatingDto);
 
     /**
-     * Find all {@link UserVO}'s with {@link EmailNotification} type.
+     * Find all {@link UserVOShort} with {@link EmailNotification} type.
      *
      * @param emailNotification - type of {@link EmailNotification}
-     * @return list of {@link UserVO}'s
+     * @return list of {@link UserVOShort}
      */
-    List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
+    List<UserVOShort> findAllByEmailNotification(EmailNotification emailNotification);
 
     /**
      * Delete from the database users that have status 'DEACTIVATED' and last
@@ -95,12 +95,12 @@ public interface UserService {
     UserVO save(UserVO user);
 
     /**
-     * Method that allow you to find {@link UserVO} by ID.
+     * Method that allow you to find {@link UserVOShort} by ID.
      *
      * @param id a value of {@link Long}
-     * @return {@link UserVO}
+     * @return {@link UserVOShort}
      */
-    UserVO findById(Long id);
+    UserVOShort findById(Long id);
 
     /**
      * Method that allow you to find {@link UserVO} by ID.
@@ -111,12 +111,12 @@ public interface UserService {
     UserVOAchievement findUserForAchievement(Long id);
 
     /**
-     * Method that allow you to find {@link UserVO} by email.
+     * Method that allow you to find {@link UserVOShort} by email.
      *
      * @param email a value of {@link String}
-     * @return {@link UserVO} with this email.
+     * @return {@link UserVOShort} with this email.
      */
-    UserVO findByEmail(String email);
+    UserVOShort findByEmail(String email);
 
     /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
@@ -341,9 +341,9 @@ public interface UserService {
     /**
      * Method for getting all Users.
      *
-     * @return {@link List} of {@link UserVO} instances.
+     * @return {@link List} of {@link UserVOShort} instances.
      */
-    List<UserVO> findAll();
+    List<UserVOShort> findAll();
 
     /**
      * Method that finds users by name.
