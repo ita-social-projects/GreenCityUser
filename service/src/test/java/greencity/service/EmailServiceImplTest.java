@@ -13,6 +13,7 @@ import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.PlaceStatus;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
@@ -47,6 +48,7 @@ import static greencity.TestConst.SIMPLE_LONG_NUMBER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doNothing;
@@ -230,17 +232,95 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendScheduledNotificationEmailTest() {
+    void sendScheduledNotificationEmailTestWhenUserIdIsPresent() {
+        Long userId = 4L;
+        String absentUuid = null;
+        Optional<String> emailOptional = Optional.of("email@email.com");
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
             .body("test body")
             .username("test user")
-            .email("test@gmail.com")
+            .userId(userId)
+            .userUuid(absentUuid)
             .subject("test subject")
             .baseLink("test link")
             .language("en")
             .build();
+
+        when(userRepo.findEmailById(userId))
+            .thenReturn(emailOptional);
+
         service.sendScheduledNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendScheduledNotificationEmailTestWhenUserUuidIsPresent() {
+        Long absentUserId = null;
+        String uuid = "uuid";
+        Optional<String> emailOptional = Optional.of("email@email.com");
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test body")
+            .username("test user")
+            .userId(absentUserId)
+            .userUuid(uuid)
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
+
+        when(userRepo.findEmailByUuid(uuid))
+            .thenReturn(emailOptional);
+
+        service.sendScheduledNotificationEmail(message);
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void sendScheduledNotificationEmailTestWhenUserNotFoundById() {
+        Long userId = 4L;
+        String absentUuid = null;
+        Optional<String> emptyEmailOptional = Optional.empty();
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test body")
+            .username("test user")
+            .userId(userId)
+            .userUuid(absentUuid)
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
+
+        when(userRepo.findEmailById(userId))
+            .thenReturn(emptyEmailOptional);
+
+        assertThrows(
+            NotFoundException.class,
+            () -> service.sendScheduledNotificationEmail(message));
+        verify(javaMailSender, never()).createMimeMessage();
+    }
+
+    @Test
+    void sendScheduledNotificationEmailTestWhenUserNotFoundByUuid() {
+        Long absentUserId = null;
+        String uuid = "uuid";
+        Optional<String> emptyEmailOptional = Optional.empty();
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test body")
+            .username("test user")
+            .userId(absentUserId)
+            .userUuid(uuid)
+            .subject("test subject")
+            .baseLink("test link")
+            .language("en")
+            .build();
+
+        when(userRepo.findEmailByUuid(uuid))
+            .thenReturn(emptyEmailOptional);
+
+        assertThrows(
+            NotFoundException.class,
+            () -> service.sendScheduledNotificationEmail(message));
+        verify(javaMailSender, never()).createMimeMessage();
     }
 
     @ParameterizedTest
