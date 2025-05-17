@@ -517,11 +517,6 @@ public class UserServiceImpl implements UserService {
         if (image != null) {
             String profilePicturePath;
             profilePicturePath = restClient.uploadImage(image);
-            greenCityRemoteClient.updateUser(UpdateUserDto.builder()
-                .email(email)
-                .profilePicturePath(profilePicturePath)
-                .userUpdateType(UserUpdateType.REPLACE)
-                .build());
             updateUserProfilePicturePath(user.getId(), profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
