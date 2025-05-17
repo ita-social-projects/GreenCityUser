@@ -129,15 +129,15 @@ public class ModelUtils {
 
     public static UserVOShort getUserVOShortDto() {
         return UserVOShort.builder()
-                .id(13L)
-                .name("user")
-                .email("taras@gmail.com")
-                .role(Role.ROLE_USER)
-                .userStatus(UserStatus.ACTIVATED)
-                .languageVO(LanguageVO.builder()
-                        .id(2L)
-                        .code("en")
-                        .build())
-                .build();
+            .id(13L)
+            .name("user")
+            .email("taras@gmail.com")
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.ACTIVATED)
+            .languageVO(LanguageVO.builder()
+                .id(2L)
+                .code("en")
+                .build())
+            .build();
     }
 }

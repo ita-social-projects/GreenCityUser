@@ -422,7 +422,8 @@ class UserServiceImplTest {
 
     @Test
     void findAllTest() {
-        List<UserVOShort> userVOShortList = List.of(ModelUtils.getUserVOShortDto(), ModelUtils.getUserVOShortDto(), ModelUtils.getUserVOShortDto());
+        List<UserVOShort> userVOShortList =
+            List.of(ModelUtils.getUserVOShortDto(), ModelUtils.getUserVOShortDto(), ModelUtils.getUserVOShortDto());
         when(modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVOShort>>() {
         }.getType())).thenReturn(userVOShortList);
         assertEquals(userVOShortList, userService.findAll());

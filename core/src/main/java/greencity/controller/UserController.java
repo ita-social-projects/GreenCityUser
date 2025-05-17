@@ -824,7 +824,8 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
     })
     @GetMapping("/findAllByEmailNotification")
-    public ResponseEntity<List<UserVOShort>> findAllByEmailNotification(@RequestParam EmailNotification emailNotification) {
+    public ResponseEntity<List<UserVOShort>> findAllByEmailNotification(
+        @RequestParam EmailNotification emailNotification) {
         return ResponseEntity.ok().body(userService.findAllByEmailNotification(emailNotification));
     }
 

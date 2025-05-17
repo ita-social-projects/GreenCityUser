@@ -3,7 +3,6 @@ package greencity.dto.user;
 import greencity.dto.language.LanguageVO;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;

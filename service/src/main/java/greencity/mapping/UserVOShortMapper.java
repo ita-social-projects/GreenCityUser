@@ -11,15 +11,15 @@ public class UserVOShortMapper extends AbstractConverter<User, UserVOShort> {
     @Override
     protected UserVOShort convert(User user) {
         return UserVOShort.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .email(user.getEmail())
-                .role(user.getRole())
-                .userStatus(user.getUserStatus())
-                .languageVO(LanguageVO.builder()
-                        .id(user.getLanguage().getId())
-                        .code(user.getLanguage().getCode())
-                        .build())
-                .build();
+            .id(user.getId())
+            .name(user.getName())
+            .email(user.getEmail())
+            .role(user.getRole())
+            .userStatus(user.getUserStatus())
+            .languageVO(LanguageVO.builder()
+                .id(user.getLanguage().getId())
+                .code(user.getLanguage().getCode())
+                .build())
+            .build();
     }
 }

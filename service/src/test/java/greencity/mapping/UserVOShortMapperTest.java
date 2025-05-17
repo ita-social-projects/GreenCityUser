@@ -21,14 +21,14 @@ public class UserVOShortMapperTest {
         UserVOShort expected = ModelUtils.getUserVOForGreenCity();
 
         User userToBeConverted = User.builder()
-                .id(expected.getId())
-                .name(expected.getName())
-                .email(expected.getEmail())
-                .role(expected.getRole())
-                .userStatus(expected.getUserStatus())
-                .language(ModelUtils.getLanguage())
-                .socialNetworks(getSocialNetworks())
-                .build();
+            .id(expected.getId())
+            .name(expected.getName())
+            .email(expected.getEmail())
+            .role(expected.getRole())
+            .userStatus(expected.getUserStatus())
+            .language(ModelUtils.getLanguage())
+            .socialNetworks(getSocialNetworks())
+            .build();
 
         UserVOShort actual = mapper.convert(userToBeConverted);
         assertEquals(expected, actual);
