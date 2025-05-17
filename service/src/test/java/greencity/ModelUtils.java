@@ -819,17 +819,6 @@ public class ModelUtils {
             .build();
     }
 
-    public static UserVOShort getUserVOForGreenCity() {
-        return UserVOShort.builder()
-            .id(1L)
-            .email(TestConst.EMAIL)
-            .name(TestConst.NAME)
-            .role(Role.ROLE_USER)
-            .userStatus(UserStatus.DEACTIVATED)
-            .languageVO(getLanguageVO())
-            .build();
-    }
-
     public static UserVOShort getUserVOShortDto() {
         return UserVOShort.builder()
             .id(13L)

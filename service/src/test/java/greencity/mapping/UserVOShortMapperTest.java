@@ -18,7 +18,7 @@ public class UserVOShortMapperTest {
 
     @Test
     void convertTest() {
-        UserVOShort expected = ModelUtils.getUserVOForGreenCity();
+        UserVOShort expected = ModelUtils.getUserVOShortDto();
 
         User userToBeConverted = User.builder()
             .id(expected.getId())
