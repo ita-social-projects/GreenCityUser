@@ -1233,4 +1233,21 @@ public class UserController {
     public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(@RequestParam Long id) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByIdAdvanced(id).orElse(null));
     }
+
+    /**
+     * Method to find all {@link UserVO} users by emails.
+     *
+     * @param emails {@link List} of emails to search for
+     * @return {@link List} of {@link UserVO} with matching emails
+     */
+    @Operation(summary = "Find users by emails")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/email/findAll")
+    public ResponseEntity<List<UserVO>> findAllByEmailIn(@RequestParam List<String> emails) {
+        return ResponseEntity.ok(userService.findAllByEmailIn(emails));
+    }
 }

@@ -40,6 +40,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Optional<User> findByEmail(String email);
 
     /**
+     * Method to find all {@link User} users by emails.
+     *
+     * @param emails {@link List} of emails to search for
+     * @return {@link List} of {@link User} with matching emails
+     */
+    List<User> findAllByEmailIn(List<String> emails);
+
+    /**
      * Find {@link User} by page.
      *
      * @param pageable pageable configuration.
@@ -55,6 +63,24 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query("SELECT id FROM User WHERE email=:email")
     Optional<Long> findIdByEmail(String email);
+
+    /**
+     * Find email by id.
+     *
+     * @param id - User's id
+     * @return User's email
+     */
+    @Query("SELECT email FROM User WHERE id=:id")
+    Optional<String> findEmailById(Long id);
+
+    /**
+     * Find email by uuid.
+     *
+     * @param uuid - User's uuid
+     * @return User's email
+     */
+    @Query("SELECT email FROM User WHERE uuid=:uuid")
+    Optional<String> findEmailByUuid(String uuid);
 
     /**
      * Find uuid by email.

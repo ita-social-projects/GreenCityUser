@@ -1635,4 +1635,26 @@ class UserServiceImplTest {
 
         assertNull(userService.findByEmailReduced(nonexistentEmail));
     }
+
+    @Test
+    void findAllByEmailInTest() {
+        List<String> emails = List.of("email1", "email2");
+        User firstMockUser = new User();
+        UserVO firstMockUserVO = new UserVO();
+        User secondMockUser = new User();
+        UserVO secondMockUserVO = new UserVO();
+        List<User> userRepoResponse = List.of(firstMockUser, secondMockUser);
+        List<UserVO> expectedResult = List.of(firstMockUserVO, secondMockUserVO);
+
+        when(userRepo.findAllByEmailIn(emails))
+            .thenReturn(userRepoResponse);
+        when(modelMapper.map(firstMockUser, UserVO.class))
+            .thenReturn(firstMockUserVO);
+        when(modelMapper.map(secondMockUser, UserVO.class))
+            .thenReturn(secondMockUserVO);
+
+        List<UserVO> actualResult = userService.findAllByEmailIn(emails);
+
+        assertEquals(expectedResult, actualResult);
+    }
 }
