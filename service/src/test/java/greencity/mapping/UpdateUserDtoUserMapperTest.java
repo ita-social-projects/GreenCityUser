@@ -20,7 +20,6 @@ public class UpdateUserDtoUserMapperTest {
     void convertTest() {
         User userToConvert = ModelUtils.getUser();
         UpdateUserDto expected = ModelUtils.getUpdateUserDto();
-        expected.setProfilePicturePath(null);
 
         UpdateUserDto result = mapper.convert(userToConvert);
 

@@ -790,9 +790,7 @@ public class ModelUtils {
     public static UpdateUserDto getUpdateUserDto() {
         return UpdateUserDto.builder()
             .id(1L)
-            .email(TestConst.EMAIL)
             .name(TestConst.NAME)
-            .profilePicturePath(PICTURE_PATH)
             .build();
     }
 
