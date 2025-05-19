@@ -1119,7 +1119,7 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public boolean existsNotDeactivatedByEmail (String email) {
+    public boolean existsNotDeactivatedByEmail(String email) {
         return userRepo.existsNotDeactivatedByEmail(email);
     }
 
@@ -1133,7 +1133,7 @@ public class UserServiceImpl implements UserService {
         }
 
         Language language = userRepo.findLanguageByEmail(email)
-                .orElseThrow(() -> new NotFoundException("Language not set for user with email: " + email));
+            .orElseThrow(() -> new NotFoundException("Language not set for user with email: " + email));
 
         return modelMapper.map(language, LanguageVO.class);
     }

@@ -365,8 +365,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<Long> findAllActivatedUserIds();
 
     /**
-     * Checks if there is a user with the given email
-     * whose status is not deactivated (userStatus ≠ 1).
+     * Checks if there is a user with the given email whose status is not
+     * deactivated (userStatus ≠ 1).
      *
      * @param email the email to search for
      * @return true if such a user exists, false otherwise
@@ -378,8 +378,9 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * Retrieves the {@link Language} of a user with the given email.
      *
      * @param email the email of the user
-     * @return an {@link Optional} containing the {@link Language} if found, or {@link Optional#empty()}
-     * if the user doesn't exist or has no language set
+     * @return an {@link Optional} containing the {@link Language} if found, or
+     *         {@link Optional#empty()} if the user doesn't exist or has no language
+     *         set
      */
     @Query("SELECT u.language FROM User u WHERE u.email = :email")
     Optional<Language> findLanguageByEmail(@Param("email") String email);

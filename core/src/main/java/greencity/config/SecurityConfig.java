@@ -161,8 +161,8 @@ public class SecurityConfig {
                     "/user/activated-ids",
                     "/lang",
                     "/lang/*",
-                        USER_LINK + "/existsNotDeactivatedByEmail",
-                        USER_LINK + "/findLanguageByEmail")
+                    USER_LINK + "/existsNotDeactivatedByEmail",
+                    USER_LINK + "/findLanguageByEmail")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",
