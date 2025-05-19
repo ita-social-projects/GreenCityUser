@@ -1295,16 +1295,18 @@ class UserServiceImplTest {
     void updateUserProfilePictureTest() {
         String fileName = "test.txt";
         String content = "test file content";
+        String picturePath = "picturePath";
         byte[] bytes = content.getBytes();
         MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-        when(restClient.uploadImage(any())).thenReturn("picturePath");
+        when(restClient.uploadImage(any())).thenReturn(picturePath);
         when(modelMapper.map(any(), any())).thenReturn(userVO);
         UserVO actual = userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
         assertEquals(userVO, actual);
         verify(restClient).uploadImage(any());
         verify(modelMapper).map(any(), any());
         verify(userRepo).findByEmail(anyString());
+        verify(greenCityRemoteClient).updateUserPicturePath(user.getId(), picturePath);
     }
 
     @Test

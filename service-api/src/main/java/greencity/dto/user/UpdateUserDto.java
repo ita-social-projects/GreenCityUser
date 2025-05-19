@@ -12,10 +12,12 @@ import lombok.experimental.SuperBuilder;
  * {@link UserVO} entity
  */
 @Data
-@SuperBuilder
-@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class UpdateUserDto extends CreateGreenCityUserDto {
+@NoArgsConstructor
+@EqualsAndHashCode()
+@SuperBuilder
+public class UpdateUserDto {
+    private Long id;
+    private String name;
     private UserUpdateType userUpdateType;
 }

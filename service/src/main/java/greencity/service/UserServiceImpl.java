@@ -14,7 +14,6 @@ import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.RoleDto;
-import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserAllFriendsDto;
@@ -50,7 +49,6 @@ import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
-import greencity.enums.UserUpdateType;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadUpdateRequestException;
@@ -517,11 +515,6 @@ public class UserServiceImpl implements UserService {
         if (image != null) {
             String profilePicturePath;
             profilePicturePath = restClient.uploadImage(image);
-            greenCityRemoteClient.updateUser(UpdateUserDto.builder()
-                .email(email)
-                .profilePicturePath(profilePicturePath)
-                .userUpdateType(UserUpdateType.REPLACE)
-                .build());
             updateUserProfilePicturePath(user.getId(), profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
