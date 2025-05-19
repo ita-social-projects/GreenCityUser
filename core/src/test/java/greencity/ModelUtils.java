@@ -9,6 +9,7 @@ import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOShort;
 import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.enums.Role;
@@ -123,6 +124,20 @@ public class ModelUtils {
             .imagePath("http://someimage.ua")
             .hostPath("somehost")
             .id(5L)
+            .build();
+    }
+
+    public static UserVOShort getUserVOShortDto() {
+        return UserVOShort.builder()
+            .id(13L)
+            .name("user")
+            .email("taras@gmail.com")
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.ACTIVATED)
+            .languageVO(LanguageVO.builder()
+                .id(2L)
+                .code("en")
+                .build())
             .build();
     }
 }

@@ -31,6 +31,7 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.UserVOReducedDto;
+import greencity.dto.user.UserVOShort;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
@@ -54,12 +55,12 @@ public interface UserService {
     void updateUserRating(UserAddRatingDto userRatingDto);
 
     /**
-     * Find all {@link UserVO}'s with {@link EmailNotification} type.
+     * Find all {@link UserVOShort} with {@link EmailNotification} type.
      *
      * @param emailNotification - type of {@link EmailNotification}
-     * @return list of {@link UserVO}'s
+     * @return list of {@link UserVOShort}
      */
-    List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
+    List<UserVOShort> findAllByEmailNotification(EmailNotification emailNotification);
 
     /**
      * Delete from the database users that have status 'DEACTIVATED' and last
@@ -94,12 +95,12 @@ public interface UserService {
     UserVO save(UserVO user);
 
     /**
-     * Method that allow you to find {@link UserVO} by ID.
+     * Method that allow you to find {@link UserVOShort} by ID.
      *
      * @param id a value of {@link Long}
-     * @return {@link UserVO}
+     * @return {@link UserVOShort}
      */
-    UserVO findById(Long id);
+    UserVOShort findById(Long id);
 
     /**
      * Method that allow you to find {@link UserVO} by ID.
@@ -340,9 +341,9 @@ public interface UserService {
     /**
      * Method for getting all Users.
      *
-     * @return {@link List} of {@link UserVO} instances.
+     * @return {@link List} of {@link UserVOShort} instances.
      */
-    List<UserVO> findAll();
+    List<UserVOShort> findAll();
 
     /**
      * Method that finds users by name.
@@ -396,9 +397,9 @@ public interface UserService {
      *
      * @param emailPreference of user.
      * @param periodicity     of notification.
-     * @return list of user ids.
+     * @return list of {@link UserVOShort}.
      */
-    List<UserVO> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
+    List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
 
     /**
      * Method that return UserVo by UUid.
@@ -483,13 +484,12 @@ public interface UserService {
     void createGreenCityUser(Long newUserId, String profilePicture);
 
     /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOReducedDto} by
-     * email.
+     * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by email.
      *
      * @param email - user's email
-     * @return {@link Optional} of found {@link UserVOReducedDto}.
+     * @return {@link Optional} of found {@link UserVOShort}.
      */
-    Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email);
+    Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email);
 
     /**
      * Method that allows to find {@link UserVOReducedDto} by email.
@@ -500,12 +500,12 @@ public interface UserService {
     UserVOReducedDto findByEmailReduced(String email);
 
     /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOReducedDto} by id.
+     * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by id.
      *
      * @param id - user's id
-     * @return {@link Optional} of found {@link UserVOReducedDto}.
+     * @return {@link Optional} of found {@link UserVOShort}.
      */
-    Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id);
+    Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id);
 
     /**
      * Method to find all {@link UserVO} users by emails.

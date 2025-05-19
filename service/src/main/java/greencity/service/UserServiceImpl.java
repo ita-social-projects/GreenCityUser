@@ -39,6 +39,7 @@ import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.UserVOReducedDto;
 import greencity.dto.user.CreateGreenCityUserDto;
+import greencity.dto.user.UserVOShort;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
@@ -127,8 +128,8 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserVO findById(Long id) {
-        return modelMapper.map(findUserById(id), UserVO.class);
+    public UserVOShort findById(Long id) {
+        return modelMapper.map(findUserById(id), UserVOShort.class);
     }
 
     /**
@@ -217,8 +218,8 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVO> findAll() {
-        return modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVO>>() {
+    public List<UserVOShort> findAll() {
+        return modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVOShort>>() {
         }.getType());
     }
 
@@ -835,9 +836,9 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVO> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity) {
+    public List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity) {
         return userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity).stream()
-            .map(user -> modelMapper.map(user, UserVO.class))
+            .map(user -> modelMapper.map(user, UserVOShort.class))
             .toList();
     }
 
@@ -855,9 +856,9 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
+    public List<UserVOShort> findAllByEmailNotification(EmailNotification emailNotification) {
         return userRepo.findAllByEmailNotification(emailNotification).stream()
-            .map(user -> modelMapper.map(user, UserVO.class))
+            .map(user -> modelMapper.map(user, UserVOShort.class))
             .toList();
     }
 
@@ -1067,12 +1068,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public Optional<UserVOReducedDto> findNotDeactivatedByEmailReduced(String email) {
+    public Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email) {
         log.info("email {}", email);
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         log.info("user: {}", notDeactivatedByEmail);
-        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOReducedDto.class));
+        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));
     }
 
     /**
@@ -1089,11 +1090,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public Optional<UserVOReducedDto> findNotDeactivatedByIdReduced(Long id) {
+    public Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
         log.info("user: {}", notDeactivatedById);
-        return Optional.of(modelMapper.map(notDeactivatedById, UserVOReducedDto.class));
+        return Optional.of(modelMapper.map(notDeactivatedById, UserVOShort.class));
     }
 
     /**
