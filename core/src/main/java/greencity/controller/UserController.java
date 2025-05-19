@@ -1250,4 +1250,21 @@ public class UserController {
     public ResponseEntity<List<UserVO>> findAllByEmailIn(@RequestParam List<String> emails) {
         return ResponseEntity.ok(userService.findAllByEmailIn(emails));
     }
+
+    /**
+     * Checks whether a user with the given email exists and is not in 'DEACTIVATED' status.
+     *
+     * @param email the user's email
+     * @return true if the user exists and is not deactivated, false otherwise
+     */
+    @Operation(summary = "Check if a user with given email exists and is not deactivated")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/existsNotDeactivatedByEmail")
+    public ResponseEntity<Boolean> existsNotDeactivatedByEmail(@RequestParam String email) {
+        return ResponseEntity.ok(userService.existsNotDeactivatedByEmail(email));
+    }
 }

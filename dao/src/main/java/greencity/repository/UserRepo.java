@@ -362,4 +362,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         WHERE u.userStatus = 2
         """)
     List<Long> findAllActivatedUserIds();
+
+    /**
+     * Checks if there is a user with the given email
+     * whose status is not deactivated (userStatus ≠ 1).
+     *
+     * @param email the email to search for
+     * @return true if such a user exists, false otherwise
+     */
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email =:email AND u.userStatus <> 1")
+    boolean existsNotDeactivatedByEmail(@Param("email") String email);
 }

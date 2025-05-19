@@ -514,4 +514,13 @@ public interface UserService {
      * @return {@link List} of {@link UserVO} with matching emails
      */
     List<UserVO> findAllByEmailIn(List<String> emails);
+
+    /**
+     * Checks if there is a user with the given email
+     * whose status is not deactivated.
+     *
+     * @param email the email to search for
+     * @return true if such a user exists, false otherwise
+     */
+    boolean existsNotDeactivatedByEmail(String email);
 }

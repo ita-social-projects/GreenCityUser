@@ -160,7 +160,8 @@ public class SecurityConfig {
                     "/user/emailNotifications",
                     "/user/activated-ids",
                     "/lang",
-                    "/lang/*")
+                    "/lang/*",
+                        USER_LINK + "/existsNotDeactivatedByEmail")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",

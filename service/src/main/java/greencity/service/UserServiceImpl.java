@@ -1112,4 +1112,12 @@ public class UserServiceImpl implements UserService {
             .map(user -> modelMapper.map(user, UserVO.class))
             .toList();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean existsNotDeactivatedByEmail (String email) {
+        return userRepo.existsNotDeactivatedByEmail(email);
+    }
 }
