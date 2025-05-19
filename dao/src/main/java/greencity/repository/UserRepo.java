@@ -5,6 +5,7 @@ import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
+import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
@@ -372,4 +373,14 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      */
     @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email =:email AND u.userStatus <> 1")
     boolean existsNotDeactivatedByEmail(@Param("email") String email);
+
+    /**
+     * Retrieves the {@link Language} of a user with the given email.
+     *
+     * @param email the email of the user
+     * @return an {@link Optional} containing the {@link Language} if found, or {@link Optional#empty()}
+     * if the user doesn't exist or has no language set
+     */
+    @Query("SELECT u.language FROM User u WHERE u.email = :email")
+    Optional<Language> findLanguageByEmail(@Param("email") String email);
 }
