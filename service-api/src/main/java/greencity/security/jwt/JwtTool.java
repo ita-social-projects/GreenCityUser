@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static greencity.constant.AppConstant.ROLE;
 import greencity.constant.AppConstant;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.enums.Role;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.JwtService;

@@ -8,7 +8,6 @@ import static greencity.constant.AppConstant.*;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;

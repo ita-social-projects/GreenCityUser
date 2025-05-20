@@ -32,7 +32,6 @@ import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.CreateGreenCityUserDto;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.dto.user.UserVOShort;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.verifyemail.VerifyEmailVO;

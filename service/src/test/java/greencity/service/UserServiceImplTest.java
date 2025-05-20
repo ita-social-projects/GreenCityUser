@@ -40,7 +40,6 @@ import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.CreateGreenCityUserDto;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.dto.user.UserVOShort;
 import greencity.entity.Language;
 import greencity.entity.User;

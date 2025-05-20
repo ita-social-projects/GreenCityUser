@@ -10,7 +10,6 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.ProfilePrivacyPolicy;

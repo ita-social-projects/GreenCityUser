@@ -30,7 +30,6 @@ import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.dto.user.UserVOShort;
 import greencity.enums.EmailNotification;
 import greencity.enums.Role;
