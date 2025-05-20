@@ -1016,7 +1016,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public String findUserLanguageByUuid(String uuid) {
         User user = userRepo.findNotDeactivatedUserByUuid(uuid)
-                    .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
         return user.getLanguage().getCode();
     }
 

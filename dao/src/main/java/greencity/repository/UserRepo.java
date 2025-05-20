@@ -364,8 +364,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<Long> findAllActivatedUserIds();
 
     /**
-     * Checks if there is a user with the given uuid whose status is not
-     * deactivated (userStatus ≠ 1).
+     * Checks if there is a user with the given uuid whose status is not deactivated
+     * (userStatus ≠ 1).
      *
      * @param uuid the uuid to search for
      * @return true if such a user exists, false otherwise
@@ -377,7 +377,8 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * Finds a user by UUID if the user is not deactivated (userStatus ≠ 1).
      *
      * @param uuid the UUID of the user
-     * @return an {@link Optional} containing the user if found and active, or empty if not
+     * @return an {@link Optional} containing the user if found and active, or empty
+     *         if not
      */
     @Query("SELECT u FROM User u WHERE u.uuid = :uuid AND u.userStatus <> 1")
     Optional<User> findNotDeactivatedUserByUuid(@Param("uuid") String uuid);
