@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Getter
@@ -16,5 +15,4 @@ import lombok.ToString;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 public class UserVO extends UserVOReducedDto {
-    private String profilePicturePath;
 }
