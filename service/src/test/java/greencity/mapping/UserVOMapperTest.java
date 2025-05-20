@@ -19,7 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class UserVOMapperTest {
-
     @InjectMocks
     UserVOMapper mapper;
 
