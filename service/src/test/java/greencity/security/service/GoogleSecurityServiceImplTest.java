@@ -97,7 +97,7 @@ class GoogleSecurityServiceImplTest {
         when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("test@mail.com");
-        when(userService.findByEmailReduced("test@mail.com")).thenReturn(userVO);
+        when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
 
         SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
         assertEquals(user.getName(), result.getName());
@@ -106,7 +106,7 @@ class GoogleSecurityServiceImplTest {
         verify(googleIdTokenVerifier).verify("token");
         verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
-        verify(userService).findByEmailReduced("test@mail.com");
+        verify(userService).findByEmail("test@mail.com");
     }
 
     @Test
@@ -121,7 +121,7 @@ class GoogleSecurityServiceImplTest {
         when(googleAccessTokenVerifier.execute(any(HttpGet.class))).thenReturn(httpResponse);
         when(httpResponse.getEntity()).thenReturn(httpEntity);
         when(objectMapper.readValue(expectedJsonResponse, UserInfo.class)).thenReturn(userInfo);
-        when(userService.findByEmailReduced(userInfo.getEmail())).thenReturn(userVO);
+        when(userService.findByEmail(userInfo.getEmail())).thenReturn(userVO);
 
         SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
 
@@ -132,7 +132,7 @@ class GoogleSecurityServiceImplTest {
         verify(googleAccessTokenVerifier).execute(any(HttpGet.class));
         verify(httpResponse).getEntity();
         verify(objectMapper).readValue(expectedJsonResponse, UserInfo.class);
-        verify(userService).findByEmailReduced(userInfo.getEmail());
+        verify(userService).findByEmail(userInfo.getEmail());
     }
 
     @Test
@@ -151,9 +151,9 @@ class GoogleSecurityServiceImplTest {
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("taras@mail.com");
 
-        when(userService.findByEmailReduced("taras@mail.com")).thenReturn(null);
+        when(userService.findByEmail("taras@mail.com")).thenReturn(null);
 
-        when(modelMapper.map(any(), eq(UserVOReducedDto.class))).thenReturn(userVO);
+        when(modelMapper.map(any(), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any())).thenReturn(user);
         when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
@@ -168,9 +168,9 @@ class GoogleSecurityServiceImplTest {
         verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
 
-        verify(userService).findByEmailReduced("taras@mail.com");
+        verify(userService).findByEmail("taras@mail.com");
 
-        verify(modelMapper).map(any(), eq(UserVOReducedDto.class));
+        verify(modelMapper).map(any(), eq(UserVO.class));
         verify(userRepo).save(argThat(savedUser -> {
             assertEquals(Role.ROLE_USER, savedUser.getRole(), "Role should be USER.");
             assertEquals(UserStatus.ACTIVATED, savedUser.getUserStatus(), "User status should be ACTIVATED.");
@@ -199,7 +199,7 @@ class GoogleSecurityServiceImplTest {
         when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
         when(payload.getEmail()).thenReturn("test@mail.com");
-        when(userService.findByEmailReduced("test@mail.com")).thenReturn(userVO);
+        when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
 
         assertThrows(UserDeactivatedException.class,
             () -> googleSecurityService.authenticate("token", "ua"));
@@ -207,7 +207,7 @@ class GoogleSecurityServiceImplTest {
         verify(googleIdTokenVerifier).verify("token");
         verify(googleIdToken, times(3)).getPayload();
         verify(payload).getEmail();
-        verify(userService).findByEmailReduced("test@mail.com");
+        verify(userService).findByEmail("test@mail.com");
     }
 
     @Test

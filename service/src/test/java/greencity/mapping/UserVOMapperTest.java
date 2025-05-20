@@ -19,8 +19,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class UserVOMapperTest {
-    @Mock
-    GreenCityRemoteClient greenCityRemoteClient;
 
     @InjectMocks
     UserVOMapper mapper;
@@ -28,7 +26,6 @@ class UserVOMapperTest {
     @Test
     void convertTest() {
         UserVO expectedResult = ModelUtils.getUserVOWithData();
-        expectedResult.setProfilePicturePath("http://testpicture.com.ua");
 
         User userToBeConverted = User.builder()
             .id(expectedResult.getId())
@@ -37,7 +34,6 @@ class UserVOMapperTest {
             .role(expectedResult.getRole())
             .emailNotification(expectedResult.getEmailNotification())
             .userStatus(expectedResult.getUserStatus())
-            // .rating(expectedResult.getRating())
             .verifyEmail(expectedResult.getVerifyEmail() != null ? VerifyEmail.builder()
                 .id(expectedResult.getVerifyEmail().getId())
                 .user(User.builder()
@@ -46,30 +42,7 @@ class UserVOMapperTest {
                     .build())
                 .token(expectedResult.getVerifyEmail().getToken())
                 .build() : null)
-            /*
-             * .userFriends(expectedResult.getUserFriends() != null ?
-             * expectedResult.getUserFriends() .stream().map(user1 -> User.builder()
-             * .id(user1.getId()) .name(user1.getName()) .build())
-             * .collect(Collectors.toList()) : null)
-             */
             .refreshTokenKey(expectedResult.getRefreshTokenKey())
-            .dateOfRegistration(expectedResult.getDateOfRegistration())
-            /*
-             * .userLocation( UserLocation.builder()
-             * .id(expectedResult.getUserLocationDto().getId())
-             * .cityEn(expectedResult.getUserLocationDto().getCityEn())
-             * .cityUk(expectedResult.getUserLocationDto().getCityUk())
-             * .regionEn(expectedResult.getUserLocationDto().getRegionEn())
-             * .regionUk(expectedResult.getUserLocationDto().getRegionUk())
-             * .countryEn(expectedResult.getUserLocationDto().getCountryEn())
-             * .countryUk(expectedResult.getUserLocationDto().getCountryUk())
-             * .latitude(expectedResult.getUserLocationDto().getLatitude())
-             * .longitude(expectedResult.getUserLocationDto().getLongitude()) .users(null)
-             * .build())
-             */
-            .showToDoList(expectedResult.getShowToDoList())
-            .showEcoPlace(expectedResult.getShowEcoPlace())
-            .showLocation(expectedResult.getShowLocation())
             .ownSecurity(expectedResult.getOwnSecurity() != null ? OwnSecurity.builder()
                 .id(expectedResult.getOwnSecurity().getId())
                 .password(expectedResult.getOwnSecurity().getPassword())
@@ -78,14 +51,14 @@ class UserVOMapperTest {
                     .email(expectedResult.getOwnSecurity().getUser().getEmail())
                     .build())
                 .build() : null)
+            .dateOfRegistration(expectedResult.getDateOfRegistration())
+            .showToDoList(expectedResult.getShowToDoList())
+            .showEcoPlace(expectedResult.getShowEcoPlace())
+            .showLocation(expectedResult.getShowLocation())
             .lastActivityTime(expectedResult.getLastActivityTime())
-            .firstName(expectedResult.getFirstName())
             .language(ModelUtils.getLanguage())
-            .socialNetworks(getSocialNetworks())
+            .firstName(expectedResult.getFirstName())
             .build();
-
-        when(greenCityRemoteClient.getUserPicturePath(userToBeConverted.getId()))
-            .thenReturn("http://testpicture.com.ua");
 
         UserVO actualResult = mapper.convert(userToBeConverted);
 
