@@ -87,6 +87,25 @@ public class EmailController {
     }
 
     /**
+     * Send email notification to manager about green office request.
+     *
+     * @param message {@link ScheduledEmailMessage} - object with all necessary data
+     *                for sending notification via email.
+     */
+    @Operation(summary = "Send email notification to manager about green office request.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.NOT_FOUND),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @PostMapping("/greenoffice/notification")
+    public ResponseEntity<Void> sendGreenOfficeRequestNotification(@RequestBody ScheduledEmailMessage message) {
+        emailService.sendGreenOfficeRequestEmailToManager(message);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
      * Method for sending an email notification about the status change of a place
      * to the user.
      *

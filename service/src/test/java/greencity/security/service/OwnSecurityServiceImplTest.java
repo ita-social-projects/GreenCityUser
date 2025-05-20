@@ -2,9 +2,12 @@ package greencity.security.service;
 
 import greencity.ModelUtils;
 import greencity.TestConst;
+import greencity.client.CloudFlareClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
+import greencity.dto.security.CloudFlareRequest;
+import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -81,6 +84,9 @@ class OwnSecurityServiceImplTest {
     @Mock
     LoginAttemptService loginAttemptService;
 
+    @Mock
+    CloudFlareClient cloudFlareClient;
+
     private OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -95,7 +101,7 @@ class OwnSecurityServiceImplTest {
     public void init() {
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo,
-            loginAttemptService);
+            loginAttemptService, cloudFlareClient);
 
         ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
         ReflectionTestUtils.setField(ownSecurityService, "secretKey", "secret-key");
@@ -297,6 +303,8 @@ class OwnSecurityServiceImplTest {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
 
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("new-access-token");
@@ -310,6 +318,7 @@ class OwnSecurityServiceImplTest {
         verify(jwtTool, times(1)).createRefreshToken(any(UserVO.class));
         verify(loginAttemptService, times(1)).isBlockedByCaptcha(anyString());
         verify(loginAttemptService, times(1)).isBlockedByWrongPassword(anyString());
+        verify(cloudFlareClient, times(1)).getCloudFlareResponse(any(CloudFlareRequest.class));
     }
 
     @Test
@@ -320,6 +329,8 @@ class OwnSecurityServiceImplTest {
         when(jwtTool.createRefreshToken(any(UserVO.class))).thenReturn("new-refresh-token");
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
 
         assertThrows(EmailNotVerified.class,
             () -> ownSecurityService.signIn(ownSignInDto));
@@ -343,6 +354,8 @@ class OwnSecurityServiceImplTest {
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
         when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(true, null, null, null));
 
         assertThrows(WrongPasswordException.class, () -> ownSecurityService.signIn(ownSignInDto));
     }
@@ -667,6 +680,20 @@ class OwnSecurityServiceImplTest {
             .thenReturn(Optional.ofNullable(userForBruteForceTest));
 
         assertThrows(WrongPasswordException.class,
+            () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
+    void throwExceptionWhenCaptchaIsNotValid() {
+        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+        when(userRepo.findByEmail(anyString()))
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
+        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+            .thenReturn(new CloudFlareResponse(false, null, null, null));
+
+        assertThrows(WrongCaptchaException.class,
             () -> ownSecurityService.signIn(ownSignInDto));
     }
 
