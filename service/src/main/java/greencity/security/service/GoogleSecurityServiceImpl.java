@@ -8,6 +8,7 @@ import static greencity.constant.AppConstant.*;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
+import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserNotificationPreference;
@@ -103,7 +104,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
 
     private SuccessSignInDto processAuthentication(String email, String userName, String profilePicture,
         String language) {
-        UserVOReducedDto userVO = userService.findByEmailReduced(email);
+        UserVO userVO = userService.findByEmail(email);
         if (userVO == null) {
             log.info(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "{}", email);
             return handleNewUser(email, userName, profilePicture, language);
@@ -125,7 +126,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             log.error("Failed to create UBS profile for user - {}", savedUser.getEmail(), e);
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
         }
-        UserVOReducedDto userVO = modelMapper.map(savedUser, UserVOReducedDto.class);
+        UserVO userVO = modelMapper.map(savedUser, UserVO.class);
         log.info("Google sign-up and sign-in user - {}", userVO.getEmail());
         return getSuccessSignInDto(userVO);
     }
@@ -167,7 +168,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         });
     }
 
-    private SuccessSignInDto getSuccessSignInDto(UserVOReducedDto user) {
+    private SuccessSignInDto getSuccessSignInDto(UserVO user) {
         String accessToken = jwtTool.createAccessToken(user.getEmail(), user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), false);

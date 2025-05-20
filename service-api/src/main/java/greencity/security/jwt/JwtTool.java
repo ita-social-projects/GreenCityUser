@@ -105,7 +105,7 @@ public class JwtTool {
      *
      * @param user - entity {@link UserVO}
      */
-    public String createRefreshToken(UserVOReducedDto user) {
+    public String createRefreshToken(UserVO user) {
         ClaimsBuilder claims = userClaimsBuilder(user.getEmail(), List.of(user.getRole()));
         return createAccessToken(claims.build(), user.getRefreshTokenKey().getBytes(StandardCharsets.UTF_8),
             refreshTokenValidTimeInMinutes);

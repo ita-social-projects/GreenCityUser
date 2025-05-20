@@ -1079,15 +1079,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserVOReducedDto findByEmailReduced(String email) {
-        Optional<User> optionalUser = userRepo.findByEmail(email);
-        return optionalUser.map(user -> modelMapper.map(user, UserVOReducedDto.class)).orElse(null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional
     public Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)

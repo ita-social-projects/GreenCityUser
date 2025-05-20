@@ -491,14 +491,6 @@ public interface UserService {
     Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email);
 
     /**
-     * Method that allows to find {@link UserVOReducedDto} by email.
-     *
-     * @param email - user's email
-     * @return {@link UserVOReducedDto} - user's dto.
-     */
-    UserVOReducedDto findByEmailReduced(String email);
-
-    /**
      * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by id.
      *
      * @param id - user's id
