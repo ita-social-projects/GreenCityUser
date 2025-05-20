@@ -5,7 +5,6 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
@@ -515,26 +514,4 @@ public interface UserService {
      * @return {@link List} of {@link UserVO} with matching emails
      */
     List<UserVO> findAllByEmailIn(List<String> emails);
-
-    /**
-     * Checks if there is a user with the given email whose status is not
-     * deactivated.
-     *
-     * @param email the email to search for
-     * @return true if such a user exists, false otherwise
-     */
-    boolean existsNotDeactivatedByEmail(String email);
-
-    /**
-     * Retrieves the {@link LanguageVO} of a user with the given email.
-     *
-     * @param email the email of the user
-     * @return {@link LanguageVO} if found
-     * @throws greencity.exception.exceptions.NotFoundException if user does not
-     *                                                          exist or is
-     *                                                          deactivated, or
-     *                                                          doesn't have a
-     *                                                          language set
-     */
-    LanguageVO findLanguageByEmail(String email);
 }

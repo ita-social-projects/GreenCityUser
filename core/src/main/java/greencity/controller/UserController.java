@@ -1251,44 +1251,4 @@ public class UserController {
     public ResponseEntity<List<UserVO>> findAllByEmailIn(@RequestParam List<String> emails) {
         return ResponseEntity.ok(userService.findAllByEmailIn(emails));
     }
-
-    /**
-     * Checks whether a user with the given email exists and is not in 'DEACTIVATED'
-     * status.
-     *
-     * @param email the user's email
-     * @return {@link ResponseEntity} of {@link Boolean}: true if the user exists
-     *         and is not deactivated, false otherwise
-     */
-    @Operation(summary = "Check if a user with given email exists and is not deactivated")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-    })
-    @GetMapping("/existsNotDeactivatedByEmail")
-    public ResponseEntity<Boolean> existsNotDeactivatedByEmail(@RequestParam String email) {
-        return ResponseEntity.ok(userService.existsNotDeactivatedByEmail(email));
-    }
-
-    /**
-     * Returns the {@link LanguageVO} of an active user identified by the given
-     * email. If the user is not found or is deactivated, or the language is not
-     * set, a 404 Not Found response will be returned.
-     *
-     * @param email the email of the user whose language should be retrieved
-     * @return {@link ResponseEntity} containing {@link LanguageVO} if the user is
-     *         active and found
-     */
-    @Operation(summary = "Finds a user's language by email")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND),
-    })
-    @GetMapping("/findLanguageByEmail")
-    public ResponseEntity<LanguageVO> findLanguageByEmail(@RequestParam String email) {
-        return ResponseEntity.ok(userService.findLanguageByEmail(email));
-    }
 }

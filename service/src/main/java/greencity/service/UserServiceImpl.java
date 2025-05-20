@@ -10,7 +10,6 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
-import greencity.dto.language.LanguageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
@@ -45,7 +44,6 @@ import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
-import greencity.entity.Language;
 import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
@@ -982,7 +980,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Boolean checkIfUserExistsByUuid(String uuid) {
-        return userRepo.findUserByUuid(uuid).isPresent();
+        return userRepo.existsNotDeactivatedByUuid(uuid);
     }
 
     /**
@@ -1017,7 +1015,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String findUserLanguageByUuid(String uuid) {
-        return findUserByUuid(uuid).getLanguage().getCode();
+        User user = userRepo.findNotDeactivatedUserByUuid(uuid)
+                    .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+        return user.getLanguage().getCode();
     }
 
     /**
@@ -1113,28 +1113,5 @@ public class UserServiceImpl implements UserService {
         return userRepo.findAllByEmailIn(emails).stream()
             .map(user -> modelMapper.map(user, UserVO.class))
             .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean existsNotDeactivatedByEmail(String email) {
-        return userRepo.existsNotDeactivatedByEmail(email);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public LanguageVO findLanguageByEmail(String email) {
-        if (!userRepo.existsNotDeactivatedByEmail(email)) {
-            throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email);
-        }
-
-        Language language = userRepo.findLanguageByEmail(email)
-            .orElseThrow(() -> new NotFoundException("Language not set for user with email: " + email));
-
-        return modelMapper.map(language, LanguageVO.class);
     }
 }

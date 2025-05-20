@@ -5,7 +5,6 @@ import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
-import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import greencity.enums.UserStatus;
@@ -365,23 +364,21 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<Long> findAllActivatedUserIds();
 
     /**
-     * Checks if there is a user with the given email whose status is not
+     * Checks if there is a user with the given uuid whose status is not
      * deactivated (userStatus ≠ 1).
      *
-     * @param email the email to search for
+     * @param uuid the uuid to search for
      * @return true if such a user exists, false otherwise
      */
-    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.email =:email AND u.userStatus <> 1")
-    boolean existsNotDeactivatedByEmail(@Param("email") String email);
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.uuid =:uuid AND u.userStatus <> 1")
+    boolean existsNotDeactivatedByUuid(@Param("uuid") String uuid);
 
     /**
-     * Retrieves the {@link Language} of a user with the given email.
+     * Finds a user by UUID if the user is not deactivated (userStatus ≠ 1).
      *
-     * @param email the email of the user
-     * @return an {@link Optional} containing the {@link Language} if found, or
-     *         {@link Optional#empty()} if the user doesn't exist or has no language
-     *         set
+     * @param uuid the UUID of the user
+     * @return an {@link Optional} containing the user if found and active, or empty if not
      */
-    @Query("SELECT u.language FROM User u WHERE u.email = :email")
-    Optional<Language> findLanguageByEmail(@Param("email") String email);
+    @Query("SELECT u FROM User u WHERE u.uuid = :uuid AND u.userStatus <> 1")
+    Optional<User> findNotDeactivatedUserByUuid(@Param("uuid") String uuid);
 }
