@@ -1055,4 +1055,16 @@ class UserControllerTest {
 
         verify(userService).findAllByEmailIn(emails);
     }
+
+    @Test
+    void findUserEmailsByUserIdsTest() throws Exception {
+        List<String> userIdsStr = List.of("1", "2", "3");
+        List<Long> userIds = List.of(1L, 2L, 3L);
+
+        mockMvc.perform(get(userLink + "/email/findByIds")
+            .param("userIds", String.join(", ", userIdsStr)))
+            .andExpect(status().isOk());
+
+        verify(userService).findUserEmailsByUserIds(userIds);
+    }
 }

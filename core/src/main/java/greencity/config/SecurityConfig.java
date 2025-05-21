@@ -159,6 +159,7 @@ public class SecurityConfig {
                     "/ownSecurity/password-status",
                     "/user/emailNotifications",
                     "/user/activated-ids",
+                    "/user/email/findByIds",
                     "/lang",
                     "/lang/*")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)

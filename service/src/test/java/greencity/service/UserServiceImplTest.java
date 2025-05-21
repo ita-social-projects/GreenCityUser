@@ -23,6 +23,7 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserEmailDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserManagementDto;
@@ -1644,5 +1645,20 @@ class UserServiceImplTest {
         List<UserVO> actualResult = userService.findAllByEmailIn(emails);
 
         assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
+    void findUserEmailsByUserIdsTest() {
+        List<Long> userIds = List.of(1L, 2L, 3L);
+        List<UserEmailDto> userEmailDtos = userIds.stream()
+            .map(userId -> new UserEmailDto(userId, "email"))
+            .toList();
+
+        when(userRepo.findAllEmailsByIdIn(userIds))
+            .thenReturn(userEmailDtos);
+
+        List<UserEmailDto> actualResult = userService.findUserEmailsByUserIds(userIds);
+
+        assertEquals(userEmailDtos, actualResult);
     }
 }
