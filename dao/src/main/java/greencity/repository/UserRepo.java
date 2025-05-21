@@ -1,6 +1,7 @@
 package greencity.repository;
 
 import greencity.dto.user.RegistrationStatisticsDtoResponse;
+import greencity.dto.user.UserEmailDto;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
@@ -46,6 +47,19 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
      * @return {@link List} of {@link User} with matching emails
      */
     List<User> findAllByEmailIn(List<String> emails);
+
+    /**
+     * Method to find all {@link UserEmailDto} user emails by user ids
+     *
+     * @param userIds list of user ids
+     * @return list of {@link UserEmailDto} containing information about user's email
+     */
+    @Query("""
+            SELECT new greencity.dto.user.UserEmailDto(u.id, u.email)
+            FROM User u
+            WHERE u.id IN :userIds
+    """)
+    List<UserEmailDto> findAllEmailsByIdIn(List<Long> userIds);
 
     /**
      * Find {@link User} by page.

@@ -21,6 +21,7 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserEmailDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
@@ -1097,5 +1098,13 @@ public class UserServiceImpl implements UserService {
         return userRepo.findAllByEmailIn(emails).stream()
             .map(user -> modelMapper.map(user, UserVO.class))
             .toList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserEmailDto> findUserEmailsByUserIds(List<Long> userIds) {
+        return userRepo.findAllEmailsByIdIn(userIds);
     }
 }

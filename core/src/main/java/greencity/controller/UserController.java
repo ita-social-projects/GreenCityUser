@@ -24,6 +24,7 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserEmailDto;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserForListDto;
@@ -101,7 +102,6 @@ public class UserController {
     private final EmailService emailService;
     private final PositionService positionService;
     private final AuthorityService authorityService;
-    private final GreenCityRemoteClient greenCityRemoteClient;
 
     /**
      * The method which update user status. Parameter principal are ignored because
@@ -1250,5 +1250,22 @@ public class UserController {
     @GetMapping("/email/findAll")
     public ResponseEntity<List<UserVO>> findAllByEmailIn(@RequestParam List<String> emails) {
         return ResponseEntity.ok(userService.findAllByEmailIn(emails));
+    }
+
+    /**
+     * Method to find all {@link UserEmailDto} user emails by user ids
+     *
+     * @param userIds list of user ids
+     * @return list of {@link UserEmailDto} containing information about user's email
+     */
+    @Operation(summary = "Find emails of users by user ids")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/email/findByIds")
+    public ResponseEntity<List<UserEmailDto>> findUserEmailsByUserIds(@RequestParam List<Long> userIds) {
+        return ResponseEntity.ok(userService.findUserEmailsByUserIds(userIds));
     }
 }

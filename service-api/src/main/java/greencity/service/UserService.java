@@ -16,6 +16,7 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserEmailDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
@@ -505,4 +506,12 @@ public interface UserService {
      * @return {@link List} of {@link UserVO} with matching emails
      */
     List<UserVO> findAllByEmailIn(List<String> emails);
+
+    /**
+     * Method to find all {@link UserEmailDto} user emails by user ids
+     *
+     * @param userIds list of user ids
+     * @return list of {@link UserEmailDto} containing information about user's email
+     */
+    List<UserEmailDto> findUserEmailsByUserIds(List<Long> userIds);
 }
