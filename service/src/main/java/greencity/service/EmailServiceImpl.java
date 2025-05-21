@@ -363,6 +363,19 @@ public class EmailServiceImpl implements EmailService {
             getLocale(userLanguageCode)), template);
     }
 
+    @Override
+    public void sendGreenOfficeRequestEmailToManager(ScheduledEmailMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.USER_NAME, message.getUsername());
+        model.put(EmailConstants.IS_UBS, message.isUbs());
+        model.put(EmailConstants.LANGUAGE, message.getLanguage());
+        model.put(EmailConstants.TITLE, message.getSubject());
+        model.put(EmailConstants.BODY, message.getBody());
+
+        String template = createEmailTemplate(model, EmailConstants.GREEN_OFFICE_REQUEST_PAGE);
+        sendEmail(senderEmailAddress, message.getSubject(), template);
+    }
+
     private String getClientLinkByIsUbs(boolean isUbs) {
         return clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity");
     }

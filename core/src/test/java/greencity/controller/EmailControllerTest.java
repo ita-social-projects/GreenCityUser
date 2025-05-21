@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -200,5 +201,26 @@ class EmailControllerTest {
             .andExpect(status().isOk());
 
         verify(emailService).sendPlaceStatusChangeNotification(dto);
+    }
+
+    @Test
+    @SneakyThrows
+    void sendGreenOfficeRequestNotificationWithValidParamsTest() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test@test.com")
+            .username("John Doe")
+            .subject("some subject")
+            .language("ua")
+            .build();
+        String content = objectMapper.writeValueAsString(message);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/greenoffice/notification")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+
+        verify(emailService, times(1)).sendGreenOfficeRequestEmailToManager(message);
     }
 }

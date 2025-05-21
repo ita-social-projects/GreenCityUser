@@ -397,6 +397,19 @@ class EmailServiceImplTest {
         verify(userRepo).findByEmail(dto.getEmail());
     }
 
+    @Test
+    void sendGreenOfficeRequestEmailToManagerTest() {
+        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
+            .body("test@test.com")
+            .username("John Doe")
+            .subject("some subject")
+            .language("ua")
+            .build();
+
+        service.sendGreenOfficeRequestEmailToManager(message);
+        verify(javaMailSender).createMimeMessage();
+    }
+
     private static Locale getLocale(String language) {
         return switch (language) {
             case "ua" -> UA_LOCALE;
