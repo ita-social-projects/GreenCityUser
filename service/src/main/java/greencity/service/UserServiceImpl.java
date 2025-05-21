@@ -974,7 +974,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Boolean checkIfUserExistsByUuid(String uuid) {
-        return userRepo.findUserByUuid(uuid).isPresent();
+        return userRepo.existsNotDeactivatedByUuid(uuid);
     }
 
     /**
@@ -1009,7 +1009,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String findUserLanguageByUuid(String uuid) {
-        return findUserByUuid(uuid).getLanguage().getCode();
+        User user = userRepo.findNotDeactivatedUserByUuid(uuid)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
+        return user.getLanguage().getCode();
     }
 
     /**

@@ -1267,7 +1267,7 @@ class UserServiceImplTest {
     @ParameterizedTest
     @MethodSource("provideUuidOptionalUserResultForCheckIfUserExistsByUuidTest")
     void checkIfUserExistsByUuidTest(String uuid, Optional<User> user, boolean existence) {
-        when(userRepo.findUserByUuid(uuid)).thenReturn(user);
+        when(userRepo.existsNotDeactivatedByUuid(uuid)).thenReturn(existence);
         assertEquals(existence, userService.checkIfUserExistsByUuid(uuid));
     }
 
