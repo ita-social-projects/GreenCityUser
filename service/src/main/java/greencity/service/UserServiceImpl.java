@@ -37,7 +37,6 @@ import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserVOAdvancedDto;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserVOShort;
 import greencity.entity.Language;
@@ -1076,15 +1075,6 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         log.info("user: {}", notDeactivatedByEmail);
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public UserVOReducedDto findByEmailReduced(String email) {
-        Optional<User> optionalUser = userRepo.findByEmail(email);
-        return optionalUser.map(user -> modelMapper.map(user, UserVOReducedDto.class)).orElse(null);
     }
 
     /**

@@ -40,7 +40,6 @@ import greencity.dto.user.UserWithOnlineStatusDto;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.CreateGreenCityUserDto;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.dto.user.UserVOShort;
 import greencity.entity.Language;
 import greencity.entity.User;
@@ -104,7 +103,6 @@ import static greencity.ModelUtils.TEST_USER;
 import static greencity.ModelUtils.TEST_USER_VO;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserVOAdvancedDto;
-import static greencity.ModelUtils.getUserVOReducedDto;
 import static greencity.ModelUtils.getUserVOShortDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -1624,26 +1622,6 @@ class UserServiceImplTest {
         when(userRepo.findNotDeactivatedById(nonexistentId)).thenReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () -> userService.findNotDeactivatedByIdReduced(nonexistentId));
-    }
-
-    @Test
-    void findByEmailReducedTest() {
-        User user = getUser();
-        user.setUserStatus(ACTIVATED);
-        UserVOReducedDto userVOReducedDto = getUserVOReducedDto();
-
-        when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVOReducedDto.class)).thenReturn(userVOReducedDto);
-
-        assertEquals(userVOReducedDto, userService.findByEmailReduced(user.getEmail()));
-    }
-
-    @Test
-    void findByEmailReducedNotFoundTest() {
-        String nonexistentEmail = "bad_email@gmail.com";
-        when(userRepo.findByEmail(nonexistentEmail)).thenReturn(Optional.empty());
-
-        assertNull(userService.findByEmailReduced(nonexistentEmail));
     }
 
     @Test

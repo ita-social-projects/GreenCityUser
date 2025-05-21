@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import static greencity.constant.AppConstant.ROLE;
 import greencity.constant.AppConstant;
 import greencity.dto.user.UserVO;
-import greencity.dto.user.UserVOReducedDto;
 import greencity.enums.Role;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.JwtService;
@@ -106,7 +105,7 @@ public class JwtTool {
      *
      * @param user - entity {@link UserVO}
      */
-    public String createRefreshToken(UserVOReducedDto user) {
+    public String createRefreshToken(UserVO user) {
         ClaimsBuilder claims = userClaimsBuilder(user.getEmail(), List.of(user.getRole()));
         return createAccessToken(claims.build(), user.getRefreshTokenKey().getBytes(StandardCharsets.UTF_8),
             refreshTokenValidTimeInMinutes);
