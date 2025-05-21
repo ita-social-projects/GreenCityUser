@@ -49,16 +49,17 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     List<User> findAllByEmailIn(List<String> emails);
 
     /**
-     * Method to find all {@link UserEmailDto} user emails by user ids
+     * Method to find all {@link UserEmailDto} user emails by user ids.
      *
      * @param userIds list of user ids
-     * @return list of {@link UserEmailDto} containing information about user's email
+     * @return list of {@link UserEmailDto} containing information about user's
+     *         email
      */
     @Query("""
-            SELECT new greencity.dto.user.UserEmailDto(u.id, u.email)
-            FROM User u
-            WHERE u.id IN :userIds
-    """)
+                SELECT new greencity.dto.user.UserEmailDto(u.id, u.email)
+                FROM User u
+                WHERE u.id IN :userIds
+        """)
     List<UserEmailDto> findAllEmailsByIdIn(List<Long> userIds);
 
     /**

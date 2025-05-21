@@ -1651,11 +1651,11 @@ class UserServiceImplTest {
     void findUserEmailsByUserIdsTest() {
         List<Long> userIds = List.of(1L, 2L, 3L);
         List<UserEmailDto> userEmailDtos = userIds.stream()
-                .map(userId -> new UserEmailDto(userId, "email"))
-                .toList();
+            .map(userId -> new UserEmailDto(userId, "email"))
+            .toList();
 
         when(userRepo.findAllEmailsByIdIn(userIds))
-                .thenReturn(userEmailDtos);
+            .thenReturn(userEmailDtos);
 
         List<UserEmailDto> actualResult = userService.findUserEmailsByUserIds(userIds);
 

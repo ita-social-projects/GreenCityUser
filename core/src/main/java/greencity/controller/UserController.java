@@ -5,7 +5,6 @@ import greencity.annotations.CurrentUser;
 import greencity.annotations.CurrentUserId;
 import greencity.annotations.ImageValidation;
 import greencity.annotations.ValidBase64;
-import greencity.client.GreenCityRemoteClient;
 import greencity.constant.HttpStatuses;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.PageableAdvancedDto;
@@ -1253,16 +1252,17 @@ public class UserController {
     }
 
     /**
-     * Method to find all {@link UserEmailDto} user emails by user ids
+     * Method to find all {@link UserEmailDto} user emails by user ids.
      *
      * @param userIds list of user ids
-     * @return list of {@link UserEmailDto} containing information about user's email
+     * @return list of {@link UserEmailDto} containing information about user's
+     *         email
      */
     @Operation(summary = "Find emails of users by user ids")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-            @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-            @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/email/findByIds")
     public ResponseEntity<List<UserEmailDto>> findUserEmailsByUserIds(@RequestParam List<Long> userIds) {

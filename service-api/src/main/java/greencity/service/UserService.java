@@ -508,10 +508,11 @@ public interface UserService {
     List<UserVO> findAllByEmailIn(List<String> emails);
 
     /**
-     * Method to find all {@link UserEmailDto} user emails by user ids
+     * Method to find all {@link UserEmailDto} user emails by user ids.
      *
      * @param userIds list of user ids
-     * @return list of {@link UserEmailDto} containing information about user's email
+     * @return list of {@link UserEmailDto} containing information about user's
+     *         email
      */
     List<UserEmailDto> findUserEmailsByUserIds(List<Long> userIds);
 }

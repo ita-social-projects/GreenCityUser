@@ -1062,8 +1062,8 @@ class UserControllerTest {
         List<Long> userIds = List.of(1L, 2L, 3L);
 
         mockMvc.perform(get(userLink + "/email/findByIds")
-                        .param("userIds", String.join(", ", userIdsStr)))
-                .andExpect(status().isOk());
+            .param("userIds", String.join(", ", userIdsStr)))
+            .andExpect(status().isOk());
 
         verify(userService).findUserEmailsByUserIds(userIds);
     }
