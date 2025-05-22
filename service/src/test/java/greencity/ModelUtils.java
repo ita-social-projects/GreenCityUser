@@ -30,7 +30,6 @@ import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserVOAdvancedDto;
-import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserVOShort;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
@@ -784,13 +783,6 @@ public class ModelUtils {
             .firstName("Julia")
             .language(getLanguageVO())
             .socialNetworks(getSocialNetworkVOs())
-            .build();
-    }
-
-    public static UpdateUserDto getUpdateUserDto() {
-        return UpdateUserDto.builder()
-            .id(1L)
-            .name(TestConst.NAME)
             .build();
     }
 

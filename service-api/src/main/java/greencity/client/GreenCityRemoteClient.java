@@ -3,7 +3,6 @@ package greencity.client;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.user.UpdateUserCredoDto;
-import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
@@ -306,22 +305,6 @@ public class GreenCityRemoteClient {
                 .build(userId))
             .retrieve()
             .bodyToMono(String.class)
-            .block();
-    }
-
-    /**
-     * Synchronize GreenCityUser and GreenCity user entity via update.
-     *
-     * @param updateUserDto {@link UpdateUserDto} contains data for PATCH-update.
-     */
-    public boolean updateUser(UpdateUserDto updateUserDto) {
-        String path = "/users/update";
-
-        return webClient.patch()
-            .uri(path)
-            .bodyValue(updateUserDto)
-            .retrieve()
-            .bodyToMono(Boolean.class)
             .block();
     }
 
