@@ -30,23 +30,6 @@ public class UserNotificationPreferenceController {
     private final UserNotificationPreferenceService userNotificationPreferenceService;
 
     /**
-     * Get user notification preferences by user id.
-     *
-     * @return list of {@link UserNotificationPreferenceVO}
-     */
-    @Operation(summary = "Get user notification preferences by user id")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-            content = @Content(schema = @Schema(implementation = UserNotificationPreferenceVO.class))),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping
-    public ResponseEntity<List<UserNotificationPreferenceVO>> findAllByUserId(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userNotificationPreferenceService.findAllByUserId(id));
-    }
-
-    /**
      * Check is user notification preference exists by params in EmailPreferenceDto.
      *
      * @return boolean of whether UserNotificationPreference exists

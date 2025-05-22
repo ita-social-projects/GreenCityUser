@@ -14,15 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserNotificationPreferenceServiceImpl implements UserNotificationPreferenceService {
     private final UserNotificationPreferenceRepo userNotificationPreferenceRepo;
-    private final ModelMapper modelMapper;
-
-    @Override
-    public List<UserNotificationPreferenceVO> findAllByUserId(Long id) {
-        return userNotificationPreferenceRepo.findAllByUserId(id).stream()
-            .map(userNotificationPreference -> modelMapper.map(userNotificationPreference,
-                UserNotificationPreferenceVO.class))
-            .toList();
-    }
 
     @Override
     public boolean existsByUserIdAndEmailPreferenceAndPeriodicity(EmailPreferenceDto emailPreferenceDto) {
