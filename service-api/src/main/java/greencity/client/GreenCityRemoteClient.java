@@ -3,13 +3,11 @@ package greencity.client;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.user.UpdateUserCredoDto;
-import greencity.dto.user.UpdateUserDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.useraction.UserActionVO;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -123,23 +121,6 @@ public class GreenCityRemoteClient {
             .uri(uriBuilder -> uriBuilder.path(path).build(userId))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<UserAchievementVO>>() {
-            })
-            .block();
-    }
-
-    /**
-     * Method returns all user actions by user id.
-     *
-     * @param userId id of the user
-     * @return list of {@link UserActionVO}
-     */
-    public List<UserActionVO> findAllUserActionsByUserId(Long userId) {
-        String path = "/achievements/user-actions/{userId}";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<UserActionVO>>() {
             })
             .block();
     }
@@ -309,32 +290,6 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    /**
-     * Synchronize GreenCityUser and GreenCity user entity via update.
-     *
-     * @param updateUserDto {@link UpdateUserDto} contains data for PATCH-update.
-     */
-    public boolean updateUser(UpdateUserDto updateUserDto) {
-        String path = "/users/update";
-
-        return webClient.patch()
-            .uri(path)
-            .bodyValue(updateUserDto)
-            .retrieve()
-            .bodyToMono(Boolean.class)
-            .block();
-    }
-
-    private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
-        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-
-        for (MultipartFile multipartFile : multipartFiles) {
-            multipartBodyBuilder.part("file", multipartFile.getResource());
-        }
-
-        return BodyInserters.fromMultipartData(multipartBodyBuilder.build());
-    }
-
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
         String path = "/users/create";
 
@@ -375,5 +330,15 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(Void.class)
             .block();
+    }
+
+    private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+
+        for (MultipartFile multipartFile : multipartFiles) {
+            multipartBodyBuilder.part("file", multipartFile.getResource());
+        }
+
+        return BodyInserters.fromMultipartData(multipartBodyBuilder.build());
     }
 }
