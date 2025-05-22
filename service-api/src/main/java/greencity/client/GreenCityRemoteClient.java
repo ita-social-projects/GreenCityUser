@@ -127,23 +127,6 @@ public class GreenCityRemoteClient {
     }
 
     /**
-     * Method returns all user actions by user id.
-     *
-     * @param userId id of the user
-     * @return list of {@link UserActionVO}
-     */
-    public List<UserActionVO> findAllUserActionsByUserId(Long userId) {
-        String path = "/achievements/user-actions/{userId}";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
-            .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<List<UserActionVO>>() {
-            })
-            .block();
-    }
-
-    /**
      * Method to find {@link UserCityDto} by user id.
      *
      * @param userId id of the user
