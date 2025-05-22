@@ -160,8 +160,17 @@ public class SecurityConfig {
                     "/user/emailNotifications",
                     "/user/activated-ids",
                     "/user/email/findByIds",
+                    "/user/roles-distribution",
+                    "/user/statuses-distribution",
+                    "/user/email-preferences-distribution",
+                    "/user/count-active-users",
+                    "/user/email",
+                    "/user/registration-statistics",
+                    "/user/findNotDeactivatedByIdAdvanced",
+                    "/user/email/findAll",
+                    "/user/email/findByIds",
                     "/lang",
-                    "/lang/*")
+                    "/lang/**")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",
@@ -183,12 +192,15 @@ public class SecurityConfig {
                     "/user/authorities",
                     "/user/deactivate-employee",
                     "/user/markUserAsDeactivated",
-                    "/user/markUserAsActivated")
+                    "/user/markUserAsActivated",
+                    "/management/socialnetworkimages/")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     "/user/findUserLanguageByUuid",
                     "/user/get-all-authorities",
-                    "/user/get-positions-authorities")
+                    "/user/get-positions-authorities",
+                    "/management/socialnetworkimages/get-all-remote",
+                    "/management/socialnetworkimages/find")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/to-do-list-items/{userToDoListItemId}",
@@ -217,7 +229,12 @@ public class SecurityConfig {
                     "/ownSecurity/register",
                     "/email/sendReport",
                     "/email/sendHabitNotification",
-                    "/email/sendInterestingEcoNews")
+                    "/email/sendInterestingEcoNews",
+                    "/management/socialnetworkimages/save-remote")
+                .hasAnyRole(ADMIN)
+                .requestMatchers(HttpMethod.DELETE,
+                    "/management/socialnetworkimages/delete",
+                    "/management/socialnetworkimages/deleteAll")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",
