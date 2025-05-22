@@ -1,14 +1,11 @@
 package greencity.service;
 
 import greencity.dto.emailpreference.EmailPreferenceDto;
-import greencity.dto.user.UserNotificationPreferenceVO;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.repository.UserNotificationPreferenceRepo;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
