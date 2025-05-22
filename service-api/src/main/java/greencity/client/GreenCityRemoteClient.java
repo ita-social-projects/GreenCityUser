@@ -291,16 +291,6 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
-        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-
-        for (MultipartFile multipartFile : multipartFiles) {
-            multipartBodyBuilder.part("file", multipartFile.getResource());
-        }
-
-        return BodyInserters.fromMultipartData(multipartBodyBuilder.build());
-    }
-
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
         String path = "/users/create";
 
@@ -341,5 +331,15 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(Void.class)
             .block();
+    }
+
+    private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+
+        for (MultipartFile multipartFile : multipartFiles) {
+            multipartBodyBuilder.part("file", multipartFile.getResource());
+        }
+
+        return BodyInserters.fromMultipartData(multipartBodyBuilder.build());
     }
 }
