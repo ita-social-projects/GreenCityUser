@@ -106,38 +106,6 @@ class RestClientTest {
     }
 
     @Test
-    void deleteSocialNetwork() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long socialNetworkId = 1L;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS + RestTemplateLinks.ID + socialNetworkId,
-            HttpMethod.DELETE, entity, Long.class)).thenReturn(ResponseEntity.ok(socialNetworkId));
-        assertEquals(socialNetworkId, restClient.deleteSocialNetwork(socialNetworkId));
-    }
-
-    @Test
-    void getSocialNetworkImageByUrl() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        String url = "http:";
-        SocialNetworkImageVO socialNetworkImageVO = new SocialNetworkImageVO();
-        socialNetworkImageVO.setId(1L);
-        socialNetworkImageVO.setHostPath("test");
-        socialNetworkImageVO.setImagePath("http:");
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS_IMAGE + RestTemplateLinks.URL + url,
-            HttpMethod.GET, entity, SocialNetworkImageVO.class)).thenReturn(ResponseEntity.ok(socialNetworkImageVO));
-        assertEquals(socialNetworkImageVO, restClient.getSocialNetworkImageByUrl(url));
-    }
-
-    @Test
     void findAmountOfPublishedNews() {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();

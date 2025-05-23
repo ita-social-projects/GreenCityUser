@@ -102,6 +102,8 @@ public class UserServiceImpl implements UserService {
     private final GreenCityRemoteClient greenCityRemoteClient;
     private final UserDeactivationRepo userDeactivationRepo;
     private final SimpMessagingTemplate messagingTemplate;
+    private final SocialNetworkImageService socialNetworkImageService;
+    private final SocialNetworkService socialNetworkService;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
     private long timeAfterLastActivity;
@@ -198,11 +200,16 @@ public class UserServiceImpl implements UserService {
      * @param user {@link UserVO} to be updated.
      */
     private void updateUserFromDto(UserManagementUpdateDto dto, User user) {
-        user.setName(dto.getName());
+        updateUserName(user, dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
         greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
         user.setUserStatus(dto.getUserStatus());
+    }
+
+    private void updateUserName(User user, String name) {
+        user.setName(name);
+        greenCityRemoteClient.updateUserName(user.getId(), name);
     }
 
     /**
@@ -421,7 +428,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        user.setName(dto.getName());
+        updateUserName(user, dto.getName());
         user.setEmailNotification(dto.getEmailNotification());
         userRepo.save(user);
         return dto;
@@ -543,7 +550,7 @@ public class UserServiceImpl implements UserService {
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         if (userProfileDtoRequest.getName() != null) {
-            user.setName(userProfileDtoRequest.getName());
+            updateUserName(user, userProfileDtoRequest.getName());
         }
         if (userProfileDtoRequest.getUserCredo() != null) {
             greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
@@ -552,14 +559,14 @@ public class UserServiceImpl implements UserService {
         greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
         if (userProfileDtoRequest.getSocialNetworks() != null) {
-            socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
+            socialNetworks.forEach(socialNetwork -> socialNetworkService.delete(socialNetwork.getId()));
             user.getSocialNetworks().clear();
             user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
                 .stream()
                 .map(url -> SocialNetwork.builder()
                     .url(url)
                     .user(user)
-                    .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
+                    .socialNetworkImage(modelMapper.map(socialNetworkImageService.getSocialNetworkImageByUrl(url),
                         SocialNetworkImage.class))
                     .build())
                 .toList());

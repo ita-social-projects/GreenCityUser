@@ -2,7 +2,6 @@ package greencity.client;
 
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
-import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
@@ -75,34 +74,6 @@ public class RestClient {
         }
         return restTemplate.postForObject(greenCityServerAddress
             + RestTemplateLinks.FILES, requestEntity, String.class);
-    }
-
-    /**
-     * Method for delete social network by id.
-     *
-     * @param socialNetworkId of {@link SocialNetworkImageVO}
-     * @return Long
-     * @author Orest Mamchuk
-     */
-    public Long deleteSocialNetwork(Long socialNetworkId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS + RestTemplateLinks.ID + socialNetworkId,
-            HttpMethod.DELETE, entity, Long.class).getBody();
-    }
-
-    /**
-     * Method for finding social network image.
-     *
-     * @param url social network image url
-     * @return {@link SocialNetworkImageVO}
-     * @author Orest Mamchuk
-     */
-    public SocialNetworkImageVO getSocialNetworkImageByUrl(String url) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS_IMAGE + RestTemplateLinks.URL + url,
-            HttpMethod.GET, entity, SocialNetworkImageVO.class).getBody();
     }
 
     /**
