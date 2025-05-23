@@ -968,7 +968,10 @@ public class UserServiceImpl implements UserService {
                 }.getType());
         allFriends.forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         // This line has to be improved by one call to greenCityRemoteClient
-        allFriends.forEach(f -> f.setProfilePicturePath(greenCityRemoteClient.getUserPicturePath(f.getId())));
+        allFriends.forEach(f -> {
+            var greencityUserProfile = greenCityRemoteClient.findGreenCityUserProfileDtoResponseByUserId(f.getId());
+            f.setProfilePicturePath(greencityUserProfile.profilePicturePath());
+        });
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
             allUsers.getTotalElements(),

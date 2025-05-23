@@ -253,17 +253,6 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    public Double findUserRatingByUserId(Long userId) {
-        String path = "/users/{userId}/rating";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path)
-                .build(userId))
-            .retrieve()
-            .bodyToMono(Double.class)
-            .block();
-    }
-
     /**
      * Update user credo by user id.
      *
@@ -282,17 +271,6 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    public String findUserCredoByUserId(Long userId) {
-        String path = "/users/{userId}/credo";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path)
-                .build(userId))
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();
-    }
-
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
         String path = "/users/create";
 
@@ -302,24 +280,6 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(Boolean.class)
             .block());
-    }
-
-    /**
-     * Method to get user's picture path.
-     *
-     * @param userId {@link Long} user's id.
-     * @return {@link String} user's profilePicturePath
-     */
-    public String getUserPicturePath(Long userId) {
-        String path = "/users/picturePath";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path)
-                .queryParam(USER_ID_QUERY_PARAM, userId)
-                .build())
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();
     }
 
     public void updateUserPicturePath(Long userId, String profilePicturePath) {
@@ -348,6 +308,10 @@ public class GreenCityRemoteClient {
     }
 
     // TODO
+    public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfileDtoResponseByUserIds(List<Long> userIds) {
+
+    }
+
     public GreenCityUserProfileDtoResponse findGreenCityUserProfileDtoResponseByUserId(Long userId) {
         return null;
     }
