@@ -969,7 +969,7 @@ public class UserServiceImpl implements UserService {
                 }.getType());
         allFriends.forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         List<Long> allFriendIds = allFriends.stream().map(UserAllFriendsDto::getId).toList();
-        var allFriendGreenCityProfiles = greenCityRemoteClient.findGreenCityUserProfileDtoResponseByUserIds(allFriendIds);
+        var allFriendGreenCityProfiles = greenCityRemoteClient.findGreenCityUserProfilesByUserIds(allFriendIds);
         Map<Long, String> userIdToProfilePictureMap = allFriendGreenCityProfiles.stream()
                 .collect(Collectors.toMap(
                         GreenCityUserProfileDtoResponse::userId,

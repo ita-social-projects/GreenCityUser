@@ -1,7 +1,6 @@
 package greencity.mapping;
 
 import greencity.client.GreenCityRemoteClient;
-import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UserForListDto;
 import greencity.entity.User;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,7 @@ public class UserForListDtoMapper extends AbstractConverter<User, UserForListDto
     @Override
     protected UserForListDto convert(User user) {
         Long userId = user.getId();
-        var greenCityUserProfile = greenCityRemoteClient.findGreenCityUserProfileDtoResponseByUserId(userId);
+        var greenCityUserProfile = greenCityRemoteClient.findGreenCityUserProfileByUserId(userId);
 
         return UserForListDto.builder()
             .id(userId)

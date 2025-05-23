@@ -25,7 +25,6 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -309,12 +308,12 @@ public class GreenCityRemoteClient {
     }
 
     // TODO
-    public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfileDtoResponseByUserIds(List<Long> userIds) {
+    public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
         return List.of();
     }
 
-    public GreenCityUserProfileDtoResponse findGreenCityUserProfileDtoResponseByUserId(Long userId) {
-        var greenCityUserProfiles = findGreenCityUserProfileDtoResponseByUserIds(List.of(userId));
+    public GreenCityUserProfileDtoResponse findGreenCityUserProfileByUserId(Long userId) {
+        var greenCityUserProfiles = findGreenCityUserProfilesByUserIds(List.of(userId));
         return greenCityUserProfiles.getFirst();
     }
 

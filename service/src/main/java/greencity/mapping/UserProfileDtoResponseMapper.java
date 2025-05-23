@@ -2,7 +2,6 @@ package greencity.mapping;
 
 import greencity.client.GreenCityRemoteClient;
 import greencity.dto.socialnetwork.SocialNetworkResponseDTO;
-import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.entity.User;
@@ -28,7 +27,7 @@ public class UserProfileDtoResponseMapper extends AbstractConverter<User, UserPr
     @Override
     protected UserProfileDtoResponse convert(User user) {
         Long userId = user.getId();
-        var greenCityUserProfileDtoResponse = greenCityRemoteClient.findGreenCityUserProfileDtoResponseByUserId(userId);
+        var greenCityUserProfileDtoResponse = greenCityRemoteClient.findGreenCityUserProfileByUserId(userId);
 
         List<SocialNetworkResponseDTO> socialNetworks = user.getSocialNetworks().stream()
             .map(socialNetwork -> modelMapper.map(socialNetwork, SocialNetworkResponseDTO.class))
