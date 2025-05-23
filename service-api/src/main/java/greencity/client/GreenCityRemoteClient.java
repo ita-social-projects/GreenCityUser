@@ -22,12 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 @Slf4j
 @Service
@@ -341,12 +338,12 @@ public class GreenCityRemoteClient {
         String path = "/users/{userId}/name";
 
         webClient.patch()
-                .uri(uriBuilder -> uriBuilder.path(path)
-                        .queryParam("userName", userName)
-                        .build(userId))
-                .retrieve()
-                .bodyToMono(Void.class)
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .queryParam("userName", userName)
+                .build(userId))
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
     }
 
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {

@@ -12,6 +12,7 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
+import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
@@ -119,6 +120,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -132,6 +134,12 @@ class UserServiceImplTest {
 
     @Mock
     RestClient restClient;
+
+    @Mock
+    SocialNetworkImageService socialNetworkImageService;
+
+    @Mock
+    SocialNetworkService socialNetworkService;
 
     @Mock
     UserDeactivationRepo userDeactivationRepo;
@@ -598,6 +606,7 @@ class UserServiceImplTest {
     void saveUserProfileTest() {
         var request = ModelUtils.getUserProfileDtoRequest();
         var myUser = ModelUtils.getUserWithSocialNetworks();
+        SocialNetworkImageVO socialNetworkImage = new SocialNetworkImageVO();
         Set<UserNotificationPreference> preferences = new HashSet<>();
         preferences.add(UserNotificationPreference.builder()
             .emailPreference(EmailPreference.SYSTEM)
@@ -610,6 +619,8 @@ class UserServiceImplTest {
 
         myUser.setNotificationPreferences(preferences);
         when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(myUser));
+        when(socialNetworkImageService.getSocialNetworkImageByUrl(anyString()))
+            .thenReturn(socialNetworkImage);
         when(userRepo.save(myUser)).thenReturn(myUser);
 
         String actualResult = userService.saveUserProfile(request, "test@gmail.com");
@@ -617,6 +628,9 @@ class UserServiceImplTest {
         assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
         verify(userRepo).findByEmail("test@gmail.com");
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService).delete(anyLong());
+        verify(socialNetworkImageService, times(request.getSocialNetworks().size()))
+            .getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 
@@ -640,6 +654,8 @@ class UserServiceImplTest {
 
         verify(userRepo).findByEmail("test@gmail.com");
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 
@@ -663,6 +679,8 @@ class UserServiceImplTest {
 
         verify(userRepo).findByEmail("test@gmail.com");
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 
@@ -686,6 +704,8 @@ class UserServiceImplTest {
 
         verify(userRepo).findByEmail("test@gmail.com");
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 
@@ -706,6 +726,8 @@ class UserServiceImplTest {
         assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
         verify(userRepo).findByEmail(email);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 
@@ -727,6 +749,8 @@ class UserServiceImplTest {
 
         verify(userRepo).findByEmail(email);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 
@@ -766,6 +790,8 @@ class UserServiceImplTest {
 
         verify(userRepo).findByEmail(email);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 
@@ -787,6 +813,8 @@ class UserServiceImplTest {
 
         verify(userRepo).findByEmail(email);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 
@@ -798,6 +826,8 @@ class UserServiceImplTest {
             () -> userService.saveUserProfile(request, "test@gmail.com"));
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + "test@gmail.com", thrown.getMessage());
         verify(userRepo).findByEmail(anyString());
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
     }
 
     @Test
@@ -818,6 +848,8 @@ class UserServiceImplTest {
 
         verify(userRepo).findByEmail(email);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(socialNetworkService, never()).delete(anyLong());
+        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
     }
 

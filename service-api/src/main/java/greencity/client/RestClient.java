@@ -2,7 +2,6 @@ package greencity.client;
 
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
-import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
