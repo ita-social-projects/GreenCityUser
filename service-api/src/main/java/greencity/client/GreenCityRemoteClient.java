@@ -180,7 +180,7 @@ public class GreenCityRemoteClient {
             .bodyValue(userProfileDtoRequest)
             .retrieve()
             .bodyToMono(Void.class)
-            .block();
+            .subscribe();
     }
 
     /**
@@ -269,7 +269,7 @@ public class GreenCityRemoteClient {
             .bodyValue(updateUserCredoDto)
             .retrieve()
             .bodyToMono(Void.class)
-            .block();
+            .subscribe();
     }
 
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
@@ -305,7 +305,7 @@ public class GreenCityRemoteClient {
                 .build(userId))
             .retrieve()
             .bodyToMono(Void.class)
-            .block();
+            .subscribe();
     }
 
     public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
