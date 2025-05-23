@@ -332,6 +332,17 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    // TODO
+    public void updateUserName(Long userId, String userName) {
+        String path = "/users/{userId}/name";
+
+        webClient.patch()
+                .uri(uriBuilder -> uriBuilder.path(path)
+                        .queryParam("name", userName)
+                        .build(userId))
+                .retrieve();
+    }
+
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
 

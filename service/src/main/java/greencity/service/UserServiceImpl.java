@@ -198,11 +198,23 @@ public class UserServiceImpl implements UserService {
      * @param user {@link UserVO} to be updated.
      */
     private void updateUserFromDto(UserManagementUpdateDto dto, User user) {
-        user.setName(dto.getName());
+        updateUserName(user, dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
         greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
         user.setUserStatus(dto.getUserStatus());
+    }
+
+    private void updateUserName(User user, String name) {
+        user.setName(name);
+        try {
+            greenCityRemoteClient.updateUserName(user.getId(), name);
+        } catch (WebClientRequestException e) {
+            log.warn("GreenCity service is unavailable: {}", e.getMessage());
+        } catch (WebClientResponseException e) {
+            log.warn("Bad response from GreenCity: {}", e.getMessage());
+            throw new BadRequestException();
+        }
     }
 
     /**
@@ -421,7 +433,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        user.setName(dto.getName());
+        updateUserName(user, dto.getName());
         user.setEmailNotification(dto.getEmailNotification());
         userRepo.save(user);
         return dto;
@@ -543,7 +555,7 @@ public class UserServiceImpl implements UserService {
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         if (userProfileDtoRequest.getName() != null) {
-            user.setName(userProfileDtoRequest.getName());
+            updateUserName(user, userProfileDtoRequest.getName());
         }
         if (userProfileDtoRequest.getUserCredo() != null) {
             greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
