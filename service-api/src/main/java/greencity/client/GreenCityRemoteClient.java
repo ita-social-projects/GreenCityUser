@@ -150,6 +150,7 @@ public class GreenCityRemoteClient {
      * @param userId id of the user
      * @return {@link UserLocationDto}.
      */
+    // TODO: seems like it is no longer used
     public Optional<UserLocationDto> findUserLocationByUserId(Long userId) {
         String path = "/users/{userId}/location";
 
@@ -307,9 +308,16 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    // TODO
     public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
-        return List.of();
+        String path = "/users/profiles";
+
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder.path(path)
+                        .queryParam("userIds", userIds)
+                        .build())
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<GreenCityUserProfileDtoResponse>>() {})
+                .block();
     }
 
     public GreenCityUserProfileDtoResponse findGreenCityUserProfileByUserId(Long userId) {
