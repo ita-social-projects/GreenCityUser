@@ -30,8 +30,9 @@ class UserForListDtoMapperTest {
         User user = ModelUtils.getUser();
         Long userId = user.getId();
         String userCredo = TestConst.CREDO;
+        String profilePicturePath = "profilePicturePath";
         var greenCityUserProfile =
-            new GreenCityUserProfileDtoResponse(userId, "pfp", userCredo, 0., new UserLocationDto());
+            new GreenCityUserProfileDtoResponse(userId, profilePicturePath, userCredo, 0., new UserLocationDto());
 
         UserForListDto expectedResult = UserForListDto.builder()
             .id(userId)
