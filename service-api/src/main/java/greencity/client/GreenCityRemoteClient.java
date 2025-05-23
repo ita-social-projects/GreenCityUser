@@ -312,12 +312,13 @@ public class GreenCityRemoteClient {
         String path = "/users/profiles";
 
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path(path)
-                        .queryParam("userIds", userIds)
-                        .build())
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<GreenCityUserProfileDtoResponse>>() {})
-                .block();
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .queryParam("userIds", userIds)
+                .build())
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<GreenCityUserProfileDtoResponse>>() {
+            })
+            .block();
     }
 
     public GreenCityUserProfileDtoResponse findGreenCityUserProfileByUserId(Long userId) {

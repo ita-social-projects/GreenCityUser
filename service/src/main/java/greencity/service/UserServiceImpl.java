@@ -971,10 +971,9 @@ public class UserServiceImpl implements UserService {
         List<Long> allFriendIds = allFriends.stream().map(UserAllFriendsDto::getId).toList();
         var allFriendGreenCityProfiles = greenCityRemoteClient.findGreenCityUserProfilesByUserIds(allFriendIds);
         Map<Long, String> userIdToProfilePictureMap = allFriendGreenCityProfiles.stream()
-                .collect(Collectors.toMap(
-                        GreenCityUserProfileDtoResponse::userId,
-                        GreenCityUserProfileDtoResponse::profilePicturePath
-                ));
+            .collect(Collectors.toMap(
+                GreenCityUserProfileDtoResponse::userId,
+                GreenCityUserProfileDtoResponse::profilePicturePath));
         allFriends.forEach(f -> {
             String profilePicturePath = userIdToProfilePictureMap.get(f.getId());
             f.setProfilePicturePath(profilePicturePath);
