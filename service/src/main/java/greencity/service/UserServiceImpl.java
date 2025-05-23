@@ -208,14 +208,7 @@ public class UserServiceImpl implements UserService {
 
     private void updateUserName(User user, String name) {
         user.setName(name);
-        try {
-            greenCityRemoteClient.updateUserName(user.getId(), name);
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable: {}", e.getMessage());
-        } catch (WebClientResponseException e) {
-            log.warn("Bad response from GreenCity: {}", e.getMessage());
-            throw new BadRequestException();
-        }
+        greenCityRemoteClient.updateUserName(user.getId(), name);
     }
 
     /**

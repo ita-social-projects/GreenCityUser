@@ -8,6 +8,7 @@ import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserProfileDtoRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -21,10 +22,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
+@Slf4j
 @Service
 public class GreenCityRemoteClient {
     private final WebClient webClient;
@@ -332,13 +337,12 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    // TODO
     public void updateUserName(Long userId, String userName) {
         String path = "/users/{userId}/name";
 
         webClient.patch()
                 .uri(uriBuilder -> uriBuilder.path(path)
-                        .queryParam("name", userName)
+                        .queryParam("userName", userName)
                         .build(userId))
                 .retrieve();
     }
