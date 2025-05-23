@@ -92,20 +92,6 @@ public class RestClient {
     }
 
     /**
-     * Method for finding social network image.
-     *
-     * @param url social network image url
-     * @return {@link SocialNetworkImageVO}
-     * @author Orest Mamchuk
-     */
-    public SocialNetworkImageVO getSocialNetworkImageByUrl(String url) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS_IMAGE + RestTemplateLinks.URL + url,
-            HttpMethod.GET, entity, SocialNetworkImageVO.class).getBody();
-    }
-
-    /**
      * The method find count of published eco news.
      *
      * @param userId of {@link UserVO}

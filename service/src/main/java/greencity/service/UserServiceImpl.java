@@ -102,6 +102,7 @@ public class UserServiceImpl implements UserService {
     private final GreenCityRemoteClient greenCityRemoteClient;
     private final UserDeactivationRepo userDeactivationRepo;
     private final SimpMessagingTemplate messagingTemplate;
+    private final SocialNetworkImageService socialNetworkImageService;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
     private long timeAfterLastActivity;
@@ -571,7 +572,7 @@ public class UserServiceImpl implements UserService {
                 .map(url -> SocialNetwork.builder()
                     .url(url)
                     .user(user)
-                    .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
+                    .socialNetworkImage(modelMapper.map(socialNetworkImageService.getSocialNetworkImageByUrl(url),
                         SocialNetworkImage.class))
                     .build())
                 .toList());
