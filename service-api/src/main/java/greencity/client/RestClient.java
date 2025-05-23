@@ -78,20 +78,6 @@ public class RestClient {
     }
 
     /**
-     * Method for delete social network by id.
-     *
-     * @param socialNetworkId of {@link SocialNetworkImageVO}
-     * @return Long
-     * @author Orest Mamchuk
-     */
-    public Long deleteSocialNetwork(Long socialNetworkId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS + RestTemplateLinks.ID + socialNetworkId,
-            HttpMethod.DELETE, entity, Long.class).getBody();
-    }
-
-    /**
      * The method find count of published eco news.
      *
      * @param userId of {@link UserVO}

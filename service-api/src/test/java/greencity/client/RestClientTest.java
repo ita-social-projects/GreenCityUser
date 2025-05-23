@@ -106,20 +106,6 @@ class RestClientTest {
     }
 
     @Test
-    void deleteSocialNetwork() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long socialNetworkId = 1L;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.SOCIAL_NETWORKS + RestTemplateLinks.ID + socialNetworkId,
-            HttpMethod.DELETE, entity, Long.class)).thenReturn(ResponseEntity.ok(socialNetworkId));
-        assertEquals(socialNetworkId, restClient.deleteSocialNetwork(socialNetworkId));
-    }
-
-    @Test
     void findAmountOfPublishedNews() {
         String accessToken = "accessToken";
         HttpHeaders headers = new HttpHeaders();

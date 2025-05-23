@@ -103,6 +103,7 @@ public class UserServiceImpl implements UserService {
     private final UserDeactivationRepo userDeactivationRepo;
     private final SimpMessagingTemplate messagingTemplate;
     private final SocialNetworkImageService socialNetworkImageService;
+    private final SocialNetworkService socialNetworkService;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
     private long timeAfterLastActivity;
@@ -558,7 +559,7 @@ public class UserServiceImpl implements UserService {
         greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
         if (userProfileDtoRequest.getSocialNetworks() != null) {
-            socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
+            socialNetworks.forEach(socialNetwork -> socialNetworkService.delete(socialNetwork.getId()));
             user.getSocialNetworks().clear();
             user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
                 .stream()
