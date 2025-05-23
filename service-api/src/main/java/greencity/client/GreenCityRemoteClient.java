@@ -2,6 +2,7 @@ package greencity.client;
 
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UpdateUserCredoDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserAddRatingDto;
@@ -344,6 +345,11 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(Void.class)
             .block();
+    }
+
+    // TODO
+    public GreenCityUserProfileDtoResponse findGreenCityUserProfileDtoResponseByUserId(Long userId) {
+        return null;
     }
 
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {

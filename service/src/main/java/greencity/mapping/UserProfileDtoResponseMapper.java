@@ -2,6 +2,7 @@ package greencity.mapping;
 
 import greencity.client.GreenCityRemoteClient;
 import greencity.dto.socialnetwork.SocialNetworkResponseDTO;
+import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.entity.User;
@@ -27,7 +28,7 @@ public class UserProfileDtoResponseMapper extends AbstractConverter<User, UserPr
     @Override
     protected UserProfileDtoResponse convert(User user) {
         Long userId = user.getId();
-        String profilePicture = greenCityRemoteClient.getUserPicturePath(userId);
+        var greenCityUserProfileDtoResponse = greenCityRemoteClient.findGreenCityUserProfileDtoResponseByUserId(userId);
 
         List<SocialNetworkResponseDTO> socialNetworks = user.getSocialNetworks().stream()
             .map(socialNetwork -> modelMapper.map(socialNetwork, SocialNetworkResponseDTO.class))
@@ -39,16 +40,16 @@ public class UserProfileDtoResponseMapper extends AbstractConverter<User, UserPr
             .collect(Collectors.toSet());
 
         return UserProfileDtoResponse.builder()
-            .profilePicturePath(profilePicture)
+            .profilePicturePath(greenCityUserProfileDtoResponse.profilePicturePath())
             .name(user.getName())
-            .userCredo(greenCityRemoteClient.findUserCredoByUserId(userId))
+            .userCredo(greenCityUserProfileDtoResponse.userCredo())
             .socialNetworks(socialNetworks)
             .showLocation(user.getShowLocation())
             .showEcoPlace(user.getShowEcoPlace())
             .showToDoList(user.getShowToDoList())
-            .rating(greenCityRemoteClient.findUserRatingByUserId(userId))
+            .rating(greenCityUserProfileDtoResponse.userRating())
             .role(user.getRole())
-            .userLocationDto(greenCityRemoteClient.findUserLocationByUserId(userId).orElse(null))
+            .userLocationDto(greenCityUserProfileDtoResponse.userLocationDto())
             .notificationPreferences(userNotificationPreferences)
             .build();
     }
