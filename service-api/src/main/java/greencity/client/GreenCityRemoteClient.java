@@ -344,7 +344,9 @@ public class GreenCityRemoteClient {
                 .uri(uriBuilder -> uriBuilder.path(path)
                         .queryParam("userName", userName)
                         .build(userId))
-                .retrieve();
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
     }
 
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
