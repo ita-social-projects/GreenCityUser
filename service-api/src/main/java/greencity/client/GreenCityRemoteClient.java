@@ -2,6 +2,7 @@ package greencity.client;
 
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UpdateUserCredoDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.UserAddRatingDto;
@@ -149,6 +150,7 @@ public class GreenCityRemoteClient {
      * @param userId id of the user
      * @return {@link UserLocationDto}.
      */
+    // TODO: seems like it is no longer used
     public Optional<UserLocationDto> findUserLocationByUserId(Long userId) {
         String path = "/users/{userId}/location";
 
@@ -178,7 +180,7 @@ public class GreenCityRemoteClient {
             .bodyValue(userProfileDtoRequest)
             .retrieve()
             .bodyToMono(Void.class)
-            .block();
+            .subscribe();
     }
 
     /**
@@ -252,17 +254,6 @@ public class GreenCityRemoteClient {
             .block();
     }
 
-    public Double findUserRatingByUserId(Long userId) {
-        String path = "/users/{userId}/rating";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path)
-                .build(userId))
-            .retrieve()
-            .bodyToMono(Double.class)
-            .block();
-    }
-
     /**
      * Update user credo by user id.
      *
@@ -278,18 +269,7 @@ public class GreenCityRemoteClient {
             .bodyValue(updateUserCredoDto)
             .retrieve()
             .bodyToMono(Void.class)
-            .block();
-    }
-
-    public String findUserCredoByUserId(Long userId) {
-        String path = "/users/{userId}/credo";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path)
-                .build(userId))
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();
+            .subscribe();
     }
 
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
@@ -301,24 +281,6 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(Boolean.class)
             .block());
-    }
-
-    /**
-     * Method to get user's picture path.
-     *
-     * @param userId {@link Long} user's id.
-     * @return {@link String} user's profilePicturePath
-     */
-    public String getUserPicturePath(Long userId) {
-        String path = "/users/picturePath";
-
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path)
-                .queryParam(USER_ID_QUERY_PARAM, userId)
-                .build())
-            .retrieve()
-            .bodyToMono(String.class)
-            .block();
     }
 
     public void updateUserPicturePath(Long userId, String profilePicturePath) {
@@ -343,7 +305,25 @@ public class GreenCityRemoteClient {
                 .build(userId))
             .retrieve()
             .bodyToMono(Void.class)
+            .subscribe();
+    }
+
+    public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
+        String path = "/users/profiles";
+
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path(path)
+                .queryParam("userIds", userIds)
+                .build())
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<GreenCityUserProfileDtoResponse>>() {
+            })
             .block();
+    }
+
+    public GreenCityUserProfileDtoResponse findGreenCityUserProfileByUserId(Long userId) {
+        var greenCityUserProfiles = findGreenCityUserProfilesByUserIds(List.of(userId));
+        return greenCityUserProfiles.getFirst();
     }
 
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {

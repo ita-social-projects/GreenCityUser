@@ -4,6 +4,7 @@ import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
 import greencity.dto.socialnetwork.SocialNetworkResponseDTO;
+import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserProfileDtoResponse;
@@ -44,16 +45,19 @@ class UserProfileDtoResponseMapperTest {
         Long userId = user.getId();
         String userCredo = TestConst.CREDO;
         Double userRating = 4.;
+        String profilePicturePath = "http://testpicture.com.ua";
         UserLocationDto userLocationDto = new UserLocationDto();
         SocialNetworkResponseDTO socialNetworkResponseDTO = new SocialNetworkResponseDTO();
         List<SocialNetworkResponseDTO> expectedSocialNetworks = List.of(socialNetworkResponseDTO);
         UserNotificationPreferenceDto userNotificationPreferenceDto = new UserNotificationPreferenceDto();
         Set<UserNotificationPreferenceDto> expectedNotificationPreferences = Set.of(userNotificationPreferenceDto);
+        var greenCityUserProfile =
+            new GreenCityUserProfileDtoResponse(userId, profilePicturePath, userCredo, userRating, userLocationDto);
 
-        when(greenCityRemoteClient.getUserPicturePath(userId)).thenReturn("http://testpicture.com.ua");
+        when(greenCityRemoteClient.findGreenCityUserProfileByUserId(userId)).thenReturn(greenCityUserProfile);
 
         UserProfileDtoResponse expectedResult = UserProfileDtoResponse.builder()
-            .profilePicturePath("http://testpicture.com.ua")
+            .profilePicturePath(profilePicturePath)
             .name(user.getName())
             .userCredo(userCredo)
             .socialNetworks(expectedSocialNetworks)
@@ -70,12 +74,6 @@ class UserProfileDtoResponseMapperTest {
             .thenReturn(socialNetworkResponseDTO);
         when(modelMapper.map(any(UserNotificationPreference.class), eq(UserNotificationPreferenceDto.class)))
             .thenReturn(userNotificationPreferenceDto);
-        when(greenCityRemoteClient.findUserCredoByUserId(userId))
-            .thenReturn(userCredo);
-        when(greenCityRemoteClient.findUserRatingByUserId(userId))
-            .thenReturn(userRating);
-        when(greenCityRemoteClient.findUserLocationByUserId(userId))
-            .thenReturn(Optional.of(userLocationDto));
 
         UserProfileDtoResponse actualResult = userProfileDtoResponseMapper.convert(user);
 

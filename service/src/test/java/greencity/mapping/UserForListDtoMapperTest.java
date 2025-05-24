@@ -3,7 +3,9 @@ package greencity.mapping;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
+import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserLocationDto;
 import greencity.entity.User;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +30,10 @@ class UserForListDtoMapperTest {
         User user = ModelUtils.getUser();
         Long userId = user.getId();
         String userCredo = TestConst.CREDO;
+        String profilePicturePath = "profilePicturePath";
+        var greenCityUserProfile =
+            new GreenCityUserProfileDtoResponse(userId, profilePicturePath, userCredo, 0., new UserLocationDto());
+
         UserForListDto expectedResult = UserForListDto.builder()
             .id(userId)
             .name(user.getName())
@@ -38,8 +44,8 @@ class UserForListDtoMapperTest {
             .userCredo(userCredo)
             .build();
 
-        when(greenCityRemoteClient.findUserCredoByUserId(userId))
-            .thenReturn(userCredo);
+        when(greenCityRemoteClient.findGreenCityUserProfileByUserId(userId))
+            .thenReturn(greenCityUserProfile);
 
         UserForListDto actualResult = userForListDtoMapper.convert(user);
 

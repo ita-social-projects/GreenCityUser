@@ -13,6 +13,7 @@ import greencity.dto.filter.FilterUserDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
 import greencity.dto.user.DeactivateUserRequestDto;
+import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.RoleDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAddRatingDto;
@@ -967,8 +968,16 @@ public class UserServiceImpl implements UserService {
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
         allFriends.forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
-        // This line has to be improved by one call to greenCityRemoteClient
-        allFriends.forEach(f -> f.setProfilePicturePath(greenCityRemoteClient.getUserPicturePath(f.getId())));
+        List<Long> allFriendIds = allFriends.stream().map(UserAllFriendsDto::getId).toList();
+        var allFriendGreenCityProfiles = greenCityRemoteClient.findGreenCityUserProfilesByUserIds(allFriendIds);
+        Map<Long, String> userIdToProfilePictureMap = allFriendGreenCityProfiles.stream()
+            .collect(Collectors.toMap(
+                GreenCityUserProfileDtoResponse::userId,
+                GreenCityUserProfileDtoResponse::profilePicturePath));
+        allFriends.forEach(f -> {
+            String profilePicturePath = userIdToProfilePictureMap.get(f.getId());
+            f.setProfilePicturePath(profilePicturePath);
+        });
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
             allUsers.getTotalElements(),

@@ -15,6 +15,7 @@ public class UserForListDtoMapper extends AbstractConverter<User, UserForListDto
     @Override
     protected UserForListDto convert(User user) {
         Long userId = user.getId();
+        var greenCityUserProfile = greenCityRemoteClient.findGreenCityUserProfileByUserId(userId);
 
         return UserForListDto.builder()
             .id(userId)
@@ -23,7 +24,7 @@ public class UserForListDtoMapper extends AbstractConverter<User, UserForListDto
             .email(user.getEmail())
             .userStatus(user.getUserStatus())
             .role(user.getRole())
-            .userCredo(greenCityRemoteClient.findUserCredoByUserId(userId))
+            .userCredo(greenCityUserProfile.userCredo())
             .build();
     }
 }
