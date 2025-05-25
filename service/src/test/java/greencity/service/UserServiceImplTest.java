@@ -351,6 +351,23 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findAllByEmailPreferenceAndEmailPeriodicityTest() {
+        List<User> users = List.of(ModelUtils.getUser(), ModelUtils.getUser());
+        List<UserVOShort> expectedResult = List.of(ModelUtils.getUserVOShortDto(), ModelUtils.getUserVOShortDto());
+        EmailPreference emailPreference = EmailPreference.LIKES;
+        EmailPreferencePeriodicity emailPreferencePeriodicity = EmailPreferencePeriodicity.DAILY;
+
+        when(userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(), emailPreferencePeriodicity.name()))
+                .thenReturn(users);
+        when(modelMapper.map(any(User.class), eq(UserVOShort.class)))
+                .thenReturn(ModelUtils.getUserVOShortDto());
+
+        List<UserVOShort> actualResult = userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(), emailPreferencePeriodicity.name());
+
+        assertEquals(expectedResult, actualResult);
+    }
+
+    @Test
     void updateRoleTest() {
         // given
         ReflectionTestUtils.setField(userService, "modelMapper", new ModelMapper());
