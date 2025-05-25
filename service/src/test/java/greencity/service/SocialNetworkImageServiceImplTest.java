@@ -1,12 +1,14 @@
 package greencity.service;
 
 import greencity.client.GreenCityRemoteClient;
+import greencity.constant.AppConstant;
 import greencity.dto.PageableDto;
 import greencity.dto.socialnetwork.SocialNetworkImageRequestDTO;
 import greencity.dto.socialnetwork.SocialNetworkImageResponseDTO;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.entity.SocialNetworkImage;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.NotSavedException;
 import greencity.repository.SocialNetworkImageRepo;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -15,12 +17,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -65,6 +70,27 @@ class SocialNetworkImageServiceImplTest {
             .thenReturn(socialNetworkImageVO);
 
         when(modelMapper.map(socialNetworkImageVO, SocialNetworkImageVO.class)).thenReturn(socialNetworkImageVO);
+
+        assertEquals(socialNetworkImageVO, socialNetworkImageService.getSocialNetworkImageByUrl(URL_TO_CHECK));
+    }
+
+    @Test
+    @SneakyThrows
+    void getSocialNetworkImageByUrlReturnsDefaultImageTest() {
+        URL checkUrl = URI.create(URL_TO_CHECK).toURL();
+        String host = checkUrl.getHost();
+        SocialNetworkImage defaultSocialNetworkImage = new SocialNetworkImage();
+        SocialNetworkImageVO socialNetworkImageVO = new SocialNetworkImageVO();
+        socialNetworkImageVO.setId(1L);
+        socialNetworkImageVO.setHostPath(checkUrl.getHost());
+        socialNetworkImageVO.setImagePath(URL_TO_CHECK);
+
+        when(socialNetworkImageRepo.findByHostPath(host))
+                .thenThrow(new IllegalArgumentException());
+        when(socialNetworkImageRepo.findByHostPath(AppConstant.DEFAULT_SOCIAL_NETWORK_IMAGE_HOST_PATH))
+                .thenReturn(Optional.of(defaultSocialNetworkImage));
+
+        when(modelMapper.map(defaultSocialNetworkImage, SocialNetworkImageVO.class)).thenReturn(socialNetworkImageVO);
 
         assertEquals(socialNetworkImageVO, socialNetworkImageService.getSocialNetworkImageByUrl(URL_TO_CHECK));
     }
@@ -183,6 +209,27 @@ class SocialNetworkImageServiceImplTest {
     }
 
     @Test
+    void saveTestWhenDataIntegrityViolationIsThrownShouldThrowNotSavedException() {
+        SocialNetworkImageRequestDTO requestDTO = new SocialNetworkImageRequestDTO();
+        MultipartFile mockImage = mock(MultipartFile.class);
+        SocialNetworkImage savedEntity = new SocialNetworkImage();
+
+        when(greenCityRemoteClient.uploadFile(any(MultipartFile.class))).thenReturn("mockImagePath");
+        when(modelMapper.map(requestDTO, SocialNetworkImage.class)).thenReturn(savedEntity);
+        when(socialNetworkImageRepo.save(savedEntity)).thenThrow(new DataIntegrityViolationException(""));
+
+        assertThrows(
+                NotSavedException.class,
+                () -> socialNetworkImageService.save(requestDTO, mockImage)
+        );
+
+        verify(greenCityRemoteClient).uploadFile(mockImage);
+        verify(socialNetworkImageRepo).save(savedEntity);
+        verify(modelMapper).map(requestDTO, SocialNetworkImage.class);
+        verify(modelMapper, never()).map(savedEntity, SocialNetworkImageResponseDTO.class);
+    }
+
+    @Test
     void testFindAll() {
         Pageable pageable = mock(Pageable.class);
         List<SocialNetworkImage> mockImages = Collections.singletonList(new SocialNetworkImage());
@@ -203,5 +250,13 @@ class SocialNetworkImageServiceImplTest {
         verify(socialNetworkImageRepo).findAll(pageable);
         verify(modelMapper, times(mockImages.size()))
             .map(any(SocialNetworkImage.class), eq(SocialNetworkImageResponseDTO.class));
+    }
+
+    @Test
+    void findDtoByIdTest() {
+        /*Long id = 1L;
+
+        when(socialNetworkImageRepo.findById(id))
+                .thenReturn(Optional.of())*/
     }
 }
