@@ -26,8 +26,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -36,7 +34,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
-
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -124,7 +121,7 @@ class GreenCityRemoteClientTest {
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals(expectedRequestMethod, recordedRequest.getMethod());
         assertEquals(expectedRequestPath, recordedRequest.getPath());
-        assertTrue(recordedRequest.getHeader(HttpHeaders.CONTENT_TYPE).contains("multipart/form-data"));
+        assertTrue(recordedRequest.getHeader(HttpHeaders.CONTENT_TYPE).startsWith(MediaType.MULTIPART_FORM_DATA_VALUE));
     }
 
     @Test
@@ -301,7 +298,17 @@ class GreenCityRemoteClientTest {
     void getAllUserFriendsIdsWithPageableTest() {
         Pageable pageable = PageRequest.of(0, 10);
         List<Long> friendIds = List.of(1L, 2L, 3L);
-        String expectedJson = toJson(friendIds);
+        PageableAdvancedDto<Long> usersIdsPage = new PageableAdvancedDto<>(
+                friendIds,
+                friendIds.size(),
+                0,
+                1,
+                0,
+                false,
+                false,
+                true,
+                true);
+        String expectedJson = toJson(usersIdsPage);
         String expectedRequestPath = "/users/" + userId + "/friends?page=0&size=10";
         String expectedRequestMethod = HttpMethod.GET.name();
 
@@ -315,7 +322,7 @@ class GreenCityRemoteClientTest {
         assertEquals(friendIds.size(), actualResult.getTotalElements());
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals(expectedRequestMethod, recordedRequest.getMethod());
-        assertTrue(recordedRequest.getPath().startsWith(expectedRequestPath));
+        assertEquals(expectedRequestPath, recordedRequest.getPath());
         assertNotNull(recordedRequest.getRequestUrl().queryParameter(pageQueryParam));
         assertNotNull(recordedRequest.getRequestUrl().queryParameter(sizeQueryParam));
         assertEquals("0", recordedRequest.getRequestUrl().queryParameter(pageQueryParam));
@@ -434,7 +441,7 @@ class GreenCityRemoteClientTest {
     @SneakyThrows
     void updateUserPicturePathTest() {
         String profilePicturePath = "/path/to/picture.jpg";
-        String expectedRequestPath = "/users/picturePath";
+        String expectedRequestPath = "/users/picturePath?userId=" + userId + "&profilePicturePath=" + profilePicturePath;
         String expectedRequestMethod = HttpMethod.PUT.name();
 
         mockWebServer.enqueue(new MockResponse()
@@ -445,7 +452,7 @@ class GreenCityRemoteClientTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals(expectedRequestMethod, recordedRequest.getMethod());
-        assertTrue(recordedRequest.getPath().startsWith(expectedRequestPath));
+        assertEquals(expectedRequestPath, recordedRequest.getPath());
         assertNotNull(recordedRequest.getRequestUrl().queryParameter(userIdQueryParam));
         assertNotNull(recordedRequest.getRequestUrl().queryParameter(profilePicturePathQueryParam));
         assertEquals(userId.toString(), recordedRequest.getRequestUrl().queryParameter(userIdQueryParam));
@@ -456,7 +463,7 @@ class GreenCityRemoteClientTest {
     @SneakyThrows
     void updateUserNameTest() {
         String userName = "newUserName";
-        String expectedRequestPath = "/users/" + userId + "/name";
+        String expectedRequestPath = "/users/" + userId + "/name?userName=" + userName;
         String expectedRequestMethod = HttpMethod.PATCH.name();
 
         mockWebServer.enqueue(new MockResponse()
@@ -467,7 +474,7 @@ class GreenCityRemoteClientTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals(expectedRequestMethod, recordedRequest.getMethod());
-        assertTrue(recordedRequest.getPath().startsWith(expectedRequestPath));
+        assertEquals(expectedRequestPath, recordedRequest.getPath());
         assertNotNull(recordedRequest.getRequestUrl().queryParameter(userNameQueryParam));
         assertEquals(userName, recordedRequest.getRequestUrl().queryParameter(userNameQueryParam));
     }
@@ -482,7 +489,7 @@ class GreenCityRemoteClientTest {
                 ModelUtils.getGreenCityUserProfileDtoResponse()
         );
         String expectedJson = toJson(expectedProfiles);
-        String expectedRequestPath = "/users/profiles";
+        String expectedRequestPath = "/users/profiles?userIds=1&userIds=2&userIds=3";
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
@@ -494,7 +501,7 @@ class GreenCityRemoteClientTest {
         assertEquals(expectedProfiles, actualResult);
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals(expectedRequestMethod, recordedRequest.getMethod());
-        assertTrue(recordedRequest.getPath().startsWith(expectedRequestPath));
+        assertEquals(expectedRequestPath, recordedRequest.getPath());
         assertNotNull(recordedRequest.getRequestUrl().queryParameter(userIdsQueryParam));
     }
 
@@ -505,7 +512,7 @@ class GreenCityRemoteClientTest {
                 ModelUtils.getGreenCityUserProfileDtoResponse()
         );
         String expectedJson = toJson(profiles);
-        String expectedRequestPath = "/users/profiles";
+        String expectedRequestPath = "/users/profiles?userIds=1";
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
@@ -514,14 +521,13 @@ class GreenCityRemoteClientTest {
 
         GreenCityUserProfileDtoResponse actualResult = greenCityRemoteClient.findGreenCityUserProfileByUserId(userId);
 
-        assertEquals(profiles.get(0), actualResult);
+        assertEquals(profiles.getFirst(), actualResult);
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals(expectedRequestMethod, recordedRequest.getMethod());
-        assertTrue(recordedRequest.getPath().startsWith(expectedRequestPath));
+        assertEquals(expectedRequestPath, recordedRequest.getPath());
         assertNotNull(recordedRequest.getRequestUrl().queryParameter(userIdsQueryParam));
     }
 
-    // Helper methods for creating mock objects
     private MultipartFile createMockMultipartFile(String name, String content) {
         return new MockMultipartFile(name, name, "text/plain", content.getBytes());
     }
