@@ -1,7 +1,6 @@
 package greencity.client;
 
 import greencity.dto.PageableAdvancedDto;
-import greencity.dto.PageableDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
