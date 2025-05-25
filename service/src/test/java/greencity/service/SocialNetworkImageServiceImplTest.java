@@ -2,6 +2,7 @@ package greencity.service;
 
 import greencity.client.GreenCityRemoteClient;
 import greencity.constant.AppConstant;
+import greencity.constant.ErrorMessage;
 import greencity.dto.PageableDto;
 import greencity.dto.socialnetwork.SocialNetworkImageRequestDTO;
 import greencity.dto.socialnetwork.SocialNetworkImageResponseDTO;
@@ -10,6 +11,7 @@ import greencity.entity.SocialNetworkImage;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.NotSavedException;
 import greencity.repository.SocialNetworkImageRepo;
+
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -30,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
+
 import static greencity.ModelUtils.getSocialNetworkImage;
 import static greencity.ModelUtils.getSocialNetworkImageId2;
 import static greencity.ModelUtils.getSocialNetworkImageId3;
@@ -253,10 +256,108 @@ class SocialNetworkImageServiceImplTest {
 
     @Test
     void findDtoByIdTest() {
-        /*
-         * Long id = 1L;
-         * 
-         * when(socialNetworkImageRepo.findById(id)) .thenReturn(Optional.of())
-         */
+        Long id = 1L;
+        String hostPath = "example.com";
+        String imagePath = "path/to/image.png";
+        SocialNetworkImage socialNetworkImage = new SocialNetworkImage(id, imagePath, hostPath);
+        SocialNetworkImageResponseDTO expectedResult = new SocialNetworkImageResponseDTO(id, imagePath, hostPath);
+
+        when(socialNetworkImageRepo.findById(id))
+                .thenReturn(Optional.of(socialNetworkImage));
+        when(modelMapper.map(socialNetworkImage, SocialNetworkImageResponseDTO.class))
+                .thenReturn(expectedResult);
+
+        SocialNetworkImageResponseDTO actualResult = socialNetworkImageService.findDtoById(id);
+
+        assertEquals(expectedResult, actualResult);
+        verify(socialNetworkImageRepo).findById(id);
+        verify(modelMapper).map(socialNetworkImage, SocialNetworkImageResponseDTO.class);
+    }
+
+    @Test
+    void findDtoByIdWhenNotFoundTest() {
+        Long nonExistentId = 999L;
+        String expectedExceptionMessage = ErrorMessage.SOCIAL_NETWORK_IMAGE_FOUND_BY_ID + nonExistentId;
+
+        when(socialNetworkImageRepo.findById(nonExistentId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> socialNetworkImageService.findDtoById(nonExistentId)
+        );
+
+        assertEquals(expectedExceptionMessage, exception.getMessage());
+        verify(socialNetworkImageRepo).findById(nonExistentId);
+        verify(modelMapper, never()).map(any(SocialNetworkImage.class), eq(SocialNetworkImageResponseDTO.class));
+    }
+
+    @Test
+    void updateTest() {
+        Long id = 1L;
+        String hostPath = "updated-example.com";
+        String imagePath = "new/image/path.png";
+        SocialNetworkImage socialNetworkImage = new SocialNetworkImage();
+        socialNetworkImage.setId(id);
+        SocialNetworkImageResponseDTO requestDTO = new SocialNetworkImageResponseDTO(id, imagePath, hostPath);
+        MultipartFile multipartFile = mock(MultipartFile.class);
+
+        when(socialNetworkImageRepo.findById(id))
+                .thenReturn(Optional.of(socialNetworkImage));
+        when(greenCityRemoteClient.uploadFile(multipartFile))
+                .thenReturn(imagePath);
+        when(socialNetworkImageRepo.save(socialNetworkImage))
+                .thenReturn(socialNetworkImage);
+
+        socialNetworkImageService.update(requestDTO, multipartFile);
+
+        verify(socialNetworkImageRepo).findById(id);
+        verify(greenCityRemoteClient).uploadFile(multipartFile);
+        verify(socialNetworkImageRepo).save(socialNetworkImage);
+    }
+
+    @Test
+    void updateWhenImageIsNullTest() {
+        Long id = 1L;
+        String hostPath = "updated-example.com";
+        String imagePath = "new/image/path.png";
+        SocialNetworkImage socialNetworkImage = new SocialNetworkImage();
+        socialNetworkImage.setId(id);
+        SocialNetworkImageResponseDTO requestDTO = new SocialNetworkImageResponseDTO(id, imagePath, hostPath);
+        MultipartFile multipartFile = null;
+
+        when(socialNetworkImageRepo.findById(id))
+                .thenReturn(Optional.of(socialNetworkImage));
+        when(socialNetworkImageRepo.save(socialNetworkImage))
+                .thenReturn(socialNetworkImage);
+
+        socialNetworkImageService.update(requestDTO, multipartFile);
+
+        verify(socialNetworkImageRepo).findById(id);
+        verify(greenCityRemoteClient, never()).uploadFile(multipartFile);
+        verify(socialNetworkImageRepo).save(socialNetworkImage);
+    }
+
+    @Test
+    void updateWhenSocialNetworkImageNotFoundTest() {
+        Long nonExistentId = 999L;
+        SocialNetworkImageResponseDTO requestDTO = new SocialNetworkImageResponseDTO();
+        requestDTO.setId(nonExistentId);
+        String expectedExceptionMessage = ErrorMessage.SOCIAL_NETWORK_IMAGE_FOUND_BY_ID + nonExistentId;
+
+        MultipartFile mockImage = mock(MultipartFile.class);
+
+        when(socialNetworkImageRepo.findById(nonExistentId))
+                .thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(
+                NotFoundException.class,
+                () -> socialNetworkImageService.update(requestDTO, mockImage)
+        );
+
+        assertEquals(expectedExceptionMessage, exception.getMessage());
+        verify(socialNetworkImageRepo).findById(nonExistentId);
+        verify(greenCityRemoteClient, never()).uploadFile(any(MultipartFile.class));
+        verify(socialNetworkImageRepo, never()).save(any(SocialNetworkImage.class));
     }
 }

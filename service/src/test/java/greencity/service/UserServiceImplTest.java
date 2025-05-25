@@ -59,6 +59,7 @@ import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.Base64DecodedException;
 import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserDeactivationException;
@@ -87,6 +88,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -162,6 +164,7 @@ class UserServiceImplTest {
         .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
+        .language(new Language(1L, "ua", List.of()))
         .build();
 
     private final User user1 = User.builder()
@@ -1379,6 +1382,30 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateUserProfilePictureWhenCannotMapToMultipartTest() {
+        String fileName = "test.txt";
+        String content = "test file content";
+        String picturePath = "picturePath";
+        String base64 = "base64";
+        String email = "testmail@gmail.com";
+        byte[] bytes = content.getBytes();
+        MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
+
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+        when(modelMapper.map(base64, MultipartFile.class)).thenThrow(new RuntimeException());
+
+        assertThrows(
+                Base64DecodedException.class,
+                () -> userService.updateUserProfilePicture(file, email, base64)
+        );
+
+        verify(userRepo).findByEmail(anyString());
+        verify(modelMapper).map(base64, MultipartFile.class);
+        verify(restClient, never()).uploadImage(any());
+        verify(greenCityRemoteClient, never()).updateUserPicturePath(user.getId(), picturePath);
+    }
+
+    @Test
     void getDeactivationReasonUkTest() {
         List<String> test1 = List.of();
         User myUser = ModelUtils.getUser();
@@ -1539,6 +1566,32 @@ class UserServiceImplTest {
         when(userRepo.findUserByUuid(uuid)).thenReturn(Optional.of(foundUser));
 
         assertThrows(UserDeactivationException.class, () -> userService.deactivateUser(uuid, request, userVO));
+    }
+
+    @Test
+    void findUserLanguageByUuidTest() {
+        String uuid = "uuid";
+        String languageCode = user.getLanguage().getCode();
+
+        when(userRepo.findNotDeactivatedUserByUuid(uuid))
+                .thenReturn(Optional.of(user));
+
+        String actualResult = userService.findUserLanguageByUuid(uuid);
+
+        assertEquals(languageCode, actualResult);
+    }
+
+    @Test
+    void findUserLanguageByUuidWhenUserNotFoundTest() {
+        String uuid = "uuid";
+
+        when(userRepo.findNotDeactivatedUserByUuid(uuid))
+                .thenReturn(Optional.empty());
+
+        assertThrows(
+                NotFoundException.class,
+                () -> userService.findUserLanguageByUuid(uuid)
+        );
     }
 
     @Test
