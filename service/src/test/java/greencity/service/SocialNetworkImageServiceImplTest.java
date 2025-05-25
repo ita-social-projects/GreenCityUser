@@ -107,9 +107,9 @@ class SocialNetworkImageServiceImplTest {
         socialNetworkImageVO.setHostPath(host);
         socialNetworkImageVO.setImagePath(URL_TO_CHECK);
 
-        when(socialNetworkImageRepo.findByHostPath(host)).thenReturn(null);
+        when(socialNetworkImageRepo.findByHostPath(host)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class,
+        assertThrows(NotFoundException.class,
             () -> socialNetworkImageService.getSocialNetworkImageByUrl(URL_TO_CHECK));
     }
 

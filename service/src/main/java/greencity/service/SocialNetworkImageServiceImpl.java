@@ -211,7 +211,7 @@ public class SocialNetworkImageServiceImpl implements SocialNetworkImageService 
      */
     public SocialNetworkImageVO getDefaultSocialNetworkImage() {
         return findByHostPath(AppConstant.DEFAULT_SOCIAL_NETWORK_IMAGE_HOST_PATH)
-            .orElseThrow(() -> new RuntimeException(ErrorMessage.BAD_DEFAULT_SOCIAL_NETWORK_IMAGE_PATH));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.BAD_DEFAULT_SOCIAL_NETWORK_IMAGE_PATH));
     }
 
     /**

@@ -41,4 +41,22 @@ class UserNotificationPreferenceServiceImplTest {
         assertEquals(expectedResult, actualResult);
     }
 
+    @Test
+    void existsByUserIdAndEmailPreferenceAndPeriodicityWhenNotExistsTest() {
+        Long userId = 1L;
+        EmailPreference emailPreference = EmailPreference.LIKES;
+        EmailPreferencePeriodicity periodicity = EmailPreferencePeriodicity.WEEKLY;
+        EmailPreferenceDto emailPreferenceDto = new EmailPreferenceDto(
+                userId, emailPreference, periodicity);
+        boolean expectedResult = false;
+
+        when(userNotificationPreferenceRepo.existsByUserIdAndEmailPreferenceAndPeriodicity(userId, emailPreference,
+                periodicity))
+                .thenReturn(expectedResult);
+
+        boolean actualResult =
+                userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(emailPreferenceDto);
+
+        assertEquals(expectedResult, actualResult);
+    }
 }
