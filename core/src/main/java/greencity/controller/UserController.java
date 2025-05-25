@@ -47,6 +47,8 @@ import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.UserVOShort;
 import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.service.AuthorityService;
@@ -1168,8 +1170,8 @@ public class UserController {
     })
     @GetMapping("/email")
     public ResponseEntity<List<UserVOShort>> findAllByEmailPreferenceAndEmailPeriodicity(
-        @RequestParam("email-preference") String emailPreference,
-        @RequestParam("email-periodicity") String periodicity) {
+        @RequestParam("email-preference") EmailPreference emailPreference,
+        @RequestParam("email-periodicity") EmailPreferencePeriodicity periodicity) {
         return ResponseEntity.ok(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity));
     }
 

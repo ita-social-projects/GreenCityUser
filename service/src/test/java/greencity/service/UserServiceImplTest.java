@@ -362,8 +362,8 @@ class UserServiceImplTest {
         when(modelMapper.map(any(User.class), eq(UserVOShort.class)))
             .thenReturn(ModelUtils.getUserVOShortDto());
 
-        List<UserVOShort> actualResult = userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(),
-            emailPreferencePeriodicity.name());
+        List<UserVOShort> actualResult = userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference,
+            emailPreferencePeriodicity);
 
         assertEquals(expectedResult, actualResult);
     }

@@ -33,6 +33,8 @@ import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.UserVOShort;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import java.time.LocalDateTime;
@@ -391,7 +393,7 @@ public interface UserService {
      * @param periodicity     of notification.
      * @return list of {@link UserVOShort}.
      */
-    List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity);
+    List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(EmailPreference emailPreference, EmailPreferencePeriodicity periodicity);
 
     /**
      * Method that return UserVo by UUid.
