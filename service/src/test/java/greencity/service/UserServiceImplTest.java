@@ -1395,9 +1395,8 @@ class UserServiceImplTest {
         when(modelMapper.map(base64, MultipartFile.class)).thenThrow(new RuntimeException());
 
         assertThrows(
-                Base64DecodedException.class,
-                () -> userService.updateUserProfilePicture(file, email, base64)
-        );
+            Base64DecodedException.class,
+            () -> userService.updateUserProfilePicture(file, email, base64));
 
         verify(userRepo).findByEmail(anyString());
         verify(modelMapper).map(base64, MultipartFile.class);
@@ -1574,7 +1573,7 @@ class UserServiceImplTest {
         String languageCode = user.getLanguage().getCode();
 
         when(userRepo.findNotDeactivatedUserByUuid(uuid))
-                .thenReturn(Optional.of(user));
+            .thenReturn(Optional.of(user));
 
         String actualResult = userService.findUserLanguageByUuid(uuid);
 
@@ -1586,12 +1585,11 @@ class UserServiceImplTest {
         String uuid = "uuid";
 
         when(userRepo.findNotDeactivatedUserByUuid(uuid))
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.empty());
 
         assertThrows(
-                NotFoundException.class,
-                () -> userService.findUserLanguageByUuid(uuid)
-        );
+            NotFoundException.class,
+            () -> userService.findUserLanguageByUuid(uuid));
     }
 
     @Test

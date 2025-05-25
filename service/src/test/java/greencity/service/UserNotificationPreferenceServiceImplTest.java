@@ -28,14 +28,15 @@ class UserNotificationPreferenceServiceImplTest {
         EmailPreference emailPreference = EmailPreference.LIKES;
         EmailPreferencePeriodicity periodicity = EmailPreferencePeriodicity.WEEKLY;
         EmailPreferenceDto emailPreferenceDto = new EmailPreferenceDto(
-                userId, emailPreference, periodicity
-        );
+            userId, emailPreference, periodicity);
         boolean expectedResult = true;
 
-        when(userNotificationPreferenceRepo.existsByUserIdAndEmailPreferenceAndPeriodicity(userId, emailPreference, periodicity))
+        when(userNotificationPreferenceRepo.existsByUserIdAndEmailPreferenceAndPeriodicity(userId, emailPreference,
+            periodicity))
                 .thenReturn(expectedResult);
 
-        boolean actualResult = userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(emailPreferenceDto);
+        boolean actualResult =
+            userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(emailPreferenceDto);
 
         assertEquals(expectedResult, actualResult);
     }

@@ -263,9 +263,9 @@ class SocialNetworkImageServiceImplTest {
         SocialNetworkImageResponseDTO expectedResult = new SocialNetworkImageResponseDTO(id, imagePath, hostPath);
 
         when(socialNetworkImageRepo.findById(id))
-                .thenReturn(Optional.of(socialNetworkImage));
+            .thenReturn(Optional.of(socialNetworkImage));
         when(modelMapper.map(socialNetworkImage, SocialNetworkImageResponseDTO.class))
-                .thenReturn(expectedResult);
+            .thenReturn(expectedResult);
 
         SocialNetworkImageResponseDTO actualResult = socialNetworkImageService.findDtoById(id);
 
@@ -280,12 +280,11 @@ class SocialNetworkImageServiceImplTest {
         String expectedExceptionMessage = ErrorMessage.SOCIAL_NETWORK_IMAGE_FOUND_BY_ID + nonExistentId;
 
         when(socialNetworkImageRepo.findById(nonExistentId))
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> socialNetworkImageService.findDtoById(nonExistentId)
-        );
+            NotFoundException.class,
+            () -> socialNetworkImageService.findDtoById(nonExistentId));
 
         assertEquals(expectedExceptionMessage, exception.getMessage());
         verify(socialNetworkImageRepo).findById(nonExistentId);
@@ -303,11 +302,11 @@ class SocialNetworkImageServiceImplTest {
         MultipartFile multipartFile = mock(MultipartFile.class);
 
         when(socialNetworkImageRepo.findById(id))
-                .thenReturn(Optional.of(socialNetworkImage));
+            .thenReturn(Optional.of(socialNetworkImage));
         when(greenCityRemoteClient.uploadFile(multipartFile))
-                .thenReturn(imagePath);
+            .thenReturn(imagePath);
         when(socialNetworkImageRepo.save(socialNetworkImage))
-                .thenReturn(socialNetworkImage);
+            .thenReturn(socialNetworkImage);
 
         socialNetworkImageService.update(requestDTO, multipartFile);
 
@@ -327,9 +326,9 @@ class SocialNetworkImageServiceImplTest {
         MultipartFile multipartFile = null;
 
         when(socialNetworkImageRepo.findById(id))
-                .thenReturn(Optional.of(socialNetworkImage));
+            .thenReturn(Optional.of(socialNetworkImage));
         when(socialNetworkImageRepo.save(socialNetworkImage))
-                .thenReturn(socialNetworkImage);
+            .thenReturn(socialNetworkImage);
 
         socialNetworkImageService.update(requestDTO, multipartFile);
 
@@ -348,12 +347,11 @@ class SocialNetworkImageServiceImplTest {
         MultipartFile mockImage = mock(MultipartFile.class);
 
         when(socialNetworkImageRepo.findById(nonExistentId))
-                .thenReturn(Optional.empty());
+            .thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(
-                NotFoundException.class,
-                () -> socialNetworkImageService.update(requestDTO, mockImage)
-        );
+            NotFoundException.class,
+            () -> socialNetworkImageService.update(requestDTO, mockImage));
 
         assertEquals(expectedExceptionMessage, exception.getMessage());
         verify(socialNetworkImageRepo).findById(nonExistentId);
