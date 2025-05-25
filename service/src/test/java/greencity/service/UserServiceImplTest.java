@@ -1017,12 +1017,18 @@ class UserServiceImplTest {
     void getAllFriendsWithTheOnlineStatus() {
         Pageable pageable = PageRequest.of(0, 1);
         Page<User> usersPage = new PageImpl<>(Collections.singletonList(user), pageable, 1);
-        Page<Long> usersIdsPage = new PageImpl<>(
-            usersPage.getContent().stream()
-                .map(User::getId)
-                .toList(),
-            pageable,
-            1);
+        PageableAdvancedDto<Long> usersIdsPage = new PageableAdvancedDto<>(
+                usersPage.getContent().stream()
+                        .map(User::getId)
+                        .toList(),
+                usersPage.getSize(),
+                0,
+                1,
+                0,
+                false,
+                false,
+                true,
+                true);
         UserWithOnlineStatusDto userWithOnlineStatusDto = UserWithOnlineStatusDto.builder()
             .id(userId)
             .onlineStatus(true)

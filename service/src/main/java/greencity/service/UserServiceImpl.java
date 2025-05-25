@@ -683,11 +683,11 @@ public class UserServiceImpl implements UserService {
             .id(userId)
             .onlineStatus(checkIfTheUserIsOnline(userId))
             .build();
-        Page<Long> friendsIds = greenCityRemoteClient.getAllUserFriendsIds(userId, pageable);
+        PageableAdvancedDto<Long> friendsIds = greenCityRemoteClient.getAllUserFriendsIds(userId, pageable);
         List<UserWithOnlineStatusDto> friendsWithOnlineStatusDtos = new ArrayList<>();
-        if (!friendsIds.isEmpty()) {
+        if (!friendsIds.getPage().isEmpty()) {
             friendsWithOnlineStatusDtos = friendsIds
-                .getContent()
+                .getPage()
                 .stream()
                 .map(friendId -> new UserWithOnlineStatusDto(friendId, checkIfTheUserIsOnline(friendId)))
                 .toList();
@@ -695,7 +695,7 @@ public class UserServiceImpl implements UserService {
         return UserAndAllFriendsWithOnlineStatusDto.builder()
             .user(userWithOnlineStatusDto)
             .friends(new PageableDto<>(friendsWithOnlineStatusDtos, friendsIds.getTotalElements(),
-                friendsIds.getPageable().getPageNumber(), friendsIds.getTotalPages()))
+                friendsIds.getNumber(), friendsIds.getTotalPages()))
             .build();
     }
 

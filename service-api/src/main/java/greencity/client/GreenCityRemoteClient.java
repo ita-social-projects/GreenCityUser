@@ -1,5 +1,7 @@
 package greencity.client;
 
+import greencity.dto.PageableAdvancedDto;
+import greencity.dto.PageableDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
@@ -189,14 +191,14 @@ public class GreenCityRemoteClient {
      * @param pageable pageable configuration.
      * @return {@link Page}
      */
-    public Page<Long> getAllUserFriendsIds(Long userId, Pageable pageable) {
+    public PageableAdvancedDto<Long> getAllUserFriendsIds(Long userId, Pageable pageable) {
         return webClient.get()
             .uri(uriBuilder -> uriBuilder.path("/users/{userId}/friends")
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
                 .build(userId))
             .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<Page<Long>>() {
+            .bodyToMono(new ParameterizedTypeReference<PageableAdvancedDto<Long>>() {
             })
             .block();
     }
