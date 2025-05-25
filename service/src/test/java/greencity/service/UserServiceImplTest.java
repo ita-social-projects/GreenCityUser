@@ -357,12 +357,14 @@ class UserServiceImplTest {
         EmailPreference emailPreference = EmailPreference.LIKES;
         EmailPreferencePeriodicity emailPreferencePeriodicity = EmailPreferencePeriodicity.DAILY;
 
-        when(userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(), emailPreferencePeriodicity.name()))
+        when(userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(),
+            emailPreferencePeriodicity.name()))
                 .thenReturn(users);
         when(modelMapper.map(any(User.class), eq(UserVOShort.class)))
-                .thenReturn(ModelUtils.getUserVOShortDto());
+            .thenReturn(ModelUtils.getUserVOShortDto());
 
-        List<UserVOShort> actualResult = userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(), emailPreferencePeriodicity.name());
+        List<UserVOShort> actualResult = userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(),
+            emailPreferencePeriodicity.name());
 
         assertEquals(expectedResult, actualResult);
     }
