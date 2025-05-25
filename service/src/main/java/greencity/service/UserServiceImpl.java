@@ -1038,7 +1038,6 @@ public class UserServiceImpl implements UserService {
     public Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVOAdvancedDto.class));
     }
 
@@ -1078,7 +1077,6 @@ public class UserServiceImpl implements UserService {
         log.info("email {}", email);
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        log.info("user: {}", notDeactivatedByEmail);
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));
     }
 
@@ -1090,7 +1088,6 @@ public class UserServiceImpl implements UserService {
     public Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVOShort.class));
     }
 

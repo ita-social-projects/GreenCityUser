@@ -113,7 +113,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -156,7 +155,7 @@ class UserServiceImplTest {
     private final User user = User.builder()
         .id(1L)
         .name("Taras")
-        .email("test@gmail.com")
+        .email(TestConst.EMAIL)
         .role(ROLE_USER)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
@@ -1612,7 +1611,6 @@ class UserServiceImplTest {
 
     @Test
     void createGreenCityUserTest() {
-        User user = ModelUtils.getUser();
         CreateGreenCityUserDto createGreenCityUserDto = ModelUtils.getCreateGreenCityDto();
 
         when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
@@ -1625,11 +1623,10 @@ class UserServiceImplTest {
 
     @Test
     void createGreenCityUserNotFoundTest() {
-        Long userId = 66L;
         when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(NotFoundException.class,
-            () -> userService.createGreenCityUser(user.getId(), "http://anypath.com.ua"));
+            () -> userService.createGreenCityUser(userId, "http://anypath.com.ua"));
 
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
         verifyNoInteractions(greenCityRemoteClient);
@@ -1637,7 +1634,6 @@ class UserServiceImplTest {
 
     @Test
     void findNotDeactivatedByEmailReducedTest() {
-        User user = getUser();
         user.setUserStatus(ACTIVATED);
         UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
 
@@ -1657,7 +1653,6 @@ class UserServiceImplTest {
 
     @Test
     void findNotDeactivatedByIdReducedTest() {
-        User user = getUser();
         user.setUserStatus(ACTIVATED);
         UserVOShort userVOShort = getUserVOShortDto();
 
@@ -1701,7 +1696,7 @@ class UserServiceImplTest {
     void findUserEmailsByUserIdsTest() {
         List<Long> userIds = List.of(1L, 2L, 3L);
         List<UserEmailDto> userEmailDtos = userIds.stream()
-            .map(userId -> new UserEmailDto(userId, "email"))
+            .map(id -> new UserEmailDto(id, "email"))
             .toList();
 
         when(userRepo.findAllEmailsByIdIn(userIds))
