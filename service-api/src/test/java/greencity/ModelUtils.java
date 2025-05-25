@@ -28,21 +28,20 @@ public class ModelUtils {
 
     public static AchievementVO getAchievementVO() {
         return new AchievementVO(1L,
-                "ACQUIRED_HABIT_14_DAYS",
-                "Набуття звички протягом 14 днів",
-                "Acquired habit 14 days",
-                new AchievementCategoryVO(1L, "name", List.of(), List.of()),
-                1
-        );
+            "ACQUIRED_HABIT_14_DAYS",
+            "Набуття звички протягом 14 днів",
+            "Acquired habit 14 days",
+            new AchievementCategoryVO(1L, "name", List.of(), List.of()),
+            1);
     }
 
     public static UserVO getUserVO() {
         return UserVO.builder()
-                .id(TestConst.USER_ID)
-                .email(TestConst.EMAIL)
-                .name(TestConst.NAME)
-                .role(Role.ROLE_USER)
-                .build();
+            .id(TestConst.USER_ID)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .build();
     }
 
     public static UserAchievementVO getUserAchievementVO() {
@@ -51,52 +50,47 @@ public class ModelUtils {
 
     public static UserCityDto getUserCityDto() {
         return new UserCityDto(
-                1L,
-                "cityEn", "cityUk",
-                0., 0.
-        );
+            1L,
+            "cityEn", "cityUk",
+            0., 0.);
     }
 
     public static UserLocationDto getUserLocationDto() {
         return new UserLocationDto(
-                1L,
-                "cityEn", "cityUk",
-                "regionEn", "regionUk",
-                "countryEn", "countryUk",
-                0., 0.
-        );
+            1L,
+            "cityEn", "cityUk",
+            "regionEn", "regionUk",
+            "countryEn", "countryUk",
+            0., 0.);
     }
 
     public static UserProfileDtoRequest getUserProfileDtoRequest() {
         return new UserProfileDtoRequest(
-                "name",
-                "credo",
-                List.of("social network 1", "social network 2"),
-                ProfilePrivacyPolicy.FRIENDS_ONLY,
-                ProfilePrivacyPolicy.PRIVATE,
-                ProfilePrivacyPolicy.PUBLIC,
-                new CoordinatesDto(),
-                Set.of(new UserNotificationPreferenceDto())
-        );
+            "name",
+            "credo",
+            List.of("social network 1", "social network 2"),
+            ProfilePrivacyPolicy.FRIENDS_ONLY,
+            ProfilePrivacyPolicy.PRIVATE,
+            ProfilePrivacyPolicy.PUBLIC,
+            new CoordinatesDto(),
+            Set.of(new UserNotificationPreferenceDto()));
     }
 
     public static CreateGreenCityUserDto getCreateGreenCityUserDto() {
         return new CreateGreenCityUserDto(
-                TestConst.USER_ID,
-                TestConst.EMAIL,
-                TestConst.NAME,
-                TestConst.PROFILE_PICTURE_PATH
-        );
+            TestConst.USER_ID,
+            TestConst.EMAIL,
+            TestConst.NAME,
+            TestConst.PROFILE_PICTURE_PATH);
     }
 
     public static GreenCityUserProfileDtoResponse getGreenCityUserProfileDtoResponse() {
         return new GreenCityUserProfileDtoResponse(
-                TestConst.USER_ID,
-                TestConst.PROFILE_PICTURE_PATH,
-                TestConst.USER_CREDO,
-                2.,
-                new UserLocationDto()
-        );
+            TestConst.USER_ID,
+            TestConst.PROFILE_PICTURE_PATH,
+            TestConst.USER_CREDO,
+            2.,
+            new UserLocationDto());
     }
 
     public static ConstraintValidatorContext.ConstraintViolationBuilder getConstraintViolationBuilder() {

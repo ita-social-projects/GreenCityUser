@@ -86,9 +86,9 @@ class SocialNetworkImageServiceImplTest {
         socialNetworkImageVO.setImagePath(URL_TO_CHECK);
 
         when(socialNetworkImageRepo.findByHostPath(host))
-                .thenThrow(new IllegalArgumentException());
+            .thenThrow(new IllegalArgumentException());
         when(socialNetworkImageRepo.findByHostPath(AppConstant.DEFAULT_SOCIAL_NETWORK_IMAGE_HOST_PATH))
-                .thenReturn(Optional.of(defaultSocialNetworkImage));
+            .thenReturn(Optional.of(defaultSocialNetworkImage));
 
         when(modelMapper.map(defaultSocialNetworkImage, SocialNetworkImageVO.class)).thenReturn(socialNetworkImageVO);
 
@@ -219,9 +219,8 @@ class SocialNetworkImageServiceImplTest {
         when(socialNetworkImageRepo.save(savedEntity)).thenThrow(new DataIntegrityViolationException(""));
 
         assertThrows(
-                NotSavedException.class,
-                () -> socialNetworkImageService.save(requestDTO, mockImage)
-        );
+            NotSavedException.class,
+            () -> socialNetworkImageService.save(requestDTO, mockImage));
 
         verify(greenCityRemoteClient).uploadFile(mockImage);
         verify(socialNetworkImageRepo).save(savedEntity);
@@ -254,9 +253,10 @@ class SocialNetworkImageServiceImplTest {
 
     @Test
     void findDtoByIdTest() {
-        /*Long id = 1L;
-
-        when(socialNetworkImageRepo.findById(id))
-                .thenReturn(Optional.of())*/
+        /*
+         * Long id = 1L;
+         * 
+         * when(socialNetworkImageRepo.findById(id)) .thenReturn(Optional.of())
+         */
     }
 }

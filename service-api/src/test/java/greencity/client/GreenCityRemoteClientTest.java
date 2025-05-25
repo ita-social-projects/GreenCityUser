@@ -49,8 +49,8 @@ class GreenCityRemoteClientTest {
     static MockWebServer mockWebServer;
     GreenCityRemoteClient greenCityRemoteClient;
     ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        .registerModule(new JavaTimeModule())
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     String userIdQueryParam = "userId";
     String profilePicturePathQueryParam = "profilePicturePath";
@@ -90,8 +90,8 @@ class GreenCityRemoteClientTest {
         List<MultipartFile> files = Arrays.asList(file1, file2);
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         List<String> actualResult = greenCityRemoteClient.uploadAllFiles(files);
 
@@ -112,8 +112,8 @@ class GreenCityRemoteClientTest {
         MultipartFile file = createMockMultipartFile("file.txt", "content");
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedUrl)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedUrl)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         String actualResult = greenCityRemoteClient.uploadFile(file);
 
@@ -132,8 +132,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.DELETE.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setResponseCode(200)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         greenCityRemoteClient.deleteAllFiles(pathsToDelete);
 
@@ -142,7 +142,8 @@ class GreenCityRemoteClientTest {
         assertEquals(expectedRequestPath, recordedRequest.getPath());
 
         String requestBody = recordedRequest.getBody().readUtf8();
-        List<String> actualPaths = fromJson(requestBody, new TypeReference<>() {});
+        List<String> actualPaths = fromJson(requestBody, new TypeReference<>() {
+        });
         assertEquals(pathsToDelete, actualPaths);
     }
 
@@ -150,16 +151,15 @@ class GreenCityRemoteClientTest {
     @SneakyThrows
     void findAllAchievementsTest() {
         List<AchievementVO> expectedAchievements = Arrays.asList(
-                ModelUtils.getAchievementVO(),
-                ModelUtils.getAchievementVO()
-        );
+            ModelUtils.getAchievementVO(),
+            ModelUtils.getAchievementVO());
         String expectedJson = toJson(expectedAchievements);
         String expectedRequestPath = "/achievements/all";
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         List<AchievementVO> actualResult = greenCityRemoteClient.findAllAchievements();
 
@@ -173,16 +173,15 @@ class GreenCityRemoteClientTest {
     @SneakyThrows
     void findAllUserAchievementsByUserIdTest() {
         List<UserAchievementVO> expectedUserAchievements = Arrays.asList(
-                ModelUtils.getUserAchievementVO(),
-                ModelUtils.getUserAchievementVO()
-        );
+            ModelUtils.getUserAchievementVO(),
+            ModelUtils.getUserAchievementVO());
         String expectedJson = toJson(expectedUserAchievements);
         String expectedRequestPath = "/achievements/user-achievements/" + userId;
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         List<UserAchievementVO> actualResult = greenCityRemoteClient.findAllUserAchievementsByUserId(userId);
 
@@ -201,8 +200,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         UserCityDto actualResult = greenCityRemoteClient.findAllUsersCities(userId);
 
@@ -221,8 +220,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         Optional<UserLocationDto> actualResult = greenCityRemoteClient.findUserLocationByUserId(userId);
 
@@ -240,8 +239,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(404)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setResponseCode(404)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         Optional<UserLocationDto> actualResult = greenCityRemoteClient.findUserLocationByUserId(userId);
 
@@ -259,8 +258,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.PATCH.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setResponseCode(200)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
 
@@ -282,8 +281,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         List<Long> actualResult = greenCityRemoteClient.getAllUserFriendsIds(userId);
 
@@ -299,22 +298,22 @@ class GreenCityRemoteClientTest {
         Pageable pageable = PageRequest.of(0, 10);
         List<Long> friendIds = List.of(1L, 2L, 3L);
         PageableAdvancedDto<Long> usersIdsPage = new PageableAdvancedDto<>(
-                friendIds,
-                friendIds.size(),
-                0,
-                1,
-                0,
-                false,
-                false,
-                true,
-                true);
+            friendIds,
+            friendIds.size(),
+            0,
+            1,
+            0,
+            false,
+            false,
+            true,
+            true);
         String expectedJson = toJson(usersIdsPage);
         String expectedRequestPath = "/users/" + userId + "/friends?page=0&size=10";
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         PageableAdvancedDto<Long> actualResult = greenCityRemoteClient.getAllUserFriendsIds(userId, pageable);
 
@@ -339,8 +338,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         List<Long> actualResult = greenCityRemoteClient.getSixFriendsIdsWithTheHighestRating(userId);
 
@@ -358,8 +357,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.PATCH.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setResponseCode(200)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         greenCityRemoteClient.updateUserRating(userAddRatingDto);
 
@@ -380,8 +379,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.PATCH.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setResponseCode(200)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         greenCityRemoteClient.updateUserCredo(userId, userCredo);
 
@@ -403,8 +402,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.POST.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody("true")
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody("true")
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         boolean actualResult = greenCityRemoteClient.createUser(createUserDto);
 
@@ -426,8 +425,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.POST.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody("false")
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody("false")
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         boolean actualResult = greenCityRemoteClient.createUser(createUserDto);
 
@@ -441,12 +440,13 @@ class GreenCityRemoteClientTest {
     @SneakyThrows
     void updateUserPicturePathTest() {
         String profilePicturePath = "/path/to/picture.jpg";
-        String expectedRequestPath = "/users/picturePath?userId=" + userId + "&profilePicturePath=" + profilePicturePath;
+        String expectedRequestPath =
+            "/users/picturePath?userId=" + userId + "&profilePicturePath=" + profilePicturePath;
         String expectedRequestMethod = HttpMethod.PUT.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setResponseCode(200)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
 
@@ -467,8 +467,8 @@ class GreenCityRemoteClientTest {
         String expectedRequestMethod = HttpMethod.PATCH.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setResponseCode(200)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setResponseCode(200)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         greenCityRemoteClient.updateUserName(userId, userName);
 
@@ -484,19 +484,19 @@ class GreenCityRemoteClientTest {
     void findGreenCityUserProfilesByUserIdsTest() {
         List<Long> userIds = Arrays.asList(1L, 2L, 3L);
         List<GreenCityUserProfileDtoResponse> expectedProfiles = Arrays.asList(
-                ModelUtils.getGreenCityUserProfileDtoResponse(),
-                ModelUtils.getGreenCityUserProfileDtoResponse(),
-                ModelUtils.getGreenCityUserProfileDtoResponse()
-        );
+            ModelUtils.getGreenCityUserProfileDtoResponse(),
+            ModelUtils.getGreenCityUserProfileDtoResponse(),
+            ModelUtils.getGreenCityUserProfileDtoResponse());
         String expectedJson = toJson(expectedProfiles);
         String expectedRequestPath = "/users/profiles?userIds=1&userIds=2&userIds=3";
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
-        List<GreenCityUserProfileDtoResponse> actualResult = greenCityRemoteClient.findGreenCityUserProfilesByUserIds(userIds);
+        List<GreenCityUserProfileDtoResponse> actualResult =
+            greenCityRemoteClient.findGreenCityUserProfilesByUserIds(userIds);
 
         assertEquals(expectedProfiles, actualResult);
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
@@ -509,15 +509,14 @@ class GreenCityRemoteClientTest {
     @SneakyThrows
     void findGreenCityUserProfileByUserIdTest() {
         List<GreenCityUserProfileDtoResponse> profiles = List.of(
-                ModelUtils.getGreenCityUserProfileDtoResponse()
-        );
+            ModelUtils.getGreenCityUserProfileDtoResponse());
         String expectedJson = toJson(profiles);
         String expectedRequestPath = "/users/profiles?userIds=1";
         String expectedRequestMethod = HttpMethod.GET.name();
 
         mockWebServer.enqueue(new MockResponse()
-                .setBody(expectedJson)
-                .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+            .setBody(expectedJson)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
 
         GreenCityUserProfileDtoResponse actualResult = greenCityRemoteClient.findGreenCityUserProfileByUserId(userId);
 

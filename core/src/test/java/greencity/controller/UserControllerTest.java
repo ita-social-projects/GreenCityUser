@@ -1092,11 +1092,11 @@ class UserControllerTest {
         UserVOShort userVOShort = new UserVOShort();
 
         when(userService.findNotDeactivatedByIdReduced(userId))
-                .thenReturn(Optional.of(userVOShort));
+            .thenReturn(Optional.of(userVOShort));
 
         mockMvc.perform(get(userLink + "/findNotDeactivatedById")
-                        .param(idQueryParam, userIdStr))
-                .andExpect(status().isOk());
+            .param(idQueryParam, userIdStr))
+            .andExpect(status().isOk());
 
         verify(userService).findNotDeactivatedByIdReduced(userId);
     }
@@ -1107,11 +1107,11 @@ class UserControllerTest {
         String userIdStr = String.valueOf(userId);
 
         when(userService.findNotDeactivatedByIdReduced(userId))
-                .thenThrow(new NotFoundException());
+            .thenThrow(new NotFoundException());
 
         mockMvc.perform(get(userLink + "/findNotDeactivatedById")
-                        .param(idQueryParam, userIdStr))
-                .andExpect(status().isNotFound());
+            .param(idQueryParam, userIdStr))
+            .andExpect(status().isNotFound());
 
         verify(userService).findNotDeactivatedByIdReduced(userId);
     }
@@ -1125,18 +1125,18 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
 
         when(principal.getName())
-                .thenReturn(TestConst.EMAIL);
+            .thenReturn(TestConst.EMAIL);
         when(userService.findByEmail(principal.getName()))
-                .thenReturn(userVO);
+            .thenReturn(userVO);
         when(userService.deactivateUser(TestConst.UUID, request, userVO))
-                .thenReturn(deactivationDto);
+            .thenReturn(deactivationDto);
 
         mockMvc.perform(put(userLink + "/deactivate")
-                        .param(uuidQueryParam, TestConst.UUID)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestJson)
-                        .principal(principal))
-                .andExpect(status().isOk());
+            .param(uuidQueryParam, TestConst.UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestJson)
+            .principal(principal))
+            .andExpect(status().isOk());
 
         verify(userService).deactivateUser(TestConst.UUID, request, userVO);
         verify(emailService).sendReasonOfDeactivation(deactivationDto);
@@ -1147,10 +1147,10 @@ class UserControllerTest {
         Principal principal = mock(Principal.class);
 
         mockMvc.perform(put(userLink + "/deactivate")
-                        .param(uuidQueryParam, TestConst.UUID)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .principal(principal))
-                .andExpect(status().isBadRequest());
+            .param(uuidQueryParam, TestConst.UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .principal(principal))
+            .andExpect(status().isBadRequest());
 
         verify(userService, never()).deactivateUser(any(), any(), any());
         verify(emailService, never()).sendReasonOfDeactivation(any());
@@ -1161,12 +1161,12 @@ class UserControllerTest {
         String language = "en";
 
         when(userService.findUserLanguageByUuid(TestConst.UUID))
-                .thenReturn(language);
+            .thenReturn(language);
 
         mockMvc.perform(get(userLink + "/findUserLanguageByUuid")
-                        .param(uuidQueryParam, TestConst.UUID))
-                .andExpect(status().isOk())
-                .andExpect(content().string(language));
+            .param(uuidQueryParam, TestConst.UUID))
+            .andExpect(status().isOk())
+            .andExpect(content().string(language));
 
         verify(userService).findUserLanguageByUuid(TestConst.UUID);
     }
@@ -1177,11 +1177,11 @@ class UserControllerTest {
         long userId = 1L;
 
         when(userService.setActivatedStatus(userId))
-                .thenReturn(activationDto);
+            .thenReturn(activationDto);
 
         mockMvc.perform(put(userLink + "/activate")
-                        .param(idQueryParam, "1"))
-                .andExpect(status().isOk());
+            .param(idQueryParam, "1"))
+            .andExpect(status().isOk());
 
         verify(userService).setActivatedStatus(userId);
         verify(emailService).sendMessageOfActivation(activationDto);
@@ -1194,23 +1194,22 @@ class UserControllerTest {
         UserVO userVO = ModelUtils.getUserVO();
         Pageable page = PageRequest.of(0, 20);
         PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
-                List.of(),
-                0,
-                0,
-                1
-        );
+            List.of(),
+            0,
+            0,
+            1);
 
         when(userService.findByEmail(principal.getName()))
-                .thenReturn(userVO);
+            .thenReturn(userVO);
         when(userService.findUserByName(name, page, userVO.getId()))
-                .thenReturn(pageableDto);
+            .thenReturn(pageableDto);
 
         mockMvc.perform(get(userLink + "/findUserByName")
-                        .param("name", name)
-                        .param("page", "0")
-                        .param("size", "20")
-                        .principal(principal))
-                .andExpect(status().isOk());
+            .param("name", name)
+            .param("page", "0")
+            .param("size", "20")
+            .principal(principal))
+            .andExpect(status().isOk());
 
         verify(userService).findUserByName(name, page, userVO.getId());
     }
@@ -1220,11 +1219,11 @@ class UserControllerTest {
         UbsCustomerDto ubsCustomerDto = new UbsCustomerDto(TestConst.NAME, TestConst.EMAIL, "phone number");
 
         when(userService.findUbsCustomerDtoByUuid(TestConst.UUID))
-                .thenReturn(ubsCustomerDto);
+            .thenReturn(ubsCustomerDto);
 
         mockMvc.perform(get(userLink + "/findByUuId")
-                        .param(uuidQueryParam, TestConst.UUID))
-                .andExpect(status().isOk());
+            .param(uuidQueryParam, TestConst.UUID))
+            .andExpect(status().isOk());
 
         verify(userService).findUbsCustomerDtoByUuid(TestConst.UUID);
     }
@@ -1236,12 +1235,12 @@ class UserControllerTest {
         List<UserVOShort> users = Arrays.asList(new UserVOShort(), new UserVOShort());
 
         when(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity))
-                .thenReturn(users);
+            .thenReturn(users);
 
         mockMvc.perform(get(userLink + "/email")
-                        .param("email-preference", emailPreference.name())
-                        .param("email-periodicity", periodicity.name()))
-                .andExpect(status().isOk());
+            .param("email-preference", emailPreference.name())
+            .param("email-periodicity", periodicity.name()))
+            .andExpect(status().isOk());
 
         verify(userService).findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity);
     }
@@ -1252,17 +1251,16 @@ class UserControllerTest {
         LocalDateTime endDate = LocalDateTime.of(2023, 12, 31, 23, 59);
         DateGranularity granularity = DateGranularity.MONTH;
         List<UserRegistrationStatisticDto> statistics = List.of(
-                new UserRegistrationStatisticDto(LocalDateTime.of(2024, Month.SEPTEMBER, 2, 1, 1), 10L)
-        );
+            new UserRegistrationStatisticDto(LocalDateTime.of(2024, Month.SEPTEMBER, 2, 1, 1), 10L));
 
         when(managementUserStatisticsService.getUserRegistrationsByDateRange(startDate, endDate, granularity))
-                .thenReturn(statistics);
+            .thenReturn(statistics);
 
         mockMvc.perform(get(userLink + "/registration-statistics")
-                        .param("start-date", "2023-01-01T00:00:00")
-                        .param("end-date", "2023-12-31T23:59:00")
-                        .param("granularity", "MONTH"))
-                .andExpect(status().isOk());
+            .param("start-date", "2023-01-01T00:00:00")
+            .param("end-date", "2023-12-31T23:59:00")
+            .param("granularity", "MONTH"))
+            .andExpect(status().isOk());
 
         verify(managementUserStatisticsService).getUserRegistrationsByDateRange(startDate, endDate, granularity);
     }

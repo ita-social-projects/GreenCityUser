@@ -393,7 +393,8 @@ public interface UserService {
      * @param periodicity     of notification.
      * @return list of {@link UserVOShort}.
      */
-    List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(EmailPreference emailPreference, EmailPreferencePeriodicity periodicity);
+    List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(EmailPreference emailPreference,
+        EmailPreferencePeriodicity periodicity);
 
     /**
      * Method that return UserVo by UUid.
