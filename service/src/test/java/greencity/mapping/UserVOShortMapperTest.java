@@ -12,7 +12,7 @@ import static greencity.ModelUtils.getSocialNetworks;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-public class UserVOShortMapperTest {
+class UserVOShortMapperTest {
     @InjectMocks
     private UserVOShortMapper mapper;
 

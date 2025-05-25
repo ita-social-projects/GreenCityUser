@@ -5,7 +5,6 @@ import static greencity.constant.AppConstant.FILES;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
-import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;

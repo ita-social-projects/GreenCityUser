@@ -1,7 +1,6 @@
 package greencity.service;
 
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
-import greencity.dto.user.UserLocationStatisticDto;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
@@ -28,7 +27,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ManagementUserStatisticsServiceImplTest {
+class ManagementUserStatisticsServiceImplTest {
 
     @Mock
     UserRepo userRepo;

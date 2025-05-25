@@ -572,20 +572,6 @@ public class ModelUtils {
             .build();
     }
 
-    /*
-     * public static UserLocation getUserLocation() { return UserLocation.builder()
-     * .id(1L) .cityEn("Lviv") .cityUk("Львів") .countryEn("Ukraine")
-     * .countryUk("Україна") .regionUk("Львівська") .regionEn("Lvivska")
-     * .latitude(49.842957) .longitude(24.031111)
-     * .users(Collections.singletonList(getUser())) .build(); }
-     *
-     * public static UserLocation getUserLocation2() { return UserLocation.builder()
-     * .id(2L) .cityEn("Ternopil") .cityUk("Тернопіль") .countryEn("Ukraine")
-     * .countryUk("Україна") .regionUk("Тернопільська") .regionEn("Ternopilska")
-     * .latitude(49.842957) .longitude(24.031111)
-     * .users(Collections.singletonList(getUser())) .build(); }
-     */
-
     public static List<GeocodingResult> getGeocodingResult() {
         List<GeocodingResult> geocodingResults = new ArrayList<>();
 

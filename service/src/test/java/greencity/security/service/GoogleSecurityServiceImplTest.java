@@ -178,7 +178,6 @@ class GoogleSecurityServiceImplTest {
             assertNotNull(savedUser.getLastActivityTime(), "Last activity time should be set.");
             assertEquals(EmailNotification.DISABLED, savedUser.getEmailNotification(),
                 "Email notification should be DISABLED.");
-            // assertEquals(DEFAULT_RATING, savedUser.getRating());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowLocation());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowEcoPlace());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowToDoList());

@@ -237,7 +237,6 @@ class UserServiceImplTest {
 
     @Test
     void findAllUsersCitiesTest() {
-        Long userId = 1L;
         UserCityDto userCityDto = mock(UserCityDto.class);
 
         when(greenCityRemoteClient.findAllUsersCities(userId))
@@ -250,8 +249,6 @@ class UserServiceImplTest {
 
     @Test
     void findAllUsersCitiesExceptionTest() {
-        Long userId = 1L;
-
         when(greenCityRemoteClient.findAllUsersCities(userId))
             .thenThrow(new RuntimeException());
 
@@ -864,7 +861,6 @@ class UserServiceImplTest {
 
     @Test
     void getUserProfileInformationWithUserLocationTest() {
-        Long userId = 1L;
         UserProfileDtoResponse response = new UserProfileDtoResponse();
         UserLocationDto userLocationDto = new UserLocationDto();
         response.setUserLocationDto(userLocationDto);
@@ -1566,7 +1562,6 @@ class UserServiceImplTest {
     @Test
     void findNotDeactivatedByIdAdvancedTest() {
         User actual = ModelUtils.getUser();
-        Long userId = 1L;
 
         UserVOAdvancedDto expected = getUserVOAdvancedDto();
 
@@ -1580,8 +1575,6 @@ class UserServiceImplTest {
 
     @Test
     void findNotDeactivatedByIdAdvanced_NotFoundTest() {
-        Long userId = 1L;
-
         when(userRepo.findNotDeactivatedById(userId)).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(
