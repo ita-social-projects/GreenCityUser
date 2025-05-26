@@ -1,5 +1,6 @@
 package greencity.client;
 
+import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
@@ -47,12 +48,10 @@ public class GreenCityRemoteClient {
      * @return urls of the saved files.
      */
     public List<String> uploadAllFiles(List<MultipartFile> files) {
-        String path = "/files";
-
         MultipartFile[] multipartFiles = files.toArray(new MultipartFile[0]);
 
         return webClient.post()
-            .uri(path)
+            .uri("/files")
             .contentType(MediaType.MULTIPART_FORM_DATA)
             .body(multipartInserter(multipartFiles))
             .retrieve()
@@ -68,10 +67,8 @@ public class GreenCityRemoteClient {
      * @return url of the saved file.
      */
     public String uploadFile(MultipartFile file) {
-        String path = "/files/single";
-
         return webClient.post()
-            .uri(path)
+            .uri("/files/single")
             .contentType(MediaType.MULTIPART_FORM_DATA)
             .body(multipartInserter(file))
             .retrieve()
@@ -85,10 +82,8 @@ public class GreenCityRemoteClient {
      * @param paths urls of files to delete.
      */
     public void deleteAllFiles(List<String> paths) {
-        String path = "/files";
-
         webClient.method(HttpMethod.DELETE)
-            .uri(path)
+            .uri("/files")
             .bodyValue(paths)
             .retrieve()
             .bodyToMono(Void.class)
@@ -101,10 +96,8 @@ public class GreenCityRemoteClient {
      * @return list of {@link AchievementVO}
      */
     public List<AchievementVO> findAllAchievements() {
-        String path = "/achievements/all";
-
         return webClient.get()
-            .uri(path)
+            .uri("/achievements/all")
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<AchievementVO>>() {
             })
@@ -118,10 +111,8 @@ public class GreenCityRemoteClient {
      * @return list of {@link UserAchievementVO}
      */
     public List<UserAchievementVO> findAllUserAchievementsByUserId(Long userId) {
-        String path = "/achievements/user-achievements/{userId}";
-
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/achievements/user-achievements/{userId}").build(userId))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<UserAchievementVO>>() {
             })
@@ -135,10 +126,8 @@ public class GreenCityRemoteClient {
      * @return {@link UserCityDto}.
      */
     public UserCityDto findAllUsersCities(Long userId) {
-        String path = "/users/{userId}/cities";
-
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/cities").build(userId))
             .retrieve()
             .bodyToMono(UserCityDto.class)
             .block();
@@ -152,10 +141,8 @@ public class GreenCityRemoteClient {
      */
     // TODO: seems like it is no longer used
     public Optional<UserLocationDto> findUserLocationByUserId(Long userId) {
-        String path = "/users/{userId}/location";
-
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/location").build(userId))
             .retrieve()
             .onStatus(
                 httpStatusCode -> httpStatusCode.isSameCodeAs(HttpStatus.NOT_FOUND),
@@ -173,10 +160,8 @@ public class GreenCityRemoteClient {
      * @param userProfileDtoRequest contains location data
      */
     public void setLocationForUser(Long userId, UserProfileDtoRequest userProfileDtoRequest) {
-        String path = "/users/{userId}/location";
-
         webClient.patch()
-            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/location").build(userId))
             .bodyValue(userProfileDtoRequest)
             .retrieve()
             .bodyToMono(Void.class)
@@ -190,10 +175,8 @@ public class GreenCityRemoteClient {
      * @return list of friends ids.
      */
     public List<Long> getAllUserFriendsIds(Long userId) {
-        String path = "/users/{userId}/all-friends";
-
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/all-friends").build(userId))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
             })
@@ -207,16 +190,14 @@ public class GreenCityRemoteClient {
      * @param pageable pageable configuration.
      * @return {@link Page}
      */
-    public Page<Long> getAllUserFriendsIds(Long userId, Pageable pageable) {
-        String path = "/users/{userId}/friends";
-
+    public PageableAdvancedDto<Long> getAllUserFriendsIds(Long userId, Pageable pageable) {
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path)
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/friends")
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
                 .build(userId))
             .retrieve()
-            .bodyToMono(new ParameterizedTypeReference<Page<Long>>() {
+            .bodyToMono(new ParameterizedTypeReference<PageableAdvancedDto<Long>>() {
             })
             .block();
     }
@@ -228,10 +209,8 @@ public class GreenCityRemoteClient {
      * @return {@link List} of friends ids
      */
     public List<Long> getSixFriendsIdsWithTheHighestRating(Long userId) {
-        String path = "/users/{userId}/top-friends";
-
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path).build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/top-friends").build(userId))
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
             })
@@ -244,10 +223,8 @@ public class GreenCityRemoteClient {
      * @param userAddRatingDto contains rating data.
      */
     public void updateUserRating(UserAddRatingDto userAddRatingDto) {
-        String path = "/users/rating";
-
         webClient.patch()
-            .uri(path)
+            .uri("/users/rating")
             .bodyValue(userAddRatingDto)
             .retrieve()
             .bodyToMono(Void.class)
@@ -261,11 +238,10 @@ public class GreenCityRemoteClient {
      * @param userCredo new user credo
      **/
     public void updateUserCredo(Long userId, String userCredo) {
-        String path = "/users/credo";
         UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(userId, userCredo);
 
         webClient.patch()
-            .uri(path)
+            .uri("/users/credo")
             .bodyValue(updateUserCredoDto)
             .retrieve()
             .bodyToMono(Void.class)
@@ -273,10 +249,8 @@ public class GreenCityRemoteClient {
     }
 
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
-        String path = "/users/create";
-
         return Boolean.TRUE.equals(webClient.post()
-            .uri(path)
+            .uri("/users/create")
             .bodyValue(createUserDto)
             .retrieve()
             .bodyToMono(Boolean.class)
@@ -284,10 +258,8 @@ public class GreenCityRemoteClient {
     }
 
     public void updateUserPicturePath(Long userId, String profilePicturePath) {
-        String path = "/users/picturePath";
-
         webClient.put()
-            .uri(uriBuilder -> uriBuilder.path(path)
+            .uri(uriBuilder -> uriBuilder.path("/users/picturePath")
                 .queryParam(USER_ID_QUERY_PARAM, userId)
                 .queryParam(PROFILE_PICTURE_PATH_QUERY_PARAM, profilePicturePath)
                 .build())
@@ -297,10 +269,8 @@ public class GreenCityRemoteClient {
     }
 
     public void updateUserName(Long userId, String userName) {
-        String path = "/users/{userId}/name";
-
         webClient.patch()
-            .uri(uriBuilder -> uriBuilder.path(path)
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/name")
                 .queryParam("userName", userName)
                 .build(userId))
             .retrieve()
@@ -309,10 +279,8 @@ public class GreenCityRemoteClient {
     }
 
     public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
-        String path = "/users/profiles";
-
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path(path)
+            .uri(uriBuilder -> uriBuilder.path("/users/profiles")
                 .queryParam("userIds", userIds)
                 .build())
             .retrieve()

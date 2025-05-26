@@ -85,7 +85,6 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_ShouldReturnUserWithDefaultValues() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = "1";
         when(modelMapper.map(language, Long.class)).thenReturn(1L);
 
@@ -105,7 +104,6 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_ShouldThrowException_WhenLanguageIsNull() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = null;
 
         when(modelMapper.map(language, Long.class)).thenThrow(new IllegalArgumentException("Language cannot be null"));
@@ -396,7 +394,6 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_ShouldHandleNullLanguage() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = null;
 
         when(modelMapper.map(language, Long.class)).thenThrow(new IllegalArgumentException("Language cannot be null"));
@@ -423,7 +420,6 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_WithPreferences_ShouldSetNotificationPreferences() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = "1";
         when(modelMapper.map(language, Long.class)).thenReturn(1L);
 
@@ -441,7 +437,6 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_ShouldSetNotificationPreferencesCorrectly() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = "1";
 
         when(modelMapper.map(language, Long.class)).thenReturn(1L);

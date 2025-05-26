@@ -4,13 +4,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
-import greencity.client.GreenCityRemoteClient;
 import static greencity.constant.AppConstant.AUTHORIZATION;
-
 import greencity.constant.AppConstant;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
@@ -18,14 +18,19 @@ import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.DeactivateUserRequestDto;
+import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserCityDto;
+import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserManagementViewDto;
 import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserStatusStatisticDto;
@@ -34,17 +39,24 @@ import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.UserVOAdvancedDto;
 import greencity.dto.user.UserVOShort;
+import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.handler.CustomExceptionHandler;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
+import greencity.service.EmailService;
 import greencity.service.ManagementUserStatisticsService;
 import greencity.service.UserService;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -55,14 +67,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -74,7 +88,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -108,9 +121,11 @@ class UserControllerTest {
     PositionService positionService;
 
     @Mock
-    GreenCityRemoteClient greenCityRemoteClient;
+    EmailService emailService;
 
     final ObjectMapper objectMapper = new ObjectMapper();
+    String idQueryParam = "id";
+    String uuidQueryParam = "uuid";
 
     @BeforeEach
     void setup() {
@@ -118,6 +133,7 @@ class UserControllerTest {
             .standaloneSetup(userController)
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver(),
                 new UserArgumentResolver(userService))
+            .setControllerAdvice(new CustomExceptionHandler(new DefaultErrorAttributes()))
             .build();
     }
 
@@ -190,6 +206,7 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(""))
             .andExpect(status().isBadRequest());
+        verify(userService, never()).updateRole(any(), any(), any());
     }
 
     @Test
@@ -1066,5 +1083,185 @@ class UserControllerTest {
             .andExpect(status().isOk());
 
         verify(userService).findUserEmailsByUserIds(userIds);
+    }
+
+    @Test
+    void findNotDeactivatedByIdTest() throws Exception {
+        Long userId = 1L;
+        String userIdStr = String.valueOf(userId);
+        UserVOShort userVOShort = new UserVOShort();
+
+        when(userService.findNotDeactivatedByIdReduced(userId))
+            .thenReturn(Optional.of(userVOShort));
+
+        mockMvc.perform(get(userLink + "/findNotDeactivatedById")
+            .param(idQueryParam, userIdStr))
+            .andExpect(status().isOk());
+
+        verify(userService).findNotDeactivatedByIdReduced(userId);
+    }
+
+    @Test
+    void findNotDeactivatedByIdNotFoundTest() throws Exception {
+        Long userId = 1L;
+        String userIdStr = String.valueOf(userId);
+
+        when(userService.findNotDeactivatedByIdReduced(userId))
+            .thenThrow(new NotFoundException());
+
+        mockMvc.perform(get(userLink + "/findNotDeactivatedById")
+            .param(idQueryParam, userIdStr))
+            .andExpect(status().isNotFound());
+
+        verify(userService).findNotDeactivatedByIdReduced(userId);
+    }
+
+    @Test
+    void deactivateUserTest() throws Exception {
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("reason");
+        String requestJson = objectMapper.writeValueAsString(request);
+        UserDeactivationReasonDto deactivationDto = new UserDeactivationReasonDto();
+        UserVO userVO = ModelUtils.getUserVO();
+        Principal principal = mock(Principal.class);
+
+        when(principal.getName())
+            .thenReturn(TestConst.EMAIL);
+        when(userService.findByEmail(principal.getName()))
+            .thenReturn(userVO);
+        when(userService.deactivateUser(TestConst.UUID, request, userVO))
+            .thenReturn(deactivationDto);
+
+        mockMvc.perform(put(userLink + "/deactivate")
+            .param(uuidQueryParam, TestConst.UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestJson)
+            .principal(principal))
+            .andExpect(status().isOk());
+
+        verify(userService).deactivateUser(TestConst.UUID, request, userVO);
+        verify(emailService).sendReasonOfDeactivation(deactivationDto);
+    }
+
+    @Test
+    void deactivateUserBadRequestTest() throws Exception {
+        Principal principal = mock(Principal.class);
+
+        mockMvc.perform(put(userLink + "/deactivate")
+            .param(uuidQueryParam, TestConst.UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .principal(principal))
+            .andExpect(status().isBadRequest());
+
+        verify(userService, never()).deactivateUser(any(), any(), any());
+        verify(emailService, never()).sendReasonOfDeactivation(any());
+    }
+
+    @Test
+    void findUserLanguageByUuidTest() throws Exception {
+        String language = "en";
+
+        when(userService.findUserLanguageByUuid(TestConst.UUID))
+            .thenReturn(language);
+
+        mockMvc.perform(get(userLink + "/findUserLanguageByUuid")
+            .param(uuidQueryParam, TestConst.UUID))
+            .andExpect(status().isOk())
+            .andExpect(content().string(language));
+
+        verify(userService).findUserLanguageByUuid(TestConst.UUID);
+    }
+
+    @Test
+    void activateUserTest() throws Exception {
+        UserActivationDto activationDto = new UserActivationDto();
+        long userId = 1L;
+
+        when(userService.setActivatedStatus(userId))
+            .thenReturn(activationDto);
+
+        mockMvc.perform(put(userLink + "/activate")
+            .param(idQueryParam, "1"))
+            .andExpect(status().isOk());
+
+        verify(userService).setActivatedStatus(userId);
+        verify(emailService).sendMessageOfActivation(activationDto);
+    }
+
+    @Test
+    void findUserByNameTest() throws Exception {
+        String name = "TestUser";
+        Principal principal = mock(Principal.class);
+        UserVO userVO = ModelUtils.getUserVO();
+        Pageable page = PageRequest.of(0, 20);
+        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
+            List.of(),
+            0,
+            0,
+            1);
+
+        when(userService.findByEmail(principal.getName()))
+            .thenReturn(userVO);
+        when(userService.findUserByName(name, page, userVO.getId()))
+            .thenReturn(pageableDto);
+
+        mockMvc.perform(get(userLink + "/findUserByName")
+            .param("name", name)
+            .param("page", "0")
+            .param("size", "20")
+            .principal(principal))
+            .andExpect(status().isOk());
+
+        verify(userService).findUserByName(name, page, userVO.getId());
+    }
+
+    @Test
+    void findByUuIdTest() throws Exception {
+        UbsCustomerDto ubsCustomerDto = new UbsCustomerDto(TestConst.NAME, TestConst.EMAIL, "phone number");
+
+        when(userService.findUbsCustomerDtoByUuid(TestConst.UUID))
+            .thenReturn(ubsCustomerDto);
+
+        mockMvc.perform(get(userLink + "/findByUuId")
+            .param(uuidQueryParam, TestConst.UUID))
+            .andExpect(status().isOk());
+
+        verify(userService).findUbsCustomerDtoByUuid(TestConst.UUID);
+    }
+
+    @Test
+    void findAllByEmailPreferenceAndEmailPeriodicityTest() throws Exception {
+        EmailPreference emailPreference = EmailPreference.LIKES;
+        EmailPreferencePeriodicity periodicity = EmailPreferencePeriodicity.DAILY;
+        List<UserVOShort> users = Arrays.asList(new UserVOShort(), new UserVOShort());
+
+        when(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity))
+            .thenReturn(users);
+
+        mockMvc.perform(get(userLink + "/email")
+            .param("email-preference", emailPreference.name())
+            .param("email-periodicity", periodicity.name()))
+            .andExpect(status().isOk());
+
+        verify(userService).findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity);
+    }
+
+    @Test
+    void getUserRegistrationsByDateRangeTest() throws Exception {
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2023, 12, 31, 23, 59);
+        DateGranularity granularity = DateGranularity.MONTH;
+        List<UserRegistrationStatisticDto> statistics = List.of(
+            new UserRegistrationStatisticDto(LocalDateTime.of(2024, Month.SEPTEMBER, 2, 1, 1), 10L));
+
+        when(managementUserStatisticsService.getUserRegistrationsByDateRange(startDate, endDate, granularity))
+            .thenReturn(statistics);
+
+        mockMvc.perform(get(userLink + "/registration-statistics")
+            .param("start-date", "2023-01-01T00:00:00")
+            .param("end-date", "2023-12-31T23:59:00")
+            .param("granularity", "MONTH"))
+            .andExpect(status().isOk());
+
+        verify(managementUserStatisticsService).getUserRegistrationsByDateRange(startDate, endDate, granularity);
     }
 }

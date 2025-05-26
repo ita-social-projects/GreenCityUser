@@ -306,18 +306,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
-    public Optional<UserVO> findNotDeactivatedById(Long id) {
-        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        log.info("user: {}", notDeactivatedById);
-        return Optional.of(modelMapper.map(notDeactivatedById, UserVO.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Long findIdByEmail(String email) {
         log.info(LogMessage.IN_FIND_ID_BY_EMAIL, email);
         return userRepo.findIdByEmail(email).orElseThrow(
@@ -695,11 +683,11 @@ public class UserServiceImpl implements UserService {
             .id(userId)
             .onlineStatus(checkIfTheUserIsOnline(userId))
             .build();
-        Page<Long> friendsIds = greenCityRemoteClient.getAllUserFriendsIds(userId, pageable);
+        PageableAdvancedDto<Long> friendsIds = greenCityRemoteClient.getAllUserFriendsIds(userId, pageable);
         List<UserWithOnlineStatusDto> friendsWithOnlineStatusDtos = new ArrayList<>();
-        if (!friendsIds.isEmpty()) {
+        if (!friendsIds.getPage().isEmpty()) {
             friendsWithOnlineStatusDtos = friendsIds
-                .getContent()
+                .getPage()
                 .stream()
                 .map(friendId -> new UserWithOnlineStatusDto(friendId, checkIfTheUserIsOnline(friendId)))
                 .toList();
@@ -707,7 +695,7 @@ public class UserServiceImpl implements UserService {
         return UserAndAllFriendsWithOnlineStatusDto.builder()
             .user(userWithOnlineStatusDto)
             .friends(new PageableDto<>(friendsWithOnlineStatusDtos, friendsIds.getTotalElements(),
-                friendsIds.getPageable().getPageNumber(), friendsIds.getTotalPages()))
+                friendsIds.getNumber(), friendsIds.getTotalPages()))
             .build();
     }
 
@@ -844,8 +832,9 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(String emailPreference, String periodicity) {
-        return userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity).stream()
+    public List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(EmailPreference emailPreference,
+        EmailPreferencePeriodicity periodicity) {
+        return userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(), periodicity.name()).stream()
             .map(user -> modelMapper.map(user, UserVOShort.class))
             .toList();
     }
@@ -1050,7 +1039,6 @@ public class UserServiceImpl implements UserService {
     public Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVOAdvancedDto.class));
     }
 
@@ -1090,7 +1078,6 @@ public class UserServiceImpl implements UserService {
         log.info("email {}", email);
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        log.info("user: {}", notDeactivatedByEmail);
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));
     }
 
@@ -1102,7 +1089,6 @@ public class UserServiceImpl implements UserService {
     public Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id) {
         User notDeactivatedById = userRepo.findNotDeactivatedById(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        log.info("user: {}", notDeactivatedById);
         return Optional.of(modelMapper.map(notDeactivatedById, UserVOShort.class));
     }
 

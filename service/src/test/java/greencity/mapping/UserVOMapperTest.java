@@ -1,21 +1,16 @@
 package greencity.mapping;
 
 import greencity.ModelUtils;
-import greencity.client.GreenCityRemoteClient;
 import greencity.dto.user.UserVO;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.entity.OwnSecurity;
-
-import static greencity.ModelUtils.getSocialNetworks;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class UserVOMapperTest {

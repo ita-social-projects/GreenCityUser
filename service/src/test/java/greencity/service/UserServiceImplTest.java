@@ -59,6 +59,7 @@ import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.Base64DecodedException;
 import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserDeactivationException;
@@ -87,6 +88,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -113,7 +115,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -156,13 +157,14 @@ class UserServiceImplTest {
     private final User user = User.builder()
         .id(1L)
         .name("Taras")
-        .email("test@gmail.com")
+        .email(TestConst.EMAIL)
         .role(ROLE_USER)
         .userStatus(ACTIVATED)
         .emailNotification(EmailNotification.DISABLED)
         .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
+        .language(new Language(1L, "ua", List.of()))
         .build();
 
     private final User user1 = User.builder()
@@ -237,7 +239,6 @@ class UserServiceImplTest {
 
     @Test
     void findAllUsersCitiesTest() {
-        Long userId = 1L;
         UserCityDto userCityDto = mock(UserCityDto.class);
 
         when(greenCityRemoteClient.findAllUsersCities(userId))
@@ -250,8 +251,6 @@ class UserServiceImplTest {
 
     @Test
     void findAllUsersCitiesExceptionTest() {
-        Long userId = 1L;
-
         when(greenCityRemoteClient.findAllUsersCities(userId))
             .thenThrow(new RuntimeException());
 
@@ -351,6 +350,25 @@ class UserServiceImplTest {
         when(userRepo.findById(any())).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
         assertThrows(LowRoleLevelException.class, () -> userService.updateStatus(userId, DEACTIVATED, "email"));
+    }
+
+    @Test
+    void findAllByEmailPreferenceAndEmailPeriodicityTest() {
+        List<User> users = List.of(ModelUtils.getUser(), ModelUtils.getUser());
+        List<UserVOShort> expectedResult = List.of(ModelUtils.getUserVOShortDto(), ModelUtils.getUserVOShortDto());
+        EmailPreference emailPreference = EmailPreference.LIKES;
+        EmailPreferencePeriodicity emailPreferencePeriodicity = EmailPreferencePeriodicity.DAILY;
+
+        when(userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(),
+            emailPreferencePeriodicity.name()))
+                .thenReturn(users);
+        when(modelMapper.map(any(User.class), eq(UserVOShort.class)))
+            .thenReturn(ModelUtils.getUserVOShortDto());
+
+        List<UserVOShort> actualResult = userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference,
+            emailPreferencePeriodicity);
+
+        assertEquals(expectedResult, actualResult);
     }
 
     @Test
@@ -864,7 +882,6 @@ class UserServiceImplTest {
 
     @Test
     void getUserProfileInformationWithUserLocationTest() {
-        Long userId = 1L;
         UserProfileDtoResponse response = new UserProfileDtoResponse();
         UserLocationDto userLocationDto = new UserLocationDto();
         response.setUserLocationDto(userLocationDto);
@@ -1002,12 +1019,18 @@ class UserServiceImplTest {
     void getAllFriendsWithTheOnlineStatus() {
         Pageable pageable = PageRequest.of(0, 1);
         Page<User> usersPage = new PageImpl<>(Collections.singletonList(user), pageable, 1);
-        Page<Long> usersIdsPage = new PageImpl<>(
+        PageableAdvancedDto<Long> usersIdsPage = new PageableAdvancedDto<>(
             usersPage.getContent().stream()
                 .map(User::getId)
                 .toList(),
-            pageable,
-            1);
+            usersPage.getSize(),
+            0,
+            1,
+            0,
+            false,
+            false,
+            true,
+            true);
         UserWithOnlineStatusDto userWithOnlineStatusDto = UserWithOnlineStatusDto.builder()
             .id(userId)
             .onlineStatus(true)
@@ -1359,6 +1382,29 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateUserProfilePictureWhenCannotMapToMultipartTest() {
+        String fileName = "test.txt";
+        String content = "test file content";
+        String picturePath = "picturePath";
+        String base64 = "base64";
+        String email = "testmail@gmail.com";
+        byte[] bytes = content.getBytes();
+        MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
+
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+        when(modelMapper.map(base64, MultipartFile.class)).thenThrow(new RuntimeException());
+
+        assertThrows(
+            Base64DecodedException.class,
+            () -> userService.updateUserProfilePicture(file, email, base64));
+
+        verify(userRepo).findByEmail(anyString());
+        verify(modelMapper).map(base64, MultipartFile.class);
+        verify(restClient, never()).uploadImage(any());
+        verify(greenCityRemoteClient, never()).updateUserPicturePath(user.getId(), picturePath);
+    }
+
+    @Test
     void getDeactivationReasonUkTest() {
         List<String> test1 = List.of();
         User myUser = ModelUtils.getUser();
@@ -1522,6 +1568,31 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findUserLanguageByUuidTest() {
+        String uuid = "uuid";
+        String languageCode = user.getLanguage().getCode();
+
+        when(userRepo.findNotDeactivatedUserByUuid(uuid))
+            .thenReturn(Optional.of(user));
+
+        String actualResult = userService.findUserLanguageByUuid(uuid);
+
+        assertEquals(languageCode, actualResult);
+    }
+
+    @Test
+    void findUserLanguageByUuidWhenUserNotFoundTest() {
+        String uuid = "uuid";
+
+        when(userRepo.findNotDeactivatedUserByUuid(uuid))
+            .thenReturn(Optional.empty());
+
+        assertThrows(
+            NotFoundException.class,
+            () -> userService.findUserLanguageByUuid(uuid));
+    }
+
+    @Test
     void findAllActivatedUserIdsOkTest() {
         List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
         when(userRepo.findAllActivatedUserIdsFromList(input)).thenReturn(List.of(1L, 2L, 3L));
@@ -1566,7 +1637,6 @@ class UserServiceImplTest {
     @Test
     void findNotDeactivatedByIdAdvancedTest() {
         User actual = ModelUtils.getUser();
-        Long userId = 1L;
 
         UserVOAdvancedDto expected = getUserVOAdvancedDto();
 
@@ -1580,8 +1650,6 @@ class UserServiceImplTest {
 
     @Test
     void findNotDeactivatedByIdAdvanced_NotFoundTest() {
-        Long userId = 1L;
-
         when(userRepo.findNotDeactivatedById(userId)).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(
@@ -1594,7 +1662,6 @@ class UserServiceImplTest {
 
     @Test
     void createGreenCityUserTest() {
-        User user = ModelUtils.getUser();
         CreateGreenCityUserDto createGreenCityUserDto = ModelUtils.getCreateGreenCityDto();
 
         when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
@@ -1607,11 +1674,10 @@ class UserServiceImplTest {
 
     @Test
     void createGreenCityUserNotFoundTest() {
-        Long userId = 66L;
         when(userRepo.findById(userId)).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(NotFoundException.class,
-            () -> userService.createGreenCityUser(user.getId(), "http://anypath.com.ua"));
+            () -> userService.createGreenCityUser(userId, "http://anypath.com.ua"));
 
         assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
         verifyNoInteractions(greenCityRemoteClient);
@@ -1619,7 +1685,6 @@ class UserServiceImplTest {
 
     @Test
     void findNotDeactivatedByEmailReducedTest() {
-        User user = getUser();
         user.setUserStatus(ACTIVATED);
         UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
 
@@ -1639,7 +1704,6 @@ class UserServiceImplTest {
 
     @Test
     void findNotDeactivatedByIdReducedTest() {
-        User user = getUser();
         user.setUserStatus(ACTIVATED);
         UserVOShort userVOShort = getUserVOShortDto();
 
@@ -1683,7 +1747,7 @@ class UserServiceImplTest {
     void findUserEmailsByUserIdsTest() {
         List<Long> userIds = List.of(1L, 2L, 3L);
         List<UserEmailDto> userEmailDtos = userIds.stream()
-            .map(userId -> new UserEmailDto(userId, "email"))
+            .map(id -> new UserEmailDto(id, "email"))
             .toList();
 
         when(userRepo.findAllEmailsByIdIn(userIds))

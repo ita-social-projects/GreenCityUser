@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class JwtServiceImplTest {
+class JwtServiceImplTest {
 
     @Mock
     UserRepo userRepo;
