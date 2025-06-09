@@ -217,25 +217,25 @@ public class SecurityConfig {
                     "/email/sendHabitNotification",
                     "/email/sendInterestingEcoNews",
                     "/management/socialnetworkimages/save-remote",
-                        "/user-notification-preference/search")
+                    "/user-notification-preference/search")
                 .hasAnyRole(ADMIN)
-                    .requestMatchers(HttpMethod.PUT,
-                            "/management/socialnetworkimages/")
-                    .hasAnyRole(ADMIN)
-                    .requestMatchers(HttpMethod.GET,
-                            "/user/email/findAll",
-                            "/user/email/findByIds",
-                            "/user/findNotDeactivatedByIdAdvanced",
-                            "/user/activated-ids",
-                            "/user/registration-statistics",
-                            "/user/email",
-                            "/user/count-active-users",
-                            "/user/email-preferences-distribution",
-                            "/user/statuses-distribution",
-                            "/user/roles-distribution",
-                            "/user/findNotDeactivatedById",
-                            "/user/findNotDeactivatedByEmail")
-                    .hasAnyRole(ADMIN)
+                .requestMatchers(HttpMethod.PUT,
+                    "/management/socialnetworkimages/")
+                .hasAnyRole(ADMIN)
+                .requestMatchers(HttpMethod.GET,
+                    "/user/email/findAll",
+                    "/user/email/findByIds",
+                    "/user/findNotDeactivatedByIdAdvanced",
+                    "/user/activated-ids",
+                    "/user/registration-statistics",
+                    "/user/email",
+                    "/user/count-active-users",
+                    "/user/email-preferences-distribution",
+                    "/user/statuses-distribution",
+                    "/user/roles-distribution",
+                    "/user/findNotDeactivatedById",
+                    "/user/findNotDeactivatedByEmail")
+                .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
                     "/management/socialnetworkimages/delete",
                     "/management/socialnetworkimages/deleteAll")
@@ -244,7 +244,7 @@ public class SecurityConfig {
                     "/user/status",
                     "/user/role",
                     "/user/update/role",
-                        "/user/{id}/role")
+                    "/user/{id}/role")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.POST, "/management/login")
                 .permitAll()
