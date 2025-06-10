@@ -66,5 +66,5 @@ public class ErrorMessage {
         "Git repository not initialized. Commit info is unavailable.";
     public static final String FAILED_TO_FETCH_COMMIT_INFO = "Failed to fetch commit info due to I/O error: ";
     public static final String INTERNAL_SERVER_ERROR = "Internal server error: ";
-    public static final String GREENCITY_APP_UNAVAILABLE= "The GreenCity service is unavailable";
+    public static final String GREENCITY_APP_UNAVAILABLE = "The GreenCity service is unavailable";
 }

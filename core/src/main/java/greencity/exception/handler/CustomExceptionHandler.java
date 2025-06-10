@@ -147,19 +147,20 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Method interceptor for server errors-related exceptions which can be thrown by WebClient
-     * during making and receiving requests to the GreenCity app such as
-     * {@link GreenCityServiceException}, {@link WebClientRequestException},
+     * Method interceptor for server errors-related exceptions which can be thrown
+     * by WebClient during making and receiving requests to the GreenCity app such
+     * as {@link GreenCityServiceException}, {@link WebClientRequestException},
      * {@link WebClientResponseException}.
      *
      * @param request Contains details about the occurred exception.
      * @return ResponseEntity which contains the HTTP status and body with the
      *         message of the exception.
      */
-    @ExceptionHandler({GreenCityServiceException.class, WebClientRequestException.class, WebClientResponseException.class})
+    @ExceptionHandler({GreenCityServiceException.class, WebClientRequestException.class,
+        WebClientResponseException.class})
     public final ResponseEntity<Object> handleGreenCityServiceException(Exception ex, WebRequest request) {
         if (ex instanceof WebClientRequestException) {
-            Map<String, String > errorBody = Map.of(AppConstant.MESSAGE, ErrorMessage.GREENCITY_APP_UNAVAILABLE);
+            Map<String, String> errorBody = Map.of(AppConstant.MESSAGE, ErrorMessage.GREENCITY_APP_UNAVAILABLE);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorBody);
         }
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));

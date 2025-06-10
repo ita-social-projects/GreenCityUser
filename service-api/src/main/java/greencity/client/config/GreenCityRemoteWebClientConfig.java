@@ -78,14 +78,17 @@ public class GreenCityRemoteWebClientConfig {
                 switch (clientResponse.statusCode()) {
                     case HttpStatus.NOT_FOUND -> sink.error(new NotFoundException(populateErrorMessage(errorBody)));
                     case HttpStatus.BAD_REQUEST -> sink.error(new BadRequestException(populateErrorMessage(errorBody)));
-                    case HttpStatus.INTERNAL_SERVER_ERROR -> sink.error(new GreenCityServiceException(populateErrorMessage(errorBody)));
+                    case HttpStatus.INTERNAL_SERVER_ERROR -> sink
+                        .error(new GreenCityServiceException(populateErrorMessage(errorBody)));
                     default -> sink.error(new IllegalStateException(ErrorMessage.INTERNAL_SERVER_ERROR + errorBody));
                 }
             }));
     }
 
     private String populateErrorMessage(String errorBody) {
-        record JsonMessage(String timestamp, short status, String error, String trace, String message, String path) {}
+        record JsonMessage(String timestamp, short status, String error, String trace, String message, String path) {
+        }
+
         try {
             return new ObjectMapper().readValue(errorBody, JsonMessage.class).message();
         } catch (JsonProcessingException e) {
