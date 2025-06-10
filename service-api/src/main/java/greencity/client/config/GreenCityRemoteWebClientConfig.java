@@ -1,7 +1,13 @@
 package greencity.client.config;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.constant.AppConstant;
+import greencity.constant.ErrorMessage;
 import greencity.enums.Role;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.GreenCityServiceException;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.security.jwt.JwtTool;
 import io.netty.channel.ChannelOption;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -41,6 +48,7 @@ public class GreenCityRemoteWebClientConfig {
         return builder.baseUrl(greenCityBaseUrl)
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .filter(authorizationHeaderFilter())
+            .filter(handlingWebClientExceptions())
             .clientConnector(
                 new ReactorClientHttpConnector(
                     HttpClient.create()
@@ -62,5 +70,26 @@ public class GreenCityRemoteWebClientConfig {
 
             return Mono.just(authorizedRequest);
         });
+    }
+
+    private ExchangeFilterFunction handlingWebClientExceptions() {
+        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> clientResponse.bodyToMono(String.class)
+            .handle((errorBody, sink) -> {
+                switch (clientResponse.statusCode()) {
+                    case HttpStatus.NOT_FOUND -> sink.error(new NotFoundException(populateErrorMessage(errorBody)));
+                    case HttpStatus.BAD_REQUEST -> sink.error(new BadRequestException(populateErrorMessage(errorBody)));
+                    case HttpStatus.INTERNAL_SERVER_ERROR -> sink.error(new GreenCityServiceException(populateErrorMessage(errorBody)));
+                    default -> sink.error(new IllegalStateException(ErrorMessage.INTERNAL_SERVER_ERROR + errorBody));
+                }
+            }));
+    }
+
+    private String populateErrorMessage(String errorBody) {
+        record JsonMessage(String timestamp, short status, String error, String trace, String message, String path) {}
+        try {
+            return new ObjectMapper().readValue(errorBody, JsonMessage.class).message();
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

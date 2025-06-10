@@ -34,4 +34,5 @@ public class AppConstant {
     public static final String USER_STATUS = "user_status";
     public static final String DEFAULT_SOCIAL_NETWORK_IMAGE_HOST_PATH = "img/default_social_network_icon.png";
     public static final String EMPTY_STRING = "";
+    public static final String MESSAGE = "message";
 }
