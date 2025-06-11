@@ -16,6 +16,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.ClientRequest;
@@ -73,16 +74,25 @@ public class GreenCityRemoteWebClientConfig {
     }
 
     private ExchangeFilterFunction handlingWebClientExceptions() {
-        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> clientResponse.bodyToMono(String.class)
-            .handle((errorBody, sink) -> {
-                switch (clientResponse.statusCode()) {
-                    case HttpStatus.NOT_FOUND -> sink.error(new NotFoundException(populateErrorMessage(errorBody)));
-                    case HttpStatus.BAD_REQUEST -> sink.error(new BadRequestException(populateErrorMessage(errorBody)));
-                    case HttpStatus.INTERNAL_SERVER_ERROR -> sink
-                        .error(new GreenCityServiceException(populateErrorMessage(errorBody)));
-                    default -> sink.error(new IllegalStateException(ErrorMessage.INTERNAL_SERVER_ERROR + errorBody));
-                }
-            }));
+        return ExchangeFilterFunction.ofResponseProcessor(clientResponse -> {
+            HttpStatusCode statusCode = clientResponse.statusCode();
+            if (!(statusCode.is4xxClientError() || statusCode.is5xxServerError())) {
+                return Mono.just(clientResponse);
+            }
+
+            return clientResponse.bodyToMono(String.class)
+                .handle((errorBody, sink) -> {
+                    switch (clientResponse.statusCode()) {
+                        case HttpStatus.NOT_FOUND -> sink.error(new NotFoundException(populateErrorMessage(errorBody)));
+                        case HttpStatus.BAD_REQUEST -> sink
+                            .error(new BadRequestException(populateErrorMessage(errorBody)));
+                        case HttpStatus.INTERNAL_SERVER_ERROR -> sink
+                            .error(new GreenCityServiceException(populateErrorMessage(errorBody)));
+                        default -> sink
+                            .error(new IllegalStateException(ErrorMessage.INTERNAL_SERVER_ERROR + errorBody));
+                    }
+                });
+        });
     }
 
     private String populateErrorMessage(String errorBody) {
