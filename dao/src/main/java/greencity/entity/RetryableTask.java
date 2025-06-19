@@ -20,7 +20,6 @@ import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 @Getter
 @Setter
@@ -31,7 +30,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Builder
 @Entity
 @Table(name = "retryable_task_table")
-public class RetryableTask{
+public class RetryableTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
