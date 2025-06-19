@@ -51,5 +51,5 @@ public class RetryableTask {
 
     @CreationTimestamp
     @Column(nullable = false)
-    private LocalDateTime retriedTime;
+    private LocalDateTime retryTime;
 }
