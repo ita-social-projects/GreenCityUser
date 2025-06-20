@@ -14,13 +14,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RetryableTaskRepository extends JpaRepository<RetryableTask, Long> {
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT r from RetryableTask r where r.type= :type " +
-        "AND r.retryTime<= :retryTime " +
-        "AND r.status= :status " +
-        "order by r.retryTime asc")
+    @Query("SELECT r from RetryableTask r where r.type= :type "
+        + "AND r.retryTime<= :retryTime "
+        + "AND r.status= :status "
+        + "order by r.retryTime asc")
     List<RetryableTask> findRetryableTaskForProcessing(RetryableTaskType type, LocalDateTime retryTime,
         RetryableTaskStatus status, Pageable pageable);
-
 }
