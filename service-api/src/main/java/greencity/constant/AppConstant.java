@@ -31,4 +31,6 @@ public class AppConstant {
     public static final String PASSWORD = "password";
     public static final String USER_STATUS = "user_status";
     public static final String GOOGLE_API = "Google API";
+    public static final String LOGS_LINKS = "/logs/**";
+    public static final String EXPORT_SETTINGS_LINKS = "/export/settings/**";
 }

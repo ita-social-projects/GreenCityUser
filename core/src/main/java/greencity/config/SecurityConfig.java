@@ -5,6 +5,8 @@ import static greencity.constant.AppConstant.EMPLOYEE;
 import static greencity.constant.AppConstant.MODERATOR;
 import static greencity.constant.AppConstant.UBS_EMPLOYEE;
 import static greencity.constant.AppConstant.USER;
+import static greencity.constant.AppConstant.LOGS_LINKS;
+import static greencity.constant.AppConstant.EXPORT_SETTINGS_LINKS;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -154,12 +156,15 @@ public class SecurityConfig {
                     "/user/createUbsRecord",
                     "/user/{userId}/sixUserFriends/",
                     "/ownSecurity/password-status",
-                    "/user/emailNotifications")
+                    "/user/emailNotifications",
+                    LOGS_LINKS,
+                    EXPORT_SETTINGS_LINKS)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",
                     "/user/{userId}/habit",
-                    "/ownSecurity/set-password")
+                    "/ownSecurity/set-password",
+                    LOGS_LINKS)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PUT,
                     "/ownSecurity/changePassword",
@@ -191,7 +196,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE,
                     "/user/to-do-list-items/user-to-do-list-items",
                     "/user/to-do-list-items",
-                    "/ownSecurity/user")
+                    "/ownSecurity/user",
+                    LOGS_LINKS)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     USER_LINK,
