@@ -3,4 +3,28 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <include file="db/changelog/logs/ch-social-network-Lehkyi.xml"/>
+    <include file="db/changelog/logs/ch-user-profile-Datsko.xml"/>
+    <include file="db/changelog/logs/ch-add-reasons-for-user-deactivatiom-table-Pikhotskyi.xml"/>
+    <include file="db/changelog/logs/ch-add-user_email_preferences-Holotsvan.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-user_email_preferences-Herchanivska-9.xml"/>
+    <include file="db/changelog/logs/ch-add-column-user_email_preferences-Herchanivska-8.xml"/>
+    <include file="db/changelog/logs/ch-add-column-Bilonizhka.xml"/>
+    <include file="db/changelog/logs/ch-add-column-Koval-1.xml"/>
+    <include file="db/changelog/logs/ch-add-column-phone-to-user-Struk.xml"/>
+    <include file="db/changelog/logs/ch-add-column-Zhurakovskyi-1.xml"/>
+    <include file="db/changelog/logs/ch-change-eco-news-Ostriychuk.xml"/>
+    <include file="db/changelog/logs/ch-change-table-users-Yurchuk-1.xml"/>
+    <include file="db/changelog/logs/ch-change-user-profile-columns-type-Haliara.xml"/>
+    <include file="db/changelog/logs/ch-change-users-addColumn-datsko.xml"/>
+    <include file="db/changelog/logs/ch-add-default-value-userprofile-confidentiality-Haliara.xml"/>
+    <include file="db/changelog/logs/ch-change-users-rating-Datsko.xml"/>
+    <include file="db/changelog/logs/ch-drop-column-city-in-users-table-Midianyi.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-users-admin-Spodaryk.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-users-Korzh.xml"/>
+    <include file="db/changelog/logs/ch-insert-table-users-service-account-Yezenitskyi.xml"/>
+    <include file="db/changelog/logs/ch-ubs-database-seperation.xml"/>
+    <include file="db/changelog/logs/ch-user-username-column-type.xml"/>
+    <include file="db/changelog/logs/ch-changed-user-role-to-varchar.xml"/>
+    <include file="db/changelog/logs/ch-rename-tables-shopping_list-to-to_do_list-Herchanivska.xml"/>
 </databaseChangeLog>
