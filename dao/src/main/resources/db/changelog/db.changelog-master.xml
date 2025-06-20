@@ -61,4 +61,6 @@
     <include file="db/changelog/logs/ch-user-username-column-type.xml"/>
     <include file="db/changelog/logs/ch-changed-user-role-to-varchar.xml"/>
     <include file="db/changelog/logs/ch-rename-tables-shopping_list-to-to_do_list-Herchanivska.xml"/>
+    <include file="db/changelog/logs/ch-drop-column-last_visit-in-users-table-Levko.xml"/>
+    <include file="db/changelog/logs/ch-update-users-set-new-main-email-Midianyi.xml"/>
 </databaseChangeLog>
