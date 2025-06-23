@@ -49,7 +49,6 @@ public class RetryableTask {
     @Column(nullable = false)
     private LocalDateTime createdTime;
 
-    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime retryTime;
 }
