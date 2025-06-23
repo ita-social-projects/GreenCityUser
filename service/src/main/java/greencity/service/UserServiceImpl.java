@@ -50,6 +50,7 @@ import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.RetryableTaskType;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRequestException;
@@ -105,6 +106,7 @@ public class UserServiceImpl implements UserService {
     private final SimpMessagingTemplate messagingTemplate;
     private final SocialNetworkImageService socialNetworkImageService;
     private final SocialNetworkService socialNetworkService;
+    private final RetryableTaskService retryableTaskService;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
     private long timeAfterLastActivity;
@@ -1049,15 +1051,17 @@ public class UserServiceImpl implements UserService {
     public void createGreenCityUser(Long newUserId, String profilePicture) {
         User newUser =
             userRepo.findById(newUserId).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        CreateGreenCityUserDto createGreenCityUserDto = CreateGreenCityUserDto.builder()
+            .id(newUser.getId())
+            .email(newUser.getEmail())
+            .name(newUser.getName())
+            .profilePicturePath(profilePicture)
+            .build();
         try {
-            greenCityRemoteClient.createUser(CreateGreenCityUserDto.builder()
-                .id(newUser.getId())
-                .email(newUser.getEmail())
-                .name(newUser.getName())
-                .profilePicturePath(profilePicture)
-                .build());
+            greenCityRemoteClient.createUser(createGreenCityUserDto);
         } catch (WebClientRequestException e) {
             log.warn("GreenCity service is unavailable: {}", e.getMessage());
+            retryableTaskService.saveRetryableTask(createGreenCityUserDto, RetryableTaskType.CREATE_USER);
         } catch (WebClientResponseException e) {
             log.warn("Bad response from GreenCity: {}", e.getMessage());
         } catch (Exception e) {
