@@ -6,5 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum RetryableTaskType {
-    SEND_GREENCITY_REQUEST
+    UPDATE_USER_RATING,
+    CREATE_USER
 }
