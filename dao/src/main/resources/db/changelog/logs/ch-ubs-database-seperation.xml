@@ -13,10 +13,6 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="Bilonizhka26/1" author="Oleh Bilonizhka">
-        <dropTable tableName="employee_position"/>
-    </changeSet>
-
     <changeSet id="Bilonizhka26/2" author="Oleh Bilonizhka">
         <dropTable tableName="positions"/>
     </changeSet>

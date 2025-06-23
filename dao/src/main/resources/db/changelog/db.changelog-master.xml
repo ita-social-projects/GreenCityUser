@@ -15,7 +15,7 @@
     <include file="db/changelog/logs/ch-add-column-Zhurakovskyi-1.xml"/>
     <include file="db/changelog/logs/ch-user-profile-Datsko.xml"/>
     <include file="db/changelog/logs/ch-social-network-Lehkyi.xml"/>
-    <include file="db/changelog/logs/ch-user-username-column-type.xml"/>
+    <include file="/db/changelog/logs/ch-user-username-column-type.xml"/>
     <include file="db/changelog/logs/ch-add-column-Bilonizhka.xml"/>
     <include file="db/changelog/logs/ch-add-new-ubs-columns-Bilonizhka.xml"/>
     <include file="db/changelog/logs/ch-add-language-column-to-user-Diakiv.xml"/>
@@ -55,7 +55,7 @@
     <include file="db/changelog/logs/ch-insert-into-employee-authority-Prots.xml" />
     <include file="db/changelog/logs/ch-insert-into-employee-authority-mapping-Prots.xml"/>
     <include file="db/changelog/logs/ch-insert-into-positions-authorities-mapping-Prots.xml"/>
-    <include file="db/changelog/logs/ch-add-user_email_preferences-Holotsvan.xml"/>
+    <include file="/db/changelog/logs/ch-add-user_email_preferences-Holotsvan.xml"/>
     <include file="db/changelog/logs/ch-add-column-user_email_preferences-Herchanivska-8.xml"/>
     <include file="db/changelog/logs/ch-insert-into-user_email_preferences-Herchanivska-9.xml"/>
     <include file="db/changelog/logs/ch-drop-column-expiry-date-Rozhko.xml"/>
