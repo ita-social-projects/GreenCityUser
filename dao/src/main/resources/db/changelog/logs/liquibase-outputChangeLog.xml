@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="Marian (generated)" id="1571227598316-9">
+        <createTable tableName="own_security">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="password" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-12">
+        <createTable tableName="restore_password_email">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="expiry_date" type="datetime(6)"/>
+            <column name="token" type="VARCHAR(255)"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-14">
+        <createTable tableName="user">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="date_of_registration" type="datetime(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email_notification" type="INT"/>
+            <column name="first_name" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_name" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_visit" type="datetime(6)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_status" type="INT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-15">
+        <createTable tableName="verify_email">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="expiry_date" type="datetime(6)"/>
+            <column name="token" type="VARCHAR(255)"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-24">
+        <addUniqueConstraint columnNames="email" constraintName="UK_ob8kqyqqgmefl0aco34akdtpe" tableName="user"/>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-25">
+        <createIndex indexName="FK1faffy1p9x95n6v18m5urdkfc" tableName="verify_email">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-30">
+        <createIndex indexName="FK84jlf1nvnb2duww5bi10j5kwy" tableName="restore_password_email">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-46">
+        <createIndex indexName="FKs084ey5e475cqp4w0hsgisjpd" tableName="own_security">
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-50">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="verify_email" constraintName="FK1faffy1p9x95n6v18m5urdkfc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-55">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="restore_password_email" constraintName="FK84jlf1nvnb2duww5bi10j5kwy" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+    <changeSet author="Marian (generated)" id="1571227598316-71">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="own_security" constraintName="FKs084ey5e475cqp4w0hsgisjpd" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>
+    </changeSet>
+</databaseChangeLog>
