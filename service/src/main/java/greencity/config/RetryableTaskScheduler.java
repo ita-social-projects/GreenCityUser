@@ -5,6 +5,7 @@ import greencity.dto.retryabletask.RetryableTaskVO;
 import greencity.entity.RetryableTask;
 import greencity.enums.RetryableTaskStatus;
 import greencity.enums.RetryableTaskType;
+import greencity.exception.exceptions.TaskProcessingException;
 import greencity.repository.RetryableTaskRepository;
 import greencity.service.RetryableTaskProcessor;
 import greencity.service.RetryableTaskServiceImpl;
@@ -37,8 +38,10 @@ public class RetryableTaskScheduler {
 
                     task.setStatus(RetryableTaskStatus.SUCCESS);
                     repository.save(task);
+                } catch (TaskProcessingException e) {
+                    log.warn("TaskProcessingException for task {}: {}", task.getId(), e.getMessage());
                 } catch (Exception e) {
-                    log.error("Failed to process task with id {}", task.getId(), e);
+                    log.error("Unexpected error for task {}: {}", task.getId(), e.getMessage(), e);
                 }
             }
         }
