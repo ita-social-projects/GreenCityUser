@@ -1,7 +1,7 @@
 DELETE FROM positions_authorities_mapping AS pam
     USING positions AS p
 WHERE pam.position_id = p.id
-  AND p.name_eng = 'Admin'
+  AND p.name_en = 'Admin'
   AND pam.authorities_id IN (
     SELECT id
     FROM employee_authorities
@@ -14,7 +14,7 @@ WHERE pam.position_id = p.id
 DELETE FROM positions_authorities_mapping AS pam
     USING positions AS p
 WHERE pam.position_id = p.id
-  AND p.name_eng = 'Service Manager'
+  AND p.name_en = 'Service Manager'
   AND pam.authorities_id IN (
     SELECT id
     FROM employee_authorities

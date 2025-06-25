@@ -53,11 +53,10 @@
         </createTable>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-15">
-        <createTable tableName="verify_email">
+        <createTable tableName="verify_emails">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="expiry_date" type="datetime(6)"/>
             <column name="token" type="VARCHAR(255)"/>
             <column name="user_id" type="BIGINT"/>
         </createTable>
@@ -66,7 +65,7 @@
         <addUniqueConstraint columnNames="email" constraintName="UK_ob8kqyqqgmefl0aco34akdtpe" tableName="user"/>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-25">
-        <createIndex indexName="FK1faffy1p9x95n6v18m5urdkfc" tableName="verify_email">
+        <createIndex indexName="FK1faffy1p9x95n6v18m5urdkfc" tableName="verify_emails">
             <column name="user_id"/>
         </createIndex>
     </changeSet>
@@ -81,7 +80,7 @@
         </createIndex>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-50">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="verify_email" constraintName="FK1faffy1p9x95n6v18m5urdkfc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="verify_emails" constraintName="FK1faffy1p9x95n6v18m5urdkfc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-55">
         <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="restore_password_email" constraintName="FK84jlf1nvnb2duww5bi10j5kwy" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>

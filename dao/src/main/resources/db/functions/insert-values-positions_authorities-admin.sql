@@ -3,7 +3,7 @@ SELECT
     emp.id AS emp_id,
     p.id AS position_id
 FROM employee_authorities AS emp
-         JOIN positions AS p ON  p.name_eng = 'Admin'
+         JOIN positions AS p ON  p.name_en = 'Admin'
 where emp.name IN ('CREATE_NEW_LOCATION',
                    'CREATE_NEW_COURIER',
                    'CREATE_NEW_STATION',
@@ -14,5 +14,5 @@ SELECT
     emp.id AS emp_id,
     p.id AS position_id
 FROM employee_authorities AS emp
-         JOIN positions AS p ON  p.name_eng = 'Service Manager'
+         JOIN positions AS p ON  p.name_en = 'Service Manager'
 where emp.name IN ('CREATE_PRICING_CARD');

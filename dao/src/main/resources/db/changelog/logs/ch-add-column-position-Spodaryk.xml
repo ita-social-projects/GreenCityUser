@@ -5,7 +5,7 @@
 
     <changeSet id="Spodaryk-1" author="Oksana Spodaryk">
         <addColumn tableName="positions">
-            <column name="name_eng" type="varchar(30)" defaultValue="name_eng">
+            <column name="name_en" type="varchar(30)" defaultValue="name_en">
                 <constraints nullable="false" />
             </column>
         </addColumn>
@@ -13,32 +13,32 @@
 
     <changeSet id="Spodaryk-2" author="Oksana Spodaryk">
         <update tableName="positions">
-            <column name="name_eng" value="Service Manager"/>
-            <where>name='Менеджер послуги'</where>
+            <column name="name_en" value="Service Manager"/>
+            <where>name_uk='Менеджер послуги'</where>
         </update>
         <update tableName="positions">
-            <column name="name_eng" value="Call Manager"/>
-            <where>name='Менеджер обдзвону'</where>
+            <column name="name_en" value="Call Manager"/>
+            <where>name_uk='Менеджер обдзвону'</where>
         </update>
         <update tableName="positions">
-            <column name="name_eng" value="Logistician"/>
-            <where>name='Логіст'</where>
+            <column name="name_en" value="Logistician"/>
+            <where>name_uk='Логіст'</where>
         </update>
         <update tableName="positions">
-            <column name="name_eng" value="Navigator"/>
-            <where>name='Штурман'</where>
+            <column name="name_en" value="Navigator"/>
+            <where>name_uk='Штурман'</where>
         </update>
         <update tableName="positions">
-            <column name="name_eng" value="Driver"/>
-            <where>name='Водій'</where>
+            <column name="name_en" value="Driver"/>
+            <where>name_uk='Водій'</where>
         </update>
         <update tableName="positions">
-            <column name="name_eng" value="Super Admin"/>
-            <where>name='Супер адмін'</where>
+            <column name="name_en" value="Super Admin"/>
+            <where>name_uk='Супер адмін'</where>
         </update>
         <update tableName="positions">
-            <column name="name_eng" value="Admin"/>
-            <where>name='Адмін'</where>
+            <column name="name_en" value="Admin"/>
+            <where>name_uk='Адмін'</where>
         </update>
     </changeSet>
 </databaseChangeLog>

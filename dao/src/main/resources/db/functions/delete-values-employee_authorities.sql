@@ -6,7 +6,7 @@ WHERE user_id IN (
     WHERE epm.position_id IN (
         SELECT id
         FROM positions p
-        WHERE p.name_eng = 'Admin'
+        WHERE p.name_en = 'Admin'
     )
       AND empl.authority_id IN (
         SELECT id
@@ -25,7 +25,7 @@ WHERE user_id IN (
     WHERE epm.position_id IN (
         SELECT id
         FROM positions p
-        WHERE p.name_eng = 'Service Manager'
+        WHERE p.name_en = 'Service Manager'
     )
       AND empl.authority_id IN (
         SELECT id
