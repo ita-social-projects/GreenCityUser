@@ -30,14 +30,12 @@ public class RetryableTaskServiceImpl implements RetryableTaskService {
     public <T> void saveRetryableTask(T payloadObject, RetryableTaskType type) {
         try {
             String jsonPayload = objectMapper.writeValueAsString(payloadObject);
-
             RetryableTask task = RetryableTask.builder()
                 .payload(jsonPayload)
                 .type(type)
                 .status(RetryableTaskStatus.IN_PROGRESS)
                 .retryTime(LocalDateTime.now())
                 .build();
-
             retryableTaskRepository.save(task);
             log.info("Saved retryable task of type: {}", type);
         } catch (JsonProcessingException e) {
@@ -50,8 +48,8 @@ public class RetryableTaskServiceImpl implements RetryableTaskService {
     public List<RetryableTask> getRetryableTaskForProcessing(RetryableTaskType type) {
         LocalDateTime currentTime = LocalDateTime.now();
         Pageable pageable = PageRequest.of(0, LIMIT);
-        List<RetryableTask> retryableTasks = retryableTaskRepository.findRetryableTaskForProcessing(
-            type, LocalDateTime.now(), RetryableTaskStatus.IN_PROGRESS, pageable);
+        List<RetryableTask> retryableTasks = retryableTaskRepository.findRetryableTaskForProcessing(type,
+            LocalDateTime.now(), RetryableTaskStatus.IN_PROGRESS, pageable);
         for (RetryableTask task : retryableTasks) {
             task.setRetryTime(currentTime.plus(Duration.ofSeconds(TIMEOUTINSECONDS)));
         }
