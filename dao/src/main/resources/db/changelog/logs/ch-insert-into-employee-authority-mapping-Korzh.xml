@@ -111,5 +111,25 @@
             <column name="authority_id" value="28"/>
             <column name="user_id" value="2"/>
         </insert>
+        <insert tableName="employee_authorities_mapping">
+            <column name="authority_id" value="29"/>
+            <column name="user_id" value="2"/>
+        </insert>
+        <insert tableName="employee_authorities_mapping">
+            <column name="authority_id" value="30"/>
+            <column name="user_id" value="2"/>
+        </insert>
+        <insert tableName="employee_authorities_mapping">
+            <column name="authority_id" value="31"/>
+            <column name="user_id" value="2"/>
+        </insert>
+        <insert tableName="employee_authorities_mapping">
+            <column name="authority_id" value="32"/>
+            <column name="user_id" value="2"/>
+        </insert>
+        <insert tableName="employee_authorities_mapping">
+            <column name="authority_id" value="33"/>
+            <column name="user_id" value="2"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>
