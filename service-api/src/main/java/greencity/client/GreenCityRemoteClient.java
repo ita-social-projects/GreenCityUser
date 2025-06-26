@@ -290,6 +290,12 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    /**
+     * Sends a request to the GreenCity service to create a new user.
+     *
+     * @param createUserDto the data transfer object containing user creation information
+     * @return {@code true} if the user was successfully created, {@code false} otherwise
+     */
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
         return Boolean.TRUE.equals(webClient.post()
             .uri("/users/create")
@@ -299,6 +305,12 @@ public class GreenCityRemoteClient {
             .block());
     }
 
+    /**
+     * Updates the user's profile picture path in the GreenCity service.
+     *
+     * @param userId             the ID of the user whose picture path should be updated
+     * @param profilePicturePath the new profile picture path to be set
+     */
     public void updateUserPicturePath(Long userId, String profilePicturePath) {
         webClient.put()
             .uri(uriBuilder -> uriBuilder.path("/users/picturePath")
@@ -310,6 +322,12 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    /**
+     * Updates the user's name in the GreenCity service.
+     *
+     * @param userId   the ID of the user whose name should be updated
+     * @param userName the new name to assign to the user
+     */
     public void updateUserName(Long userId, String userName) {
         webClient.patch()
             .uri(uriBuilder -> uriBuilder.path("/users/{userId}/name")
@@ -320,6 +338,13 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    /**
+     * Retrieves a list of user profile information from the GreenCity service
+     * for the given list of user IDs.
+     *
+     * @param userIds list of user IDs to fetch profile data for
+     * @return a list of {@link GreenCityUserProfileDtoResponse} objects containing user profile information
+     */
     public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
         return webClient.get()
             .uri(uriBuilder -> uriBuilder.path("/users/profiles")
