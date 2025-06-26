@@ -1079,7 +1079,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private void updateUserProfilePicturePath(Long userId, String profilePicturePath) {
-        greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
+        try {
+            greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
+        } catch (WebClientRequestException e) {
+            UpdateUserPicturePathDto dto = UpdateUserPicturePathDto.builder()
+                .userId(userId)
+                .picturePath(profilePicturePath)
+                .build();
+            log.warn("GreenCity service is unavailable: update user picture path failed");
+            retryableTaskService.saveRetryableTask(dto, RetryableTaskType.UPDATE_USER_PICTURE_PATH);
+        }
     }
 
     /**
