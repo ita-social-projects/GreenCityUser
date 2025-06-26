@@ -12,7 +12,7 @@ public class UpdateUserPicturePathProcessor extends AbstractRetryableTaskProcess
     private final GreenCityRemoteClient greenCityRemoteClient;
 
     protected UpdateUserPicturePathProcessor(ObjectMapper objectMapper,
-                                             GreenCityRemoteClient greenCityRemoteClient) {
+        GreenCityRemoteClient greenCityRemoteClient) {
         super(objectMapper, RetryableTaskType.UPDATE_USER_PICTURE_PATH);
         this.greenCityRemoteClient = greenCityRemoteClient;
     }
