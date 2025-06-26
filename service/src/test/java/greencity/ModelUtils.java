@@ -1,5 +1,7 @@
 package greencity;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.maps.model.AddressComponent;
 import com.google.maps.model.Geometry;
 import com.google.maps.model.AddressComponentType;
@@ -36,6 +38,7 @@ import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.Language;
+import greencity.entity.RetryableTask;
 import greencity.entity.User;
 import greencity.entity.SocialNetwork;
 import greencity.entity.VerifyEmail;
@@ -48,6 +51,8 @@ import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.ProfilePrivacyPolicy;
+import greencity.enums.RetryableTaskStatus;
+import greencity.enums.RetryableTaskType;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
@@ -793,5 +798,18 @@ public class ModelUtils {
                 .code("en")
                 .build())
             .build();
+    }
+
+    public static List<RetryableTask> getRetryableTasks() throws JsonProcessingException {
+        List<RetryableTask> tasks = new ArrayList<>();
+        String json = new ObjectMapper().writeValueAsString(getCreateGreenCityDto());
+        tasks.add(RetryableTask.builder()
+            .id(1L)
+            .payload(json)
+            .type(RetryableTaskType.CREATE_USER)
+            .status(RetryableTaskStatus.IN_PROGRESS)
+            .retryTime(LocalDateTime.now())
+            .build());
+        return tasks;
     }
 }
