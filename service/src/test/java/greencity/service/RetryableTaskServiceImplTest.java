@@ -66,12 +66,12 @@ class RetryableTaskServiceImplTest {
         RetryableTaskType type = RetryableTaskType.CREATE_USER;
         CreateGreenCityUserDto dto = new CreateGreenCityUserDto();
 
-        when(objectMapper.writeValueAsString(dto)).thenThrow(new JsonProcessingException("Serialization error"){});
+        when(objectMapper.writeValueAsString(dto)).thenThrow(new JsonProcessingException("Serialization error") {
+        });
 
         RetryableTaskSerializationException exception = assertThrows(
             RetryableTaskSerializationException.class,
-            () -> retryableTaskService.saveRetryableTask(dto, type)
-        );
+            () -> retryableTaskService.saveRetryableTask(dto, type));
 
         assertTrue(exception.getMessage().contains("Failed to serialize payload"));
         verify(objectMapper).writeValueAsString(dto);
@@ -85,7 +85,7 @@ class RetryableTaskServiceImplTest {
 
         when(retryableTaskRepository.findRetryableTaskForProcessing(
             eq(type), any(LocalDateTime.class), eq(RetryableTaskStatus.IN_PROGRESS), any(Pageable.class)))
-            .thenReturn(tasks);
+                .thenReturn(tasks);
 
         retryableTaskService.getRetryableTaskForProcessing(type);
 

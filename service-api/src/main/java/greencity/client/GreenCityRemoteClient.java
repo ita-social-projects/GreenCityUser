@@ -293,8 +293,10 @@ public class GreenCityRemoteClient {
     /**
      * Sends a request to the GreenCity service to create a new user.
      *
-     * @param createUserDto the data transfer object containing user creation information
-     * @return {@code true} if the user was successfully created, {@code false} otherwise
+     * @param createUserDto the data transfer object containing user creation
+     *                      information
+     * @return {@code true} if the user was successfully created, {@code false}
+     *         otherwise
      */
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
         return Boolean.TRUE.equals(webClient.post()
@@ -308,7 +310,8 @@ public class GreenCityRemoteClient {
     /**
      * Updates the user's profile picture path in the GreenCity service.
      *
-     * @param userId             the ID of the user whose picture path should be updated
+     * @param userId             the ID of the user whose picture path should be
+     *                           updated
      * @param profilePicturePath the new profile picture path to be set
      */
     public void updateUserPicturePath(Long userId, String profilePicturePath) {
@@ -339,11 +342,12 @@ public class GreenCityRemoteClient {
     }
 
     /**
-     * Retrieves a list of user profile information from the GreenCity service
-     * for the given list of user IDs.
+     * Retrieves a list of user profile information from the GreenCity service for
+     * the given list of user IDs.
      *
      * @param userIds list of user IDs to fetch profile data for
-     * @return a list of {@link GreenCityUserProfileDtoResponse} objects containing user profile information
+     * @return a list of {@link GreenCityUserProfileDtoResponse} objects containing
+     *         user profile information
      */
     public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
         return webClient.get()
