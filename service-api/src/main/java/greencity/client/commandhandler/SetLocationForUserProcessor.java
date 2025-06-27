@@ -5,7 +5,9 @@ import greencity.client.AbstractRetryableTaskProcessor;
 import greencity.client.GreenCityRemoteClient;
 import greencity.dto.user.SetLocationForUserDto;
 import greencity.enums.RetryableTaskType;
+import org.springframework.stereotype.Component;
 
+@Component
 public class SetLocationForUserProcessor extends AbstractRetryableTaskProcessor<SetLocationForUserDto> {
     private final GreenCityRemoteClient greenCityRemoteClient;
 
