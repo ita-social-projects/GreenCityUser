@@ -26,7 +26,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 @ExtendWith(MockitoExtension.class)
@@ -66,12 +65,12 @@ class RetryableTaskServiceImplTest {
         RetryableTaskType type = RetryableTaskType.CREATE_USER;
         CreateGreenCityUserDto dto = new CreateGreenCityUserDto();
 
-        when(objectMapper.writeValueAsString(dto)).thenThrow(new JsonProcessingException("Serialization error"){});
+        when(objectMapper.writeValueAsString(dto)).thenThrow(new JsonProcessingException("Serialization error") {
+        });
 
         RetryableTaskSerializationException exception = assertThrows(
             RetryableTaskSerializationException.class,
-            () -> retryableTaskService.saveRetryableTask(dto, type)
-        );
+            () -> retryableTaskService.saveRetryableTask(dto, type));
 
         assertTrue(exception.getMessage().contains("Failed to serialize payload"));
         verify(objectMapper).writeValueAsString(dto);
@@ -80,16 +79,15 @@ class RetryableTaskServiceImplTest {
 
     @Test
     void getRetryableTaskTest() throws JsonProcessingException {
-        RetryableTaskType type = RetryableTaskType.CREATE_USER;
         List<RetryableTask> tasks = ModelUtils.getRetryableTasks();
 
         when(retryableTaskRepository.findRetryableTaskForProcessing(
-            eq(type), any(LocalDateTime.class), eq(RetryableTaskStatus.IN_PROGRESS), any(Pageable.class)))
-            .thenReturn(tasks);
+            any(LocalDateTime.class), eq(RetryableTaskStatus.IN_PROGRESS), any(Pageable.class)))
+                .thenReturn(tasks);
 
-        retryableTaskService.getRetryableTaskForProcessing(type);
+        retryableTaskService.getRetryableTaskForProcessing();
 
         verify(retryableTaskRepository).findRetryableTaskForProcessing(
-            eq(type), any(LocalDateTime.class), eq(RetryableTaskStatus.IN_PROGRESS), any(Pageable.class));
+            any(LocalDateTime.class), eq(RetryableTaskStatus.IN_PROGRESS), any(Pageable.class));
     }
 }
