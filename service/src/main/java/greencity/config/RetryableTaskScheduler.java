@@ -4,7 +4,6 @@ import greencity.client.RetryableTaskProcessorRegistry;
 import greencity.dto.retryabletask.RetryableTaskVO;
 import greencity.entity.RetryableTask;
 import greencity.enums.RetryableTaskStatus;
-import greencity.enums.RetryableTaskType;
 import greencity.exception.exceptions.TaskProcessingException;
 import greencity.repository.RetryableTaskRepository;
 import greencity.service.RetryableTaskProcessor;
@@ -27,22 +26,20 @@ public class RetryableTaskScheduler {
 
     @Scheduled(fixedRate = 30000)
     public void executePendingTasks() {
-        for (RetryableTaskType type : RetryableTaskType.values()) {
-            List<RetryableTask> tasks = retryableTaskService.getRetryableTaskForProcessing(type);
-            for (RetryableTask task : tasks) {
-                try {
-                    RetryableTaskVO taskVO = modelMapper.map(task, RetryableTaskVO.class);
-                    RetryableTaskProcessor processor = registry.getProcessor(task.getType());
-                    log.info("Retrieved processor for type {}: {}", task.getType(), processor);
-                    processor.process(taskVO);
+        List<RetryableTask> tasks = retryableTaskService.getRetryableTaskForProcessing();
+        for (RetryableTask task : tasks) {
+            try {
+                RetryableTaskVO taskVO = modelMapper.map(task, RetryableTaskVO.class);
+                RetryableTaskProcessor processor = registry.getProcessor(task.getType());
+                log.info("Retrieved processor for type {}: {}", task.getType(), processor);
+                processor.process(taskVO);
 
-                    task.setStatus(RetryableTaskStatus.SUCCESS);
-                    repository.save(task);
-                } catch (TaskProcessingException e) {
-                    log.warn("TaskProcessingException for task {}: {}", task.getId(), e.getMessage());
-                } catch (Exception e) {
-                    log.error("Unexpected error for task {}: {}", task.getId(), e.getMessage(), e);
-                }
+                task.setStatus(RetryableTaskStatus.SUCCESS);
+                repository.save(task);
+            } catch (TaskProcessingException e) {
+                log.warn("TaskProcessingException for task {}: {}", task.getId(), e.getMessage());
+            } catch (Exception e) {
+                log.error("Unexpected error for task {}: {}", task.getId(), e.getMessage(), e);
             }
         }
     }

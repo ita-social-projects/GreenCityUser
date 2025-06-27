@@ -45,10 +45,10 @@ public class RetryableTaskServiceImpl implements RetryableTaskService {
     }
 
     @Transactional
-    public List<RetryableTask> getRetryableTaskForProcessing(RetryableTaskType type) {
+    public List<RetryableTask> getRetryableTaskForProcessing() {
         LocalDateTime currentTime = LocalDateTime.now();
         Pageable pageable = PageRequest.of(0, LIMIT);
-        List<RetryableTask> retryableTasks = retryableTaskRepository.findRetryableTaskForProcessing(type,
+        List<RetryableTask> retryableTasks = retryableTaskRepository.findRetryableTaskForProcessing(
             LocalDateTime.now(), RetryableTaskStatus.IN_PROGRESS, pageable);
         for (RetryableTask task : retryableTasks) {
             task.setRetryTime(currentTime.plus(Duration.ofSeconds(TIMEOUTINSECONDS)));
