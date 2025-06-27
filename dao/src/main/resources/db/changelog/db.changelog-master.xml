@@ -64,4 +64,5 @@
     <include file="db/changelog/logs/ch-add-default-value-userprofile-confidentiality-Haliara.xml"/>
     <include file="db/changelog/logs/ch-insert-into-empolyee-authority-Haliara.xml"/>
     <include file="db/changelog/logs/ch-update-column-names-positions-Bulhakova.xml"/>
+    <include file="db/changelog/logs/ch-create-retryable-task-table-Pohranychnyi.xml"/>
 </databaseChangeLog>
