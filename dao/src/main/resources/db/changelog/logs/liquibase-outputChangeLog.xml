@@ -26,30 +26,41 @@
         </createTable>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-14">
-        <createTable tableName="user">
+        <createTable tableName="users">
             <column autoIncrement="true" name="id" type="BIGINT">
-                <constraints primaryKey="true"/>
+                <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="date_of_registration" type="datetime(6)">
                 <constraints nullable="false"/>
             </column>
             <column name="email" type="VARCHAR(50)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true" uniqueConstraintName="UK_ob8kqyqqgmefl0aco34akdtpe"/>
             </column>
             <column name="email_notification" type="INT"/>
-            <column name="first_name" type="VARCHAR(20)">
+            <column name="first_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="last_name" type="VARCHAR(20)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_visit" type="datetime(6)">
+            <column name="name" type="VARCHAR(30)">
                 <constraints nullable="false"/>
             </column>
             <column name="role" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="user_status" type="INT"/>
+            <column name="refresh_token_key" type="varchar(255)" defaultValue="secret">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone_number" type="VARCHAR"/>
+            <column name="last_activity_time" type="timestamp with time zone"/>
+            <column name="language_id" defaultValue="2" type="BIGINT"/>
+            <column name="profile_picture" type="varchar(300)"/>
+            <column name="rating" type="double"/>
+            <column name="uuid" type="varchar(60)"/>
+            <column name="user_credo" type="varchar(255)">
+            </column>
+            <column name="show_location" type="varchar(255)" defaultValue="PUBLIC"/>
+            <column name="show_eco_place" type="varchar(255)" defaultValue="PUBLIC"/>
+            <column name="show_to_do_list" type="varchar(255)" defaultValue="PUBLIC"/>
         </createTable>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-15">
@@ -60,9 +71,6 @@
             <column name="token" type="VARCHAR(255)"/>
             <column name="user_id" type="BIGINT"/>
         </createTable>
-    </changeSet>
-    <changeSet author="Marian (generated)" id="1571227598316-24">
-        <addUniqueConstraint columnNames="email" constraintName="UK_ob8kqyqqgmefl0aco34akdtpe" tableName="user"/>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-25">
         <createIndex indexName="FK1faffy1p9x95n6v18m5urdkfc" tableName="verify_emails">
@@ -80,12 +88,21 @@
         </createIndex>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-50">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="verify_emails" constraintName="FK1faffy1p9x95n6v18m5urdkfc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="verify_emails"
+                                 constraintName="FK1faffy1p9x95n6v18m5urdkfc" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="users"/>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-55">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="restore_password_email" constraintName="FK84jlf1nvnb2duww5bi10j5kwy" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="restore_password_email"
+                                 constraintName="FK84jlf1nvnb2duww5bi10j5kwy" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="users"/>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-71">
-        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="own_security" constraintName="FKs084ey5e475cqp4w0hsgisjpd" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="user"/>
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="own_security"
+                                 constraintName="FKs084ey5e475cqp4w0hsgisjpd" deferrable="false"
+                                 initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT"
+                                 referencedColumnNames="id" referencedTableName="users"/>
     </changeSet>
 </databaseChangeLog>
