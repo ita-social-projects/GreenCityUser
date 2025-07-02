@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
 import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Optional;
@@ -97,17 +96,12 @@ public class GreenCityRemoteClient {
      * @return list of {@link AchievementVO}
      */
     public List<AchievementVO> findAllAchievements() {
-        try {
-            return webClient.get()
-                .uri("/achievements/all")
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<AchievementVO>>() {
-                })
-                .block();
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable, failed to retrieve all achievements: {}", e.getMessage());
-            return List.of();
-        }
+        return webClient.get()
+            .uri("/achievements/all")
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<AchievementVO>>() {
+            })
+            .block();
     }
 
     /**
@@ -117,18 +111,12 @@ public class GreenCityRemoteClient {
      * @return list of {@link UserAchievementVO}
      */
     public List<UserAchievementVO> findAllUserAchievementsByUserId(Long userId) {
-        try {
-            return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/achievements/user-achievements/{userId}").build(userId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<UserAchievementVO>>() {
-                })
-                .block();
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable, failed to retrieve all achievements by user id: {}",
-                e.getMessage());
-            return List.of();
-        }
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/achievements/user-achievements/{userId}").build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<UserAchievementVO>>() {
+            })
+            .block();
     }
 
     /**
@@ -138,17 +126,11 @@ public class GreenCityRemoteClient {
      * @return {@link UserCityDto}.
      */
     public UserCityDto findAllUsersCities(Long userId) {
-        try {
-            return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/users/{userId}/cities").build(userId))
-                .retrieve()
-                .bodyToMono(UserCityDto.class)
-                .block();
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable, failed to retrieve all users cities: {}",
-                e.getMessage());
-            return null;
-        }
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/cities").build(userId))
+            .retrieve()
+            .bodyToMono(UserCityDto.class)
+            .block();
     }
 
     /**
@@ -158,22 +140,16 @@ public class GreenCityRemoteClient {
      * @return {@link UserLocationDto}.
      */
     public Optional<UserLocationDto> findUserLocationByUserId(Long userId) {
-        try {
-            return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/users/{userId}/location").build(userId))
-                .retrieve()
-                .onStatus(
-                    httpStatusCode -> httpStatusCode.isSameCodeAs(HttpStatus.NOT_FOUND),
-                    clientResponse -> Mono.empty())
-                .bodyToMono(UserLocationDto.class)
-                .map(Optional::of)
-                .switchIfEmpty(Mono.just(Optional.empty()))
-                .block();
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable, failed to retrieve location bu user id: {}",
-                e.getMessage());
-            return Optional.of(new UserLocationDto());
-        }
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/location").build(userId))
+            .retrieve()
+            .onStatus(
+                httpStatusCode -> httpStatusCode.isSameCodeAs(HttpStatus.NOT_FOUND),
+                clientResponse -> Mono.empty())
+            .bodyToMono(UserLocationDto.class)
+            .map(Optional::of)
+            .switchIfEmpty(Mono.just(Optional.empty()))
+            .block();
     }
 
     /**
@@ -198,18 +174,12 @@ public class GreenCityRemoteClient {
      * @return list of friends ids.
      */
     public List<Long> getAllUserFriendsIds(Long userId) {
-        try {
-            return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/users/{userId}/all-friends").build(userId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
-                })
-                .block();
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable, failed to retrieve all user friends ids: {}",
-                e.getMessage());
-            return List.of();
-        }
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/all-friends").build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
+            })
+            .block();
     }
 
     /**
@@ -220,21 +190,15 @@ public class GreenCityRemoteClient {
      * @return {@link Page}
      */
     public PageableAdvancedDto<Long> getAllUserFriendsIds(Long userId, Pageable pageable) {
-        try {
-            return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/users/{userId}/friends")
-                    .queryParam("page", pageable.getPageNumber())
-                    .queryParam("size", pageable.getPageSize())
-                    .build(userId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PageableAdvancedDto<Long>>() {
-                })
-                .block();
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable, failed to retrieve pageable all user friends ids: {}",
-                e.getMessage());
-            return null;
-        }
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/friends")
+                .queryParam("page", pageable.getPageNumber())
+                .queryParam("size", pageable.getPageSize())
+                .build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<PageableAdvancedDto<Long>>() {
+            })
+            .block();
     }
 
     /**
@@ -244,18 +208,12 @@ public class GreenCityRemoteClient {
      * @return {@link List} of friends ids
      */
     public List<Long> getSixFriendsIdsWithTheHighestRating(Long userId) {
-        try {
-            return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/users/{userId}/top-friends").build(userId))
-                .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
-                })
-                .block();
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable, failed to retrieve friends ids with the highest rating: {}",
-                e.getMessage());
-            return List.of();
-        }
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/top-friends").build(userId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
+            })
+            .block();
     }
 
     /**
