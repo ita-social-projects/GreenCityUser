@@ -25,13 +25,7 @@ import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.RetryableTaskType;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadUpdateRequestException;
-import greencity.exception.exceptions.Base64DecodedException;
-import greencity.exception.exceptions.LowRoleLevelException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.UserDeactivationException;
-import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.*;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
@@ -100,9 +94,11 @@ public class UserServiceImpl implements UserService {
     public void updateUserRating(UserAddRatingDto userRatingDto) {
         try {
             greenCityRemoteClient.updateUserRating(userRatingDto);
-        } catch (WebClientRequestException e) {
+        } catch (WebClientRequestException | GreenCityServiceException e) {
             retryableTaskService.saveRetryableTask(userRatingDto, RetryableTaskType.UPDATE_USER_RATING);
-            log.warn("GreenCity service is unavailable: update user rating failed");
+            log.warn("GreenCity service is unavailable: update user rating failed. Reason: {}",
+                e.getMessage());
+            throw e;
         }
     }
 
