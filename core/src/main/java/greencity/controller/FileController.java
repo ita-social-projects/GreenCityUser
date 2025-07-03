@@ -52,7 +52,7 @@ public class FileController {
      * @param file file to save.
      * @return url of the saved file.
      */
-    @Operation(summary = "Upload file.")
+    @Operation(summary = "Upload single file.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
             content = @Content(schema = @Schema(implementation = List.class))),
@@ -83,5 +83,24 @@ public class FileController {
     @DeleteMapping
     public void deleteAll(@RequestBody @NotNull List<String> paths) {
         fileService.deleteAll(paths);
+    }
+
+    /**
+     * Method for deleting file.
+     *
+     * @param path urls of file to delete.
+     */
+    @Operation(summary = "Delete single file.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+            content = @Content(schema = @Schema(implementation = List.class))),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED,
+            content = @Content(examples = @ExampleObject(HttpStatuses.UNAUTHORIZED))),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN,
+            content = @Content(examples = @ExampleObject(HttpStatuses.FORBIDDEN)))
+    })
+    @DeleteMapping(path = "/single")
+    public void delete(@RequestBody @NotNull String path) {
+        fileService.delete(path);
     }
 }
