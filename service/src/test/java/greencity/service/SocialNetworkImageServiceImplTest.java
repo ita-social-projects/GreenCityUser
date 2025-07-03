@@ -1,6 +1,18 @@
 package greencity.service;
 
-import greencity.client.GreenCityRemoteClient;
+import static greencity.ModelUtils.getSocialNetworkImage;
+import static greencity.ModelUtils.getSocialNetworkImageId2;
+import static greencity.ModelUtils.getSocialNetworkImageId3;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.PageableDto;
@@ -11,7 +23,6 @@ import greencity.entity.SocialNetworkImage;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.NotSavedException;
 import greencity.repository.SocialNetworkImageRepo;
-
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
@@ -19,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,12 +43,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import static greencity.ModelUtils.getSocialNetworkImage;
-import static greencity.ModelUtils.getSocialNetworkImageId2;
-import static greencity.ModelUtils.getSocialNetworkImageId3;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class SocialNetworkImageServiceImplTest {
     @Mock
@@ -48,7 +52,7 @@ class SocialNetworkImageServiceImplTest {
     ModelMapper modelMapper;
 
     @Mock
-    GreenCityRemoteClient greenCityRemoteClient;
+    FileService fileService;
 
     @InjectMocks
     SocialNetworkImageServiceImpl socialNetworkImageService;
@@ -159,7 +163,7 @@ class SocialNetworkImageServiceImplTest {
 
         verify(socialNetworkImageRepo).findById(idToDelete);
         verify(socialNetworkImageRepo).deleteById(idToDelete);
-        verify(greenCityRemoteClient).deleteAllFiles(filesToDelete);
+        verify(fileService).deleteAll(filesToDelete);
     }
 
     @Test
@@ -185,8 +189,8 @@ class SocialNetworkImageServiceImplTest {
         verify(socialNetworkImageRepo).deleteById(listIds.get(1));
         verify(socialNetworkImageRepo).deleteById(listIds.get(2));
 
-        verify(greenCityRemoteClient)
-            .deleteAllFiles(List.of(image1.getImagePath(), image2.getImagePath(), image3.getImagePath()));
+        verify(fileService)
+            .deleteAll(List.of(image1.getImagePath(), image2.getImagePath(), image3.getImagePath()));
     }
 
     @Test
@@ -196,7 +200,7 @@ class SocialNetworkImageServiceImplTest {
         SocialNetworkImage savedEntity = new SocialNetworkImage();
         SocialNetworkImageResponseDTO expectedResponseDTO = new SocialNetworkImageResponseDTO();
 
-        when(greenCityRemoteClient.uploadFile(any(MultipartFile.class))).thenReturn("mockImagePath");
+        when(fileService.upload(any(MultipartFile.class))).thenReturn("mockImagePath");
         when(modelMapper.map(requestDTO, SocialNetworkImage.class)).thenReturn(savedEntity);
         when(modelMapper.map(savedEntity, SocialNetworkImageResponseDTO.class)).thenReturn(expectedResponseDTO);
         when(socialNetworkImageRepo.save(savedEntity)).thenReturn(savedEntity);
@@ -205,7 +209,7 @@ class SocialNetworkImageServiceImplTest {
 
         assertNotNull(result);
         assertEquals(expectedResponseDTO, result);
-        verify(greenCityRemoteClient).uploadFile(mockImage);
+        verify(fileService).upload(mockImage);
         verify(socialNetworkImageRepo).save(savedEntity);
         verify(modelMapper).map(requestDTO, SocialNetworkImage.class);
         verify(modelMapper).map(savedEntity, SocialNetworkImageResponseDTO.class);
@@ -217,7 +221,7 @@ class SocialNetworkImageServiceImplTest {
         MultipartFile mockImage = mock(MultipartFile.class);
         SocialNetworkImage savedEntity = new SocialNetworkImage();
 
-        when(greenCityRemoteClient.uploadFile(any(MultipartFile.class))).thenReturn("mockImagePath");
+        when(fileService.upload(any(MultipartFile.class))).thenReturn("mockImagePath");
         when(modelMapper.map(requestDTO, SocialNetworkImage.class)).thenReturn(savedEntity);
         when(socialNetworkImageRepo.save(savedEntity)).thenThrow(new DataIntegrityViolationException(""));
 
@@ -225,7 +229,7 @@ class SocialNetworkImageServiceImplTest {
             NotSavedException.class,
             () -> socialNetworkImageService.save(requestDTO, mockImage));
 
-        verify(greenCityRemoteClient).uploadFile(mockImage);
+        verify(fileService).upload(mockImage);
         verify(socialNetworkImageRepo).save(savedEntity);
         verify(modelMapper).map(requestDTO, SocialNetworkImage.class);
         verify(modelMapper, never()).map(savedEntity, SocialNetworkImageResponseDTO.class);
@@ -303,7 +307,7 @@ class SocialNetworkImageServiceImplTest {
 
         when(socialNetworkImageRepo.findById(id))
             .thenReturn(Optional.of(socialNetworkImage));
-        when(greenCityRemoteClient.uploadFile(multipartFile))
+        when(fileService.upload(multipartFile))
             .thenReturn(imagePath);
         when(socialNetworkImageRepo.save(socialNetworkImage))
             .thenReturn(socialNetworkImage);
@@ -311,7 +315,7 @@ class SocialNetworkImageServiceImplTest {
         socialNetworkImageService.update(requestDTO, multipartFile);
 
         verify(socialNetworkImageRepo).findById(id);
-        verify(greenCityRemoteClient).uploadFile(multipartFile);
+        verify(fileService).upload(multipartFile);
         verify(socialNetworkImageRepo).save(socialNetworkImage);
     }
 
@@ -333,7 +337,7 @@ class SocialNetworkImageServiceImplTest {
         socialNetworkImageService.update(requestDTO, multipartFile);
 
         verify(socialNetworkImageRepo).findById(id);
-        verify(greenCityRemoteClient, never()).uploadFile(multipartFile);
+        verify(fileService, never()).upload(multipartFile);
         verify(socialNetworkImageRepo).save(socialNetworkImage);
     }
 
@@ -355,7 +359,7 @@ class SocialNetworkImageServiceImplTest {
 
         assertEquals(expectedExceptionMessage, exception.getMessage());
         verify(socialNetworkImageRepo).findById(nonExistentId);
-        verify(greenCityRemoteClient, never()).uploadFile(any(MultipartFile.class));
+        verify(fileService, never()).upload(any(MultipartFile.class));
         verify(socialNetworkImageRepo, never()).save(any(SocialNetworkImage.class));
     }
 }
