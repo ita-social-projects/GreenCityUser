@@ -98,7 +98,6 @@ public class UserServiceImpl implements UserService {
             retryableTaskService.saveRetryableTask(userRatingDto, RetryableTaskType.UPDATE_USER_RATING);
             log.warn("GreenCity service is unavailable: update user rating failed. Reason: {}",
                 e.getMessage());
-            throw e;
         }
     }
 
@@ -179,15 +178,15 @@ public class UserServiceImpl implements UserService {
         updateUserName(user, dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
+        user.setUserStatus(dto.getUserStatus());
         try {
             greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
-        } catch (WebClientRequestException e) {
+        } catch (WebClientRequestException | GreenCityServiceException e) {
             log.warn("GreenCity service is unavailable: update user credo failed");
             UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(user.getId(),
                 dto.getUserCredo());
             retryableTaskService.saveRetryableTask(updateUserCredoDto, RetryableTaskType.UPDATE_USER_CREDO);
         }
-        user.setUserStatus(dto.getUserStatus());
     }
 
     private void updateUserName(User user, String name) {
@@ -535,7 +534,7 @@ public class UserServiceImpl implements UserService {
         if (userProfileDtoRequest.getUserCredo() != null) {
             try {
                 greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
-            } catch (WebClientRequestException e) {
+            } catch (WebClientRequestException | GreenCityServiceException e) {
                 log.warn("GreenCity service is unavailable: update user credo failed");
                 UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(user.getId(),
                     userProfileDtoRequest.getUserCredo());
@@ -545,7 +544,7 @@ public class UserServiceImpl implements UserService {
         Long userId = user.getId();
         try {
             greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
-        } catch (WebClientRequestException e) {
+        } catch (WebClientRequestException | GreenCityServiceException e) {
             SetLocationForUserDto setLocationForUserDto = SetLocationForUserDto.builder()
                 .id(userId)
                 .userProfileDtoRequest(userProfileDtoRequest)
@@ -1064,7 +1063,7 @@ public class UserServiceImpl implements UserService {
             .build();
         try {
             greenCityRemoteClient.createUser(createGreenCityUserDto);
-        } catch (WebClientRequestException e) {
+        } catch (WebClientRequestException | GreenCityServiceException e) {
             log.warn("GreenCity service is unavailable: {}", e.getMessage());
             retryableTaskService.saveRetryableTask(createGreenCityUserDto, RetryableTaskType.CREATE_USER);
         } catch (WebClientResponseException e) {
@@ -1077,7 +1076,7 @@ public class UserServiceImpl implements UserService {
     private void updateUserProfilePicturePath(Long userId, String profilePicturePath) {
         try {
             greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
-        } catch (WebClientRequestException e) {
+        } catch (WebClientRequestException | GreenCityServiceException e) {
             UpdateUserPicturePathDto dto = UpdateUserPicturePathDto.builder()
                 .userId(userId)
                 .picturePath(profilePicturePath)
