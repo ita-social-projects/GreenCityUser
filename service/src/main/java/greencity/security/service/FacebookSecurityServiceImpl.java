@@ -2,6 +2,7 @@ package greencity.security.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
@@ -48,6 +49,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
     private final WebClient webClient;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${address}")
     private String address;
@@ -66,7 +68,8 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         ModelMapper modelMapper,
         RestClient restClient,
         ObjectMapper objectMapper,
-        @Qualifier("facebookWebClient") WebClient webClient) {
+        @Qualifier("facebookWebClient") WebClient webClient,
+        GreenCityRemoteClient greenCityRemoteClient) {
         this.userService = userService;
         this.jwtTool = jwtTool;
         this.userRepo = userRepo;
@@ -75,6 +78,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         this.restClient = restClient;
         this.objectMapper = objectMapper;
         this.webClient = webClient;
+        this.greenCityRemoteClient = greenCityRemoteClient;
     }
 
     @Override
@@ -262,7 +266,8 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         User newUser = createNewUser(email, userName, language);
         User savedUser = saveNewUser(newUser, profilePicture);
         try {
-            restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
+            greenCityRemoteClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
+            //restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
         }
