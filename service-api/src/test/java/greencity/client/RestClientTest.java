@@ -5,7 +5,6 @@ import static greencity.constant.AppConstant.FILES;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
-import greencity.dto.ubs.UbsProfileCreationDto;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,7 +16,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -148,24 +146,6 @@ class RestClientTest {
             + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
             entity, Long.class)).thenReturn(ResponseEntity.ok(habitsInProgress));
         assertEquals(habitsInProgress, restClient.findAmountOfHabitsInProgress(userId));
-    }
-
-    @Test
-    void createUbsProfileTest() {
-        UbsProfileCreationDto ubsProfileCreationDto =
-            UbsProfileCreationDto.builder()
-                .uuid("f81d4fae-7dec-11d0-a765-00a0c91e6bf6")
-                .email("ubsemail@mail.com")
-                .name("UBS")
-                .build();
-        ResponseEntity<Long> responseEntity = ResponseEntity.status(HttpStatus.CREATED).body(1L);
-        when(restTemplate.postForEntity(greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-            ubsProfileCreationDto, Long.class)).thenReturn(responseEntity);
-        Long id = restClient.createUbsProfile(ubsProfileCreationDto);
-        verify(restTemplate, times(1)).postForEntity(
-            greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-            ubsProfileCreationDto, Long.class);
-        assertEquals(1L, id);
     }
 
     @Test
