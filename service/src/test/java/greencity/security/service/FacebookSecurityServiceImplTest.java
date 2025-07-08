@@ -2,7 +2,7 @@ package greencity.security.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import greencity.client.RestClient;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
@@ -56,7 +56,7 @@ class FacebookSecurityServiceImplTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private RestClient restClient;
+    private GreenCityRemoteClient greenCityRemoteClient;
 
     @Mock
     private PlatformTransactionManager transactionManager;
@@ -352,7 +352,7 @@ class FacebookSecurityServiceImplTest {
         when(userRepo.save(any(User.class))).thenReturn(savedUser);
         when(modelMapper.map(any(User.class), eq(UbsProfileCreationDto.class)))
             .thenReturn(new UbsProfileCreationDto());
-        when(restClient.createUbsProfile(any())).thenThrow(new RestClientException("Failed to create UBS profile"));
+        when(greenCityRemoteClient.createUbsProfile(any())).thenThrow(new RestClientException("Failed to create UBS profile"));
 
         RestClientException exception = assertThrows(RestClientException.class,
             () -> facebookSecurityService.handleNewUser(email, userName, profilePicture, language));
