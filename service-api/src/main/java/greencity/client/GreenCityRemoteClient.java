@@ -3,7 +3,6 @@ package greencity.client;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
@@ -329,7 +328,6 @@ public class GreenCityRemoteClient {
      * @author Orest Mamchuk
      */
     public List<CustomToDoListItemResponseDto> getAllAvailableCustomToDoListItems(Long userId, Long habitId) {
-        log.info("----getAllAvailableCustomToDoListItems----");
         return webClient.get()
             .uri(uriBuilder -> uriBuilder.path("/custom/to-do-list-items/{userId}/{habitId}")
                 .build(userId, habitId))
@@ -365,22 +363,6 @@ public class GreenCityRemoteClient {
                 .build())
             .retrieve()
             .bodyToMono(Long.class)
-            .block();
-    }
-
-    /**
-     * Method for checking if there is a chat between two people.
-     *
-     * @param firstUserId  of {Long}
-     * @param secondUserId of {Long}
-     * @return {FriendsChatDto}
-     * @author Max Bohonko
-     */
-    public FriendsChatDto chatBetweenTwo(Long firstUserId, Long secondUserId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/chat/exist/" + firstUserId
-                + "/" + secondUserId).build())
-            .retrieve()
-            .bodyToMono(FriendsChatDto.class)
             .block();
     }
 

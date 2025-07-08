@@ -38,22 +38,6 @@ public class RestClient {
     private String greenCityUbsServerAddress;
 
     /**
-     * Method for finding all custom to-do list items.
-     *
-     * @param userId of {@link UserVO}
-     * @return list of {@link CustomToDoListItemResponseDto}
-     * @author Orest Mamchuk
-     */
-    public List<CustomToDoListItemResponseDto> getAllAvailableCustomToDoListItems(Long userId, Long habitId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        ResponseEntity<CustomToDoListItemResponseDto[]> exchange = restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_TO_DO_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
-            CustomToDoListItemResponseDto[].class);
-        CustomToDoListItemResponseDto[] responseDtos = exchange.getBody();
-        return Arrays.asList(responseDtos);
-    }
-
-    /**
      * Method for uploading an image.
      *
      * @param image {@link MultipartFile}
