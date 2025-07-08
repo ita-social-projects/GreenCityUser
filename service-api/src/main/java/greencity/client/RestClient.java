@@ -2,8 +2,6 @@ package greencity.client;
 
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
-import greencity.dto.todolist.CustomToDoListItemResponseDto;
-import greencity.dto.user.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +11,11 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 import static greencity.constant.AppConstant.AUTHORIZATION;
 import static greencity.constant.AppConstant.FILES;
 
@@ -59,35 +54,6 @@ public class RestClient {
     }
 
     /**
-     * The method find count of published eco news.
-     *
-     * @param userId of {@link UserVO}
-     * @return Long
-     * @author Orest Mamchuk
-     */
-    public Long findAmountOfPublishedNews(Long userId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(
-            greenCityServerAddress + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.AUTHOR_ID + userId,
-            HttpMethod.GET, entity, Long.class)
-            .getBody();
-    }
-
-    /**
-     * Method for getting amount of acquired habit by {@link UserVO} id.
-     *
-     * @param userId of {@link UserVO}
-     * @return Long
-     * @author Orest Mamchuk
-     */
-    public Long findAmountOfAcquiredHabits(Long userId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.HABIT_STATISTIC_ACQUIRED_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
-            entity, Long.class).getBody();
-    }
-
-    /**
      * Method for checking if there is a chat between two people.
      *
      * @param firstUserId  of {Long}
@@ -99,20 +65,6 @@ public class RestClient {
         HttpEntity<String> entity = new HttpEntity<>(setHeader());
         return restTemplate.exchange(greenCityChatServerAddress + "/chat/exist/" + firstUserId + "/" + secondUserId,
             HttpMethod.GET, entity, FriendsChatDto.class).getBody();
-    }
-
-    /**
-     * Method for getting amount of in progress habit by {@link UserVO} id.
-     *
-     * @param userId of {@link UserVO}
-     * @return Long
-     * @author Orest Mamchuk
-     */
-    public Long findAmountOfHabitsInProgress(Long userId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
-            entity, Long.class).getBody();
     }
 
     /**
@@ -140,31 +92,5 @@ public class RestClient {
                 return image.getOriginalFilename();
             }
         };
-    }
-
-    /**
-     * Method for getting amount of attended events by {@link UserVO} id.
-     *
-     * @param userId of {@link UserVO}
-     * @return {@link Long} count of attended by user events.
-     */
-    public Long findAmountOfEventsAttendedByUser(Long userId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ATTENDED_COUNT_BY_USER_ID + userId,
-            HttpMethod.GET, entity, Long.class).getBody();
-    }
-
-    /**
-     * Method for getting amount of organized events by {@link UserVO} id.
-     *
-     * @param userId of {@link UserVO}
-     * @return {@link Long} count of organized by user events.
-     */
-    public Long findAmountOfEventsOrganizedByUser(Long userId) {
-        HttpEntity<String> entity = new HttpEntity<>(setHeader());
-        return restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ORGANIZED_COUNT_BY_USER_ID + userId,
-            HttpMethod.GET, entity, Long.class).getBody();
     }
 }

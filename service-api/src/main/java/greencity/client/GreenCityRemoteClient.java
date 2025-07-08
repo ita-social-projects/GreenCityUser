@@ -345,7 +345,9 @@ public class GreenCityRemoteClient {
      * @author Orest Mamchuk
      */
     public Long findAmountOfPublishedNews(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/eco-news/count?author-id=" + userId).build())
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/eco-news/count")
+                .queryParam("author-id", userId)
+                .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();
@@ -359,7 +361,8 @@ public class GreenCityRemoteClient {
      * @author Orest Mamchuk
      */
     public Long findAmountOfAcquiredHabits(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/acquired/count?userId=" + userId)
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/acquired/count")
+                .queryParam("userId", userId)
                 .build())
             .retrieve()
             .bodyToMono(Long.class)
@@ -374,8 +377,9 @@ public class GreenCityRemoteClient {
      * @author Orest Mamchuk
      */
     public Long findAmountOfHabitsInProgress(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/in-progress/count?userId="
-                + userId).build())
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/in-progress/count")
+                .queryParam("userId", userId)
+                .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();
@@ -403,7 +407,9 @@ public class GreenCityRemoteClient {
      * @return {@link Long} count of attended by user events.
      */
     public Long findAmountOfEventsAttendedByUser(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/attenders/count?user-id=" + userId).build())
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/attenders/count")
+                .queryParam("user-id", userId)
+                .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();
@@ -416,7 +422,9 @@ public class GreenCityRemoteClient {
      * @return {@link Long} count of organized by user events.
      */
     public Long findAmountOfEventsOrganizedByUser(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/organizers/count?user-id=" + userId).build())
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/organizers/count")
+                .queryParam("user-id", userId)
+                .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();
