@@ -580,15 +580,15 @@ class UserServiceImplTest {
 
     @Test
     void getUserProfileStatistics() {
-        when(restClient.findAmountOfPublishedNews(TestConst.SIMPLE_LONG_NUMBER))
+        when(greenCityRemoteClient.findAmountOfPublishedNews(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
-        when(restClient.findAmountOfAcquiredHabits(TestConst.SIMPLE_LONG_NUMBER))
+        when(greenCityRemoteClient.findAmountOfAcquiredHabits(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
-        when(restClient.findAmountOfHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER))
+        when(greenCityRemoteClient.findAmountOfHabitsInProgress(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
-        when(restClient.findAmountOfEventsAttendedByUser(TestConst.SIMPLE_LONG_NUMBER))
+        when(greenCityRemoteClient.findAmountOfEventsAttendedByUser(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
-        when(restClient.findAmountOfEventsOrganizedByUser(TestConst.SIMPLE_LONG_NUMBER))
+        when(greenCityRemoteClient.findAmountOfEventsOrganizedByUser(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
 
         assertEquals(ModelUtils.USER_PROFILE_STATISTICS_DTO,
@@ -596,11 +596,11 @@ class UserServiceImplTest {
         assertNotEquals(ModelUtils.USER_PROFILE_STATISTICS_DTO,
             userService.getUserProfileStatistics(TestConst.SIMPLE_LONG_NUMBER_BAD_VALUE));
 
-        verify(restClient, times(2)).findAmountOfPublishedNews(anyLong());
-        verify(restClient, times(2)).findAmountOfAcquiredHabits(anyLong());
-        verify(restClient, times(2)).findAmountOfHabitsInProgress(anyLong());
-        verify(restClient, times(2)).findAmountOfEventsAttendedByUser(anyLong());
-        verify(restClient, times(2)).findAmountOfEventsOrganizedByUser(anyLong());
+        verify(greenCityRemoteClient, times(2)).findAmountOfPublishedNews(anyLong());
+        verify(greenCityRemoteClient, times(2)).findAmountOfAcquiredHabits(anyLong());
+        verify(greenCityRemoteClient, times(2)).findAmountOfHabitsInProgress(anyLong());
+        verify(greenCityRemoteClient, times(2)).findAmountOfEventsAttendedByUser(anyLong());
+        verify(greenCityRemoteClient, times(2)).findAmountOfEventsOrganizedByUser(anyLong());
     }
 
     @Test

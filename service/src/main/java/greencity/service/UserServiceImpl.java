@@ -643,11 +643,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
-        Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
-        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
-        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
+        Long amountOfPublishedNewsByUserId = greenCityRemoteClient.findAmountOfPublishedNews(userId);
+        Long amountOfAcquiredHabitsByUserId = greenCityRemoteClient.findAmountOfAcquiredHabits(userId);
+        Long amountOfHabitsInProgressByUserId = greenCityRemoteClient.findAmountOfHabitsInProgress(userId);
         Long amountOfOrganizedAndAttendedEventsByUserId =
-            restClient.findAmountOfEventsAttendedByUser(userId) + restClient.findAmountOfEventsOrganizedByUser(userId);
+            greenCityRemoteClient.findAmountOfEventsAttendedByUser(userId) + greenCityRemoteClient
+                .findAmountOfEventsOrganizedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)
