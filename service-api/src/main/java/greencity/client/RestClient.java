@@ -3,7 +3,6 @@ package greencity.client;
 import greencity.constant.RestTemplateLinks;
 import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
-import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -131,20 +129,6 @@ public class RestClient {
         return restTemplate.exchange(greenCityServerAddress
             + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
             entity, Long.class).getBody();
-    }
-
-    /**
-     * Method for creating an ubs profile for a user.
-     *
-     * @param ubsProfile of {@link UbsProfileCreationDto};
-     * @return id of ubs profile {@link Long};
-     * @author Maksym Golik
-     */
-    public Long createUbsProfile(UbsProfileCreationDto ubsProfile) throws RestClientException {
-        return restTemplate
-            .postForEntity(greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-                ubsProfile, Long.class)
-            .getBody();
     }
 
     /**
