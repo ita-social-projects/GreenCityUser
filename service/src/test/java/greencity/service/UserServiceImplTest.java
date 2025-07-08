@@ -1171,7 +1171,8 @@ class UserServiceImplTest {
     void getAvailableCustomToDoListItem() {
         CustomToDoListItemResponseDto customToDoListItemResponseDto =
             new CustomToDoListItemResponseDto(1L, "test");
-        when(restClient.getAllAvailableCustomToDoListItems(userId, habitId))
+
+        when(greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId))
             .thenReturn(Collections.singletonList(customToDoListItemResponseDto));
 
         assertEquals(Collections.singletonList(customToDoListItemResponseDto),

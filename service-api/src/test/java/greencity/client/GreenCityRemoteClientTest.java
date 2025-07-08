@@ -9,6 +9,7 @@ import greencity.TestConst;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
@@ -569,5 +570,36 @@ class GreenCityRemoteClientTest {
         String requestBody = recordedRequest.getBody().readUtf8();
         UbsProfileCreationDto actualRequest = fromJson(requestBody, UbsProfileCreationDto.class);
         assertEquals(dto, actualRequest);
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllAvailableCustomToDoListItems(){
+        Long userId = 1L;
+        Long habitId = 2L;
+        String expectedPath = "/custom/to-do-list-items/" + userId + "/" + habitId;
+        String expectedMethod = HttpMethod.GET.name();
+
+        List<CustomToDoListItemResponseDto> expectedResponse = List.of(
+            new CustomToDoListItemResponseDto(1L, "Test 1"),
+            new CustomToDoListItemResponseDto(2L, "Test 2")
+        );
+
+        String responseBody = toJson(expectedResponse);
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(responseBody)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        List<CustomToDoListItemResponseDto> actualResponse =
+            greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId);
+
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.size(), actualResponse.size());
+        assertEquals(expectedResponse, actualResponse);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
     }
 }

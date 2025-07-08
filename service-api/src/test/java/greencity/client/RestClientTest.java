@@ -48,29 +48,6 @@ class RestClientTest {
     private RestClient restClient;
 
     @Test
-    void getAllAvailableCustomToDoListItems() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long userId = 1L;
-        Long habitId = 1L;
-        CustomToDoListItemResponseDto customToDoListItemResponseDto =
-            new CustomToDoListItemResponseDto(1L, "test");
-        CustomToDoListItemResponseDto[] customToDoListItemResponseDtos =
-            new CustomToDoListItemResponseDto[1];
-        customToDoListItemResponseDtos[0] = customToDoListItemResponseDto;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.CUSTOM_TO_DO_LIST_ITEMS + userId + "/" + habitId, HttpMethod.GET, entity,
-            CustomToDoListItemResponseDto[].class))
-                .thenReturn(ResponseEntity.ok(customToDoListItemResponseDtos));
-
-        assertEquals(Arrays.asList(customToDoListItemResponseDtos),
-            restClient.getAllAvailableCustomToDoListItems(userId, habitId));
-    }
-
-    @Test
     void uploadImage() throws IOException {
         String imagePath = "image";
         String accessToken = "accessToken";
