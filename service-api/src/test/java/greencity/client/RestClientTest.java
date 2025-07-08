@@ -80,52 +80,6 @@ class RestClientTest {
     }
 
     @Test
-    void findAmountOfPublishedNews() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long publishedNews = 5L;
-        Long userId = 1L;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(
-            greenCityServerAddress + RestTemplateLinks.ECO_NEWS_COUNT + RestTemplateLinks.AUTHOR_ID + userId,
-            HttpMethod.GET, entity, Long.class))
-                .thenReturn(ResponseEntity.ok(publishedNews));
-        assertEquals(publishedNews, restClient.findAmountOfPublishedNews(userId));
-    }
-
-    @Test
-    void findAmountOfAcquiredHabits() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long acquiredHabits = 5L;
-        Long userId = 1L;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.HABIT_STATISTIC_ACQUIRED_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
-            entity, Long.class)).thenReturn(ResponseEntity.ok(acquiredHabits));
-        assertEquals(acquiredHabits, restClient.findAmountOfAcquiredHabits(userId));
-    }
-
-    @Test
-    void findAmountOfHabitsInProgress() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long habitsInProgress = 5L;
-        Long userId = 1L;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.HABIT_STATISTIC_IN_PROGRESS_COUNT + RestTemplateLinks.USER_ID + userId, HttpMethod.GET,
-            entity, Long.class)).thenReturn(ResponseEntity.ok(habitsInProgress));
-        assertEquals(habitsInProgress, restClient.findAmountOfHabitsInProgress(userId));
-    }
-
-    @Test
     void testChatBetweenTwo() {
         Long firstUserId = 1L;
         Long secondUserId = 2L;
@@ -145,47 +99,5 @@ class RestClientTest {
             eq(HttpMethod.GET),
             any(HttpEntity.class),
             eq(FriendsChatDto.class));
-    }
-
-    @Test
-    void findAmountOfEventsAttendedByUserTest() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long userId = 1L;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ATTENDED_COUNT_BY_USER_ID + userId,
-            HttpMethod.GET, entity, Long.class))
-                .thenReturn(ResponseEntity.ok(1L));
-
-        assertEquals(1, restClient.findAmountOfEventsAttendedByUser(userId));
-
-        verify(httpServletRequest).getHeader(AUTHORIZATION);
-        verify(restTemplate).exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ATTENDED_COUNT_BY_USER_ID + userId,
-            HttpMethod.GET, entity, Long.class);
-    }
-
-    @Test
-    void findAmountOfEventsOrganizedByUserTest() {
-        String accessToken = "accessToken";
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(AUTHORIZATION, accessToken);
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        Long userId = 1L;
-        when(httpServletRequest.getHeader(AUTHORIZATION)).thenReturn(accessToken);
-        when(restTemplate.exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ORGANIZED_COUNT_BY_USER_ID + userId,
-            HttpMethod.GET, entity, Long.class))
-                .thenReturn(ResponseEntity.ok(1L));
-
-        assertEquals(1, restClient.findAmountOfEventsOrganizedByUser(userId));
-
-        verify(httpServletRequest).getHeader(AUTHORIZATION);
-        verify(restTemplate).exchange(greenCityServerAddress
-            + RestTemplateLinks.EVENTS_ORGANIZED_COUNT_BY_USER_ID + userId,
-            HttpMethod.GET, entity, Long.class);
     }
 }

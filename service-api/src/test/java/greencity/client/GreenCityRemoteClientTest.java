@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.ModelUtils;
 import greencity.TestConst;
+import greencity.constant.RestTemplateLinks;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
@@ -39,10 +40,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static greencity.constant.AppConstant.AUTHORIZATION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class GreenCityRemoteClientTest {
@@ -597,6 +601,101 @@ class GreenCityRemoteClientTest {
         assertNotNull(actualResponse);
         assertEquals(expectedResponse.size(), actualResponse.size());
         assertEquals(expectedResponse, actualResponse);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfPublishedNews() {
+        String expectedPath = "/eco-news/count?author-id=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfPublishedNews(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfAcquiredHabits() {
+        String expectedPath = "/habit/statistic/acquired/count?userId=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfAcquiredHabits(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfHabitsInProgress() {
+        String expectedPath = "/habit/statistic/in-progress/count?userId=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfHabitsInProgress(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfEventsOrganizedByUserTest() {
+        String expectedPath = "/events/organizers/count?user-id=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfEventsOrganizedByUser(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfEventsAttendedByUserTest() {
+        String expectedPath = "/events/attenders/count?user-id=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfEventsAttendedByUser(userId);
+        assertEquals(expectedCount, actualCount);
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals(expectedMethod, recordedRequest.getMethod());
