@@ -473,7 +473,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public List<CustomToDoListItemResponseDto> getAvailableCustomToDoListItems(Long userId, Long habitId) {
-        return restClient.getAllAvailableCustomToDoListItems(userId, habitId);
+        return greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId);
     }
 
     /**
