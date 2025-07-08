@@ -75,7 +75,6 @@ public class GreenCityRemoteWebClientConfig {
             .build();
     }
 
-
     private ExchangeFilterFunction authorizationHeaderFilter() {
         List<Role> roles = List.of(Role.ROLE_USER, Role.ROLE_ADMIN);
 

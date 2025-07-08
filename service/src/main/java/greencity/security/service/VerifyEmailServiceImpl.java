@@ -33,7 +33,7 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 public class VerifyEmailServiceImpl implements VerifyEmailService {
     private final VerifyEmailRepo verifyEmailRepo;
     private final UserRepo userRepo;
-    //private final RestClient restClient;
+    // private final RestClient restClient;
     private final ModelMapper modelMapper;
     private final UserService userService;
     private final GreenCityRemoteClient greenCityRemoteClient;

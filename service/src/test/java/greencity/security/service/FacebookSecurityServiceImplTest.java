@@ -352,7 +352,8 @@ class FacebookSecurityServiceImplTest {
         when(userRepo.save(any(User.class))).thenReturn(savedUser);
         when(modelMapper.map(any(User.class), eq(UbsProfileCreationDto.class)))
             .thenReturn(new UbsProfileCreationDto());
-        when(greenCityRemoteClient.createUbsProfile(any())).thenThrow(new RestClientException("Failed to create UBS profile"));
+        when(greenCityRemoteClient.createUbsProfile(any()))
+            .thenThrow(new RestClientException("Failed to create UBS profile"));
 
         RestClientException exception = assertThrows(RestClientException.class,
             () -> facebookSecurityService.handleNewUser(email, userName, profilePicture, language));

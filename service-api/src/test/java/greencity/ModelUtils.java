@@ -98,8 +98,7 @@ public class ModelUtils {
         return new UbsProfileCreationDto(
             TestConst.UUID,
             TestConst.EMAIL,
-            TestConst.NAME
-        );
+            TestConst.NAME);
     }
 
     public static ConstraintValidatorContext.ConstraintViolationBuilder getConstraintViolationBuilder() {

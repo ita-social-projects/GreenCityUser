@@ -346,8 +346,8 @@ public class GreenCityRemoteClient {
      */
     public Long findAmountOfPublishedNews(Long userId) {
         return webClient.get().uri(uriBuilder -> uriBuilder.path("/eco-news/count")
-                .queryParam("author-id", userId)
-                .build())
+            .queryParam("author-id", userId)
+            .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();
@@ -362,8 +362,8 @@ public class GreenCityRemoteClient {
      */
     public Long findAmountOfAcquiredHabits(Long userId) {
         return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/acquired/count")
-                .queryParam("userId", userId)
-                .build())
+            .queryParam("userId", userId)
+            .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();
@@ -378,8 +378,8 @@ public class GreenCityRemoteClient {
      */
     public Long findAmountOfHabitsInProgress(Long userId) {
         return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/in-progress/count")
-                .queryParam("userId", userId)
-                .build())
+            .queryParam("userId", userId)
+            .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();
@@ -408,8 +408,8 @@ public class GreenCityRemoteClient {
      */
     public Long findAmountOfEventsAttendedByUser(Long userId) {
         return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/attenders/count")
-                .queryParam("user-id", userId)
-                .build())
+            .queryParam("user-id", userId)
+            .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();
@@ -423,8 +423,8 @@ public class GreenCityRemoteClient {
      */
     public Long findAmountOfEventsOrganizedByUser(Long userId) {
         return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/organizers/count")
-                .queryParam("user-id", userId)
-                .build())
+            .queryParam("user-id", userId)
+            .build())
             .retrieve()
             .bodyToMono(Long.class)
             .block();

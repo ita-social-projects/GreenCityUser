@@ -124,7 +124,8 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         User savedUser = saveNewUser(newUser, profilePicture);
         try {
             greenCityRemoteClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
-            //restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
+            // restClient.createUbsProfile(modelMapper.map(savedUser,
+            // UbsProfileCreationDto.class));
         } catch (RestClientException e) {
             log.error("Failed to create UBS profile for user - {}", savedUser.getEmail(), e);
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);

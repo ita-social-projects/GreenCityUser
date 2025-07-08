@@ -267,7 +267,8 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         User savedUser = saveNewUser(newUser, profilePicture);
         try {
             greenCityRemoteClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
-            //restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
+            // restClient.createUbsProfile(modelMapper.map(savedUser,
+            // UbsProfileCreationDto.class));
         } catch (RestClientException e) {
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
         }

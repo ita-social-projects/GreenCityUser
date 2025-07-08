@@ -79,7 +79,8 @@ class GreenCityRemoteClientTest {
     void initialize() {
         String baseUrl1 = "http://localhost:%s".formatted(mockWebServer.getPort());
         String baseUrl2 = "http://localhost:%s".formatted(mockWebServer.getPort());
-        greenCityRemoteClient = new GreenCityRemoteClient(WebClient.builder().baseUrl(baseUrl1).build(), WebClient.builder().baseUrl(baseUrl2).build());
+        greenCityRemoteClient = new GreenCityRemoteClient(WebClient.builder().baseUrl(baseUrl1).build(),
+            WebClient.builder().baseUrl(baseUrl2).build());
     }
 
     @Test
@@ -553,7 +554,7 @@ class GreenCityRemoteClientTest {
 
     @Test
     @SneakyThrows
-    void createUbsProfile(){
+    void createUbsProfile() {
         UbsProfileCreationDto dto = ModelUtils.getUbsProfileCreationDto();
         Long expectedId = 123L;
         String expectedPath = "/ubs/userProfile/user/create";
@@ -578,7 +579,7 @@ class GreenCityRemoteClientTest {
 
     @Test
     @SneakyThrows
-    void getAllAvailableCustomToDoListItems(){
+    void getAllAvailableCustomToDoListItems() {
         Long userId = 1L;
         Long habitId = 2L;
         String expectedPath = "/custom/to-do-list-items/" + userId + "/" + habitId;
@@ -586,8 +587,7 @@ class GreenCityRemoteClientTest {
 
         List<CustomToDoListItemResponseDto> expectedResponse = List.of(
             new CustomToDoListItemResponseDto(1L, "Test 1"),
-            new CustomToDoListItemResponseDto(2L, "Test 2")
-        );
+            new CustomToDoListItemResponseDto(2L, "Test 2"));
 
         String responseBody = toJson(expectedResponse);
 
