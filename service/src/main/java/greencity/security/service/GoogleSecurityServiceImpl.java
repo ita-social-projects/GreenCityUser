@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.client.GreenCityRemoteClient;
-import greencity.client.RestClient;
 import static greencity.constant.AppConstant.*;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
@@ -59,7 +58,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final ModelMapper modelMapper;
     private final AchievementService achievementService;
     private final UserRepo userRepo;
-    private final RestClient restClient;
     private final PlatformTransactionManager transactionManager;
     private final HttpClient googleAccessTokenVerifier;
     private final ObjectMapper objectMapper;
@@ -124,8 +122,6 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         User savedUser = saveNewUser(newUser, profilePicture);
         try {
             greenCityRemoteClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
-            // restClient.createUbsProfile(modelMapper.map(savedUser,
-            // UbsProfileCreationDto.class));
         } catch (RestClientException e) {
             log.error("Failed to create UBS profile for user - {}", savedUser.getEmail(), e);
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);

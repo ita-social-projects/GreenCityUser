@@ -1,7 +1,6 @@
 package greencity.security.service;
 
 import greencity.client.GreenCityRemoteClient;
-//import greencity.client.RestClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
@@ -20,7 +19,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.web.client.RestClientException;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 /**
@@ -33,7 +31,6 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 public class VerifyEmailServiceImpl implements VerifyEmailService {
     private final VerifyEmailRepo verifyEmailRepo;
     private final UserRepo userRepo;
-    // private final RestClient restClient;
     private final ModelMapper modelMapper;
     private final UserService userService;
     private final GreenCityRemoteClient greenCityRemoteClient;
