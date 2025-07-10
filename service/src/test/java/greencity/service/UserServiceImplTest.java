@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
 import greencity.dto.CoordinatesDto;
@@ -132,9 +131,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 class UserServiceImplTest {
     @Mock
     UserRepo userRepo;
-
-    @Mock
-    RestClient restClient;
 
     @Mock
     SocialNetworkImageService socialNetworkImageService;
@@ -1362,11 +1358,11 @@ class UserServiceImplTest {
         byte[] bytes = content.getBytes();
         MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-        when(restClient.uploadImage(any())).thenReturn(picturePath);
+        when(greenCityRemoteClient.uploadFile(any())).thenReturn(picturePath);
         when(modelMapper.map(any(), any())).thenReturn(userVO);
         UserVO actual = userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
         assertEquals(userVO, actual);
-        verify(restClient).uploadImage(any());
+        verify(greenCityRemoteClient).uploadFile(any());
         verify(modelMapper).map(any(), any());
         verify(userRepo).findByEmail(anyString());
         verify(greenCityRemoteClient).updateUserPicturePath(user.getId(), picturePath);
@@ -1401,7 +1397,7 @@ class UserServiceImplTest {
 
         verify(userRepo).findByEmail(anyString());
         verify(modelMapper).map(base64, MultipartFile.class);
-        verify(restClient, never()).uploadImage(any());
+        verify(greenCityRemoteClient, never()).uploadFile(any());
         verify(greenCityRemoteClient, never()).updateUserPicturePath(user.getId(), picturePath);
     }
 
