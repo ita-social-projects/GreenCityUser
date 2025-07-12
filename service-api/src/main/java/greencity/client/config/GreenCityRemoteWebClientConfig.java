@@ -33,6 +33,9 @@ public class GreenCityRemoteWebClientConfig {
     @Value("${greencity.server.address}")
     private String greenCityBaseUrl;
 
+    @Value("${greencityubs.server.address}")
+    private String greenCityUbsBaseUrl;
+
     @Value("${greencity.authorization.service-email}")
     private String systemEmail;
 
@@ -58,8 +61,37 @@ public class GreenCityRemoteWebClientConfig {
             .build();
     }
 
+    @Bean("greenCityUbsWebClient")
+    public WebClient greenCityUbsWebClient(WebClient.Builder builder) {
+        return builder.baseUrl(greenCityUbsBaseUrl)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .filter(authorizationHeaderFilterForGreenCityUbs())
+            .filter(handlingWebClientExceptions())
+            .clientConnector(
+                new ReactorClientHttpConnector(
+                    HttpClient.create()
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
+                        .responseTimeout(Duration.ofMillis(responseTimeoutMillis))))
+            .build();
+    }
+
     private ExchangeFilterFunction authorizationHeaderFilter() {
         List<Role> roles = List.of(Role.ROLE_USER, Role.ROLE_ADMIN);
+
+        return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
+            String jwt = jwtTool.createAccessToken(systemEmail, roles);
+            String authHeader = AppConstant.TOKEN_PREFIX + jwt;
+
+            ClientRequest authorizedRequest = ClientRequest.from(clientRequest)
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
+                .build();
+
+            return Mono.just(authorizedRequest);
+        });
+    }
+
+    private ExchangeFilterFunction authorizationHeaderFilterForGreenCityUbs() {
+        List<Role> roles = List.of(Role.ROLE_USER, Role.ROLE_EMPLOYEE, Role.ROLE_UBS_EMPLOYEE);
 
         return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
             String jwt = jwtTool.createAccessToken(systemEmail, roles);

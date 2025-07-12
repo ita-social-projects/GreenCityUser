@@ -473,7 +473,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public List<CustomToDoListItemResponseDto> getAvailableCustomToDoListItems(Long userId, Long habitId) {
-        return restClient.getAllAvailableCustomToDoListItems(userId, habitId);
+        return greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId);
     }
 
     /**
@@ -501,7 +501,7 @@ public class UserServiceImpl implements UserService {
         }
         if (image != null) {
             String profilePicturePath;
-            profilePicturePath = restClient.uploadImage(image);
+            profilePicturePath = greenCityRemoteClient.uploadFile(image);
             updateUserProfilePicturePath(user.getId(), profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
@@ -643,11 +643,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
-        Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
-        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
-        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
+        Long amountOfPublishedNewsByUserId = greenCityRemoteClient.findAmountOfPublishedNews(userId);
+        Long amountOfAcquiredHabitsByUserId = greenCityRemoteClient.findAmountOfAcquiredHabits(userId);
+        Long amountOfHabitsInProgressByUserId = greenCityRemoteClient.findAmountOfHabitsInProgress(userId);
         Long amountOfOrganizedAndAttendedEventsByUserId =
-            restClient.findAmountOfEventsAttendedByUser(userId) + restClient.findAmountOfEventsOrganizedByUser(userId);
+            greenCityRemoteClient.findAmountOfEventsAttendedByUser(userId) + greenCityRemoteClient
+                .findAmountOfEventsOrganizedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)
