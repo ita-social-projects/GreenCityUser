@@ -37,9 +37,6 @@
                 <constraints nullable="false" unique="true" uniqueConstraintName="UK_ob8kqyqqgmefl0aco34akdtpe"/>
             </column>
             <column name="email_notification" type="INT"/>
-            <column name="first_name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
             <column name="name" type="VARCHAR(30)">
                 <constraints nullable="false"/>
             </column>
@@ -50,17 +47,20 @@
             <column name="refresh_token_key" type="varchar(255)" defaultValue="secret">
                 <constraints nullable="false"/>
             </column>
-            <column name="phone_number" type="VARCHAR"/>
-            <column name="last_activity_time" type="timestamp with time zone"/>
-            <column name="language_id" defaultValue="2" type="BIGINT"/>
             <column name="profile_picture" type="varchar(300)"/>
             <column name="rating" type="double"/>
-            <column name="uuid" type="varchar(60)"/>
+            <column name="last_activity_time" type="timestamp with time zone"/>
+            <column name="first_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
             <column name="user_credo" type="varchar(255)">
             </column>
             <column name="show_location" type="varchar(255)" defaultValue="PUBLIC"/>
             <column name="show_eco_place" type="varchar(255)" defaultValue="PUBLIC"/>
             <column name="show_to_do_list" type="varchar(255)" defaultValue="PUBLIC"/>
+            <column name="language_id" defaultValue="2" type="BIGINT"/>
+            <column name="uuid" type="varchar(60)"/>
+            <column name="phone_number" type="VARCHAR"/>
         </createTable>
     </changeSet>
     <changeSet author="Marian (generated)" id="1571227598316-15">
