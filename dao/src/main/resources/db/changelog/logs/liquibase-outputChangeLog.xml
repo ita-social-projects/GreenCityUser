@@ -51,7 +51,7 @@
             <column name="rating" type="double"/>
             <column name="last_activity_time" type="timestamp with time zone"/>
             <column name="first_name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="user_credo" type="varchar(255)">
             </column>
