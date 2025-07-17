@@ -4,6 +4,7 @@ import greencity.dto.CoordinatesDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UserCityDto;
@@ -91,6 +92,13 @@ public class ModelUtils {
             TestConst.USER_CREDO,
             2.,
             new UserLocationDto());
+    }
+
+    public static UbsProfileCreationDto getUbsProfileCreationDto() {
+        return new UbsProfileCreationDto(
+            TestConst.UUID,
+            TestConst.EMAIL,
+            TestConst.NAME);
     }
 
     public static ConstraintValidatorContext.ConstraintViolationBuilder getConstraintViolationBuilder() {

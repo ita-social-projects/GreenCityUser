@@ -9,6 +9,8 @@ import greencity.TestConst;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.CreateGreenCityUserDto;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UpdateUserCredoDto;
@@ -28,9 +30,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -73,8 +73,10 @@ class GreenCityRemoteClientTest {
 
     @BeforeEach
     void initialize() {
-        String baseUrl = "http://localhost:%s".formatted(mockWebServer.getPort());
-        greenCityRemoteClient = new GreenCityRemoteClient(WebClient.builder().baseUrl(baseUrl).build());
+        String baseUrl1 = "http://localhost:%s".formatted(mockWebServer.getPort());
+        String baseUrl2 = "http://localhost:%s".formatted(mockWebServer.getPort());
+        greenCityRemoteClient = new GreenCityRemoteClient(WebClient.builder().baseUrl(baseUrl1).build(),
+            WebClient.builder().baseUrl(baseUrl2).build());
     }
 
     @Test
@@ -544,5 +546,155 @@ class GreenCityRemoteClientTest {
     @SneakyThrows
     private <T> T fromJson(String json, TypeReference<T> typeReference) {
         return objectMapper.readValue(json, typeReference);
+    }
+
+    @Test
+    @SneakyThrows
+    void createUbsProfile() {
+        UbsProfileCreationDto dto = ModelUtils.getUbsProfileCreationDto();
+        Long expectedId = 123L;
+        String expectedPath = "/ubs/userProfile/user/create";
+        String expectedMethod = HttpMethod.POST.name();
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedId.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualId = greenCityRemoteClient.createUbsProfile(dto);
+
+        assertEquals(expectedId, actualId);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+
+        String requestBody = recordedRequest.getBody().readUtf8();
+        UbsProfileCreationDto actualRequest = fromJson(requestBody, UbsProfileCreationDto.class);
+        assertEquals(dto, actualRequest);
+    }
+
+    @Test
+    @SneakyThrows
+    void getAllAvailableCustomToDoListItems() {
+        Long userId = 1L;
+        Long habitId = 2L;
+        String expectedPath = "/custom/to-do-list-items/" + userId + "/" + habitId;
+        String expectedMethod = HttpMethod.GET.name();
+
+        List<CustomToDoListItemResponseDto> expectedResponse = List.of(
+            new CustomToDoListItemResponseDto(1L, "Test 1"),
+            new CustomToDoListItemResponseDto(2L, "Test 2"));
+
+        String responseBody = toJson(expectedResponse);
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(responseBody)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        List<CustomToDoListItemResponseDto> actualResponse =
+            greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId);
+
+        assertNotNull(actualResponse);
+        assertEquals(expectedResponse.size(), actualResponse.size());
+        assertEquals(expectedResponse, actualResponse);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfPublishedNews() {
+        String expectedPath = "/eco-news/count?author-id=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfPublishedNews(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfAcquiredHabits() {
+        String expectedPath = "/habit/statistic/acquired/count?userId=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfAcquiredHabits(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfHabitsInProgress() {
+        String expectedPath = "/habit/statistic/in-progress/count?userId=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfHabitsInProgress(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfEventsOrganizedByUserTest() {
+        String expectedPath = "/events/organizers/count?user-id=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfEventsOrganizedByUser(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void findAmountOfEventsAttendedByUserTest() {
+        String expectedPath = "/events/attenders/count?user-id=" + userId;
+        String expectedMethod = HttpMethod.GET.name();
+        Long expectedCount = 5L;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(expectedCount.toString())
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        Long actualCount = greenCityRemoteClient.findAmountOfEventsAttendedByUser(userId);
+        assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
     }
 }
