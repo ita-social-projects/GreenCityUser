@@ -3,6 +3,8 @@ package greencity.client;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
+import greencity.dto.todolist.CustomToDoListItemResponseDto;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UpdateUserCredoDto;
 import greencity.dto.user.CreateGreenCityUserDto;
@@ -15,9 +17,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.http.client.MultipartBodyBuilder;
 import greencity.dto.user.UserVO;
 import org.springframework.stereotype.Service;
@@ -32,13 +32,16 @@ import java.util.Optional;
 @Service
 public class GreenCityRemoteClient {
     private final WebClient webClient;
+    private final WebClient greenCityUbsWebClient;
 
     private static final String USER_ID_QUERY_PARAM = "userId";
     private static final String PROFILE_PICTURE_PATH_QUERY_PARAM = "profilePicturePath";
 
     public GreenCityRemoteClient(
-        @Qualifier("greenCityWebClient") WebClient webClient) {
+        @Qualifier("greenCityWebClient") WebClient webClient,
+        @Qualifier("greenCityUbsWebClient") WebClient greenCityUbsWebClient) {
         this.webClient = webClient;
+        this.greenCityUbsWebClient = greenCityUbsWebClient;
     }
 
     /**
@@ -139,7 +142,6 @@ public class GreenCityRemoteClient {
      * @param userId id of the user
      * @return {@link UserLocationDto}.
      */
-    // TODO: seems like it is no longer used
     public Optional<UserLocationDto> findUserLocationByUserId(Long userId) {
         return webClient.get()
             .uri(uriBuilder -> uriBuilder.path("/users/{userId}/location").build(userId))
@@ -245,9 +247,17 @@ public class GreenCityRemoteClient {
             .bodyValue(updateUserCredoDto)
             .retrieve()
             .bodyToMono(Void.class)
-            .subscribe();
+            .block();
     }
 
+    /**
+     * Sends a request to the GreenCity service to create a new user.
+     *
+     * @param createUserDto the data transfer object containing user creation
+     *                      information
+     * @return {@code true} if the user was successfully created, {@code false}
+     *         otherwise
+     */
     public boolean createUser(CreateGreenCityUserDto createUserDto) {
         return Boolean.TRUE.equals(webClient.post()
             .uri("/users/create")
@@ -257,6 +267,13 @@ public class GreenCityRemoteClient {
             .block());
     }
 
+    /**
+     * Updates the user's profile picture path in the GreenCity service.
+     *
+     * @param userId             the ID of the user whose picture path should be
+     *                           updated
+     * @param profilePicturePath the new profile picture path to be set
+     */
     public void updateUserPicturePath(Long userId, String profilePicturePath) {
         webClient.put()
             .uri(uriBuilder -> uriBuilder.path("/users/picturePath")
@@ -268,6 +285,12 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    /**
+     * Updates the user's name in the GreenCity service.
+     *
+     * @param userId   the ID of the user whose name should be updated
+     * @param userName the new name to assign to the user
+     */
     public void updateUserName(Long userId, String userName) {
         webClient.patch()
             .uri(uriBuilder -> uriBuilder.path("/users/{userId}/name")
@@ -275,9 +298,17 @@ public class GreenCityRemoteClient {
                 .build(userId))
             .retrieve()
             .bodyToMono(Void.class)
-            .subscribe();
+            .block();
     }
 
+    /**
+     * Retrieves a list of user profile information from the GreenCity service for
+     * the given list of user IDs.
+     *
+     * @param userIds list of user IDs to fetch profile data for
+     * @return a list of {@link GreenCityUserProfileDtoResponse} objects containing
+     *         user profile information
+     */
     public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
         return webClient.get()
             .uri(uriBuilder -> uriBuilder.path("/users/profiles")
@@ -286,6 +317,116 @@ public class GreenCityRemoteClient {
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<GreenCityUserProfileDtoResponse>>() {
             })
+            .block();
+    }
+
+    /**
+     * Method for finding all custom to-do list items.
+     *
+     * @param userId of {@link UserVO}
+     * @return list of {@link CustomToDoListItemResponseDto}
+     * @author Orest Mamchuk
+     */
+    public List<CustomToDoListItemResponseDto> getAllAvailableCustomToDoListItems(Long userId, Long habitId) {
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/custom/to-do-list-items/{userId}/{habitId}")
+                .build(userId, habitId))
+            .retrieve()
+            .bodyToMono(new ParameterizedTypeReference<List<CustomToDoListItemResponseDto>>() {
+            })
+            .block();
+    }
+
+    /**
+     * The method find count of published eco news.
+     *
+     * @param userId of {@link UserVO}
+     * @return Long
+     * @author Orest Mamchuk
+     */
+    public Long findAmountOfPublishedNews(Long userId) {
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/eco-news/count")
+            .queryParam("author-id", userId)
+            .build())
+            .retrieve()
+            .bodyToMono(Long.class)
+            .block();
+    }
+
+    /**
+     * Method for getting amount of acquired habit by {@link UserVO} id.
+     *
+     * @param userId of {@link UserVO}
+     * @return Long
+     * @author Orest Mamchuk
+     */
+    public Long findAmountOfAcquiredHabits(Long userId) {
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/acquired/count")
+            .queryParam("userId", userId)
+            .build())
+            .retrieve()
+            .bodyToMono(Long.class)
+            .block();
+    }
+
+    /**
+     * Method for getting amount of in progress habit by {@link UserVO} id.
+     *
+     * @param userId of {@link UserVO}
+     * @return Long
+     * @author Orest Mamchuk
+     */
+    public Long findAmountOfHabitsInProgress(Long userId) {
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/in-progress/count")
+            .queryParam("userId", userId)
+            .build())
+            .retrieve()
+            .bodyToMono(Long.class)
+            .block();
+    }
+
+    /**
+     * Method for creating an ubs profile for a user.
+     *
+     * @param ubsProfile of {@link UbsProfileCreationDto};
+     * @return id of ubs profile {@link Long};
+     * @author Maksym Golik
+     */
+    public Long createUbsProfile(UbsProfileCreationDto ubsProfile) {
+        return greenCityUbsWebClient.post().uri("/ubs/userProfile/user/create")
+            .bodyValue(ubsProfile)
+            .retrieve()
+            .bodyToMono(Long.class)
+            .block();
+    }
+
+    /**
+     * Method for getting amount of attended events by {@link UserVO} id.
+     *
+     * @param userId of {@link UserVO}
+     * @return {@link Long} count of attended by user events.
+     */
+    public Long findAmountOfEventsAttendedByUser(Long userId) {
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/attenders/count")
+            .queryParam("user-id", userId)
+            .build())
+            .retrieve()
+            .bodyToMono(Long.class)
+            .block();
+    }
+
+    /**
+     * Method for getting amount of organized events by {@link UserVO} id.
+     *
+     * @param userId of {@link UserVO}
+     * @return {@link Long} count of organized by user events.
+     */
+    public Long findAmountOfEventsOrganizedByUser(Long userId) {
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/organizers/count")
+            .queryParam("user-id", userId)
+            .build())
+            .retrieve()
+            .bodyToMono(Long.class)
             .block();
     }
 

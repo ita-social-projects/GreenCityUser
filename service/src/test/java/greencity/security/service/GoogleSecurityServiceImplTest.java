@@ -5,7 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.ModelUtils;
 import greencity.TestConst;
-import greencity.client.RestClient;
+import greencity.client.GreenCityRemoteClient;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
@@ -77,7 +77,7 @@ class GoogleSecurityServiceImplTest {
     @Mock
     private AchievementService achievementService;
     @Mock
-    private RestClient restClient;
+    private GreenCityRemoteClient greenCityRemoteClient;
     @Mock
     private PlatformTransactionManager platformTransactionManager;
     @Mock
@@ -157,7 +157,7 @@ class GoogleSecurityServiceImplTest {
         when(userRepo.save(any())).thenReturn(user);
         when(achievementService.findAll()).thenReturn(achievementVOList);
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
-        when(restClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
+        when(greenCityRemoteClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
 
         SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
 

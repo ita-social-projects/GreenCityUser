@@ -12,35 +12,7 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.DeactivateUserRequestDto;
-import greencity.dto.user.GreenCityUserProfileDtoResponse;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserActivationDto;
-import greencity.dto.user.UserAddRatingDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserCityDto;
-import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserEmailDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UsersOnlineStatusRequestDto;
-import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.dto.user.UserNotificationPreferenceDto;
-import greencity.dto.user.UserVOAdvancedDto;
-import greencity.dto.user.CreateGreenCityUserDto;
-import greencity.dto.user.UserVOShort;
+import greencity.dto.user.*;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
@@ -50,15 +22,10 @@ import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.RetryableTaskType;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadUpdateRequestException;
-import greencity.exception.exceptions.Base64DecodedException;
-import greencity.exception.exceptions.LowRoleLevelException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.UserDeactivationException;
-import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.*;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
@@ -105,6 +72,7 @@ public class UserServiceImpl implements UserService {
     private final SimpMessagingTemplate messagingTemplate;
     private final SocialNetworkImageService socialNetworkImageService;
     private final SocialNetworkService socialNetworkService;
+    private final RetryableTaskService retryableTaskService;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
     private long timeAfterLastActivity;
@@ -124,7 +92,13 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserRating(UserAddRatingDto userRatingDto) {
-        greenCityRemoteClient.updateUserRating(userRatingDto);
+        try {
+            greenCityRemoteClient.updateUserRating(userRatingDto);
+        } catch (WebClientRequestException | GreenCityServiceException e) {
+            retryableTaskService.saveRetryableTask(userRatingDto, RetryableTaskType.UPDATE_USER_RATING);
+            log.warn("GreenCity service is unavailable: update user rating failed. Reason: {}",
+                e.getMessage());
+        }
     }
 
     /**
@@ -204,13 +178,29 @@ public class UserServiceImpl implements UserService {
         updateUserName(user, dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
-        greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
         user.setUserStatus(dto.getUserStatus());
+        try {
+            greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
+        } catch (WebClientRequestException | GreenCityServiceException e) {
+            log.warn("GreenCity service is unavailable: update user credo failed");
+            UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(user.getId(),
+                dto.getUserCredo());
+            retryableTaskService.saveRetryableTask(updateUserCredoDto, RetryableTaskType.UPDATE_USER_CREDO);
+        }
     }
 
     private void updateUserName(User user, String name) {
-        user.setName(name);
-        greenCityRemoteClient.updateUserName(user.getId(), name);
+        try {
+            user.setName(name);
+            greenCityRemoteClient.updateUserName(user.getId(), name);
+        } catch (WebClientRequestException e) {
+            log.warn("GreenCity service is unavailable: update user name failed");
+            UpdateUserNameDto updateUserNameDto = UpdateUserNameDto.builder()
+                .id(user.getId())
+                .name(name)
+                .build();
+            retryableTaskService.saveRetryableTask(updateUserNameDto, RetryableTaskType.UPDATE_USERNAME);
+        }
     }
 
     /**
@@ -483,7 +473,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public List<CustomToDoListItemResponseDto> getAvailableCustomToDoListItems(Long userId, Long habitId) {
-        return restClient.getAllAvailableCustomToDoListItems(userId, habitId);
+        return greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId);
     }
 
     /**
@@ -511,7 +501,7 @@ public class UserServiceImpl implements UserService {
         }
         if (image != null) {
             String profilePicturePath;
-            profilePicturePath = restClient.uploadImage(image);
+            profilePicturePath = greenCityRemoteClient.uploadFile(image);
             updateUserProfilePicturePath(user.getId(), profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
@@ -542,10 +532,26 @@ public class UserServiceImpl implements UserService {
             updateUserName(user, userProfileDtoRequest.getName());
         }
         if (userProfileDtoRequest.getUserCredo() != null) {
-            greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
+            try {
+                greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
+            } catch (WebClientRequestException | GreenCityServiceException e) {
+                log.warn("GreenCity service is unavailable: update user credo failed");
+                UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(user.getId(),
+                    userProfileDtoRequest.getUserCredo());
+                retryableTaskService.saveRetryableTask(updateUserCredoDto, RetryableTaskType.UPDATE_USER_CREDO);
+            }
         }
         Long userId = user.getId();
-        greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
+        try {
+            greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
+        } catch (WebClientRequestException | GreenCityServiceException e) {
+            SetLocationForUserDto setLocationForUserDto = SetLocationForUserDto.builder()
+                .id(userId)
+                .userProfileDtoRequest(userProfileDtoRequest)
+                .build();
+            log.warn("GreenCity service is unavailable: set user location failed");
+            retryableTaskService.saveRetryableTask(setLocationForUserDto, RetryableTaskType.SET_LOCATION_FOR_USER);
+        }
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
         if (userProfileDtoRequest.getSocialNetworks() != null) {
             socialNetworks.forEach(socialNetwork -> socialNetworkService.delete(socialNetwork.getId()));
@@ -637,11 +643,12 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
-        Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
-        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
-        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
+        Long amountOfPublishedNewsByUserId = greenCityRemoteClient.findAmountOfPublishedNews(userId);
+        Long amountOfAcquiredHabitsByUserId = greenCityRemoteClient.findAmountOfAcquiredHabits(userId);
+        Long amountOfHabitsInProgressByUserId = greenCityRemoteClient.findAmountOfHabitsInProgress(userId);
         Long amountOfOrganizedAndAttendedEventsByUserId =
-            restClient.findAmountOfEventsAttendedByUser(userId) + restClient.findAmountOfEventsOrganizedByUser(userId);
+            greenCityRemoteClient.findAmountOfEventsAttendedByUser(userId) + greenCityRemoteClient
+                .findAmountOfEventsOrganizedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)
@@ -1049,15 +1056,17 @@ public class UserServiceImpl implements UserService {
     public void createGreenCityUser(Long newUserId, String profilePicture) {
         User newUser =
             userRepo.findById(newUserId).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
+        CreateGreenCityUserDto createGreenCityUserDto = CreateGreenCityUserDto.builder()
+            .id(newUser.getId())
+            .email(newUser.getEmail())
+            .name(newUser.getName())
+            .profilePicturePath(profilePicture)
+            .build();
         try {
-            greenCityRemoteClient.createUser(CreateGreenCityUserDto.builder()
-                .id(newUser.getId())
-                .email(newUser.getEmail())
-                .name(newUser.getName())
-                .profilePicturePath(profilePicture)
-                .build());
-        } catch (WebClientRequestException e) {
+            greenCityRemoteClient.createUser(createGreenCityUserDto);
+        } catch (WebClientRequestException | GreenCityServiceException e) {
             log.warn("GreenCity service is unavailable: {}", e.getMessage());
+            retryableTaskService.saveRetryableTask(createGreenCityUserDto, RetryableTaskType.CREATE_USER);
         } catch (WebClientResponseException e) {
             log.warn("Bad response from GreenCity: {}", e.getMessage());
         } catch (Exception e) {
@@ -1066,7 +1075,16 @@ public class UserServiceImpl implements UserService {
     }
 
     private void updateUserProfilePicturePath(Long userId, String profilePicturePath) {
-        greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
+        try {
+            greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
+        } catch (WebClientRequestException | GreenCityServiceException e) {
+            UpdateUserPicturePathDto dto = UpdateUserPicturePathDto.builder()
+                .userId(userId)
+                .picturePath(profilePicturePath)
+                .build();
+            log.warn("GreenCity service is unavailable: update user picture path failed");
+            retryableTaskService.saveRetryableTask(dto, RetryableTaskType.UPDATE_USER_PICTURE_PATH);
+        }
     }
 
     /**
