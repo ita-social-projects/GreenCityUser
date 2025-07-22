@@ -6,6 +6,8 @@ import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserVO;
+import greencity.enums.Role;
+import greencity.security.jwt.JwtTool;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ import static greencity.constant.AppConstant.FILES;
 public class RestClient {
     private final RestTemplate restTemplate;
     private final HttpServletRequest httpServletRequest;
+    private final JwtTool jwtTool;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
     @Value("${greencitychat.server.address}")
@@ -181,9 +184,15 @@ public class RestClient {
      * @author Maksym Golik
      */
     public Long createUbsProfile(UbsProfileCreationDto ubsProfile) throws RestClientException {
+        String accessToken = "Bearer " + jwtTool.createAccessToken("service@greencity.ua",
+            Role.ROLE_ADMIN);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, accessToken);
+        HttpEntity<UbsProfileCreationDto> entity = new HttpEntity<>(ubsProfile, headers);
+
         return restTemplate
             .postForEntity(greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-                ubsProfile, Long.class)
+                entity, Long.class)
             .getBody();
     }
 

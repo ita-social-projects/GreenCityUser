@@ -7,6 +7,7 @@ import greencity.dto.friends.FriendsChatDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
+import greencity.security.jwt.JwtTool;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
@@ -41,6 +42,8 @@ class RestClientTest {
     private RestTemplate restTemplate;
     @Mock
     private HttpServletRequest httpServletRequest;
+    @Mock
+    private JwtTool jwtTool;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
     @Value("${greencitychat.server.address}")
@@ -202,13 +205,17 @@ class RestClientTest {
                 .email("ubsemail@mail.com")
                 .name("UBS")
                 .build();
+        when(jwtTool.createAccessToken(any(), any())).thenReturn("token");
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, "Bearer token");
+        HttpEntity<UbsProfileCreationDto> entity = new HttpEntity<>(ubsProfileCreationDto, headers);
         ResponseEntity<Long> responseEntity = ResponseEntity.status(HttpStatus.CREATED).body(1L);
         when(restTemplate.postForEntity(greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-            ubsProfileCreationDto, Long.class)).thenReturn(responseEntity);
+            entity, Long.class)).thenReturn(responseEntity);
         Long id = restClient.createUbsProfile(ubsProfileCreationDto);
         verify(restTemplate, times(1)).postForEntity(
             greenCityUbsServerAddress + RestTemplateLinks.UBS_USER_PROFILE + "/user/create",
-            ubsProfileCreationDto, Long.class);
+            entity, Long.class);
         assertEquals(1L, id);
     }
 
