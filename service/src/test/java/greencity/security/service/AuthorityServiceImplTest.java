@@ -7,8 +7,10 @@ import static greencity.ModelUtils.getAuthority;
 import static greencity.ModelUtils.getPositions;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserEmployeeAuthorityDto;
+import greencity.constant.ErrorMessage;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.position.PositionDto;
+import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.entity.Authority;
 import greencity.entity.Position;
 import greencity.entity.User;
@@ -33,6 +35,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -94,6 +98,30 @@ class AuthorityServiceImplTest {
         verify(userRepo).findByEmail(TEST_EMAIL);
         verify(authorityRepo).findAuthoritiesByNames(authoritiesName);
         verify(userRepo).save(employee);
+    }
+
+    @Test
+    void updateEmployeesAuthoritiesThrowsNotFoundAuthoritiesExceptionTest() {
+        User employee = createEmployee();
+        List<String> requestedAuthorities = List.of("EXISTING_AUTHORITY", "NON_EXISTING_AUTHORITY");
+        List<Authority> foundAuthorities = List.of(getAuthority());
+
+        UserEmployeeAuthorityDto dto = new UserEmployeeAuthorityDto();
+        dto.setEmployeeEmail(TEST_EMAIL);
+        dto.setAuthorities(requestedAuthorities);
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+        when(authorityRepo.findAuthoritiesByNames(requestedAuthorities)).thenReturn(foundAuthorities);
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+            () -> authorityService.updateEmployeesAuthorities(dto));
+
+        assertEquals(ErrorMessage.AUTHORITY_NOT_FOUND_BY_NAMES + List.of("NON_EXISTING_AUTHORITY"),
+            exception.getMessage());
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(authorityRepo).findAuthoritiesByNames(requestedAuthorities);
+        verify(userRepo, never()).save(any());
     }
 
     @Test

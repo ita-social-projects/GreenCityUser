@@ -147,12 +147,12 @@ public class ModelUtils {
         List<Authority> authorities = new ArrayList<>();
         authorities.add(Authority.builder()
             .id(1L)
-            .name("test1")
+            .name("EXISTING_AUTHORITY")
             .employees(users)
             .build());
         authorities.add(Authority.builder()
             .id(2L)
-            .name("test2")
+            .name("ANOTHER_EXISTING_AUTHORITY")
             .employees(users)
             .build());
         return authorities;
@@ -161,7 +161,7 @@ public class ModelUtils {
     public static UserEmployeeAuthorityDto getUserEmployeeAuthorityDto() {
         return UserEmployeeAuthorityDto.builder()
             .employeeEmail("taras@gmail.com")
-            .authorities(List.of("test1"))
+            .authorities(List.of("EXISTING_AUTHORITY"))
             .build();
     }
 
@@ -178,7 +178,7 @@ public class ModelUtils {
         list.add(createUser());
         return Authority.builder()
             .id(1L)
-            .name("test1")
+            .name("EXISTING_AUTHORITY")
             .employees(list)
             .build();
     }

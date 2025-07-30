@@ -57,7 +57,7 @@ public class AuthorityServiceImpl implements AuthorityService {
             List<String> notFoundAuthorityNames =
                 requestedAuthorityNames.stream().filter(a -> !foundAuthorityNames.contains(a)).toList();
             if (!notFoundAuthorityNames.isEmpty()) {
-                throw new BadRequestException(ErrorMessage.AUTHORITY_NOT_FOUND_BY_NAMES + notFoundAuthorityNames);
+                throw new NotFoundException(ErrorMessage.AUTHORITY_NOT_FOUND_BY_NAMES + notFoundAuthorityNames);
             }
         }
 
