@@ -20,6 +20,7 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
@@ -147,6 +149,25 @@ class AuthorityServiceImplTest {
             () -> authorityService.updateEmployeesAuthorities(dto));
 
         verify(userRepo).findByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    void updateEmployeesAuthoritiesWithEmptyAuthoritiesTest() {
+        User employee = createEmployee();
+
+        UserEmployeeAuthorityDto dto = new UserEmployeeAuthorityDto();
+        dto.setEmployeeEmail(TEST_EMAIL);
+        dto.setAuthorities(Collections.emptyList());
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+
+        authorityService.updateEmployeesAuthorities(dto);
+
+        assertTrue(employee.getAuthorities().isEmpty());
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(authorityRepo, never()).findAuthoritiesByNames(any());
+        verify(userRepo).save(employee);
     }
 
     @Test
