@@ -1,6 +1,8 @@
 package greencity.client;
 
+import static greencity.constant.AppConstant.AUTHORIZATION;
 import greencity.dto.friends.FriendsChatDto;
+import greencity.security.jwt.JwtTool;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import static greencity.constant.AppConstant.AUTHORIZATION;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ import static greencity.constant.AppConstant.AUTHORIZATION;
 public class RestClient {
     private final RestTemplate restTemplate;
     private final HttpServletRequest httpServletRequest;
+    private final JwtTool jwtTool;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
     @Value("${greencitychat.server.address}")
