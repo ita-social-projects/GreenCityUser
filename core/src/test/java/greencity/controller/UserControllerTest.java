@@ -1013,7 +1013,7 @@ class UserControllerTest {
         when(userService.findAllActivatedUserIds(input)).thenReturn(List.of());
 
         MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
-                .accept(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .param("ids", stringIds.toArray(new String[0])))
             .andExpect(status().isOk())
