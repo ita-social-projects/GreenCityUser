@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
+import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
 import greencity.dto.CoordinatesDto;
@@ -146,6 +147,9 @@ class UserServiceImplTest {
 
     @Mock
     GreenCityRemoteClient greenCityRemoteClient;
+
+    @Mock
+    RestClient restClient;
 
     @Mock
     SimpMessagingTemplate messagingTemplate;
@@ -603,7 +607,7 @@ class UserServiceImplTest {
     void findUserByName() {
         Pageable pageable = PageRequest.of(1, 3);
         Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
-        when(userRepo.findAllUsersByName("martin", pageable, 1L))
+        when(userRepo.findAllUsersByName(user.getName(), pageable, 1L))
             .thenReturn(pages);
         when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
         }.getType()))
@@ -613,7 +617,7 @@ class UserServiceImplTest {
             pages.getTotalElements(),
             pages.getPageable().getPageNumber(),
             pages.getTotalPages());
-        assertEquals(pageableDto, userService.findUserByName("martin", pageable, 1L));
+        assertEquals(pageableDto, userService.findUserByName(user.getName(), pageable, 1L));
     }
 
     @Test
