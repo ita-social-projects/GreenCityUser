@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
@@ -43,6 +44,9 @@ class LanguageControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(languageController)
             .setControllerAdvice(new CustomExceptionHandler(new DefaultErrorAttributes())) // Assuming you have a global
                                                                                            // exception handler
+            .defaultRequest(MockMvcRequestBuilders.get("/")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
             .build();
 
         languageVO1 = new LanguageVO();
