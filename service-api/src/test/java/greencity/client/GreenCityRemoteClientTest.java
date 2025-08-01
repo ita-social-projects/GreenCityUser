@@ -576,7 +576,6 @@ class GreenCityRemoteClientTest {
     @Test
     @SneakyThrows
     void getAllAvailableCustomToDoListItems() {
-        Long userId = 1L;
         Long habitId = 2L;
         String expectedPath = "/custom/to-do-list-items/" + userId + "/" + habitId;
         String expectedMethod = HttpMethod.GET.name();
