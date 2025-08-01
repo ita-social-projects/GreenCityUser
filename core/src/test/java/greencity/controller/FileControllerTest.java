@@ -33,18 +33,16 @@ class FileControllerTest {
     @BeforeEach
     void setUp() {
         this.mockMvc = MockMvcBuilders.standaloneSetup(fileController)
-            .setCustomArgumentResolvers
-                (new PageableHandlerMethodArgumentResolver())
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
             .build();
     }
 
     @Test
     void uploadAllTest() throws Exception {
-        MockMultipartFile file = new MockMultipartFile
-            ("files", "image", MediaType.IMAGE_JPEG_VALUE, new byte[1]);
+        MockMultipartFile file = new MockMultipartFile("files", "image", MediaType.IMAGE_JPEG_VALUE, new byte[1]);
 
         mockMvc.perform(multipart(baseUrl)
-                .file(file))
+            .file(file))
             .andExpect(status().isOk());
 
         verify(fileService).upload(List.of(file));
@@ -52,11 +50,10 @@ class FileControllerTest {
 
     @Test
     void uploadTest() throws Exception {
-        MockMultipartFile file = new MockMultipartFile
-            ("file", "image", MediaType.IMAGE_JPEG_VALUE, new byte[1]);
+        MockMultipartFile file = new MockMultipartFile("file", "image", MediaType.IMAGE_JPEG_VALUE, new byte[1]);
 
         mockMvc.perform(multipart(baseUrl + "/single")
-                .file(file))
+            .file(file))
             .andExpect(status().isOk());
 
         verify(fileService).upload(file);
@@ -68,8 +65,8 @@ class FileControllerTest {
         String pathsJson = objectMapper.writeValueAsString(paths);
 
         mockMvc.perform(delete(baseUrl)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(pathsJson))
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .content(pathsJson))
             .andExpect(status().isOk());
 
         verify(fileService).deleteAll(paths);
@@ -80,7 +77,7 @@ class FileControllerTest {
         String path = "path1";
 
         mockMvc.perform(delete(baseUrl + "/single")
-                .param("path", path))
+            .param("path", path))
             .andExpect(status().isOk());
 
         verify(fileService).delete(path);

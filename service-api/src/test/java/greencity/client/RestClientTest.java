@@ -48,7 +48,7 @@ class RestClientTest {
             eq(HttpMethod.GET),
             any(HttpEntity.class),
             eq(FriendsChatDto.class)))
-            .thenReturn(new ResponseEntity<>(expectedBody, HttpStatus.OK));
+                .thenReturn(new ResponseEntity<>(expectedBody, HttpStatus.OK));
 
         FriendsChatDto result = restClient.chatBetweenTwo(firstUserId, secondUserId);
 
