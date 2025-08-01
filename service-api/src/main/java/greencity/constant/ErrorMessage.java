@@ -67,4 +67,8 @@ public class ErrorMessage {
     public static final String FAILED_TO_FETCH_COMMIT_INFO = "Failed to fetch commit info due to I/O error: ";
     public static final String INTERNAL_SERVER_ERROR = "Internal server error: ";
     public static final String GREENCITY_APP_UNAVAILABLE = "The GreenCity service is unavailable";
+    public static final String FILE_NOT_SAVED = "File hasn't been saved";
+    public static final String MULTIPART_FILE_BAD_REQUEST =
+        "Can`t convert To Multipart Image. Bad inputted image string : ";
+    public static final String PARSING_URL_FAILED = "Can't parse image's url: ";
 }
