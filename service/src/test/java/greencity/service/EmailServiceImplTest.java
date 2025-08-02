@@ -73,7 +73,7 @@ class EmailServiceImplTest {
     private static final Locale UA_LOCALE = Locale.of("uk", "UA");
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         service = new EmailServiceImpl(
             javaMailSender,
             templateEngine,
