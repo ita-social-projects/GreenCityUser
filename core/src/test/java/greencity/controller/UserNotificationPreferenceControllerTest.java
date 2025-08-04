@@ -42,7 +42,7 @@ public class UserNotificationPreferenceControllerTest {
         when(userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(
             emailPreferenceDto)).thenReturn(true);
         mockMvc.perform(post("/user-notification-preference/search").contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(emailPreferenceDto)))
+            .accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(emailPreferenceDto)))
             .andExpect(status().isOk()).andExpect(content().string("true"));
     }
 
@@ -52,7 +52,7 @@ public class UserNotificationPreferenceControllerTest {
         when(userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(
             emailPreferenceDto)).thenReturn(false);
         mockMvc.perform(post("/user-notification-preference/search").contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(emailPreferenceDto)))
+            .accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(emailPreferenceDto)))
             .andExpect(status().isOk()).andExpect(content().string("false"));
     }
 }
