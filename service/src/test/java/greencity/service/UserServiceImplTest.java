@@ -728,7 +728,8 @@ class UserServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("provideUserProfileTestData")
-    void updateUserProfileLocationTest(User myUser, CoordinatesDto coordinates, boolean shouldCallSave, boolean shouldDeleteSocial, boolean shouldGetSocialImage) {
+    void updateUserProfileLocationTest(User myUser, CoordinatesDto coordinates, boolean shouldCallSave,
+        boolean shouldDeleteSocial, boolean shouldGetSocialImage) {
         String email = "test@gmail.com";
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName("Dmytro");
@@ -765,8 +766,7 @@ class UserServiceImplTest {
             Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false),
             Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(null, null), true, false, false),
             Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false),
-            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false)
-        );
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false));
     }
 
     @Test
