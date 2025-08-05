@@ -8,7 +8,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.dto.emailpreference.EmailPreferenceDto;
-import greencity.service.SocialNetworkImageService;
 import greencity.service.UserNotificationPreferenceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 @ExtendWith(MockitoExtension.class)
-public class UserNotificationPreferenceControllerTest {
+class UserNotificationPreferenceControllerTest {
 
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;

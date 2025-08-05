@@ -89,7 +89,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -727,113 +726,47 @@ class UserServiceImplTest {
         verify(userRepo).save(myUser);
     }
 
-    @Test
-    void updateUserProfileLocationWithTwoAssignedUsersTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        request.setName("Dmutro");
-        var myUser = ModelUtils.getUserWithSocialNetworks();
+    @ParameterizedTest
+    @MethodSource("provideUserProfileTestData")
+    void updateUserProfileLocationTest(User myUser, CoordinatesDto coordinates, boolean shouldCallSave, boolean shouldDeleteSocial, boolean shouldGetSocialImage) {
         String email = "test@gmail.com";
-
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmytro");
+        request.setCoordinates(coordinates);
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
-
+        if (shouldCallSave) {
+            when(userRepo.save(myUser)).thenReturn(myUser);
+        }
         String actualResult = userService.saveUserProfile(request, email);
-
         assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
         verify(userRepo).findByEmail(email);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(socialNetworkService, never()).delete(anyLong());
-        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
-        verify(userRepo).save(myUser);
+
+        if (shouldDeleteSocial) {
+            verify(socialNetworkService).delete(anyLong());
+        } else {
+            verify(socialNetworkService, never()).delete(anyLong());
+        }
+        if (shouldGetSocialImage) {
+            verify(socialNetworkImageService).getSocialNetworkImageByUrl(anyString());
+        } else {
+            verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
+        }
+        if (shouldCallSave) {
+            verify(userRepo).save(myUser);
+        } else {
+            verify(userRepo, never()).save(any());
+        }
     }
 
-    @Test
-    void updateUserProfileLocationWhenUserHasAUserLocationTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
-
-        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
-
-        String actualResult = userService.saveUserProfile(request, email);
-
-        assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-
-        verify(userRepo).findByEmail(email);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(socialNetworkService, never()).delete(anyLong());
-        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
-        verify(userRepo).save(myUser);
-    }
-
-    @Test
-    void testUpdateUserProfileDeleteLocation() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(null, null);
-        request.setCoordinates(coordinates);
-        var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
-
-        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-
-        String actualResult = userService.saveUserProfile(request, email);
-
-        assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(userRepo).save(myUser);
-    }
-
-    @Test
-    void updateUserProfileRemoveUserFromUserLocationListTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
-
-        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
-
-        String actualResult = userService.saveUserProfile(request, email);
-
-        assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-
-        verify(userRepo).findByEmail(email);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(socialNetworkService, never()).delete(anyLong());
-        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
-        verify(userRepo).save(myUser);
-    }
-
-    @Test
-    void updateUserProfileLocationWhenUserModifyUserLocationTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
-
-        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
-
-        String actualResult = userService.saveUserProfile(request, email);
-
-        assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-
-        verify(userRepo).findByEmail(email);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(socialNetworkService, never()).delete(anyLong());
-        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
-        verify(userRepo).save(myUser);
+    private static Stream<Arguments> provideUserProfileTestData() {
+        return Stream.of(
+            Arguments.of(ModelUtils.getUserWithSocialNetworks(), new CoordinatesDto(20.0, 20.0), true, false, false),
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false),
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(null, null), true, false, false),
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false),
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false)
+        );
     }
 
     @Test
