@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import greencity.client.GreenCityRemoteClient;
-import greencity.dto.user.SetLocationForUserDto;
 import greencity.dto.user.UpdateUserNameDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

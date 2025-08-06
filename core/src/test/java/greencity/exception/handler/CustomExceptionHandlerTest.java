@@ -3,6 +3,7 @@ package greencity.exception.handler;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.*;
+import jakarta.json.stream.JsonParsingException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
@@ -369,4 +370,16 @@ class CustomExceptionHandlerTest {
             customExceptionHandler.handleResourceNotFoundException(exception, webRequest));
     }
 
+    @Test
+    void handleErrorParsingExceptionTest() {
+        ErrorParsingException exception = new ErrorParsingException("Error while parsing JSON");
+        when(errorAttributes.getErrorAttributes(eq(webRequest), any(ErrorAttributeOptions.class)))
+            .thenReturn(objectMap);
+        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
+        exceptionResponse.setMessage("Failed to parse JSON response: " + exception.getMessage());
+        ResponseEntity<Object> expected =
+            ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(exceptionResponse);
+        assertEquals(expected,
+            customExceptionHandler.handleErrorParsingException(exception, webRequest));
+    }
 }

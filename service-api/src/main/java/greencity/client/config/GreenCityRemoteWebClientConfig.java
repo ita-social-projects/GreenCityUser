@@ -6,6 +6,7 @@ import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.enums.Role;
 import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.ErrorParsingException;
 import greencity.exception.exceptions.GreenCityServiceException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.security.jwt.JwtTool;
@@ -134,7 +135,7 @@ public class GreenCityRemoteWebClientConfig {
         try {
             return new ObjectMapper().readValue(errorBody, JsonMessage.class).message();
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new ErrorParsingException(e.getMessage());
         }
     }
 }
