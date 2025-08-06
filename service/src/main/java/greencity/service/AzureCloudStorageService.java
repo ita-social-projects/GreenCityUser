@@ -1,9 +1,6 @@
 package greencity.service;
 
 import com.azure.storage.blob.BlobClient;
-import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.BlobServiceClient;
-import com.azure.storage.blob.BlobServiceClientBuilder;
 import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.ImageUrlParseException;
@@ -17,7 +14,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,12 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AzureCloudStorageService implements FileService {
     private final ModelMapper modelMapper;
-
-    @Value("${azure.connection.string}")
-    private String connectionString;
-
-    @Value("${azure.container.name}")
-    private String containerName;
+    private final AzureBlobClientFactory blobClientFactory;
 
     /**
      * {@inheritDoc}
@@ -46,7 +37,7 @@ public class AzureCloudStorageService implements FileService {
         return files.stream()
             .map(pic -> {
                 String blob = UUID.randomUUID().toString();
-                BlobClient client = containerClient()
+                BlobClient client = blobClientFactory.getContainerClient()
                     .getBlobClient(blob + pic.getOriginalFilename());
                 try {
                     client.upload(new BufferedInputStream(pic.getInputStream()), pic.getSize());
@@ -56,12 +47,6 @@ public class AzureCloudStorageService implements FileService {
                 return client.getBlobUrl();
             })
             .toList();
-    }
-
-    private BlobContainerClient containerClient() {
-        BlobServiceClient serviceClient = new BlobServiceClientBuilder()
-            .connectionString(connectionString).buildClient();
-        return serviceClient.getBlobContainerClient(containerName);
     }
 
     /**
@@ -86,7 +71,7 @@ public class AzureCloudStorageService implements FileService {
         } catch (URISyntaxException e) {
             throw new ImageUrlParseException(ErrorMessage.PARSING_URL_FAILED + path);
         }
-        BlobClient client = containerClient().getBlobClient(fileName);
+        BlobClient client = blobClientFactory.getContainerClient().getBlobClient(fileName);
         if (Boolean.TRUE.equals(client.exists())) {
             client.delete();
         }
