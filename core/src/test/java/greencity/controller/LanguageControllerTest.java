@@ -52,10 +52,12 @@ class LanguageControllerTest {
         languageVO1 = new LanguageVO();
         languageVO1.setId(1L);
         languageVO1.setCode("en");
+        languageVO1.setName("English");
 
         languageVO2 = new LanguageVO();
         languageVO2.setId(2L);
         languageVO2.setCode("fr");
+        languageVO2.setName("French");
     }
 
     @Test
@@ -87,7 +89,8 @@ class LanguageControllerTest {
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id", is(1)))
-            .andExpect(jsonPath("$.code", is("en")));
+            .andExpect(jsonPath("$.code", is("en")))
+            .andExpect(jsonPath("$.name", is("English")));
 
         verify(languageService, times(1)).findLanguageByCode(code);
         verifyNoMoreInteractions(languageService);

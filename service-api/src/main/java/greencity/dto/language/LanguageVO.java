@@ -1,5 +1,6 @@
 package greencity.dto.language;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,4 +17,6 @@ import lombok.Setter;
 public class LanguageVO {
     private Long id;
     private String code;
+    @NotNull
+    private String name;
 }
