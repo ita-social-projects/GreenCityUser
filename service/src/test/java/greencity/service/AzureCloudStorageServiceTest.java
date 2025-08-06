@@ -12,7 +12,6 @@ import greencity.exception.exceptions.NotSavedException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.core.env.PropertyResolver;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,9 +50,9 @@ class AzureCloudStorageServiceTest {
 
     @Test
     void convertToMultipartImage() {
-        MultipartFile multipartFile = new MockMultipartFile("Image", "Image".getBytes(StandardCharsets.UTF_8));
-        when(modelMapper.map("Image", MultipartFile.class)).thenReturn(multipartFile);
-        assertEquals(multipartFile, azureCloudStorageService.convertToMultipartImage("Image"));
+        MultipartFile multipartFile1 = new MockMultipartFile("Image", "Image".getBytes(StandardCharsets.UTF_8));
+        when(modelMapper.map("Image", MultipartFile.class)).thenReturn(multipartFile1);
+        assertEquals(multipartFile1, azureCloudStorageService.convertToMultipartImage("Image"));
     }
 
     @Test
@@ -83,7 +81,7 @@ class AzureCloudStorageServiceTest {
     }
 
     @Test
-    void delete_existingBlob_deletesSuccessfully() throws URISyntaxException {
+    void delete_existingBlob_deletesSuccessfully() {
         when(blobClientFactory.getContainerClient()).thenReturn(blobContainerClient);
         String url = "https://mock.azure/container/file.jpg";
         when(blobContainerClient.getBlobClient("file.jpg")).thenReturn(blobClient);
@@ -101,7 +99,7 @@ class AzureCloudStorageServiceTest {
     }
 
     @Test
-    void deleteAll_deletesEachFile() throws URISyntaxException {
+    void deleteAll_deletesEachFile() {
         when(blobClientFactory.getContainerClient()).thenReturn(blobContainerClient);
         String url1 = "https://mock.azure/container/file1.jpg";
         String url2 = "https://mock.azure/container/file2.jpg";

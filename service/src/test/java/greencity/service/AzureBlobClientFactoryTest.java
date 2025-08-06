@@ -7,7 +7,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
-public class AzureBlobClientFactoryTest {
+class AzureBlobClientFactoryTest {
     @Test
     void getContainerClient_doesNotThrow() {
         AzureBlobClientFactory factory = new AzureBlobClientFactory();

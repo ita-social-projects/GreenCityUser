@@ -22,11 +22,6 @@ class AbstractRetryableTaskProcessorTest {
     }
 
     @Test
-    void getRetryableTaskType() {
-
-    }
-
-    @Test
     void process_shouldCallHandleWithCorrectPayload() {
         TestDto payload = new TestDto("Test");
         String jsonPayload;

@@ -1270,13 +1270,13 @@ class UserServiceImplTest {
 
     @Test
     void editUserRatingTest() {
-        UserAddRatingDto userRatingDto = UserAddRatingDto.builder()
+        UserAddRatingDto userRatingDto2 = UserAddRatingDto.builder()
             .id(1L)
             .rating(200D)
             .build();
 
-        userService.updateUserRating(userRatingDto);
-        verify(greenCityRemoteClient).updateUserRating(userRatingDto);
+        userService.updateUserRating(userRatingDto2);
+        verify(greenCityRemoteClient).updateUserRating(userRatingDto2);
     }
 
     @Test
