@@ -1,7 +1,7 @@
 package greencity.exception.exceptions;
 
+import lombok.experimental.StandardException;
+
+@StandardException
 public class ErrorParsingException extends RuntimeException {
-    public ErrorParsingException(String message) {
-        super(message);
-    }
 }

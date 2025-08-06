@@ -3,7 +3,6 @@ package greencity.exception.handler;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
 import greencity.exception.exceptions.*;
-import jakarta.json.stream.JsonParsingException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.io.IOException;
