@@ -1351,16 +1351,14 @@ class UserServiceImplTest {
             new IOException("fail"),
             HttpMethod.POST,
             URI.create("http://localhost/fake"),
-            HttpHeaders.EMPTY
-        )).when(greenCityRemoteClient).updateUserPicturePath(user.getId(), picturePath);
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserPicturePath(user.getId(), picturePath);
         userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
         verify(retryableTaskService).saveRetryableTask(
             UpdateUserPicturePathDto.builder()
                 .userId(user.getId())
                 .picturePath(picturePath)
                 .build(),
-            RetryableTaskType.UPDATE_USER_PICTURE_PATH
-        );
+            RetryableTaskType.UPDATE_USER_PICTURE_PATH);
     }
 
     @Test
@@ -1650,8 +1648,7 @@ class UserServiceImplTest {
             new IOException("fail"),
             HttpMethod.POST,
             URI.create("http://localhost/fake"),
-            HttpHeaders.EMPTY
-        )).when(greenCityRemoteClient).createUser(createGreenCityUserDto);
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).createUser(createGreenCityUserDto);
         String testPath = "http://testpicture.com.ua";
         userService.createGreenCityUser(userId, testPath);
         verify(retryableTaskService).saveRetryableTask(createGreenCityUserDto, RetryableTaskType.CREATE_USER);
@@ -1665,8 +1662,7 @@ class UserServiceImplTest {
             "Bad Request",
             HttpHeaders.EMPTY,
             null,
-            null
-        );
+            null);
         doThrow(responseException)
             .when(greenCityRemoteClient)
             .createUser(any(CreateGreenCityUserDto.class));
@@ -1674,7 +1670,6 @@ class UserServiceImplTest {
         verify(retryableTaskService, never()).saveRetryableTask(any(), any());
         verify(greenCityRemoteClient).createUser(any(CreateGreenCityUserDto.class));
     }
-
 
     @Test
     void createGreenCityUser_whenUnexpectedException_thenOnlyLog() {
