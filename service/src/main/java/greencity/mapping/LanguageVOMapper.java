@@ -12,6 +12,7 @@ public class LanguageVOMapper extends AbstractConverter<Language, LanguageVO> {
         return LanguageVO.builder()
             .id(language.getId())
             .code(language.getCode())
+            .name(language.getName())
             .build();
     }
 }

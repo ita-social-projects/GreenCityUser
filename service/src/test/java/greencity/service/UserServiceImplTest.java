@@ -132,7 +132,7 @@ class UserServiceImplTest {
         .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
-        .language(new Language(1L, "ua", List.of()))
+        .language(new Language(1L, "ua", "Ukrainian", List.of()))
         .build();
 
     private final User user1 = User.builder()
