@@ -185,12 +185,12 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/to-do-list-items/{userToDoListItemId}",
-                    "/user/profilePicture",
-                    "/user/deleteProfilePicture")
+                    "/user/profilePicture")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.DELETE,
                     "/user/to-do-list-items/user-to-do-list-items",
                     "/user/to-do-list-items",
+                    "/user/deleteProfilePicture",
                     "/ownSecurity/user")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
