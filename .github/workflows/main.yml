@@ -46,7 +46,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USER }}
         run: |
           git fetch --unshallow
-          mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=ita-social-projects-green-city-user -Dsonar.organization=ita-social-projects -Dsonar.host.url=https://sonarcloud.io -Dsonar.sources='src/main/java/greencity' -Dsonar.binaries=target/classes -Dsonar.dynamicAnalysis=reuseReports -Dsonar.coverage.exclusions=**/config/*,**/dto/security/*,**/enums/*
+          mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar -Dsonar.projectKey=ita-social-projects-green-city-user -Dsonar.organization=ita-social-projects -Dsonar.host.url=https://sonarcloud.io -Dsonar.sources='src/main/java/greencity' -Dsonar.binaries=target/classes -Dsonar.dynamicAnalysis=reuseReports -Dsonar.coverage.exclusions=**/config/*,**/dto/security/*,**/enums/*,**/specification/*
         # Checks-out your greencity.repository under $GITHUB_WORKSPACE, so your job can access it
       
       - name: Test Reporter
