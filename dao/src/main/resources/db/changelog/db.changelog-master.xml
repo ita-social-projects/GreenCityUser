@@ -48,6 +48,7 @@
     <include file="db/changelog/logs/ch-add-values-_authorities-mapping-Spodaryk.xml"/>
     <include file="db/changelog/logs/ch-insert-values-admin_authorities-Spodaryk.xml"/>
     <include file="db/changelog/logs/ch-insert-into-users-admin-Spodaryk.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-users-aiuser-Pohranychnyi.xml"/>
     <include file="db/changelog/logs/ch-drop-column-city-in-users-table-Midianyi.xml"/>
     <include file="db/changelog/logs/ch-update-users-set-new-main-email-Midianyi.xml"/>
     <include file="db/changelog/logs/ch-delete-from-positions_authorities_mapping-authority-for-admin-position-Kizerov.xml"/>
