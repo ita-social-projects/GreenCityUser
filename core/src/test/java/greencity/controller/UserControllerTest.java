@@ -131,6 +131,9 @@ class UserControllerTest {
     void setup() {
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(userController)
+            .defaultRequest(MockMvcRequestBuilders.get("/")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver(),
                 new UserArgumentResolver(userService))
             .setControllerAdvice(new CustomExceptionHandler(new DefaultErrorAttributes()))
@@ -1010,6 +1013,7 @@ class UserControllerTest {
         when(userService.findAllActivatedUserIds(input)).thenReturn(List.of());
 
         MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+            .accept(MediaType.APPLICATION_JSON)
             .contentType(MediaType.APPLICATION_JSON)
             .param("ids", stringIds.toArray(new String[0])))
             .andExpect(status().isOk())

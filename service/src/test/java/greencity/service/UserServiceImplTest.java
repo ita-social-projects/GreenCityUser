@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
+import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
 import greencity.dto.CoordinatesDto;
@@ -14,59 +15,25 @@ import greencity.dto.filter.FilterUserDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.DeactivateUserRequestDto;
-import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserActivationDto;
-import greencity.dto.user.UserAddRatingDto;
-import greencity.dto.user.UserAllFriendsDto;
-import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
-import greencity.dto.user.UserCityDto;
-import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserEmailDto;
-import greencity.dto.user.UserForListDto;
-import greencity.dto.user.UserLocationDto;
-import greencity.dto.user.UserManagementDto;
-import greencity.dto.user.UserManagementUpdateDto;
-import greencity.dto.user.UserManagementVO;
-import greencity.dto.user.UserManagementViewDto;
-import greencity.dto.user.UserProfileDtoRequest;
-import greencity.dto.user.UserProfileDtoResponse;
-import greencity.dto.user.UserProfilePictureDto;
-import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserUpdateDto;
-import greencity.dto.user.UserVO;
-import greencity.dto.user.UserWithOnlineStatusDto;
-import greencity.dto.user.UsersOnlineStatusRequestDto;
-import greencity.dto.user.UserVOAdvancedDto;
-import greencity.dto.user.CreateGreenCityUserDto;
-import greencity.dto.user.UserVOShort;
+import greencity.dto.user.*;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserNotificationPreference;
-import greencity.enums.EmailNotification;
-import greencity.enums.EmailPreference;
-import greencity.enums.EmailPreferencePeriodicity;
-import greencity.enums.Role;
+import greencity.enums.*;
 import static greencity.ModelUtils.getLanguage;
 import static greencity.enums.Role.ROLE_USER;
 import static greencity.enums.Role.ROLE_ADMIN;
 import static greencity.enums.Role.ROLE_MODERATOR;
 import static greencity.enums.UserStatus.ACTIVATED;
 import static greencity.enums.UserStatus.DEACTIVATED;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadUpdateRequestException;
-import greencity.exception.exceptions.Base64DecodedException;
-import greencity.exception.exceptions.LowRoleLevelException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.UserDeactivationException;
-import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.*;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
+import java.io.IOException;
+import java.net.URI;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -84,11 +51,12 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -100,6 +68,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import static greencity.ModelUtils.CREATE_USER_ALL_FRIENDS_DTO;
 import static greencity.ModelUtils.TEST_ADMIN;
 import static greencity.ModelUtils.TEST_USER;
@@ -119,12 +89,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -148,7 +113,14 @@ class UserServiceImplTest {
     GreenCityRemoteClient greenCityRemoteClient;
 
     @Mock
+    RestClient restClient;
+
+    @Mock
     SimpMessagingTemplate messagingTemplate;
+    @Mock
+    private UserAddRatingDto userRatingDto;
+    @Mock
+    private RetryableTaskService retryableTaskService;
 
     private final User user = User.builder()
         .id(1L)
@@ -160,7 +132,7 @@ class UserServiceImplTest {
         .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
-        .language(new Language(1L, "ua", List.of()))
+        .language(new Language(1L, "ua", "Ukrainian", List.of()))
         .build();
 
     private final User user1 = User.builder()
@@ -603,7 +575,7 @@ class UserServiceImplTest {
     void findUserByName() {
         Pageable pageable = PageRequest.of(1, 3);
         Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
-        when(userRepo.findAllUsersByName("martin", pageable, 1L))
+        when(userRepo.findAllUsersByName(user.getName(), pageable, 1L))
             .thenReturn(pages);
         when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
         }.getType()))
@@ -613,7 +585,7 @@ class UserServiceImplTest {
             pages.getTotalElements(),
             pages.getPageable().getPageNumber(),
             pages.getTotalPages());
-        assertEquals(pageableDto, userService.findUserByName("martin", pageable, 1L));
+        assertEquals(pageableDto, userService.findUserByName(user.getName(), pageable, 1L));
     }
 
     @Test
@@ -723,113 +695,47 @@ class UserServiceImplTest {
         verify(userRepo).save(myUser);
     }
 
-    @Test
-    void updateUserProfileLocationWithTwoAssignedUsersTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        request.setName("Dmutro");
-        var myUser = ModelUtils.getUserWithSocialNetworks();
+    @ParameterizedTest
+    @MethodSource("provideUserProfileTestData")
+    void updateUserProfileLocationTest(User myUser, CoordinatesDto coordinates, boolean shouldCallSave,
+        boolean shouldDeleteSocial, boolean shouldGetSocialImage) {
         String email = "test@gmail.com";
-
+        UserProfileDtoRequest request = new UserProfileDtoRequest();
+        request.setName("Dmytro");
+        request.setCoordinates(coordinates);
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
-
+        if (shouldCallSave) {
+            when(userRepo.save(myUser)).thenReturn(myUser);
+        }
         String actualResult = userService.saveUserProfile(request, email);
-
         assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
         verify(userRepo).findByEmail(email);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(socialNetworkService, never()).delete(anyLong());
-        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
-        verify(userRepo).save(myUser);
+
+        if (shouldDeleteSocial) {
+            verify(socialNetworkService).delete(anyLong());
+        } else {
+            verify(socialNetworkService, never()).delete(anyLong());
+        }
+        if (shouldGetSocialImage) {
+            verify(socialNetworkImageService).getSocialNetworkImageByUrl(anyString());
+        } else {
+            verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
+        }
+        if (shouldCallSave) {
+            verify(userRepo).save(myUser);
+        } else {
+            verify(userRepo, never()).save(any());
+        }
     }
 
-    @Test
-    void updateUserProfileLocationWhenUserHasAUserLocationTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
-
-        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
-
-        String actualResult = userService.saveUserProfile(request, email);
-
-        assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-
-        verify(userRepo).findByEmail(email);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(socialNetworkService, never()).delete(anyLong());
-        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
-        verify(userRepo).save(myUser);
-    }
-
-    @Test
-    void testUpdateUserProfileDeleteLocation() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(null, null);
-        request.setCoordinates(coordinates);
-        var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
-
-        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-
-        String actualResult = userService.saveUserProfile(request, email);
-
-        assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(userRepo).save(myUser);
-    }
-
-    @Test
-    void updateUserProfileRemoveUserFromUserLocationListTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
-
-        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
-
-        String actualResult = userService.saveUserProfile(request, email);
-
-        assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-
-        verify(userRepo).findByEmail(email);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(socialNetworkService, never()).delete(anyLong());
-        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
-        verify(userRepo).save(myUser);
-    }
-
-    @Test
-    void updateUserProfileLocationWhenUserModifyUserLocationTest() {
-        UserProfileDtoRequest request = new UserProfileDtoRequest();
-        request.setName("Dmutro");
-        CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
-        request.setCoordinates(coordinates);
-        var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
-
-        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-        when(userRepo.save(myUser)).thenReturn(myUser);
-
-        String actualResult = userService.saveUserProfile(request, email);
-
-        assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-
-        verify(userRepo).findByEmail(email);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
-        verify(socialNetworkService, never()).delete(anyLong());
-        verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
-        verify(userRepo).save(myUser);
+    private static Stream<Arguments> provideUserProfileTestData() {
+        return Stream.of(
+            Arguments.of(ModelUtils.getUserWithSocialNetworks(), new CoordinatesDto(20.0, 20.0), true, false, false),
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false),
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(null, null), true, false, false),
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false),
+            Arguments.of(ModelUtils.getUserWithUserLocation(), new CoordinatesDto(20.0, 20.0), true, false, false));
     }
 
     @Test
@@ -965,6 +871,40 @@ class UserServiceImplTest {
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         userService.updateUser(1L, userManagementUpdateDto);
         assertEquals(excepted, user);
+    }
+
+    @Test
+    void updateUserWhenUpdateCredoFailsRetryTaskIsSaved() {
+        UserManagementUpdateDto dto = ModelUtils.getUserManagementUpdateDto();
+        dto.setUserCredo("My credo");
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        doThrow(new WebClientRequestException(
+            new IOException("fail"),
+            HttpMethod.POST,
+            URI.create("http://localhost/fake"),
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserCredo(user.getId(), "My credo");
+        userService.updateUser(1L, dto);
+        verify(retryableTaskService).saveRetryableTask(
+            new UpdateUserCredoDto(user.getId(), "My credo"),
+            RetryableTaskType.UPDATE_USER_CREDO);
+    }
+
+    @Test
+    void updateUserWhenUpdateUserNameFailsRetryTaskIsSaved() {
+        UserManagementUpdateDto dto = ModelUtils.getUserManagementUpdateDto();
+        dto.setName("BrokenName");
+        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        doThrow(new WebClientRequestException(
+            new IOException("fail"),
+            HttpMethod.POST,
+            URI.create("http://localhost/fake"),
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserName(user.getId(), "BrokenName");
+        userService.updateUser(1L, dto);
+        verify(retryableTaskService).saveRetryableTask(
+            UpdateUserNameDto.builder().id(user.getId()).name("BrokenName").build(),
+            RetryableTaskType.UPDATE_USERNAME);
     }
 
     @Test
@@ -1330,13 +1270,13 @@ class UserServiceImplTest {
 
     @Test
     void editUserRatingTest() {
-        UserAddRatingDto userRatingDto = UserAddRatingDto.builder()
+        UserAddRatingDto userRatingDto2 = UserAddRatingDto.builder()
             .id(1L)
             .rating(200D)
             .build();
 
-        userService.updateUserRating(userRatingDto);
-        verify(greenCityRemoteClient).updateUserRating(userRatingDto);
+        userService.updateUserRating(userRatingDto2);
+        verify(greenCityRemoteClient).updateUserRating(userRatingDto2);
     }
 
     @Test
@@ -1399,6 +1339,26 @@ class UserServiceImplTest {
         verify(modelMapper).map(base64, MultipartFile.class);
         verify(greenCityRemoteClient, never()).uploadFile(any());
         verify(greenCityRemoteClient, never()).updateUserPicturePath(user.getId(), picturePath);
+    }
+
+    @Test
+    void updateUserProfilePictureWhenUpdatePathFailsRetryIsSaved() {
+        var file = new MockMultipartFile("file", "name.jpg", "image/jpeg", "data".getBytes());
+        var picturePath = "picturePath";
+        when(userRepo.findByEmail("testmail@gmail.com")).thenReturn(Optional.of(user));
+        when(greenCityRemoteClient.uploadFile(file)).thenReturn(picturePath);
+        doThrow(new WebClientRequestException(
+            new IOException("fail"),
+            HttpMethod.POST,
+            URI.create("http://localhost/fake"),
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserPicturePath(user.getId(), picturePath);
+        userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
+        verify(retryableTaskService).saveRetryableTask(
+            UpdateUserPicturePathDto.builder()
+                .userId(user.getId())
+                .picturePath(picturePath)
+                .build(),
+            RetryableTaskType.UPDATE_USER_PICTURE_PATH);
     }
 
     @Test
@@ -1681,6 +1641,48 @@ class UserServiceImplTest {
     }
 
     @Test
+    void createGreenCityUserWhenWebClientRequestExceptionThenRetryIsSaved() {
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+        CreateGreenCityUserDto createGreenCityUserDto = ModelUtils.getCreateGreenCityDto();
+        doThrow(new WebClientRequestException(
+            new IOException("fail"),
+            HttpMethod.POST,
+            URI.create("http://localhost/fake"),
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).createUser(createGreenCityUserDto);
+        String testPath = "http://testpicture.com.ua";
+        userService.createGreenCityUser(userId, testPath);
+        verify(retryableTaskService).saveRetryableTask(createGreenCityUserDto, RetryableTaskType.CREATE_USER);
+    }
+
+    @Test
+    void createGreenCityUserWhenWebClientResponseExceptionThenOnlyWarnLogged() {
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+        WebClientResponseException responseException = WebClientResponseException.create(
+            400,
+            "Bad Request",
+            HttpHeaders.EMPTY,
+            null,
+            null);
+        doThrow(responseException)
+            .when(greenCityRemoteClient)
+            .createUser(any(CreateGreenCityUserDto.class));
+        userService.createGreenCityUser(userId, "http://testpicture.com.ua");
+        verify(retryableTaskService, never()).saveRetryableTask(any(), any());
+        verify(greenCityRemoteClient).createUser(any(CreateGreenCityUserDto.class));
+    }
+
+    @Test
+    void createGreenCityUser_whenUnexpectedException_thenOnlyLog() {
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+        CreateGreenCityUserDto createGreenCityUserDto = ModelUtils.getCreateGreenCityDto();
+        doThrow(new RuntimeException("Unexpected error"))
+            .when(greenCityRemoteClient).createUser(createGreenCityUserDto);
+        String testPath = "http://testpicture.com.ua";
+        userService.createGreenCityUser(userId, testPath);
+        verifyNoInteractions(retryableTaskService);
+    }
+
+    @Test
     void findNotDeactivatedByEmailReducedTest() {
         user.setUserStatus(ACTIVATED);
         UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
@@ -1753,5 +1755,33 @@ class UserServiceImplTest {
         List<UserEmailDto> actualResult = userService.findUserEmailsByUserIds(userIds);
 
         assertEquals(userEmailDtos, actualResult);
+    }
+
+    @Test
+    void updateUserRating_success_noRetry() {
+        userService.updateUserRating(userRatingDto);
+        verify(greenCityRemoteClient).updateUserRating(userRatingDto);
+        verifyNoInteractions(retryableTaskService);
+    }
+
+    @Test
+    void updateUserRating_webClientException_retrySaved() {
+        doThrow(new WebClientRequestException(
+            new IOException("fail"),
+            HttpMethod.POST,
+            URI.create("http://localhost/fake"),
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserRating(userRatingDto);
+        userService.updateUserRating(userRatingDto);
+        verify(retryableTaskService).saveRetryableTask(userRatingDto, RetryableTaskType.UPDATE_USER_RATING);
+    }
+
+    @Test
+    void updateUserRating_greenCityServiceException_retrySaved() {
+        doThrow(new GreenCityServiceException("fail")).when(greenCityRemoteClient)
+            .updateUserRating(userRatingDto);
+
+        userService.updateUserRating(userRatingDto);
+
+        verify(retryableTaskService).saveRetryableTask(userRatingDto, RetryableTaskType.UPDATE_USER_RATING);
     }
 }

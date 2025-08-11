@@ -1,6 +1,22 @@
 package greencity.service;
 
+import static greencity.ModelUtils.getSubscriberDto;
+import static greencity.TestConst.EMAIL;
+import static greencity.TestConst.ENGLISH_CODE;
+import static greencity.TestConst.NAME;
+import static greencity.TestConst.PLACE_NAME;
+import static greencity.TestConst.SIMPLE_LONG_NUMBER;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import greencity.ModelUtils;
+import greencity.constant.AppConstant;
 import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
@@ -21,6 +37,13 @@ import greencity.message.SendReportEmailMessage;
 import greencity.repository.UserRepo;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,48 +56,29 @@ import org.mockito.quality.Strictness;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
-
-import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-
-import static greencity.ModelUtils.getSubscriberDto;
-
-import static greencity.TestConst.ENGLISH_CODE;
-import static greencity.TestConst.NAME;
-import static greencity.TestConst.EMAIL;
-import static greencity.TestConst.PLACE_NAME;
-import static greencity.TestConst.SIMPLE_LONG_NUMBER;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.doAnswer;
-
 import org.thymeleaf.context.Context;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class EmailServiceImplTest {
+    static final Locale UA_LOCALE = Locale.of("uk", "UA");
     EmailService service;
-
     @Mock
     JavaMailSender javaMailSender;
-
     @Mock
     ITemplateEngine templateEngine;
-
     @Mock
     MessageSource messageSource;
-
     @Mock
     UserRepo userRepo;
 
-    static final Locale UA_LOCALE = Locale.of("uk", "UA");
+    private static Locale getLocale(String language) {
+        return switch (language) {
+            case "ua" -> UA_LOCALE;
+            case "en" -> Locale.ENGLISH;
+            default -> throw new IllegalStateException("Unexpected value: " + language);
+        };
+    }
 
     @BeforeEach
     public void setup() {
@@ -360,7 +364,8 @@ class EmailServiceImplTest {
         User user = new User();
         user.setEmail(EMAIL);
         user.setName(NAME);
-        Language language = new Language(SIMPLE_LONG_NUMBER, ENGLISH_CODE, List.of(user));
+        Language language =
+            new Language(SIMPLE_LONG_NUMBER, ENGLISH_CODE, AppConstant.DEFAULT_LANGUAGE_NAME, List.of(user));
         user.setLanguage(language);
         when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
         MimeMessage mimeMessage = mock(MimeMessage.class);
@@ -408,13 +413,5 @@ class EmailServiceImplTest {
 
         service.sendGreenOfficeRequestEmailToManager(message);
         verify(javaMailSender).createMimeMessage();
-    }
-
-    private static Locale getLocale(String language) {
-        return switch (language) {
-            case "ua" -> UA_LOCALE;
-            case "en" -> Locale.ENGLISH;
-            default -> throw new IllegalStateException("Unexpected value: " + language);
-        };
     }
 }

@@ -362,7 +362,7 @@ public class GreenCityRemoteClient {
      */
     public Long findAmountOfAcquiredHabits(Long userId) {
         return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/acquired/count")
-            .queryParam("userId", userId)
+            .queryParam(USER_ID_QUERY_PARAM, userId)
             .build())
             .retrieve()
             .bodyToMono(Long.class)
@@ -378,7 +378,7 @@ public class GreenCityRemoteClient {
      */
     public Long findAmountOfHabitsInProgress(Long userId) {
         return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/in-progress/count")
-            .queryParam("userId", userId)
+            .queryParam(USER_ID_QUERY_PARAM, userId)
             .build())
             .retrieve()
             .bodyToMono(Long.class)

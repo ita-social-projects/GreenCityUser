@@ -72,7 +72,7 @@ public class User {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(unique = true, nullable = false, length = 72)
     private String email;
 
     @Enumerated(value = EnumType.STRING)

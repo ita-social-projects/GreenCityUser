@@ -2,27 +2,7 @@ package greencity.exception.handler;
 
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
-import greencity.exception.exceptions.BadRefreshTokenException;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadSocialNetworkLinksException;
-import greencity.exception.exceptions.BadUpdateRequestException;
-import greencity.exception.exceptions.BadUserStatusException;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.GreenCityServiceException;
-import greencity.exception.exceptions.InvalidURLException;
-import greencity.exception.exceptions.LanguageNotSupportedException;
-import greencity.exception.exceptions.LanguageNotFoundException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.PasswordsDoNotMatchesException;
-import greencity.exception.exceptions.UserAlreadyHasPasswordException;
-import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.UserBlockedException;
-import greencity.exception.exceptions.WrongCaptchaException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
-import greencity.exception.exceptions.UserDeactivationException;
-import greencity.exception.exceptions.Base64DecodedException;
-import greencity.exception.exceptions.ResourceNotFoundException;
+import greencity.exception.exceptions.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;
@@ -512,5 +492,24 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         exceptionResponse.setMessage(ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
+    }
+
+    /**
+     * Method intercepts exception {@link ErrorParsingException}.
+     *
+     * @param ex      Exception that should be intercepted.
+     * @param request Contains details about the occurred exception.
+     * @return {@code ResponseEntity} which contains the HTTP status and body with
+     *         the exception message.
+     */
+    @ExceptionHandler(ErrorParsingException.class)
+    public final ResponseEntity<Object> handleErrorParsingException(ErrorParsingException ex,
+        WebRequest request) {
+        log.error(ex.getMessage(), ex);
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        exceptionResponse.setMessage("Failed to parse JSON response: " + ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(exceptionResponse);
     }
 }

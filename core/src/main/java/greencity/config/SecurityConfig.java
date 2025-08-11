@@ -53,6 +53,7 @@ public class SecurityConfig {
     private final UserService userService;
     private static final String USER_LINK = "/user";
     private static final String COMMIT_INFO = "/commit-info";
+    private static final String FILES = "/files";
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Value("${spring.messaging.stomp.websocket.allowed-origins}")
@@ -159,6 +160,9 @@ public class SecurityConfig {
                     "/lang",
                     "/lang/**")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                .requestMatchers(HttpMethod.POST,
+                    FILES)
+                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",
                     "/user/{userId}/habit",
@@ -190,14 +194,13 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/to-do-list-items/{userToDoListItemId}",
-                    "/user/profilePicture",
-                    "/user/deleteProfilePicture")
+                    "/user/profilePicture")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.DELETE,
                     "/user/to-do-list-items/user-to-do-list-items",
                     "/user/to-do-list-items",
-                    "/ownSecurity/user",
-                    "/user/deleteProfilePicture")
+                    "/user/deleteProfilePicture",
+                    "/ownSecurity/user")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     USER_LINK,
@@ -217,7 +220,8 @@ public class SecurityConfig {
                     "/email/sendHabitNotification",
                     "/email/sendInterestingEcoNews",
                     "/management/socialnetworkimages/save-remote",
-                    "/user-notification-preference/search")
+                    "/user-notification-preference/search",
+                    FILES + "/single")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PUT,
                     "/management/socialnetworkimages/")
@@ -238,7 +242,9 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
                     "/management/socialnetworkimages/delete",
-                    "/management/socialnetworkimages/deleteAll")
+                    "/management/socialnetworkimages/deleteAll",
+                    FILES,
+                    FILES + "/single")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",

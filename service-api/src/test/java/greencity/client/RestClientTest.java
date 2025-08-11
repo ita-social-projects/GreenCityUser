@@ -1,16 +1,17 @@
 package greencity.client;
 
-import greencity.dto.friends.FriendsChatDto;
-import jakarta.servlet.http.HttpServletRequest;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import greencity.dto.friends.FriendsChatDto;
+import greencity.security.jwt.JwtTool;
+import jakarta.servlet.http.HttpServletRequest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -25,6 +26,8 @@ class RestClientTest {
     private RestTemplate restTemplate;
     @Mock
     private HttpServletRequest httpServletRequest;
+    @Mock
+    private JwtTool jwtTool;
     @Value("${greencity.server.address}")
     private String greenCityServerAddress;
     @Value("${greencitychat.server.address}")

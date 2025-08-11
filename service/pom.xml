@@ -13,6 +13,7 @@
         <modelmapper.version>3.2.0</modelmapper.version>
         <google.api-client.version>2.1.4</google.api-client.version>
         <commons-fileupload.version>1.5</commons-fileupload.version>
+        <azure.storage.blob.version>12.25.0</azure.storage.blob.version>
         <commons-io.version>2.15.0</commons-io.version>
         <google.maps.version>2.0.0</google.maps.version>
     </properties>
@@ -123,6 +124,11 @@
             <artifactId>spring-context-support</artifactId>
             <version>6.1.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-storage-blob</artifactId>
+            <version>${azure.storage.blob.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>

@@ -20,10 +20,12 @@ class LanguageVOMapperTest {
         Language languageToConvert = Language.builder()
             .id(2L)
             .code("code")
+            .name("name")
             .build();
         LanguageVO expectedResult = LanguageVO.builder()
             .id(languageToConvert.getId())
             .code(languageToConvert.getCode())
+            .name(languageToConvert.getName())
             .build();
 
         LanguageVO actualResult = languageVOMapper.convert(languageToConvert);
