@@ -39,12 +39,6 @@
                               tableName="verify_emails"/>
     </changeSet>
     <changeSet author="Yurii Koval"
-               id="Yurii-6">
-        <addNotNullConstraint columnName="expiry_date"
-                              constraintName="token_expiry_date_cannot_be_null"
-                              tableName="verify_emails"/>
-    </changeSet>
-    <changeSet author="Yurii Koval"
                id="Yurii-7">
         <addUniqueConstraint columnNames="user_id"
                              constraintName="one_user_one_email_verification_token"

@@ -136,11 +136,6 @@
             <column name="authorities_id">27</column>
         </insert>
         <insert tableName="positions_authorities_mapping">
-            <column name="position_id">1</column>
-            <column name="authorities_id">28</column>
-        </insert>
-
-        <insert tableName="positions_authorities_mapping">
             <column name="position_id">6</column>
             <column name="authorities_id">1</column>
         </insert>
@@ -215,10 +210,6 @@
         <insert tableName="positions_authorities_mapping">
             <column name="position_id">6</column>
             <column name="authorities_id">22</column>
-        </insert>
-        <insert tableName="positions_authorities_mapping">
-            <column name="position_id">6</column>
-            <column name="authorities_id">24</column>
         </insert>
         <insert tableName="positions_authorities_mapping">
             <column name="position_id">6</column>
@@ -308,10 +299,6 @@
         </insert>
         <insert tableName="positions_authorities_mapping">
             <column name="position_id">7</column>
-            <column name="authorities_id">18</column>
-        </insert>
-        <insert tableName="positions_authorities_mapping">
-            <column name="position_id">7</column>
             <column name="authorities_id">19</column>
         </insert>
         <insert tableName="positions_authorities_mapping">
@@ -333,10 +320,6 @@
         </insert>
         <insert tableName="positions_authorities_mapping">
             <column name="position_id">7</column>
-            <column name="authorities_id">24</column>
-        </insert>
-        <insert tableName="positions_authorities_mapping">
-            <column name="position_id">7</column>
             <column name="authorities_id">25</column>
         </insert>
         <insert tableName="positions_authorities_mapping">
@@ -351,5 +334,31 @@
             <column name="position_id">7</column>
             <column name="authorities_id">28</column>
         </insert>
+        <insert tableName="positions_authorities_mapping">
+            <column name="position_id">7</column>
+            <column name="authorities_id">29</column>
+        </insert>
+        <insert tableName="positions_authorities_mapping">
+            <column name="position_id">7</column>
+            <column name="authorities_id">30</column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="3" author="Nazar Prots">
+        <sql>
+            INSERT INTO positions_authorities_mapping (position_id, authorities_id)
+            VALUES (7, 31)
+                ON CONFLICT (position_id, authorities_id) DO NOTHING;
+        </sql>
+        <sql>
+            INSERT INTO positions_authorities_mapping (position_id, authorities_id)
+            VALUES (7, 32)
+                ON CONFLICT (position_id, authorities_id) DO NOTHING;
+        </sql>
+        <sql>
+            INSERT INTO positions_authorities_mapping (position_id, authorities_id)
+            VALUES (7, 33)
+                ON CONFLICT (position_id, authorities_id) DO NOTHING;
+        </sql>
     </changeSet>
 </databaseChangeLog>

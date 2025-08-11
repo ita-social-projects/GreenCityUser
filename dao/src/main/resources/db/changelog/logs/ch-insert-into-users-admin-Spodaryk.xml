@@ -21,10 +21,9 @@
             <column name="refresh_token_key" value="e59b50f5-53c2-48e5-9439-b171634ffdd0"/>
             <column name="rating" value="0"/>
             <column name="first_name" value="ADMIN"/>
-            <column name="city" value="Kyiv"/>
-            <column name="show_location" value="true"/>
-            <column name="show_eco_place" value="true"/>
-            <column name="show_shopping_list" value="true"/>
+            <column name="show_location" value="PUBLIC"/>
+            <column name="show_eco_place" value="PUBLIC"/>
+            <column name="show_to_do_list" value="PUBLIC"/>
             <column name="language_id" value="2"/>
             <column name="uuid" value="550e8400-e29b-41d4-a716-446655440000"/>
             <column name="phone_number" value="+380979797979"/>
