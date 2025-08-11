@@ -10,6 +10,9 @@
             <column name="code" type="varchar(35)">
                 <constraints nullable="false" unique="true"/>
             </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
         </createTable>
     </changeSet>
 </databaseChangeLog>
