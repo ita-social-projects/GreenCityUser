@@ -6,10 +6,12 @@
         <insert tableName="languages">
             <column name="id">1</column>
             <column name="code">uk</column>
+            <column name="name" value="Ukrainian"/>
         </insert>
         <insert tableName="languages">
             <column name="id">2</column>
             <column name="code">en</column>
+            <column name="name" value="English"/>
         </insert>
     </changeSet>
 </databaseChangeLog>
