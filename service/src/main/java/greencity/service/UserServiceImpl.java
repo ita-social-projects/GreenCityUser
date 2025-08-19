@@ -786,7 +786,7 @@ public class UserServiceImpl implements UserService {
         UserDeactivationReason userReason = userDeactivationRepo.getLastDeactivationReasons(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DEACTIVATION_REASON_IS_EMPTY));
         if (adminLang.equals("uk")) {
-            adminLang = "ua";
+            adminLang = "uk";
         }
         return filterReasons(adminLang,
             userReason.getReason());
@@ -799,9 +799,9 @@ public class UserServiceImpl implements UserService {
             result = forAll.stream().filter(s -> s.contains("{en}"))
                 .map(filterEn -> filterEn.replace("{en}", "").trim()).toList();
         }
-        if (lang.equals("ua")) {
-            result = forAll.stream().filter(s -> s.contains("{ua}"))
-                .map(filterEn -> filterEn.replace("{ua}", "").trim()).toList();
+        if (lang.equals("uk")) {
+            result = forAll.stream().filter(s -> s.contains("{uk}"))
+                .map(filterEn -> filterEn.replace("{uk}", "").trim()).toList();
         }
         return result;
     }

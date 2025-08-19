@@ -358,10 +358,10 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     /**
      * Gets user language from user object. If user language code is "1", method
-     * returns "ua", otherwise - "en".
+     * returns "uk", otherwise - "en".
      *
      * @param user user to get language from
-     * @return "ua" or "en" depending on user language code
+     * @return "uk" or "en" depending on user language code
      */
     private String getLanguageFromUser(User user) {
         return user.getLanguage().getCode();

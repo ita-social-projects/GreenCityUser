@@ -132,7 +132,7 @@ class UserServiceImplTest {
         .lastActivityTime(LocalDateTime.of(2020, 10, 10, 20, 10, 10))
         .dateOfRegistration(LocalDateTime.now())
         .socialNetworks(new ArrayList<>())
-        .language(new Language(1L, "ua", "Ukrainian", List.of()))
+        .language(new Language(1L, "uk", "Ukrainian", List.of()))
         .build();
 
     private final User user1 = User.builder()
@@ -1043,7 +1043,7 @@ class UserServiceImplTest {
             .build();
         when(userDeactivationRepo.getLastDeactivationReasons(1L)).thenReturn(Optional.of(test));
         assertEquals(test1, userService.getDeactivationReason(1L, "en"));
-        assertEquals(test1, userService.getDeactivationReason(1L, "ua"));
+        assertEquals(test1, userService.getDeactivationReason(1L, "uk"));
     }
 
     @Test

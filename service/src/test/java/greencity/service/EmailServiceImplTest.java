@@ -74,7 +74,7 @@ class EmailServiceImplTest {
 
     private static Locale getLocale(String language) {
         return switch (language) {
-            case "ua" -> UA_LOCALE;
+            case "uk" -> UA_LOCALE;
             case "en" -> Locale.ENGLISH;
             default -> throw new IllegalStateException("Unexpected value: " + language);
         };
@@ -118,9 +118,9 @@ class EmailServiceImplTest {
     @Test
     void sendInterestingEcoNewsTest() {
         InterestingEcoNewsDto dto = new InterestingEcoNewsDto();
-        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", "ua", UUID.randomUUID())));
+        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", "uk", UUID.randomUUID())));
 
-        when(messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null, getLocale("ua")))
+        when(messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null, getLocale("uk")))
             .thenReturn("Interesting Eco News");
 
         service.sendInterestingEcoNews(dto);
@@ -128,7 +128,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ua",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, uk",
         "1, Test, test@gmail.com, token, en"})
     void sendVerificationEmail(Long id, String name, String email, String token, String language) {
         when(messageSource.getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language)))
@@ -152,7 +152,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, uk, false",
         "1, Test, test@gmail.com, token, en, false"})
     void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
         when(messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)))
@@ -328,7 +328,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, uk, false",
         "1, Test, test@gmail.com, token, en, true"})
     void sendCreateNewPasswordForEmployee(Long id, String name, String email, String token, String language,
         Boolean isUbs) {
@@ -341,7 +341,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, uk, false",
         "1, Test, test@gmail.com, token, en, true"})
     void sendBlockAccountNotificationWithUnblockLinkEmailTest(Long id, String name, String email,
         String token, String language,
@@ -408,7 +408,7 @@ class EmailServiceImplTest {
             .body("test@test.com")
             .username("John Doe")
             .subject("some subject")
-            .language("ua")
+            .language("uk")
             .build();
 
         service.sendGreenOfficeRequestEmailToManager(message);

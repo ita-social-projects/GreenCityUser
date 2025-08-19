@@ -23,10 +23,10 @@ class LanguageValidatorTest {
 
     @Test
     void initializeSuccessTest() {
-        when(languageService.findAllLanguageCodes()).thenReturn(List.of("en", "ua"));
+        when(languageService.findAllLanguageCodes()).thenReturn(List.of("en", "uk"));
         validator.initialize(null);
         assertTrue(validator.isValid(Locale.ENGLISH, context));
-        assertTrue(validator.isValid(Locale.of("ua"), context));
+        assertTrue(validator.isValid(Locale.of("uk"), context));
         assertFalse(validator.isValid(Locale.of("de"), context));
     }
 
@@ -35,7 +35,7 @@ class LanguageValidatorTest {
         when(languageService.findAllLanguageCodes()).thenThrow(new RuntimeException("mock error"));
         validator.initialize(null);
         assertTrue(validator.isValid(Locale.ENGLISH, context));
-        assertTrue(validator.isValid(Locale.of("ua"), context));
+        assertTrue(validator.isValid(Locale.of("uk"), context));
         assertFalse(validator.isValid(Locale.of("de"), context));
     }
 }

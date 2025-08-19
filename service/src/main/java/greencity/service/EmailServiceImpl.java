@@ -255,7 +255,7 @@ public class EmailServiceImpl implements EmailService {
     private static Locale getLocale(String language) {
         if (language == null || language.equals("en")) {
             return Locale.ENGLISH;
-        } else if (language.equals("ua")) {
+        } else if (language.equals("uk")) {
             return Locale.of("uk", "UA");
         } else {
             throw new IllegalStateException("Unexpected value: " + language);

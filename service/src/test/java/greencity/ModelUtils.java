@@ -336,7 +336,7 @@ public class ModelUtils {
     }
 
     public static Language getLanguageUa() {
-        return Language.builder().id(1L).code("ua").build();
+        return Language.builder().id(1L).code("uk").build();
     }
 
     public static LanguageVO getLanguageVO() {
