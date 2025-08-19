@@ -5,7 +5,7 @@
     <changeSet id="Natalia-1" author="Kozak">
         <insert tableName="languages">
             <column name="id">1</column>
-            <column name="code">uk</column>
+            <column name="code">ua</column>
             <column name="name" value="Ukrainian"/>
         </insert>
         <insert tableName="languages">
