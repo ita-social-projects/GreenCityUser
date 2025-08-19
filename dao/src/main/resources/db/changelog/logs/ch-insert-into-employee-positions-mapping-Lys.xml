@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="insert-into-employee-positions-mapping" author="BohdanLys">
+        <insert tableName="employee_positions_mapping">
+            <column name="user_id">2</column>
+            <column name="position_id">1</column>
+        </insert>
+        <insert tableName="employee_positions_mapping">
+            <column name="user_id">2</column>
+            <column name="position_id">2</column>
+        </insert>
+        <insert tableName="employee_positions_mapping">
+            <column name="user_id">2</column>
+            <column name="position_id">3</column>
+        </insert>
+        <insert tableName="employee_positions_mapping">
+            <column name="user_id">2</column>
+            <column name="position_id">4</column>
+        </insert>
+        <insert tableName="employee_positions_mapping">
+            <column name="user_id">2</column>
+            <column name="position_id">5</column>
+        </insert>
+        <insert tableName="employee_positions_mapping">
+            <column name="user_id">2</column>
+            <column name="position_id">6</column>
+        </insert>
+        <insert tableName="employee_positions_mapping">
+            <column name="user_id">2</column>
+            <column name="position_id">7</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

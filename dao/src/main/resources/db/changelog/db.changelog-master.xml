@@ -28,6 +28,7 @@
     <include file="db/changelog/logs/ch-insert-into-users-aiuser-Pohranychnyi.xml"/>
     <include file="/db/changelog/logs/ch-add-user_email_preferences-Holotsvan.xml"/>
     <include file="db/changelog/logs/ch-insert-into-user_email_preferences-Herchanivska-9.xml"/>
-    <include file="db/changelog/logs/ch-insert-into-empolyee-authority-Haliara.xml"/>
     <include file="db/changelog/logs/ch-create-retryable-task-table-Pohranychnyi.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-employee-positions-mapping-Lys.xml"/>
+
 </databaseChangeLog>
