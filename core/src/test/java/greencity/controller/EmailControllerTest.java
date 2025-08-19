@@ -63,7 +63,7 @@ class EmailControllerTest {
                     {
                         "name": "Ilia",
                         "email": "email@gmail.com",
-                        "language": "ua",
+                        "language": "uk",
                         "unsubscribeToken": "d1d3a8b9-2488-48b5-9c7a-3d0b2896063b"
                     }
                 ]
@@ -168,7 +168,8 @@ class EmailControllerTest {
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
             .body("test body")
             .username("test user")
-            .email("test@gmail.com")
+            .userId(5L)
+            .userUuid("uuid")
             .subject("test subject")
             .baseLink("test link")
             .language("en")
@@ -211,7 +212,7 @@ class EmailControllerTest {
             .body("test@test.com")
             .username("John Doe")
             .subject("some subject")
-            .language("ua")
+            .language("uk")
             .build();
         String content = objectMapper.writeValueAsString(message);
 

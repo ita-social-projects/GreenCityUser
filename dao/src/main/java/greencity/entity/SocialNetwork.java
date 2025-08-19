@@ -1,7 +1,19 @@
 package greencity.entity;
 
-import lombok.*;
-import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Builder;
+import jakarta.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -10,6 +22,8 @@ import jakarta.validation.constraints.Size;
 @Getter
 @Setter
 @Builder
+@EqualsAndHashCode
+@ToString
 @Table(name = "social_networks")
 public class SocialNetwork {
     @Id

@@ -1,7 +1,7 @@
 package greencity.security.service;
 
 import greencity.client.CloudFlareClient;
-import greencity.constant.AppConstant;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.security.CloudFlareRequest;
 import greencity.dto.security.CloudFlareResponse;
@@ -91,6 +91,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final AuthorityRepo authorityRepo;
     private final LoginAttemptService loginAttemptService;
     private final CloudFlareClient cloudFlareClient;
+    private final GreenCityRemoteClient greenCityRemoteClient;
     @Value("${verifyEmailTimeHour}")
     private Integer expirationTime;
     @Value("${bruteForceSettings.blockTimeInMinutes}")
@@ -145,7 +146,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
-            .rating(AppConstant.DEFAULT_RATING)
             .language(Language.builder()
                 .id(modelMapper.map(language, Long.class))
                 .build())
@@ -358,13 +358,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     /**
      * Gets user language from user object. If user language code is "1", method
-     * returns "ua", otherwise - "en".
+     * returns "uk", otherwise - "en".
      *
      * @param user user to get language from
-     * @return "ua" or "en" depending on user language code
+     * @return "uk" or "en" depending on user language code
      */
     private String getLanguageFromUser(User user) {
-        return user.getLanguage().getCode().equals("1") ? "ua" : "en";
+        return user.getLanguage().getCode();
     }
 
     private boolean isPasswordCorrect(OwnSignInDto signInDto, UserVO user) {
@@ -535,7 +535,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
-            .rating(AppConstant.DEFAULT_RATING)
             .language(Language.builder()
                 .id(2L)
                 .code("en")

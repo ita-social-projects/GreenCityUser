@@ -55,6 +55,7 @@ public class SecurityConfig {
     private final UserService userService;
     private static final String USER_LINK = "/user";
     private static final String COMMIT_INFO = "/commit-info";
+    private static final String FILES = "/files";
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Value("${spring.messaging.stomp.websocket.allowed-origins}")
@@ -145,6 +146,8 @@ public class SecurityConfig {
                     "/user/usersOnlineStatus",
                     "/user/findByIdForAchievement",
                     "/user/findNotDeactivatedByEmail",
+                    "/user/findNotDeactivatedByEmailRemote",
+                    "/user/findNotDeactivatedByIdRemote",
                     "/user/findByEmail",
                     "/user/findIdByEmail",
                     "/user/findAllUsersCities",
@@ -157,9 +160,14 @@ public class SecurityConfig {
                     "/user/{userId}/sixUserFriends/",
                     "/ownSecurity/password-status",
                     "/user/emailNotifications",
+                    "/lang",
+                    "/lang/**",
                     LOGS_LINKS,
                     EXPORT_SETTINGS_LINKS)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                .requestMatchers(HttpMethod.POST,
+                    FILES)
+                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",
                     "/user/{userId}/habit",
@@ -186,7 +194,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,
                     "/user/findUserLanguageByUuid",
                     "/user/get-all-authorities",
-                    "/user/get-positions-authorities")
+                    "/user/get-positions-authorities",
+                    "/management/socialnetworkimages/get-all-remote",
+                    "/management/socialnetworkimages/find")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/to-do-list-items/{userToDoListItemId}",
@@ -214,12 +224,39 @@ public class SecurityConfig {
                     "/ownSecurity/register",
                     "/email/sendReport",
                     "/email/sendHabitNotification",
-                    "/email/sendInterestingEcoNews")
+                    "/email/sendInterestingEcoNews",
+                    "/management/socialnetworkimages/save-remote",
+                    "/user-notification-preference/search",
+                    FILES + "/single")
+                .hasAnyRole(ADMIN)
+                .requestMatchers(HttpMethod.PUT,
+                    "/management/socialnetworkimages/")
+                .hasAnyRole(ADMIN)
+                .requestMatchers(HttpMethod.GET,
+                    "/user/email/findAll",
+                    "/user/email/findByIds",
+                    "/user/findNotDeactivatedByIdAdvanced",
+                    "/user/activated-ids",
+                    "/user/registration-statistics",
+                    "/user/email",
+                    "/user/count-active-users",
+                    "/user/email-preferences-distribution",
+                    "/user/statuses-distribution",
+                    "/user/roles-distribution",
+                    "/user/findNotDeactivatedById",
+                    "/user/findNotDeactivatedByEmail")
+                .hasAnyRole(ADMIN)
+                .requestMatchers(HttpMethod.DELETE,
+                    "/management/socialnetworkimages/delete",
+                    "/management/socialnetworkimages/deleteAll",
+                    FILES,
+                    FILES + "/single")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",
                     "/user/role",
-                    "/user/update/role")
+                    "/user/update/role",
+                    "/user/{id}/role")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.POST, "/management/login")
                 .permitAll()

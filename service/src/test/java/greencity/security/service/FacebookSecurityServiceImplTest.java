@@ -2,7 +2,7 @@ package greencity.security.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import greencity.client.RestClient;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
@@ -56,7 +56,7 @@ class FacebookSecurityServiceImplTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private RestClient restClient;
+    private GreenCityRemoteClient greenCityRemoteClient;
 
     @Mock
     private PlatformTransactionManager transactionManager;
@@ -85,11 +85,10 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_ShouldReturnUserWithDefaultValues() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = "1";
         when(modelMapper.map(language, Long.class)).thenReturn(1L);
 
-        User user = facebookSecurityService.createNewUser(email, userName, profilePicture, language);
+        User user = facebookSecurityService.createNewUser(email, userName, language);
 
         assertNotNull(user);
         assertEquals(email, user.getEmail());
@@ -97,7 +96,6 @@ class FacebookSecurityServiceImplTest {
         assertEquals(Role.ROLE_USER, user.getRole());
         assertEquals(UserStatus.ACTIVATED, user.getUserStatus());
         assertEquals(EmailNotification.DISABLED, user.getEmailNotification());
-        assertEquals(profilePicture, user.getProfilePicturePath());
         assertEquals(ProfilePrivacyPolicy.PUBLIC, user.getShowLocation());
         assertEquals(1L, user.getLanguage().getId());
     }
@@ -106,13 +104,12 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_ShouldThrowException_WhenLanguageIsNull() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = null;
 
         when(modelMapper.map(language, Long.class)).thenThrow(new IllegalArgumentException("Language cannot be null"));
 
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-            () -> facebookSecurityService.createNewUser(email, userName, profilePicture, language));
+            () -> facebookSecurityService.createNewUser(email, userName, language));
         assertNotNull(exception);
     }
 
@@ -142,10 +139,11 @@ class FacebookSecurityServiceImplTest {
         userVO.setEmail("test@example.com");
         userVO.setName("Test User");
         userVO.setUserStatus(UserStatus.ACTIVATED);
+        userVO.setRole(Role.ROLE_USER);
 
         when(userService.findByEmail("test@example.com")).thenReturn(userVO);
-        when(jwtTool.createAccessToken(anyString(), any())).thenReturn("accessToken");
-        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+        when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
 
         SuccessSignInDto result = facebookSecurityService.authenticate(fbToken, "en");
 
@@ -176,10 +174,14 @@ class FacebookSecurityServiceImplTest {
         UserVO userVO = new UserVO();
         userVO.setEmail(email);
         userVO.setUserStatus(UserStatus.ACTIVATED);
+        userVO.setRole(Role.ROLE_USER);
+
         when(userService.findByEmail(email)).thenReturn(userVO);
-        when(jwtTool.createAccessToken(anyString(), any())).thenReturn("accessToken");
-        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+        when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
+
         SuccessSignInDto result = facebookSecurityService.processAuthentication(email, "Test User", "profile.jpg", "1");
+
         assertNotNull(result);
         assertEquals("accessToken", result.getAccessToken());
         assertEquals("refreshToken", result.getRefreshToken());
@@ -212,7 +214,7 @@ class FacebookSecurityServiceImplTest {
             return user;
         });
 
-        User result = facebookSecurityService.saveNewUser(newUser);
+        User result = facebookSecurityService.saveNewUser(newUser, null);
         assertNotNull(result);
         assertNotNull(result.getUuid());
         assertEquals(1L, result.getId());
@@ -224,9 +226,13 @@ class FacebookSecurityServiceImplTest {
         userVO.setId(1L);
         userVO.setEmail("test@example.com");
         userVO.setName("Test User");
-        when(jwtTool.createAccessToken(anyString(), any())).thenReturn("accessToken");
-        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+        userVO.setRole(Role.ROLE_USER);
+
+        when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
+
         SuccessSignInDto result = facebookSecurityService.getSuccessSignInDto(userVO);
+
         assertNotNull(result);
         assertEquals(1L, result.getUserId());
         assertEquals("accessToken", result.getAccessToken());
@@ -294,6 +300,7 @@ class FacebookSecurityServiceImplTest {
         UserVO userVO = new UserVO();
         userVO.setId(1L);
         userVO.setName(userName);
+        userVO.getRole();
 
         UbsProfileCreationDto profileDto = new UbsProfileCreationDto();
 
@@ -301,8 +308,8 @@ class FacebookSecurityServiceImplTest {
         when(userRepo.save(any(User.class))).thenReturn(savedUser);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(User.class), eq(UbsProfileCreationDto.class))).thenReturn(profileDto);
-        when(jwtTool.createAccessToken(any(), any())).thenReturn("accessToken");
-        when(jwtTool.createRefreshToken(any())).thenReturn("refreshToken");
+        when(jwtTool.createAccessToken(userVO.getEmail(), userVO.getRole())).thenReturn("accessToken");
+        when(jwtTool.createRefreshToken(userVO)).thenReturn("refreshToken");
 
         SuccessSignInDto result = facebookSecurityService.handleNewUser(email, userName, profilePicture, language);
 
@@ -345,7 +352,8 @@ class FacebookSecurityServiceImplTest {
         when(userRepo.save(any(User.class))).thenReturn(savedUser);
         when(modelMapper.map(any(User.class), eq(UbsProfileCreationDto.class)))
             .thenReturn(new UbsProfileCreationDto());
-        when(restClient.createUbsProfile(any())).thenThrow(new RestClientException("Failed to create UBS profile"));
+        when(greenCityRemoteClient.createUbsProfile(any()))
+            .thenThrow(new RestClientException("Failed to create UBS profile"));
 
         RestClientException exception = assertThrows(RestClientException.class,
             () -> facebookSecurityService.handleNewUser(email, userName, profilePicture, language));
@@ -387,13 +395,12 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_ShouldHandleNullLanguage() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = null;
 
         when(modelMapper.map(language, Long.class)).thenThrow(new IllegalArgumentException("Language cannot be null"));
 
         assertThrows(IllegalArgumentException.class,
-            () -> facebookSecurityService.createNewUser(email, userName, profilePicture, language));
+            () -> facebookSecurityService.createNewUser(email, userName, language));
     }
 
     @Test
@@ -414,11 +421,10 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_WithPreferences_ShouldSetNotificationPreferences() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = "1";
         when(modelMapper.map(language, Long.class)).thenReturn(1L);
 
-        User user = facebookSecurityService.createNewUser(email, userName, profilePicture, language);
+        User user = facebookSecurityService.createNewUser(email, userName, language);
 
         assertNotNull(user.getNotificationPreferences());
         assertEquals(EmailPreference.values().length, user.getNotificationPreferences().size());
@@ -432,12 +438,11 @@ class FacebookSecurityServiceImplTest {
     void createNewUser_ShouldSetNotificationPreferencesCorrectly() {
         String email = "test@example.com";
         String userName = "Test User";
-        String profilePicture = "profile.jpg";
         String language = "1";
 
         when(modelMapper.map(language, Long.class)).thenReturn(1L);
 
-        User user = facebookSecurityService.createNewUser(email, userName, profilePicture, language);
+        User user = facebookSecurityService.createNewUser(email, userName, language);
 
         assertNotNull(user.getNotificationPreferences());
         assertEquals(EmailPreference.values().length, user.getNotificationPreferences().size());

@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.mockito.Mockito.verify;
@@ -37,6 +38,9 @@ class TestersSecurityControllerTest {
     void setUp() {
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(testersSecurityController)
+            .defaultRequest(MockMvcRequestBuilders.get("/")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
             .build();
         this.request = TestersSignInRequest.builder()
             .email("test@email.com")

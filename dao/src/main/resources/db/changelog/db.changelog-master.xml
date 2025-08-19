@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <include file="db/changelog/logs/liquibase-outputChangeLog.xml"/>
+    <include file="db/changelog/logs/ch-add-constraints-Koval-2.xml"/>
+    <include file="db/changelog/logs/ch-advice-localization-kopylchak-1.xml"/>
+    <include file="db/changelog/logs/ch-social-network-Lehkyi.xml"/>
+    <include file="db/changelog/logs/ch-add-new-ubs-columns-Bilonizhka.xml"/>
+    <include file="db/changelog/logs/ch-add-language-column-to-user-Diakiv.xml"/>
+    <include file="db/changelog/logs/ch-add-reasons-for-user-deactivatiom-table-Pikhotskyi.xml"/>
+    <include file="db/changelog/logs/ch-ubs-database-seperation.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-languages-Kozak.xml"/>
+    <include file="db/changelog/logs/ch-insert-table-users-service-account-Yezenitskyi.xml"/>
+    <include file="db/changelog/logs/ch-changed-user-role-to-varchar.xml"/>
+    <include file="db/changelog/logs/ch-add-name-unique-constraint-Sakhno.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-employee-authority-Hlazova.xml"/>
+    <include file="db/changelog/logs/ch-add-table-positions-Korzh.xml"/>
+    <include file="db/changelog/logs/ch-add-table-positions-authorities-mapping-Korzh.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-positions-authorities-mapping-Korzh.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-users-Korzh.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-employee-authority-mapping-Korzh.xml"/>
+    <include file="/db/changelog/logs/ch-add-table-employee-positions-mapping-Bondar.xml"/>
+    <include file="db/changelog/logs/ch-add-column-position-Spodaryk.xml"/>
+    <include file="db/changelog/logs/ch-insert-values-admin_authorities-Spodaryk.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-users-admin-Spodaryk.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-users-aiuser-Pohranychnyi.xml"/>
+    <include file="/db/changelog/logs/ch-add-user_email_preferences-Holotsvan.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-user_email_preferences-Herchanivska-9.xml"/>
+    <include file="db/changelog/logs/ch-create-retryable-task-table-Pohranychnyi.xml"/>
+    <include file="db/changelog/logs/ch-insert-into-employee-positions-mapping-Lys.xml"/>
+
+</databaseChangeLog>

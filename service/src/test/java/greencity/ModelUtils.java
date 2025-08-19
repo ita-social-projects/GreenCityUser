@@ -1,6 +1,12 @@
 package greencity;
 
-import com.google.maps.model.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.maps.model.AddressComponent;
+import com.google.maps.model.Geometry;
+import com.google.maps.model.AddressComponentType;
+import com.google.maps.model.LatLng;
+import com.google.maps.model.GeocodingResult;
 import greencity.constant.AppConstant;
 import greencity.dto.CoordinatesDto;
 import greencity.dto.UbsCustomerDto;
@@ -11,16 +17,42 @@ import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.position.PositionDto;
+import greencity.dto.socialnetwork.SocialNetworkVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
-import greencity.dto.user.*;
-import greencity.dto.useraction.UserActionVO;
+import greencity.dto.user.UserVO;
+import greencity.dto.user.UserAllFriendsDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserProfilePictureDto;
+import greencity.dto.user.UserNotificationPreferenceDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserAdminRegistrationDto;
+import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserProfileStatisticsDto;
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserInfo;
+import greencity.dto.user.SubscriberDto;
+import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.CreateGreenCityUserDto;
+import greencity.dto.user.UserVOShort;
+import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
-import greencity.entity.*;
+import greencity.entity.Language;
+import greencity.entity.RetryableTask;
+import greencity.entity.User;
+import greencity.entity.SocialNetwork;
+import greencity.entity.VerifyEmail;
+import greencity.entity.OwnSecurity;
+import greencity.entity.Authority;
+import greencity.entity.Position;
+import greencity.entity.RestorePasswordEmail;
+import greencity.entity.SocialNetworkImage;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.ProfilePrivacyPolicy;
+import greencity.enums.RetryableTaskStatus;
+import greencity.enums.RetryableTaskType;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
@@ -29,7 +61,6 @@ import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.TestersSignInRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +78,7 @@ public class ModelUtils {
     public static final UserManagementDto CREATE_USER_MANAGER_DTO = createUserManagerDto();
     public static final List<UserAllFriendsDto> CREATE_USER_ALL_FRIENDS_DTO = createUserAllFriendsDto();
     public static final String TEST_EMAIL = "taras@gmail.com";
+    public static final String PICTURE_PATH = "http://testpicture.com.ua";
 
     public static User getUser() {
         return User.builder()
@@ -72,10 +104,7 @@ public class ModelUtils {
             .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            .userLocation(new UserLocation(1L, "Lviv", "Львів", "Lvivska",
-                "Львівська", "Ukraine", "Україна", 20.000000,
-                20.000000, new ArrayList<>()))
-            .language(new Language(1L, "en", null))
+            .language(getLanguage())
             .build();
     }
 
@@ -194,12 +223,11 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .language(ModelUtils.getLanguage())
+            .language(getLanguage())
             .socialNetworks(socialNetwork)
             .lastActivityTime(LocalDateTime.now())
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
-            .userLocation(null)
             .build();
     }
 
@@ -240,10 +268,8 @@ public class ModelUtils {
             .name("user")
             .email("namesurname1995@gmail.com")
             .role(Role.ROLE_USER)
-            .userCredo("save the world")
             .emailNotification(EmailNotification.MONTHLY)
             .userStatus(UserStatus.ACTIVATED)
-            .rating(13.4)
             .verifyEmail(VerifyEmailVO.builder()
                 .id(32L)
                 .user(UserVO.builder()
@@ -252,18 +278,9 @@ public class ModelUtils {
                     .build())
                 .token("toooookkkeeeeen42324532542")
                 .build())
-            .userFriends(Collections.singletonList(
-                UserVO.builder()
-                    .id(75L)
-                    .name("Andrew")
-                    .build()))
             .refreshTokenKey("refreshtoooookkkeeeeen42324532542")
             .ownSecurity(null)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
-            .userLocationDto(
-                new UserLocationDto(1L, "Lviv", "Львів", "Lvivska", "Львівська",
-                    "Ukraine", "Україна", 20.000000,
-                    20.000000))
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
@@ -275,39 +292,8 @@ public class ModelUtils {
                     .build())
                 .build())
             .lastActivityTime(LocalDateTime.of(2020, 12, 11, 13, 30))
-            .userAchievements(List.of(
-                UserAchievementVO.builder()
-                    .id(47L)
-                    .user(UserVO.builder()
-                        .id(13L)
-                        .build())
-                    .achievement(AchievementVO.builder()
-                        .id(56L)
-                        .build())
-                    .build(),
-                UserAchievementVO.builder()
-                    .id(39L)
-                    .user(UserVO.builder()
-                        .id(13L)
-                        .build())
-                    .achievement(AchievementVO.builder()
-                        .id(14L)
-                        .build())
-                    .build()))
-            .userActions(Collections.singletonList(UserActionVO.builder()
-                .id(13L)
-                .achievementCategory(AchievementCategoryVO.builder()
-                    .id(1L)
-                    .build())
-                .count(0)
-                .user(UserVO.builder()
-                    .id(13L)
-                    .build())
-                .build()))
-            .languageVO(LanguageVO.builder()
-                .id(1L)
-                .code("ua")
-                .build())
+            .firstName("Julia")
+            .languageVO(getLanguageVO())
             .build();
     }
 
@@ -346,17 +332,22 @@ public class ModelUtils {
     }
 
     public static Language getLanguage() {
-        return Language.builder().id(1L).code(AppConstant.DEFAULT_LANGUAGE_CODE).build();
+        return Language.builder().id(2L).code(AppConstant.DEFAULT_LANGUAGE_CODE).build();
+    }
+
+    public static Language getLanguageUa() {
+        return Language.builder().id(1L).code("uk").build();
+    }
+
+    public static LanguageVO getLanguageVO() {
+        return LanguageVO.builder()
+            .id(getLanguage().getId())
+            .code("en")
+            .build();
     }
 
     public static UserProfilePictureDto getUserProfilePictureDto() {
         return new UserProfilePictureDto(1L, "name", "image");
-    }
-
-    public static Achievement getAchievement() {
-        return new Achievement(1L, "ACQUIRED_HABIT_14_DAYS", "Набуття звички протягом 14 днів",
-            "Acquired habit 14 days", Collections.emptyList(),
-            new AchievementCategory(), 1);
     }
 
     public static AchievementVO getAchievementVO() {
@@ -364,8 +355,14 @@ public class ModelUtils {
             "Acquired habit 14 days", new AchievementCategoryVO(), 1);
     }
 
-    public static UserAchievement getUserAchievement() {
-        return new UserAchievement(1L, getUser(), getAchievement(), false);
+    public static UserAchievementVO getUserAchievement() {
+        return new UserAchievementVO(1L, getUserVO(), getAchievementVO(), false);
+    }
+
+    public static List<SocialNetworkVO> getListSocialNetworkVO() {
+        List<SocialNetworkVO> socialNetworkVO = new ArrayList<>();
+        socialNetworkVO.add(SocialNetworkVO.builder().id(1L).url("url").build());
+        return socialNetworkVO;
     }
 
     public static UserViolationMailDto getUserViolationMailDto() {
@@ -418,7 +415,7 @@ public class ModelUtils {
             .email("test@mail.com")
             .userStatus(UserStatus.CREATED)
             .role(Role.ROLE_USER)
-            .rating(100D)
+            .language(getLanguage())
             .build();
     }
 
@@ -545,6 +542,30 @@ public class ModelUtils {
             .build();
     }
 
+    public static SocialNetworkImage getSocialNetworkImage() {
+        return SocialNetworkImage.builder()
+            .id(1L)
+            .hostPath("hostPath")
+            .imagePath("imagePath")
+            .build();
+    }
+
+    public static SocialNetworkImage getSocialNetworkImageId2() {
+        return SocialNetworkImage.builder()
+            .id(2L)
+            .hostPath("hostPath2")
+            .imagePath("imagePath2")
+            .build();
+    }
+
+    public static SocialNetworkImage getSocialNetworkImageId3() {
+        return SocialNetworkImage.builder()
+            .id(3L)
+            .hostPath("hostPath3")
+            .imagePath("imagePath3")
+            .build();
+    }
+
     public static User getEmployeeWithPositionsAndRelatedAuthorities_Empty() {
         return User.builder()
             .positions(List.of(Position.builder()
@@ -553,36 +574,6 @@ public class ModelUtils {
             .authorities(List.of(Authority.builder()
                 .name("Auth")
                 .build()))
-            .build();
-    }
-
-    public static UserLocation getUserLocation() {
-        return UserLocation.builder()
-            .id(1L)
-            .cityEn("Lviv")
-            .cityUk("Львів")
-            .countryEn("Ukraine")
-            .countryUk("Україна")
-            .regionUk("Львівська")
-            .regionEn("Lvivska")
-            .latitude(49.842957)
-            .longitude(24.031111)
-            .users(Collections.singletonList(getUser()))
-            .build();
-    }
-
-    public static UserLocation getUserLocation2() {
-        return UserLocation.builder()
-            .id(2L)
-            .cityEn("Ternopil")
-            .cityUk("Тернопіль")
-            .countryEn("Ukraine")
-            .countryUk("Україна")
-            .regionUk("Тернопільська")
-            .regionEn("Ternopilska")
-            .latitude(49.842957)
-            .longitude(24.031111)
-            .users(Collections.singletonList(getUser()))
             .build();
     }
 
@@ -713,4 +704,112 @@ public class ModelUtils {
             .build();
     }
 
+    public static List<SocialNetwork> getSocialNetworks() {
+        SocialNetwork socialNetwork1 = SocialNetwork.builder()
+            .id(9L)
+            .url("http://test.com.ua")
+            .user(getUser())
+            .socialNetworkImage(getOneSocialNetworkImage())
+            .build();
+
+        SocialNetwork socialNetwork2 = SocialNetwork.builder()
+            .id(10L)
+            .url("http://test-test.com.ua")
+            .user(getUser())
+            .socialNetworkImage(getOneSocialNetworkImage())
+            .build();
+
+        return List.of(socialNetwork1, socialNetwork2);
+    }
+
+    public static List<SocialNetworkVO> getSocialNetworkVOs() {
+        SocialNetworkVO socialNetworkVO1 = SocialNetworkVO.builder()
+            .id(9L)
+            .url("http://test.com.ua")
+            .user(getUserVoShort())
+            .socialNetworkImage(getOneSocialNetworkImageVO())
+            .build();
+
+        SocialNetworkVO socialNetworkVO2 = SocialNetworkVO.builder()
+            .id(10L)
+            .url("http://test-test.com.ua")
+            .user(getUserVoShort())
+            .socialNetworkImage(getOneSocialNetworkImageVO())
+            .build();
+
+        return List.of(socialNetworkVO1, socialNetworkVO2);
+    }
+
+    public static SocialNetworkImageVO getOneSocialNetworkImageVO() {
+        return SocialNetworkImageVO.builder()
+            .id(13L)
+            .imagePath("http://test-test.com.ua")
+            .hostPath("hostPath2")
+            .build();
+    }
+
+    public static SocialNetworkImage getOneSocialNetworkImage() {
+        return SocialNetworkImage.builder()
+            .id(13L)
+            .imagePath("http://test-test.com.ua")
+            .hostPath("hostPath2")
+            .build();
+    }
+
+    public static UserVO getUserVoShort() {
+        return UserVO.builder()
+            .id(1L)
+            .email("taras@gmail.com")
+            .build();
+    }
+
+    public static UserVOAdvancedDto getUserVOAdvancedDto() {
+        return UserVOAdvancedDto.builder()
+            .id(13L)
+            .name("user")
+            .email("namesurname1995@gmail.com")
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.ACTIVATED)
+            .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
+            .firstName("Julia")
+            .language(getLanguageVO())
+            .socialNetworks(getSocialNetworkVOs())
+            .build();
+    }
+
+    public static CreateGreenCityUserDto getCreateGreenCityDto() {
+        return CreateGreenCityUserDto.builder()
+            .id(1L)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .profilePicturePath(PICTURE_PATH)
+            .build();
+    }
+
+    public static UserVOShort getUserVOShortDto() {
+        return UserVOShort.builder()
+            .id(13L)
+            .name("user")
+            .email("taras@gmail.com")
+            .role(Role.ROLE_USER)
+            .userStatus(UserStatus.ACTIVATED)
+            .languageVO(LanguageVO.builder()
+                .id(2L)
+                .code("en")
+                .build())
+            .build();
+    }
+
+    public static List<RetryableTask> getRetryableTasks() throws JsonProcessingException {
+        List<RetryableTask> tasks = new ArrayList<>();
+        String json = new ObjectMapper().writeValueAsString(getCreateGreenCityDto());
+        tasks.add(RetryableTask.builder()
+            .id(1L)
+            .payload(json)
+            .type(RetryableTaskType.CREATE_USER)
+            .status(RetryableTaskStatus.IN_PROGRESS)
+            .retryTime(LocalDateTime.now())
+            .build());
+        return tasks;
+    }
 }
