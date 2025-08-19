@@ -3,9 +3,12 @@ package greencity.security.jwt;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import static greencity.constant.AppConstant.ROLE;
+import greencity.constant.AppConstant;
 import greencity.dto.user.UserVO;
 import greencity.enums.Role;
 import greencity.security.service.AuthorityService;
+import greencity.security.service.JwtService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ClaimsBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -13,8 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.crypto.SecretKey;
@@ -36,18 +39,23 @@ public class JwtTool {
     private final Integer refreshTokenValidTimeInMinutes;
     private final String accessTokenKey;
     private final AuthorityService authorityService;
+    private final JwtService jwtService;
 
     /**
      * Constructor.
      */
     @Autowired
-    public JwtTool(@Value("${accessTokenValidTimeInMinutes}") Integer accessTokenValidTimeInMinutes,
+    public JwtTool(
+        @Value("${accessTokenValidTimeInMinutes}") Integer accessTokenValidTimeInMinutes,
         @Value("${refreshTokenValidTimeInMinutes}") Integer refreshTokenValidTimeInMinutes,
-        @Value("${tokenKey}") String accessTokenKey, AuthorityService authorityService) {
+        @Value("${tokenKey}") String accessTokenKey,
+        AuthorityService authorityService,
+        JwtService jwtService) {
         this.accessTokenValidTimeInMinutes = accessTokenValidTimeInMinutes;
         this.refreshTokenValidTimeInMinutes = refreshTokenValidTimeInMinutes;
         this.accessTokenKey = accessTokenKey;
         this.authorityService = authorityService;
+        this.jwtService = jwtService;
     }
 
     /**
@@ -57,22 +65,37 @@ public class JwtTool {
      * @param role  this is role of user.
      */
     public String createAccessToken(String email, Role role) {
-        ClaimsBuilder claims = Jwts.claims().subject(email);
-        claims.add(ROLE, Collections.singleton(role.name()));
+        return createAccessToken(email, List.of(role));
+    }
 
-        if (role.equals(Role.ROLE_UBS_EMPLOYEE)) {
+    /**
+     * Method for creating access token.
+     *
+     * @param email this is email of user.
+     * @param roles roles of user.
+     */
+    public String createAccessToken(String email, List<Role> roles) {
+        ClaimsBuilder claims = userClaimsBuilder(email, roles);
+
+        if (roles.contains(Role.ROLE_UBS_EMPLOYEE)) {
             claims.add("employee_authorities", authorityService.getAllEmployeesAuthorities(email));
         }
+
+        return createAccessToken(claims.build(), accessTokenKey.getBytes(StandardCharsets.UTF_8),
+            accessTokenValidTimeInMinutes);
+    }
+
+    private String createAccessToken(Claims claims, byte[] signature, Integer validTimeMinutes) {
         Date now = new Date();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(now);
-        calendar.add(Calendar.MINUTE, accessTokenValidTimeInMinutes);
+        calendar.add(Calendar.MINUTE, validTimeMinutes);
         return Jwts.builder()
-            .claims(claims.build())
+            .claims(claims)
             .issuedAt(now)
             .expiration(calendar.getTime())
-            .signWith(Keys.hmacShaKeyFor(
-                accessTokenKey.getBytes(StandardCharsets.UTF_8)),
+            .signWith(
+                Keys.hmacShaKeyFor(signature),
                 Jwts.SIG.HS256)
             .compact();
     }
@@ -83,20 +106,9 @@ public class JwtTool {
      * @param user - entity {@link UserVO}
      */
     public String createRefreshToken(UserVO user) {
-        ClaimsBuilder claims = Jwts.claims().subject(user.getEmail());
-        claims.add(ROLE, Collections.singleton(user.getRole().name()));
-        Date now = new Date();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(now);
-        calendar.add(Calendar.MINUTE, refreshTokenValidTimeInMinutes);
-        return Jwts.builder()
-            .claims(claims.build())
-            .issuedAt(now)
-            .expiration(calendar.getTime())
-            .signWith(
-                Keys.hmacShaKeyFor(user.getRefreshTokenKey().getBytes(StandardCharsets.UTF_8)),
-                Jwts.SIG.HS256)
-            .compact();
+        ClaimsBuilder claims = userClaimsBuilder(user.getEmail(), List.of(user.getRole()));
+        return createAccessToken(claims.build(), user.getRefreshTokenKey().getBytes(StandardCharsets.UTF_8),
+            refreshTokenValidTimeInMinutes);
     }
 
     /**
@@ -207,5 +219,16 @@ public class JwtTool {
             .issuedAt(now)
             .expiration(calendar.getTime())
             .compact();
+    }
+
+    private ClaimsBuilder userClaimsBuilder(String userEmail, List<Role> roles) {
+        Long userId = jwtService.findUserIdByEmail(userEmail);
+        List<String> roleNames = roles.stream().map(Role::name).toList();
+
+        ClaimsBuilder claims = Jwts.claims().subject(userEmail);
+        claims.add(ROLE, roleNames);
+        claims.add(AppConstant.JWT_USER_ID_CLAIM, userId);
+
+        return claims;
     }
 }
