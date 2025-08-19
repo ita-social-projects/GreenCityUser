@@ -38,4 +38,7 @@ public class AppConstant {
     public static final String EMPTY_STRING = "";
     public static final String MESSAGE = "message";
     public static final String DEFAULT_LANGUAGE_NAME = "English";
+    public static final String GOOGLE_API = "Google API";
+    public static final String LOGS_LINKS = "/logs/**";
+    public static final String EXPORT_SETTINGS_LINKS = "/export/settings/**";
 }
