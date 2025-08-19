@@ -131,5 +131,9 @@
             <column name="authority_id" value="33"/>
             <column name="user_id" value="2"/>
         </insert>
+        <insert tableName="employee_authorities_mapping">
+            <column name="authority_id" value="34"/>
+            <column name="user_id" value="2"/>
+        </insert>
     </changeSet>
 </databaseChangeLog>
