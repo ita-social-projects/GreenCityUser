@@ -12,6 +12,7 @@ import greencity.dto.EmployeePositionsDto;
 import greencity.dto.authorities.AuthorityCategoryDto;
 import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.position.PositionDto;
+import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.entity.Authority;
 import greencity.entity.AuthorityCategory;
 import greencity.entity.Position;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -155,6 +157,60 @@ class AuthorityServiceImplTest {
     void updateAuthoritiesToRelatedPositionsThrowsNotFoundExceptionTest() {
         var dto = new EmployeePositionsDto();
         assertThrows(UsernameNotFoundException.class, () -> authorityService.updateAuthoritiesToRelatedPositions(dto));
+    }
+
+    @Test
+    void updateAuthoritiesToRelatedPositionsWithNullPositionsTest() {
+        User employee = createEmployee();
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+
+        EmployeePositionsDto dto = EmployeePositionsDto.builder()
+            .email(TEST_EMAIL)
+            .positions(null)
+            .build();
+
+        authorityService.updateAuthoritiesToRelatedPositions(dto);
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(userRepo).save(employee);
+    }
+
+    @Test
+    void updateAuthoritiesToRelatedPositionsWithEmptyPositionsListTest() {
+        User employee = createEmployee();
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+
+        EmployeePositionsDto dto = EmployeePositionsDto.builder()
+            .email(TEST_EMAIL)
+            .positions(List.of())
+            .build();
+
+        authorityService.updateAuthoritiesToRelatedPositions(dto);
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(userRepo).save(employee);
+    }
+
+    @Test
+    void updateEmployeesAuthoritiesWithEmptyAuthoritiesTest() {
+        User employee = createEmployee();
+
+        UserEmployeeAuthorityDto dto = UserEmployeeAuthorityDto.builder()
+            .employeeEmail(TEST_EMAIL)
+            .authorities(List.of())
+            .build();
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+
+        authorityService.updateEmployeesAuthorities(dto);
+
+        assertTrue(employee.getAuthorities().isEmpty());
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(userRepo).save(employee);
+        verifyNoInteractions(authorityRepo);
     }
 
     @Test
