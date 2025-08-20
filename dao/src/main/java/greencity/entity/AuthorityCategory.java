@@ -38,4 +38,3 @@ public class AuthorityCategory {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Authority> authorities;
 }
-

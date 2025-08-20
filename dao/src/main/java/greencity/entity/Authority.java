@@ -41,7 +41,8 @@ public class Authority {
     @Column(name = "description_uk")
     private String descriptionUk;
 
-    @ManyToMany(mappedBy = "authorities", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(mappedBy = "authorities",
+        cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<User> employees;
 
     @ManyToMany
