@@ -1,6 +1,7 @@
 package greencity.repository;
 
 import greencity.entity.Authority;
+import greencity.entity.AuthorityCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -59,4 +60,13 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
      */
     @Query("SELECT au FROM Authority au JOIN FETCH au.category")
     List<Authority> findAllWithCategories();
+
+    /**
+     * Retrieves all authorities that belong to the given category.
+     *
+     * @param categoryId ID of the {@link AuthorityCategory}.
+     * @return list of {@link Authority}.
+     */
+    @Query("SELECT a FROM Authority a WHERE a.category.id = :categoryId")
+    List<Authority> findAllByCategoryId(@Param("categoryId") Long categoryId);
 }
