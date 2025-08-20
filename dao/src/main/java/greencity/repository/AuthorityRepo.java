@@ -54,14 +54,6 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
     List<Authority> findAuthoritiesByNames(List<String> name);
 
     /**
-     * Retrieves all authorities with their categories eagerly fetched.
-     *
-     * @return list of {@link Authority} with categories initialized.
-     */
-    @Query("SELECT au FROM Authority au JOIN FETCH au.category")
-    List<Authority> findAllWithCategories();
-
-    /**
      * Retrieves all authorities that belong to the given category.
      *
      * @param categoryId ID of the {@link AuthorityCategory}.
