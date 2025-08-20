@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,6 +35,12 @@ public class Authority {
     @Column
     private String name;
 
+    @Column(name = "description_en")
+    private String descriptionEn;
+
+    @Column(name = "description_uk")
+    private String descriptionUk;
+
     @ManyToMany(mappedBy = "authorities", cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     private List<User> employees;
 
@@ -43,4 +50,8 @@ public class Authority {
         joinColumns = @JoinColumn(name = "authorities_id"),
         inverseJoinColumns = @JoinColumn(name = "position_id"))
     private List<Position> positions;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private AuthoritiesCategory category;
 }
