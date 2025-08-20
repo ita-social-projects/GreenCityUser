@@ -121,10 +121,15 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     private AuthorityCategoryDto toAuthorityCategoryDto(AuthorityCategory category) {
+        List<AuthorityDto> authorityDTOs = category.getAuthorities().stream()
+            .map(this::toAuthorityDto)
+            .toList();
+
         return AuthorityCategoryDto.builder()
             .id(category.getId())
             .nameEn(category.getNameEn())
             .nameUk(category.getNameUk())
+            .authorities(authorityDTOs)
             .build();
     }
 }
