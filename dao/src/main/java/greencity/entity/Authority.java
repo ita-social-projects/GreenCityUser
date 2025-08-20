@@ -53,5 +53,5 @@ public class Authority {
 
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
-    private AuthoritiesCategory category;
+    private AuthorityCategory category;
 }

@@ -4,8 +4,8 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <changeSet id="2025-08-20-01-create-authorities-category" author="Oleh Popovych">
-        <createTable tableName="authorities_category">
+    <changeSet id="2025-08-20-01-create-authority-category" author="Oleh Popovych">
+        <createTable tableName="authority_category">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -17,7 +17,7 @@
             </column>
         </createTable>
         <rollback>
-            <dropTable tableName="authorities_category"/>
+            <dropTable tableName="authority_category"/>
         </rollback>
     </changeSet>
 
@@ -31,7 +31,7 @@
                 baseTableName="employee_authorities"
                 baseColumnNames="category_id"
                 constraintName="fk_authority_category"
-                referencedTableName="authorities_category"
+                referencedTableName="authority_category"
                 referencedColumnNames="id"/>
         <rollback>
             <dropForeignKeyConstraint
@@ -44,53 +44,53 @@
     </changeSet>
 
     <changeSet id="2025-08-20-03-insert-categories" author="Oleh Popovych">
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="1"/>
             <column name="name_en" value="Clients"/>
             <column name="name_uk" value="Клієнти"/>
         </insert>
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="2"/>
             <column name="name_en" value="Employees"/>
             <column name="name_uk" value="Працівники"/>
         </insert>
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="3"/>
             <column name="name_en" value="Certificates"/>
             <column name="name_uk" value="Сертифікати"/>
         </insert>
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="4"/>
             <column name="name_en" value="Orders"/>
             <column name="name_uk" value="Замовлення"/>
         </insert>
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="5"/>
             <column name="name_en" value="Notifications"/>
             <column name="name_uk" value="Сповіщення"/>
         </insert>
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="6"/>
             <column name="name_en" value="Tariffs"/>
             <column name="name_uk" value="Тарифи"/>
         </insert>
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="7"/>
             <column name="name_en" value="Logistics"/>
             <column name="name_uk" value="Логістика"/>
         </insert>
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="8"/>
             <column name="name_en" value="Agreements"/>
             <column name="name_uk" value="Угоди"/>
         </insert>
-        <insert tableName="authorities_category">
+        <insert tableName="authority_category">
             <column name="id" valueNumeric="9"/>
             <column name="name_en" value="Bots Managements"/>
             <column name="name_uk" value="Управління ботами"/>
         </insert>
         <rollback>
-            <delete tableName="authorities_category">
+            <delete tableName="authority_category">
                 <where>id IN (1,2,3,4,5,6,7,8,9)</where>
             </delete>
         </rollback>

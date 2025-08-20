@@ -17,14 +17,14 @@ import lombok.Setter;
 import java.util.List;
 
 @Entity
-@Table(name = "authorities_category")
+@Table(name = "authority_category")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @EqualsAndHashCode
-public class AuthoritiesCategory {
+public class AuthorityCategory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
