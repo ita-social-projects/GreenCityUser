@@ -2,8 +2,11 @@ package greencity.security.service;
 
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.authorities.AuthorityCategoryDto;
+import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.position.PositionDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
+
+import java.net.URLPermission;
 import java.util.List;
 import java.util.Set;
 
@@ -47,4 +50,20 @@ public interface AuthorityService {
      *         and only the authorities that this employee has.
      */
     List<AuthorityCategoryDto> getEmployeesAuthoritiesGroupedByCategories(String email);
+
+    /**
+     * Retrieves all available authorities belonging to a given category.
+     *
+     * @param categoryId the ID of the category
+     * @return a list of {@link AuthorityDto} belonging to the category
+     */
+    List<AuthorityDto> getAuthoritiesByCategory(Long categoryId);
+
+    /**
+     * Retrieves all authority categories available in the system.
+     *
+     * @return a list of {@link AuthorityCategoryDto} representing all categories
+     *         with their names in English and Ukrainian.
+     */
+    List<AuthorityCategoryDto> getAllAuthorityCategories();
 }
