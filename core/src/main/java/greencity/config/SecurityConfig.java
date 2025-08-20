@@ -195,6 +195,9 @@ public class SecurityConfig {
                     "/user/findUserLanguageByUuid",
                     "/user/get-all-authorities",
                     "/user/get-positions-authorities",
+                    "/user/authorities/categories",
+                    "/user/authorities/by-category",
+                    "/user/authorities/grouped-by-categories",
                     "/management/socialnetworkimages/get-all-remote",
                     "/management/socialnetworkimages/find")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
