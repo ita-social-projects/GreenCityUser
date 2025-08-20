@@ -1,10 +1,12 @@
 package greencity.repository;
 
-import greencity.entity.*;
+import greencity.entity.Authority;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 public interface AuthorityRepo extends JpaRepository<Authority, Long> {
     /**
@@ -12,11 +14,11 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
      *
      * @return Set of {@link String}.
      */
-    @Query(value = """
-        SELECT DISTINCT name from employee_authorities\
-         inner join employee_authorities_mapping eam on employee_authorities.id = eam.authority_id \
-        where user_id = :userId\
-        """, nativeQuery = true)
+    @Query(
+        value = "SELECT DISTINCT name from employee_authorities "
+            + "INNER JOIN employee_authorities_mapping eam ON employee_authorities.id = eam.authority_id "
+            + "where user_id = :userId",
+        nativeQuery = true)
     Set<String> getAuthoritiesByEmployeeId(@Param(value = "userId") Long employeeId);
 
     /**
@@ -26,11 +28,20 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
      * @return list of authorities.
      */
     @Query(
-        value = """
-            SELECT DISTINCT au FROM Authority au LEFT JOIN au.positions pos \
-            WHERE pos.nameUk IN (:name) or pos.nameEn IN (:name)\
-            """)
+        value = "SELECT DISTINCT au FROM Authority au LEFT JOIN au.positions pos "
+            + "WHERE pos.nameUk IN (:name) or pos.nameEn IN (:name) ")
     List<Authority> findAuthoritiesByPositions(List<String> name);
+
+    /**
+     * Finds all authorities by related position ids.
+     *
+     * @param positionIds list of position IDs.
+     * @return list of {@link Authority}.
+     */
+    @Query(
+        value = "SELECT DISTINCT au FROM Authority au LEFT JOIN au.positions pos "
+            + "WHERE pos.id IN (:positionIds)")
+    List<Authority> findAllByPositionIdsIn(Collection<Long> positionIds);
 
     /**
      * Method that return list of authorities by names.
@@ -40,4 +51,12 @@ public interface AuthorityRepo extends JpaRepository<Authority, Long> {
      */
     @Query(value = "SELECT au FROM Authority au WHERE au.name in (:name)")
     List<Authority> findAuthoritiesByNames(List<String> name);
+
+    /**
+     * Retrieves all authorities with their categories eagerly fetched.
+     *
+     * @return list of {@link Authority} with categories initialized.
+     */
+    @Query("SELECT au FROM Authority au JOIN FETCH au.category")
+    List<Authority> findAllWithCategories();
 }
