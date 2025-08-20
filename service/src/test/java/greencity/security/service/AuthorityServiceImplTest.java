@@ -22,6 +22,7 @@ import greencity.repository.AuthorityCategoryRepo;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -130,24 +131,24 @@ class AuthorityServiceImplTest {
         User employee = createEmployee();
         Authority authority = getAuthority();
         List<Position> positions = getPositions();
-        List<String> positionNames = List.of("Супер адмін");
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        when(positionRepo.findPositionsByNames(positionNames)).thenReturn(positions);
-        when(authorityRepo.findAuthoritiesByPositions(positionNames)).thenReturn(List.of(getAuthority()));
+        when(positionRepo.findAllById(List.of(1L))).thenReturn(positions);
+        when(authorityRepo.findAllByPositionIdsIn(List.of(1L))).thenReturn(List.of(getAuthority()));
 
         authorityService.updateAuthoritiesToRelatedPositions(EmployeePositionsDto.builder()
             .email(TEST_EMAIL)
             .positions(List.of(PositionDto.builder()
                 .id(1L)
                 .nameUk("Супер адмін")
+                .nameEn("Super admin")
                 .build()))
             .build());
         authority.getEmployees().add(createAdmin());
 
         verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(positionRepo).findPositionsByNames(positionNames);
-        verify(authorityRepo).findAuthoritiesByPositions(positionNames);
+        verify(positionRepo).findAllById(List.of(1L));
+        verify(authorityRepo).findAllByPositionIdsIn(List.of(1L));
     }
 
     @Test
@@ -163,6 +164,7 @@ class AuthorityServiceImplTest {
 
         employee.setAuthorities(List.of(authority));
 
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         List<AuthorityCategoryDto> result = authorityService.getEmployeesAuthoritiesGroupedByCategories(TEST_EMAIL);
 
         assertEquals(1, result.size());
@@ -203,6 +205,7 @@ class AuthorityServiceImplTest {
             .id(1L)
             .nameEn("Clients")
             .nameUk("Клієнти")
+            .authorities(Collections.emptyList())
             .build();
 
         when(authorityCategoryRepo.findAll()).thenReturn(List.of(category));

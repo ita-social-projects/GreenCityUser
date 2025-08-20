@@ -37,6 +37,7 @@ import greencity.dto.user.UserVOShort;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.dto.violation.UserViolationMailDto;
+import greencity.entity.AuthorityCategory;
 import greencity.entity.Language;
 import greencity.entity.RetryableTask;
 import greencity.entity.User;
@@ -205,10 +206,21 @@ public class ModelUtils {
     public static Authority getAuthority() {
         List<User> list = new ArrayList<>();
         list.add(createUser());
+
+        AuthorityCategory category = AuthorityCategory.builder()
+            .id(1L)
+            .nameEn("Clients")
+            .nameUk("Клієнти")
+            .authorities(new ArrayList<>())
+            .build();
+
         return Authority.builder()
             .id(1L)
             .name("test1")
+            .descriptionEn("description")
+            .descriptionUk("опис")
             .employees(list)
+            .category(category)
             .build();
     }
 
