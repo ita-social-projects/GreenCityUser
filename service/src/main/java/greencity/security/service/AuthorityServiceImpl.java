@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -65,9 +66,16 @@ public class AuthorityServiceImpl implements AuthorityService {
         User employee = userRepo.findByEmail(dto.getEmail()).orElseThrow(
             () -> new UsernameNotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + dto.getEmail()));
 
-        List<Long> positionIds = dto.getPositions().stream().map(PositionDto::getId).toList();
+        List<Long> positionIds = dto.getPositions() == null
+            ? List.of()
+            : dto.getPositions().stream()
+                .map(PositionDto::getId)
+                .distinct()
+                .toList();
         List<Position> positions = positionRepo.findAllById(positionIds);
-        List<Authority> authorities = authorityRepo.findAllByPositionIdsIn(positionIds);
+        List<Authority> authorities = positionIds.isEmpty()
+            ? List.of()
+            : authorityRepo.findAllByPositionIdsIn(positionIds);
 
         employee.setPositions(positions);
         employee.setAuthorities(authorities);
@@ -76,6 +84,9 @@ public class AuthorityServiceImpl implements AuthorityService {
 
     @Override
     public List<AuthorityDto> getAuthoritiesByCategory(Long categoryId) {
+        authorityCategoryRepo.findById(categoryId)
+            .orElseThrow(
+                () -> new NotFoundException(String.format(ErrorMessage.AUTHORITY_CATEGORY_NOT_FOUND, categoryId)));
         List<Authority> authorities = authorityRepo.findAllByCategoryId(categoryId);
         return authorities.stream()
             .map(this::toAuthorityDto)
@@ -83,6 +94,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AuthorityCategoryDto> getAllAuthorityCategories() {
         List<AuthorityCategory> categories = authorityCategoryRepo.findAll();
         return categories.stream()
@@ -91,6 +103,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AuthorityCategoryDto> getEmployeesAuthoritiesGroupedByCategories(String email) {
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
@@ -101,14 +114,12 @@ public class AuthorityServiceImpl implements AuthorityService {
             .collect(Collectors.groupingBy(Authority::getCategory))
             .entrySet()
             .stream()
-            .map(entry -> {
-                AuthorityCategoryDto categoryDto = toAuthorityCategoryDto(entry.getKey());
-                List<AuthorityDto> authorityDTOs = entry.getValue().stream()
-                    .map(this::toAuthorityDto)
-                    .toList();
-                categoryDto.setAuthorities(authorityDTOs);
-                return categoryDto;
-            })
+            .map(entry -> AuthorityCategoryDto.builder()
+                .id(entry.getKey().getId())
+                .nameEn(entry.getKey().getNameEn())
+                .nameUk(entry.getKey().getNameUk())
+                .authorities(entry.getValue().stream().map(this::toAuthorityDto).toList())
+                .build())
             .toList();
     }
 

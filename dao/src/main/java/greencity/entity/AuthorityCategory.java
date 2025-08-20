@@ -14,6 +14,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,5 +37,6 @@ public class AuthorityCategory {
     private String nameUk;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    private List<Authority> authorities;
+    @Builder.Default
+    private List<Authority> authorities = new ArrayList<>();
 }

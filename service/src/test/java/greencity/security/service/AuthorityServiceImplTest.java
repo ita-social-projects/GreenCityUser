@@ -1,12 +1,13 @@
 package greencity.security.service;
 
 import static greencity.ModelUtils.TEST_EMAIL;
-import static greencity.ModelUtils.createAdmin;
 import static greencity.ModelUtils.createEmployee;
 import static greencity.ModelUtils.getAuthority;
+import static greencity.ModelUtils.getAuthorityCategory;
 import static greencity.ModelUtils.getPositions;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserEmployeeAuthorityDto;
+import greencity.constant.ErrorMessage;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.authorities.AuthorityCategoryDto;
 import greencity.dto.authorities.AuthorityDto;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -129,7 +131,6 @@ class AuthorityServiceImplTest {
     @Test
     void updateAuthoritiesToRelatedPositionsTest() {
         User employee = createEmployee();
-        Authority authority = getAuthority();
         List<Position> positions = getPositions();
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
@@ -144,7 +145,6 @@ class AuthorityServiceImplTest {
                 .nameEn("Super admin")
                 .build()))
             .build());
-        authority.getEmployees().add(createAdmin());
 
         verify(userRepo).findByEmail(TEST_EMAIL);
         verify(positionRepo).findAllById(List.of(1L));
@@ -185,7 +185,9 @@ class AuthorityServiceImplTest {
     void getAuthoritiesByCategoryTest() {
         Long categoryId = 1L;
         Authority authority = getAuthority();
+        AuthorityCategory category = getAuthorityCategory();
 
+        when(authorityCategoryRepo.findById(categoryId)).thenReturn(Optional.of(category));
         when(authorityRepo.findAllByCategoryId(categoryId)).thenReturn(List.of(authority));
 
         List<AuthorityDto> result = authorityService.getAuthoritiesByCategory(categoryId);
@@ -197,6 +199,21 @@ class AuthorityServiceImplTest {
         assertEquals(authority.getDescriptionUk(), authorityDto.getDescriptionUk());
 
         verify(authorityRepo).findAllByCategoryId(categoryId);
+    }
+
+    @Test
+    void getAuthoritiesByCategoryShouldThrowIfCategoryNotFound() {
+        Long categoryId = 999L;
+
+        when(authorityCategoryRepo.findById(categoryId)).thenReturn(Optional.empty());
+
+        NotFoundException exception =
+            assertThrows(NotFoundException.class, () -> authorityService.getAuthoritiesByCategory(categoryId));
+
+        assertEquals(String.format(ErrorMessage.AUTHORITY_CATEGORY_NOT_FOUND, categoryId), exception.getMessage());
+
+        verify(authorityCategoryRepo).findById(categoryId);
+        verifyNoInteractions(authorityRepo);
     }
 
     @Test

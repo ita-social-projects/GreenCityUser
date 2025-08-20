@@ -14,5 +14,5 @@ public class AuthorityCategoryDto {
     private Long id;
     private String nameEn;
     private String nameUk;
-    List<AuthorityDto> authorities;
+    private List<AuthorityDto> authorities;
 }

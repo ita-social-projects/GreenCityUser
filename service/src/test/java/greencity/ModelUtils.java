@@ -207,20 +207,22 @@ public class ModelUtils {
         List<User> list = new ArrayList<>();
         list.add(createUser());
 
-        AuthorityCategory category = AuthorityCategory.builder()
-            .id(1L)
-            .nameEn("Clients")
-            .nameUk("Клієнти")
-            .authorities(new ArrayList<>())
-            .build();
-
         return Authority.builder()
             .id(1L)
             .name("test1")
             .descriptionEn("description")
             .descriptionUk("опис")
             .employees(list)
-            .category(category)
+            .category(getAuthorityCategory())
+            .build();
+    }
+
+    public static AuthorityCategory getAuthorityCategory() {
+        return AuthorityCategory.builder()
+            .id(1L)
+            .nameEn("Clients")
+            .nameUk("Клієнти")
+            .authorities(new ArrayList<>())
             .build();
     }
 

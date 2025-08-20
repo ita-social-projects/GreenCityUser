@@ -86,7 +86,7 @@
         </insert>
         <insert tableName="authority_category">
             <column name="id" valueNumeric="9"/>
-            <column name="name_en" value="Bots Managements"/>
+            <column name="name_en" value="Bots Management"/>
             <column name="name_uk" value="Управління ботами"/>
         </insert>
         <rollback>
@@ -305,7 +305,7 @@
 
         <rollback>
             <update tableName="employee_authorities">
-                <column name="category_id" valueNumeric="NULL"/>
+                <column name="category_id" valueComputed="NULL"/>
                 <column name="description_en" value=""/>
                 <column name="description_uk" value=""/>
                 <where>name IN (
