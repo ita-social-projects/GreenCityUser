@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +31,6 @@ import org.springframework.stereotype.Service;
 public class AuthorityServiceImpl implements AuthorityService {
     private final UserRepo userRepo;
     private final AuthorityCategoryRepo authorityCategoryRepo;
-    private final ModelMapper modelMapper;
     private final AuthorityRepo authorityRepo;
     private final PositionRepo positionRepo;
 
@@ -80,7 +78,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     public List<AuthorityDto> getAuthoritiesByCategory(Long categoryId) {
         List<Authority> authorities = authorityRepo.findAllByCategoryId(categoryId);
         return authorities.stream()
-            .map(authority -> modelMapper.map(authority, AuthorityDto.class))
+            .map(this::toAuthorityDto)
             .toList();
     }
 
@@ -88,7 +86,7 @@ public class AuthorityServiceImpl implements AuthorityService {
     public List<AuthorityCategoryDto> getAllAuthorityCategories() {
         List<AuthorityCategory> categories = authorityCategoryRepo.findAll();
         return categories.stream()
-            .map(category -> modelMapper.map(category, AuthorityCategoryDto.class))
+            .map(this::toAuthorityCategoryDto)
             .toList();
     }
 
@@ -101,15 +99,32 @@ public class AuthorityServiceImpl implements AuthorityService {
 
         return authorities.stream()
             .collect(Collectors.groupingBy(Authority::getCategory))
-            .entrySet().stream()
+            .entrySet()
+            .stream()
             .map(entry -> {
-                AuthorityCategoryDto categoryDto = modelMapper.map(entry.getKey(), AuthorityCategoryDto.class);
+                AuthorityCategoryDto categoryDto = toAuthorityCategoryDto(entry.getKey());
                 List<AuthorityDto> authorityDTOs = entry.getValue().stream()
-                    .map(auth -> modelMapper.map(auth, AuthorityDto.class))
+                    .map(this::toAuthorityDto)
                     .toList();
                 categoryDto.setAuthorities(authorityDTOs);
                 return categoryDto;
             })
             .toList();
+    }
+
+    private AuthorityDto toAuthorityDto(Authority authority) {
+        return AuthorityDto.builder()
+            .name(authority.getName())
+            .descriptionEn(authority.getDescriptionEn())
+            .descriptionUk(authority.getDescriptionUk())
+            .build();
+    }
+
+    private AuthorityCategoryDto toAuthorityCategoryDto(AuthorityCategory category) {
+        return AuthorityCategoryDto.builder()
+            .id(category.getId())
+            .nameEn(category.getNameEn())
+            .nameUk(category.getNameUk())
+            .build();
     }
 }

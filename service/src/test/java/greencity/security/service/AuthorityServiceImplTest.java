@@ -39,7 +39,6 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -55,8 +54,6 @@ class AuthorityServiceImplTest {
     private PositionRepo positionRepo;
     @Mock
     private Authentication auth;
-    @Mock
-    private ModelMapper modelMapper;
     @Mock
     private AuthorityCategoryRepo authorityCategoryRepo;
     @InjectMocks
@@ -163,58 +160,41 @@ class AuthorityServiceImplTest {
     void getEmployeesAuthoritiesGroupedByCategoriesTest() {
         User employee = createEmployee();
         Authority authority = getAuthority();
-        AuthorityCategoryDto categoryDto = AuthorityCategoryDto.builder()
-            .id(authority.getCategory().getId())
-            .nameEn(authority.getCategory().getNameEn())
-            .nameUk(authority.getCategory().getNameUk())
-            .build();
-        AuthorityDto authorityDto = AuthorityDto.builder()
-            .name(authority.getName())
-            .descriptionEn(authority.getDescriptionEn())
-            .descriptionUk(authority.getDescriptionUk())
-            .build();
 
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        when(authorityRepo.getAuthoritiesByEmployeeId(employee.getId()))
-            .thenReturn(Set.of(authority.getName()));
-        when(authorityRepo.findAll()).thenReturn(List.of(authority));
-
-        when(modelMapper.map(authority, AuthorityDto.class)).thenReturn(authorityDto);
-        when(modelMapper.map(authority.getCategory(), AuthorityCategoryDto.class)).thenReturn(categoryDto);
+        employee.setAuthorities(List.of(authority));
 
         List<AuthorityCategoryDto> result = authorityService.getEmployeesAuthoritiesGroupedByCategories(TEST_EMAIL);
 
         assertEquals(1, result.size());
-        assertEquals(categoryDto.getNameEn(), result.getFirst().getNameEn());
-        assertEquals(1, result.getFirst().getAuthorities().size());
-        assertEquals(authorityDto.getName(), result.getFirst().getAuthorities().getFirst().getName());
+        AuthorityCategoryDto categoryDto = result.getFirst();
+        assertEquals(authority.getCategory().getNameEn(), categoryDto.getNameEn());
+        assertEquals(authority.getCategory().getNameUk(), categoryDto.getNameUk());
+
+        assertEquals(1, categoryDto.getAuthorities().size());
+        AuthorityDto authorityDto = categoryDto.getAuthorities().getFirst();
+        assertEquals(authority.getName(), authorityDto.getName());
+        assertEquals(authority.getDescriptionEn(), authorityDto.getDescriptionEn());
+        assertEquals(authority.getDescriptionUk(), authorityDto.getDescriptionUk());
 
         verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(authorityRepo).getAuthoritiesByEmployeeId(employee.getId());
     }
 
     @Test
     void getAuthoritiesByCategoryTest() {
         Long categoryId = 1L;
         Authority authority = getAuthority();
-        AuthorityDto authorityDto = AuthorityDto.builder()
-            .name(authority.getName())
-            .descriptionEn(authority.getDescriptionEn())
-            .descriptionUk(authority.getDescriptionUk())
-            .build();
 
         when(authorityRepo.findAllByCategoryId(categoryId)).thenReturn(List.of(authority));
-        when(modelMapper.map(authority, AuthorityDto.class)).thenReturn(authorityDto);
 
         List<AuthorityDto> result = authorityService.getAuthoritiesByCategory(categoryId);
 
         assertEquals(1, result.size());
-        assertEquals(authority.getName(), result.getFirst().getName());
-        assertEquals(authority.getDescriptionEn(), result.getFirst().getDescriptionEn());
-        assertEquals(authority.getDescriptionUk(), result.getFirst().getDescriptionUk());
+        AuthorityDto authorityDto = result.getFirst();
+        assertEquals(authority.getName(), authorityDto.getName());
+        assertEquals(authority.getDescriptionEn(), authorityDto.getDescriptionEn());
+        assertEquals(authority.getDescriptionUk(), authorityDto.getDescriptionUk());
 
         verify(authorityRepo).findAllByCategoryId(categoryId);
-        verify(modelMapper).map(authority, AuthorityDto.class);
     }
 
     @Test
@@ -225,22 +205,15 @@ class AuthorityServiceImplTest {
             .nameUk("Клієнти")
             .build();
 
-        AuthorityCategoryDto categoryDto = AuthorityCategoryDto.builder()
-            .id(1L)
-            .nameEn("Clients")
-            .nameUk("Клієнти")
-            .build();
-
         when(authorityCategoryRepo.findAll()).thenReturn(List.of(category));
-        when(modelMapper.map(category, AuthorityCategoryDto.class)).thenReturn(categoryDto);
 
         List<AuthorityCategoryDto> result = authorityService.getAllAuthorityCategories();
 
         assertEquals(1, result.size());
-        assertEquals("Clients", result.getFirst().getNameEn());
-        assertEquals("Клієнти", result.getFirst().getNameUk());
+        AuthorityCategoryDto categoryDto = result.getFirst();
+        assertEquals("Clients", categoryDto.getNameEn());
+        assertEquals("Клієнти", categoryDto.getNameUk());
 
         verify(authorityCategoryRepo).findAll();
-        verify(modelMapper).map(category, AuthorityCategoryDto.class);
     }
 }
