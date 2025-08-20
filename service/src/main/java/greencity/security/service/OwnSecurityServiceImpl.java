@@ -251,12 +251,13 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     private void handleBruteForceProtection(String email) {
         if (loginAttemptService.isBlockedByCaptcha(email)) {
-            log.error("Brute force protection, user with email is blocked - {}", email);
+            log.error("Too many failed login attempts - {}, account is blocked for {} minutes. Wrong Captcha", email,
+                blockTimeInMinutes);
             blockUserByEmail(email);
         }
 
         if (loginAttemptService.isBlockedByWrongPassword(email)) {
-            log.error("Too many failed login attempts - {}, account is blocked for {} minutes", email,
+            log.error("Too many failed login attempts - {}, account is blocked for {} minutes. Wrong Password", email,
                 blockTimeInMinutes);
             throw new WrongPasswordException(
                 String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
@@ -332,15 +333,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
 
-        user.setUserStatus(UserStatus.BLOCKED);
-        userRepo.save(user);
         log.info("User with email {} is blocked", user.getEmail());
 
         emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
             user.getId(), user.getName(), user.getEmail(),
             jwtTool.generateUnblockToken(email), getLanguageFromUser(user), false);
 
-        throw new UserBlockedException(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE);
+        throw new UserBlockedException(
+            String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
     }
 
     /**
@@ -514,7 +514,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     /**
      * Converts a {@link TestersSignInRequest} to an {@link OwnSignInDto}.
-     * 
+     *
      * @param request the request to convert
      * @return the converted {@link OwnSignInDto}
      */
