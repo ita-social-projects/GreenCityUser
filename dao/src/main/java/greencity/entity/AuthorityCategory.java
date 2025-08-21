@@ -35,6 +35,13 @@ public class AuthorityCategory {
     @Column(name = "name_uk", nullable = false, unique = true)
     private String nameUk;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(
+        mappedBy = "category",
+        cascade = {
+            CascadeType.DETACH,
+            CascadeType.MERGE,
+            CascadeType.PERSIST,
+            CascadeType.REFRESH
+        })
     private List<Authority> authorities;
 }

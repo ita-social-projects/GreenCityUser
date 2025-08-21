@@ -902,6 +902,7 @@ class UserControllerTest {
             .param("email", principal.getName())
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
             .andExpect(jsonPath("$[0].nameEn").value("Clients"))
             .andExpect(jsonPath("$[0].authorities[0].name").value("EDIT_ORDER"));
 

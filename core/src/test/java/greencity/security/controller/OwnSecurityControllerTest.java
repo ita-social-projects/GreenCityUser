@@ -242,6 +242,7 @@ class OwnSecurityControllerTest {
             .param("categoryId", String.valueOf(categoryId))
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.length()").value(1))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$[0].name").value("EDIT_ORDER"));
 
