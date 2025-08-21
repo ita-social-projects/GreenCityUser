@@ -15,6 +15,8 @@ import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
+import greencity.dto.authorities.AuthorityCategoryDto;
+import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
@@ -87,7 +89,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -875,6 +876,37 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk());
         verify(authorityService).updateAuthoritiesToRelatedPositions(dto);
+    }
+
+    @Test
+    void getAuthoritiesGroupedByCategoriesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        AuthorityCategoryDto categoryDto = AuthorityCategoryDto.builder()
+            .id(1L)
+            .nameEn("Clients")
+            .nameUk("Клієнти")
+            .authorities(List.of(AuthorityDto.builder()
+                .name("EDIT_ORDER")
+                .descriptionEn("Edit orders")
+                .descriptionUk("Редагувати замовлення")
+                .build()))
+            .build();
+
+        when(authorityService.getEmployeesAuthoritiesGroupedByCategories(principal.getName()))
+            .thenReturn(List.of(categoryDto));
+
+        mockMvc.perform(get(userLink + "/authorities/grouped-by-categories")
+            .principal(principal)
+            .param("email", principal.getName())
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].nameEn").value("Clients"))
+            .andExpect(jsonPath("$[0].authorities[0].name").value("EDIT_ORDER"));
+
+        verify(authorityService).getEmployeesAuthoritiesGroupedByCategories(principal.getName());
     }
 
     @Test

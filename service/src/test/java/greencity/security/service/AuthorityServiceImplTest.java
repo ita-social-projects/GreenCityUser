@@ -1,28 +1,34 @@
 package greencity.security.service;
 
 import static greencity.ModelUtils.TEST_EMAIL;
-import static greencity.ModelUtils.createAdmin;
 import static greencity.ModelUtils.createEmployee;
 import static greencity.ModelUtils.getAuthority;
+import static greencity.ModelUtils.getAuthorityCategory;
 import static greencity.ModelUtils.getPositions;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserEmployeeAuthorityDto;
+import greencity.constant.ErrorMessage;
 import greencity.dto.EmployeePositionsDto;
+import greencity.dto.authorities.AuthorityCategoryDto;
+import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.position.PositionDto;
+import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.entity.Authority;
+import greencity.entity.AuthorityCategory;
 import greencity.entity.Position;
 import greencity.entity.User;
 import greencity.enums.Role;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.repository.AuthorityCategoryRepo;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,7 +37,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -51,6 +59,8 @@ class AuthorityServiceImplTest {
     private PositionRepo positionRepo;
     @Mock
     private Authentication auth;
+    @Mock
+    private AuthorityCategoryRepo authorityCategoryRepo;
     @InjectMocks
     private AuthorityServiceImpl authorityService;
 
@@ -82,8 +92,7 @@ class AuthorityServiceImplTest {
     void updateEmployeesAuthoritiesTest() {
         User employee = createEmployee();
         List<Authority> authority = List.of(getAuthority());
-        List<String> authoritiesName = authority.stream().map(Authority::getName)
-            .collect(Collectors.toList());
+        List<String> authoritiesName = authority.stream().map(Authority::getName).toList();
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
         when(authorityRepo.findAuthoritiesByNames(authoritiesName)).thenReturn(authority);
@@ -124,31 +133,163 @@ class AuthorityServiceImplTest {
     @Test
     void updateAuthoritiesToRelatedPositionsTest() {
         User employee = createEmployee();
-        Authority authority = getAuthority();
         List<Position> positions = getPositions();
-        List<String> positionNames = List.of("Супер адмін");
 
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-        when(positionRepo.findPositionsByNames(positionNames)).thenReturn(positions);
-        when(authorityRepo.findAuthoritiesByPositions(positionNames)).thenReturn(List.of(getAuthority()));
+        when(positionRepo.findAllById(List.of(1L))).thenReturn(positions);
+        when(authorityRepo.findAllByPositionIdsIn(List.of(1L))).thenReturn(List.of(getAuthority()));
 
         authorityService.updateAuthoritiesToRelatedPositions(EmployeePositionsDto.builder()
             .email(TEST_EMAIL)
             .positions(List.of(PositionDto.builder()
                 .id(1L)
                 .nameUk("Супер адмін")
+                .nameEn("Super admin")
                 .build()))
             .build());
-        authority.getEmployees().add(createAdmin());
 
         verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(positionRepo).findPositionsByNames(positionNames);
-        verify(authorityRepo).findAuthoritiesByPositions(positionNames);
+        verify(positionRepo).findAllById(List.of(1L));
+        verify(authorityRepo).findAllByPositionIdsIn(List.of(1L));
     }
 
     @Test
     void updateAuthoritiesToRelatedPositionsThrowsNotFoundExceptionTest() {
         var dto = new EmployeePositionsDto();
         assertThrows(UsernameNotFoundException.class, () -> authorityService.updateAuthoritiesToRelatedPositions(dto));
+    }
+
+    @Test
+    void updateAuthoritiesToRelatedPositionsWithNullPositionsTest() {
+        User employee = createEmployee();
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+
+        EmployeePositionsDto dto = EmployeePositionsDto.builder()
+            .email(TEST_EMAIL)
+            .positions(null)
+            .build();
+
+        authorityService.updateAuthoritiesToRelatedPositions(dto);
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(userRepo).save(employee);
+    }
+
+    @Test
+    void updateAuthoritiesToRelatedPositionsWithEmptyPositionsListTest() {
+        User employee = createEmployee();
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+
+        EmployeePositionsDto dto = EmployeePositionsDto.builder()
+            .email(TEST_EMAIL)
+            .positions(List.of())
+            .build();
+
+        authorityService.updateAuthoritiesToRelatedPositions(dto);
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(userRepo).save(employee);
+    }
+
+    @Test
+    void updateEmployeesAuthoritiesWithEmptyAuthoritiesTest() {
+        User employee = createEmployee();
+
+        UserEmployeeAuthorityDto dto = UserEmployeeAuthorityDto.builder()
+            .employeeEmail(TEST_EMAIL)
+            .authorities(List.of())
+            .build();
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+
+        authorityService.updateEmployeesAuthorities(dto);
+
+        assertTrue(employee.getAuthorities().isEmpty());
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(userRepo).save(employee);
+        verifyNoInteractions(authorityRepo);
+    }
+
+    @Test
+    void getEmployeesAuthoritiesGroupedByCategoriesTest() {
+        User employee = createEmployee();
+        Authority authority = getAuthority();
+
+        employee.setAuthorities(List.of(authority));
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+        List<AuthorityCategoryDto> result = authorityService.getEmployeesAuthoritiesGroupedByCategories(TEST_EMAIL);
+
+        assertEquals(1, result.size());
+        AuthorityCategoryDto categoryDto = result.getFirst();
+        assertEquals(authority.getCategory().getNameEn(), categoryDto.getNameEn());
+        assertEquals(authority.getCategory().getNameUk(), categoryDto.getNameUk());
+
+        assertEquals(1, categoryDto.getAuthorities().size());
+        AuthorityDto authorityDto = categoryDto.getAuthorities().getFirst();
+        assertEquals(authority.getName(), authorityDto.getName());
+        assertEquals(authority.getDescriptionEn(), authorityDto.getDescriptionEn());
+        assertEquals(authority.getDescriptionUk(), authorityDto.getDescriptionUk());
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    void getAuthoritiesByCategoryTest() {
+        Long categoryId = 1L;
+        Authority authority = getAuthority();
+        AuthorityCategory category = getAuthorityCategory();
+
+        when(authorityCategoryRepo.findById(categoryId)).thenReturn(Optional.of(category));
+        when(authorityRepo.findAllByCategoryId(categoryId)).thenReturn(List.of(authority));
+
+        List<AuthorityDto> result = authorityService.getAuthoritiesByCategory(categoryId);
+
+        assertEquals(1, result.size());
+        AuthorityDto authorityDto = result.getFirst();
+        assertEquals(authority.getName(), authorityDto.getName());
+        assertEquals(authority.getDescriptionEn(), authorityDto.getDescriptionEn());
+        assertEquals(authority.getDescriptionUk(), authorityDto.getDescriptionUk());
+
+        verify(authorityRepo).findAllByCategoryId(categoryId);
+    }
+
+    @Test
+    void getAuthoritiesByCategoryShouldThrowIfCategoryNotFound() {
+        Long categoryId = 999L;
+
+        when(authorityCategoryRepo.findById(categoryId)).thenReturn(Optional.empty());
+
+        NotFoundException exception =
+            assertThrows(NotFoundException.class, () -> authorityService.getAuthoritiesByCategory(categoryId));
+
+        assertEquals(String.format(ErrorMessage.AUTHORITY_CATEGORY_NOT_FOUND, categoryId), exception.getMessage());
+
+        verify(authorityCategoryRepo).findById(categoryId);
+        verifyNoInteractions(authorityRepo);
+    }
+
+    @Test
+    void getAllAuthorityCategoriesTest() {
+        AuthorityCategory category = AuthorityCategory.builder()
+            .id(1L)
+            .nameEn("Clients")
+            .nameUk("Клієнти")
+            .authorities(Collections.emptyList())
+            .build();
+
+        when(authorityCategoryRepo.findAll()).thenReturn(List.of(category));
+
+        List<AuthorityCategoryDto> result = authorityService.getAllAuthorityCategories();
+
+        assertEquals(1, result.size());
+        AuthorityCategoryDto categoryDto = result.getFirst();
+        assertEquals("Clients", categoryDto.getNameEn());
+        assertEquals("Клієнти", categoryDto.getNameUk());
+
+        verify(authorityCategoryRepo).findAll();
     }
 }

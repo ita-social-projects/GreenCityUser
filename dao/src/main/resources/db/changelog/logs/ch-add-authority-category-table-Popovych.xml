@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2025-08-20-01-create-authority-category" author="Oleh Popovych">
+        <createTable tableName="authority_category">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name_en" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="name_uk" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="authority_category"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2025-08-20-02-add-category-and-description" author="Oleh Popovych">
+        <addColumn tableName="employee_authorities">
+            <column name="category_id" type="BIGINT"/>
+            <column name="description_en" type="VARCHAR(500)"/>
+            <column name="description_uk" type="VARCHAR(500)"/>
+        </addColumn>
+        <addForeignKeyConstraint
+                baseTableName="employee_authorities"
+                baseColumnNames="category_id"
+                constraintName="fk_authority_category"
+                referencedTableName="authority_category"
+                referencedColumnNames="id"/>
+        <rollback>
+            <dropForeignKeyConstraint
+                    baseTableName="employee_authorities"
+                    constraintName="fk_authority_category"/>
+            <dropColumn tableName="employee_authorities" columnName="category_id"/>
+            <dropColumn tableName="employee_authorities" columnName="description_en"/>
+            <dropColumn tableName="employee_authorities" columnName="description_uk"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2025-08-20-03-insert-categories" author="Oleh Popovych">
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="1"/>
+            <column name="name_en" value="Clients"/>
+            <column name="name_uk" value="Клієнти"/>
+        </insert>
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="2"/>
+            <column name="name_en" value="Employees"/>
+            <column name="name_uk" value="Працівники"/>
+        </insert>
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="3"/>
+            <column name="name_en" value="Certificates"/>
+            <column name="name_uk" value="Сертифікати"/>
+        </insert>
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="4"/>
+            <column name="name_en" value="Orders"/>
+            <column name="name_uk" value="Замовлення"/>
+        </insert>
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="5"/>
+            <column name="name_en" value="Notifications"/>
+            <column name="name_uk" value="Сповіщення"/>
+        </insert>
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="6"/>
+            <column name="name_en" value="Tariffs"/>
+            <column name="name_uk" value="Тарифи"/>
+        </insert>
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="7"/>
+            <column name="name_en" value="Logistics"/>
+            <column name="name_uk" value="Логістика"/>
+        </insert>
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="8"/>
+            <column name="name_en" value="Agreements"/>
+            <column name="name_uk" value="Угоди"/>
+        </insert>
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="9"/>
+            <column name="name_en" value="Bots Management"/>
+            <column name="name_uk" value="Управління ботами"/>
+        </insert>
+        <rollback>
+            <delete tableName="authority_category">
+                <where>id IN (1,2,3,4,5,6,7,8,9)</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="2025-08-20-04-map-authorities-to-categories" author="Oleh Popovych">
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="1"/>
+            <column name="description_en" value="See the main page of “Clients”"/>
+            <column name="description_uk" value="Перегляд головної сторінки «Клієнти»"/>
+            <where>name = 'SEE_CLIENTS_PAGE'</where>
+        </update>
+
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="description_en" value="See the main page of “Employees”"/>
+            <column name="description_uk" value="Перегляд головної сторінки «Працівники»"/>
+            <where>name = 'SEE_EMPLOYEES_PAGE'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="description_en" value="Create a new employee card"/>
+            <column name="description_uk" value="Створення картки нового працівника"/>
+            <where>name = 'REGISTER_A_NEW_EMPLOYEE'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="description_en" value="Edit an employee’s authorities"/>
+            <column name="description_uk" value="Редагування прав доступу працівника"/>
+            <where>name = 'EDIT_EMPLOYEES_AUTHORITIES'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="description_en" value="Edit an employee card"/>
+            <column name="description_uk" value="Редагування картки працівника"/>
+            <where>name = 'EDIT_EMPLOYEE'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="2"/>
+            <column name="description_en" value="Deactivate an employee"/>
+            <column name="description_uk" value="Деактивація працівника"/>
+            <where>name = 'DEACTIVATE_EMPLOYEE'</where>
+        </update>
+
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="3"/>
+            <column name="description_en" value="See the main page of “Certificates”"/>
+            <column name="description_uk" value="Перегляд головної сторінки «Сертифікати»"/>
+            <where>name = 'SEE_CERTIFICATES'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="3"/>
+            <column name="description_en" value="Create a new certificate"/>
+            <column name="description_uk" value="Створення нового сертифіката"/>
+            <where>name = 'CREATE_NEW_CERTIFICATE'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="3"/>
+            <column name="description_en" value="Edit a certificate"/>
+            <column name="description_uk" value="Редагування сертифіката"/>
+            <where>name = 'EDIT_CERTIFICATE'</where>
+        </update>
+
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="4"/>
+            <column name="description_en" value="See an order card"/>
+            <column name="description_uk" value="Перегляд картки замовлення"/>
+            <where>name = 'SEE_BIG_ORDER_TABLE'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="4"/>
+            <column name="description_en" value="Edit an order card"/>
+            <column name="description_uk" value="Редагування картки замовлення"/>
+            <where>name = 'EDIT_ORDER'</where>
+        </update>
+
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="description_en" value="See the main page “Notifications”"/>
+            <column name="description_uk" value="Перегляд головної сторінки «Сповіщення»"/>
+            <where>name = 'SEE_MESSAGES_PAGE'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="description_en" value="Create a new notification card"/>
+            <column name="description_uk" value="Створення картки нового сповіщення"/>
+            <where>name = 'CREATE_NEW_MESSAGE'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="description_en" value="Edit a notification card"/>
+            <column name="description_uk" value="Редагування картки сповіщення"/>
+            <where>name = 'EDIT_MESSAGE'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="5"/>
+            <column name="description_en" value="Deactivate a notification card"/>
+            <column name="description_uk" value="Деактивація картки сповіщення"/>
+            <where>name = 'DELETE_MESSAGE'</where>
+        </update>
+
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="6"/>
+            <column name="description_en" value="See the main page “Tariffs”"/>
+            <column name="description_uk" value="Перегляд головної сторінки «Тарифи»"/>
+            <where>name = 'SEE_TARIFFS'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="6"/>
+            <column name="description_en" value="See the pricing card"/>
+            <column name="description_uk" value="Перегляд картки тарифів"/>
+            <where>name = 'SEE_PRICING_CARD'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="6"/>
+            <column name="description_en" value="Create a pricing card"/>
+            <column name="description_uk" value="Створення картки тарифів"/>
+            <where>name = 'CREATE_PRICING_CARD'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="6"/>
+            <column name="description_en" value="Edit/Delete/Deactivate the pricing card"/>
+            <column name="description_uk" value="Редагування/Видалення/Деактивація картки тарифів"/>
+            <where>name = 'EDIT_DELETE_DEACTIVATE_PRICING_CARD'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="6"/>
+            <column name="description_en" value="Add/Edit/Deactivate a service"/>
+            <column name="description_uk" value="Додавання/Редагування/Деактивація сервісу"/>
+            <where>name = 'CONTROL_SERVICE'</where>
+        </update>
+
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Create a location"/>
+            <column name="description_uk" value="Створення локації"/>
+            <where>name = 'CREATE_NEW_LOCATION'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Edit the location name"/>
+            <column name="description_uk" value="Редагування назви локації"/>
+            <where>name = 'EDIT_LOCATION'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Delete a location"/>
+            <column name="description_uk" value="Видалення локації"/>
+            <where>name = 'DELETE_LOCATION'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Create a courier"/>
+            <column name="description_uk" value="Створення кур’єра"/>
+            <where>name = 'CREATE_NEW_COURIER'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Edit the courier name"/>
+            <column name="description_uk" value="Редагування імені кур’єра"/>
+            <where>name = 'EDIT_COURIER'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Delete/Deactivate a courier"/>
+            <column name="description_uk" value="Видалення/Деактивація кур’єра"/>
+            <where>name = 'DELETE_DEACTIVATE_COURIER'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Create a receiving station"/>
+            <column name="description_uk" value="Створення приймального пункту"/>
+            <where>name = 'CREATE_NEW_STATION'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Edit the receiving station name"/>
+            <column name="description_uk" value="Редагування назви приймального пункту"/>
+            <where>name = 'EDIT_STATION'</where></update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="7"/>
+            <column name="description_en" value="Delete/Deactivate a receiving station"/>
+            <column name="description_uk" value="Видалення/Деактивація приймального пункту"/>
+            <where>name = 'DELETE_DEACTIVATE_STATION'</where>
+        </update>
+
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="8"/>
+            <column name="description_en" value="See all agreements"/>
+            <column name="description_uk" value="Перегляд усіх угод"/>
+            <where>name = 'SEE_ALL_AGREEMENTS'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="8"/>
+            <column name="description_en" value="Create an agreement"/>
+            <column name="description_uk" value="Створення угоди"/>
+            <where>name = 'CREATE_AGREEMENT'</where>
+        </update>
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="8"/>
+            <column name="description_en" value="Delete an agreement"/>
+            <column name="description_uk" value="Видалення угоди"/>
+            <where>name = 'DELETE_AGREEMENT'</where>
+        </update>
+
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="9"/>
+            <column name="description_en" value="Manage Telegram bots"/>
+            <column name="description_uk" value="Керування Telegram ботами"/>
+            <where>name = 'TELEGRAM_MANAGEMENT'</where>
+        </update>
+
+        <rollback>
+            <update tableName="employee_authorities">
+                <column name="category_id" valueComputed="NULL"/>
+                <column name="description_en" value=""/>
+                <column name="description_uk" value=""/>
+                <where>name IN (
+                    'SEE_CLIENTS_PAGE','SEE_EMPLOYEES_PAGE','REGISTER_A_NEW_EMPLOYEE','EDIT_EMPLOYEES_AUTHORITIES',
+                    'EDIT_EMPLOYEE','DEACTIVATE_EMPLOYEE','SEE_CERTIFICATES','CREATE_NEW_CERTIFICATE','EDIT_CERTIFICATE',
+                    'SEE_BIG_ORDER_TABLE','EDIT_ORDER','SEE_MESSAGES_PAGE','CREATE_NEW_MESSAGE','EDIT_MESSAGE','DELETE_MESSAGE',
+                    'SEE_TARIFFS','SEE_PRICING_CARD','CREATE_PRICING_CARD','EDIT_DELETE_DEACTIVATE_PRICING_CARD','CONTROL_SERVICE',
+                    'CREATE_NEW_LOCATION','EDIT_LOCATION','DELETE_LOCATION','CREATE_NEW_COURIER','EDIT_COURIER','DELETE_DEACTIVATE_COURIER',
+                    'CREATE_NEW_STATION','EDIT_STATION','DELETE_DEACTIVATE_STATION','SEE_ALL_AGREEMENTS','CREATE_AGREEMENT',
+                    'DELETE_AGREEMENT','TELEGRAM_MANAGEMENT'
+                    )
+                </where>
+            </update>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
