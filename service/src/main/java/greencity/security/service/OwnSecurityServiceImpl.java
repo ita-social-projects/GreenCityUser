@@ -480,7 +480,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             user.setUserStatus(UserStatus.ACTIVATED);
             userRepo.save(user);
             log.info("User {} unblocked (status set to ACTIVATED)", user.getEmail());
-        }else {
+        } else {
             log.info("User {} unblock link used (cache cleared); status remains {}", user.getEmail(), current);
         }
     }
