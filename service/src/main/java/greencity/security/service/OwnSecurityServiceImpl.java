@@ -340,7 +340,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             jwtTool.generateUnblockToken(email), getLanguageFromUser(user), false);
 
         throw new UserBlockedException(
-            String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
+            String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_CAPTCHA, blockTimeInMinutes));
     }
 
     /**
@@ -475,9 +475,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        user.setUserStatus(UserStatus.ACTIVATED);
-        userRepo.save(user);
-        log.info("User {} unblocked", user.getEmail());
+        UserStatus current = user.getUserStatus();
+        if (current == UserStatus.BLOCKED) {
+            user.setUserStatus(UserStatus.ACTIVATED);
+            userRepo.save(user);
+            log.info("User {} unblocked (status set to ACTIVATED)", user.getEmail());
+        }else {
+            log.info("User {} unblock link used (cache cleared); status remains {}", user.getEmail(), current);
+        }
     }
 
     /**
