@@ -71,4 +71,5 @@ public class ErrorMessage {
     public static final String MULTIPART_FILE_BAD_REQUEST =
         "Can`t convert To Multipart Image. Bad inputted image string : ";
     public static final String PARSING_URL_FAILED = "Can't parse image's url: ";
+    public static final String AUTHORITY_CATEGORY_NOT_FOUND = "The authority category does not exist by this id: %s";
 }

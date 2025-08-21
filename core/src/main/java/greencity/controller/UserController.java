@@ -11,6 +11,7 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
+import greencity.dto.authorities.AuthorityCategoryDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
@@ -1050,6 +1051,27 @@ public class UserController {
         @Valid @RequestBody EmployeePositionsDto dto) {
         authorityService.updateAuthoritiesToRelatedPositions(dto);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Controller to get an employee's authorities grouped by categories.
+     *
+     * @param email {@link String} - employee email.
+     * @return {@link List} of {@link AuthorityCategoryDto}.
+     */
+    @Operation(summary = "Get all employee's authorities grouped by categories")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @GetMapping("/authorities/grouped-by-categories")
+    public ResponseEntity<List<AuthorityCategoryDto>> getAuthoritiesGroupedByCategories(
+        @RequestParam String email) {
+        List<AuthorityCategoryDto> authorities = authorityService.getEmployeesAuthoritiesGroupedByCategories(email);
+        return ResponseEntity.ok(authorities);
     }
 
     /**
