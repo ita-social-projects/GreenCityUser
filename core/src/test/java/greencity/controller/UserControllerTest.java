@@ -909,45 +909,6 @@ class UserControllerTest {
     }
 
     @Test
-    void getAuthoritiesByCategoryTest() throws Exception {
-        Long categoryId = 1L;
-        AuthorityDto authorityDto = AuthorityDto.builder()
-            .name("EDIT_ORDER")
-            .descriptionEn("Edit orders")
-            .descriptionUk("Редагувати замовлення")
-            .build();
-
-        when(authorityService.getAuthoritiesByCategory(categoryId)).thenReturn(List.of(authorityDto));
-
-        mockMvc.perform(get(userLink + "/authorities/by-category")
-            .param("categoryId", String.valueOf(categoryId))
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].name").value("EDIT_ORDER"));
-
-        verify(authorityService).getAuthoritiesByCategory(categoryId);
-    }
-
-    @Test
-    void getAllAuthorityCategoriesTest() throws Exception {
-        AuthorityCategoryDto categoryDto = AuthorityCategoryDto.builder()
-            .id(1L)
-            .nameEn("Clients")
-            .nameUk("Клієнти")
-            .build();
-
-        when(authorityService.getAllAuthorityCategories()).thenReturn(List.of(categoryDto));
-
-        mockMvc.perform(get(userLink + "/authorities/categories")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].nameEn").value("Clients"))
-            .andExpect(jsonPath("$[0].nameUk").value("Клієнти"));
-
-        verify(authorityService).getAllAuthorityCategories();
-    }
-
-    @Test
     void deactivateEmployeeByUUID() throws Exception {
         String uuid = "87df9ad5-6393-441f-8423-8b2e770b01a8";
         mockMvc.perform(put(userLink + "/deactivate-employee").param("uuid", uuid))

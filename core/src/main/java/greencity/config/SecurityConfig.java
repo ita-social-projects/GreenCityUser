@@ -195,11 +195,11 @@ public class SecurityConfig {
                     "/user/findUserLanguageByUuid",
                     "/user/get-all-authorities",
                     "/user/get-positions-authorities",
-                    "/user/authorities/categories",
-                    "/user/authorities/by-category",
                     "/user/authorities/grouped-by-categories",
                     "/management/socialnetworkimages/get-all-remote",
-                    "/management/socialnetworkimages/find")
+                    "/management/socialnetworkimages/find",
+                    "/ownSecurity/authorities/categories",
+                    "/ownSecurity/authorities/by-category")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/to-do-list-items/{userToDoListItemId}",

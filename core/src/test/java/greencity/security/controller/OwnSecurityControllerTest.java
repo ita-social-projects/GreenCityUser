@@ -2,6 +2,8 @@ package greencity.security.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
+import greencity.dto.authorities.AuthorityCategoryDto;
+import greencity.dto.authorities.AuthorityDto;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
@@ -9,6 +11,7 @@ import greencity.security.dto.ownsecurity.OwnSignUpDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
 import greencity.security.dto.ownsecurity.UnblockAccountDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
+import greencity.security.service.AuthorityService;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
@@ -18,7 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -28,16 +30,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class OwnSecurityControllerTest {
-    private static final String LINK = "/ownSecurity";
+    private static final String OWN_SECURITY_LINK = "/ownSecurity";
     private MockMvc mockMvc;
 
     @InjectMocks
@@ -48,6 +53,9 @@ class OwnSecurityControllerTest {
 
     @Mock
     private VerifyEmailService verifyEmailService;
+
+    @Mock
+    AuthorityService authorityService;
 
     @Mock
     private PasswordRecoveryService passwordRecoveryService;
@@ -75,7 +83,7 @@ class OwnSecurityControllerTest {
             }\
             """;
 
-        mockMvc.perform(post(LINK + "/signUp?lang=en")
+        mockMvc.perform(post(OWN_SECURITY_LINK + "/signUp?lang=en")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isCreated());
@@ -94,7 +102,7 @@ class OwnSecurityControllerTest {
             }\
             """;
 
-        mockMvc.perform(post(LINK + "/sign-up-employee?lang=en")
+        mockMvc.perform(post(OWN_SECURITY_LINK + "/sign-up-employee?lang=en")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isCreated());
@@ -112,7 +120,7 @@ class OwnSecurityControllerTest {
             }\
             """;
 
-        mockMvc.perform(post(LINK + "/signIn")
+        mockMvc.perform(post(OWN_SECURITY_LINK + "/signIn")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
@@ -123,7 +131,7 @@ class OwnSecurityControllerTest {
 
     @Test
     void verifyEmailTest() throws Exception {
-        mockMvc.perform(get(LINK + "/verifyEmail")
+        mockMvc.perform(get(OWN_SECURITY_LINK + "/verifyEmail")
             .param("token", "12345")
             .param("user_id", String.valueOf(1L)))
             .andExpect(status().isOk());
@@ -133,7 +141,7 @@ class OwnSecurityControllerTest {
 
     @Test
     void updateAccessTokenTest() throws Exception {
-        mockMvc.perform(get(LINK + "/updateAccessToken")
+        mockMvc.perform(get(OWN_SECURITY_LINK + "/updateAccessToken")
             .param("refreshToken", "12345"))
             .andExpect(status().isOk());
 
@@ -142,7 +150,7 @@ class OwnSecurityControllerTest {
 
     @Test
     void restoreTest() throws Exception {
-        mockMvc.perform(get(LINK + "/restorePassword")
+        mockMvc.perform(get(OWN_SECURITY_LINK + "/restorePassword")
             .param("email", "test@mail.com")
             .param("lang", "en"))
             .andExpect(status().isOk());
@@ -163,7 +171,7 @@ class OwnSecurityControllerTest {
 
         OwnRestoreDto form = new OwnRestoreDto("String124=", "String123=", "12345", false);
 
-        mockMvc.perform(post(LINK + "/updatePassword")
+        mockMvc.perform(post(OWN_SECURITY_LINK + "/updatePassword")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
@@ -181,7 +189,7 @@ class OwnSecurityControllerTest {
             }\
             """;
 
-        mockMvc.perform(post(LINK + "/set-password")
+        mockMvc.perform(post(OWN_SECURITY_LINK + "/set-password")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isCreated());
@@ -193,7 +201,7 @@ class OwnSecurityControllerTest {
     @Test
     @SneakyThrows
     void hasPassword() {
-        mockMvc.perform(get(LINK + "/password-status"))
+        mockMvc.perform(get(OWN_SECURITY_LINK + "/password-status"))
             .andExpect(status().isOk());
 
         verify(ownSecurityService).hasPassword(email);
@@ -208,7 +216,7 @@ class OwnSecurityControllerTest {
             }\
             """;
 
-        mockMvc.perform(put(LINK + "/changePassword")
+        mockMvc.perform(put(OWN_SECURITY_LINK + "/changePassword")
             .contentType(MediaType.APPLICATION_JSON)
             .content(content))
             .andExpect(status().isOk());
@@ -220,9 +228,50 @@ class OwnSecurityControllerTest {
     }
 
     @Test
+    void getAuthoritiesByCategoryTest() throws Exception {
+        Long categoryId = 1L;
+        AuthorityDto authorityDto = AuthorityDto.builder()
+            .name("EDIT_ORDER")
+            .descriptionEn("Edit orders")
+            .descriptionUk("Редагувати замовлення")
+            .build();
+
+        when(authorityService.getAuthoritiesByCategory(categoryId)).thenReturn(List.of(authorityDto));
+
+        mockMvc.perform(get(OWN_SECURITY_LINK + "/authorities/by-category")
+            .param("categoryId", String.valueOf(categoryId))
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].name").value("EDIT_ORDER"));
+
+        verify(authorityService).getAuthoritiesByCategory(categoryId);
+    }
+
+    @Test
+    void getAllAuthorityCategoriesTest() throws Exception {
+        AuthorityCategoryDto categoryDto = AuthorityCategoryDto.builder()
+            .id(1L)
+            .nameEn("Clients")
+            .nameUk("Клієнти")
+            .build();
+
+        when(authorityService.getAllAuthorityCategories()).thenReturn(List.of(categoryDto));
+
+        mockMvc.perform(get(OWN_SECURITY_LINK + "/authorities/categories")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].nameEn").value("Clients"))
+            .andExpect(jsonPath("$[0].nameUk").value("Клієнти"));
+
+        verify(authorityService).getAllAuthorityCategories();
+    }
+
+    @Test
     @SneakyThrows
     void deleteUser() {
-        mockMvc.perform(delete(LINK + "/user"))
+        mockMvc.perform(delete(OWN_SECURITY_LINK + "/user"))
             .andExpect(status().isOk());
 
         verify(ownSecurityService).deleteUserByEmail(email);
@@ -234,7 +283,7 @@ class OwnSecurityControllerTest {
 
         doNothing().when(ownSecurityService).unblockAccount(accountDto.token());
 
-        mockMvc.perform(post(LINK + "/unblockAccount")
+        mockMvc.perform(post(OWN_SECURITY_LINK + "/unblockAccount")
             .contentType(MediaType.APPLICATION_JSON)
             .content(new ObjectMapper().writeValueAsString(accountDto)))
             .andExpect(status().isOk());

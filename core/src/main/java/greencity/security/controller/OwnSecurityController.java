@@ -11,6 +11,8 @@ import greencity.constant.ErrorMessage;
 import greencity.constant.HttpStatuses;
 import static greencity.constant.ValidationConstants.USER_CREATED;
 import greencity.constant.ValidationConstants;
+import greencity.dto.authorities.AuthorityCategoryDto;
+import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.security.dto.SuccessSignInDto;
@@ -23,6 +25,7 @@ import greencity.security.dto.ownsecurity.PasswordStatusDto;
 import greencity.security.dto.ownsecurity.SetPasswordDto;
 import greencity.security.dto.ownsecurity.UnblockAccountDto;
 import greencity.security.dto.ownsecurity.UpdatePasswordDto;
+import greencity.security.service.AuthorityService;
 import greencity.security.service.OwnSecurityService;
 import greencity.security.service.PasswordRecoveryService;
 import greencity.security.service.VerifyEmailService;
@@ -36,6 +39,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -69,6 +73,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class OwnSecurityController {
     private final OwnSecurityService service;
+    private final AuthorityService authorityService;
     private final VerifyEmailService verifyEmailService;
     private final PasswordRecoveryService passwordRecoveryService;
 
@@ -244,6 +249,45 @@ public class OwnSecurityController {
     public ResponseEntity<UserAdminRegistrationDto> managementRegisterUser(
         @Valid @RequestBody UserManagementDto userDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.managementRegisterUser(userDto));
+    }
+
+    /**
+     * Controller to get all authorities for a specific category.
+     *
+     * @param categoryId {@link Long} - the category ID.
+     * @return {@link List} of {@link AuthorityDto}.
+     */
+    @Operation(summary = "Get all authorities by category")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @GetMapping("/authorities/by-category")
+    public ResponseEntity<List<AuthorityDto>> getAuthoritiesByCategory(@RequestParam Long categoryId) {
+        List<AuthorityDto> authorities = authorityService.getAuthoritiesByCategory(categoryId);
+        return ResponseEntity.ok(authorities);
+    }
+
+    /**
+     * Controller to get all available authority categories.
+     *
+     * @return {@link List} of {@link AuthorityCategoryDto}.
+     */
+    @Operation(summary = "Get all authority categories")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @GetMapping("/authorities/categories")
+    public ResponseEntity<List<AuthorityCategoryDto>> getAllAuthorityCategories() {
+        List<AuthorityCategoryDto> categories = authorityService.getAllAuthorityCategories();
+        return ResponseEntity.ok(categories);
     }
 
     /**

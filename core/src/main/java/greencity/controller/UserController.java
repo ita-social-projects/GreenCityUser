@@ -12,7 +12,6 @@ import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.authorities.AuthorityCategoryDto;
-import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
@@ -1073,45 +1072,6 @@ public class UserController {
         @RequestParam String email) {
         List<AuthorityCategoryDto> authorities = authorityService.getEmployeesAuthoritiesGroupedByCategories(email);
         return ResponseEntity.ok(authorities);
-    }
-
-    /**
-     * Controller to get all authorities for a specific category.
-     *
-     * @param categoryId {@link Long} - the category ID.
-     * @return {@link List} of {@link AuthorityDto}.
-     */
-    @Operation(summary = "Get all authorities by category")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
-    })
-    @GetMapping("/authorities/by-category")
-    public ResponseEntity<List<AuthorityDto>> getAuthoritiesByCategory(@RequestParam Long categoryId) {
-        List<AuthorityDto> authorities = authorityService.getAuthoritiesByCategory(categoryId);
-        return ResponseEntity.ok(authorities);
-    }
-
-    /**
-     * Controller to get all available authority categories.
-     *
-     * @return {@link List} of {@link AuthorityCategoryDto}.
-     */
-    @Operation(summary = "Get all authority categories")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
-    })
-    @GetMapping("/authorities/categories")
-    public ResponseEntity<List<AuthorityCategoryDto>> getAllAuthorityCategories() {
-        List<AuthorityCategoryDto> categories = authorityService.getAllAuthorityCategories();
-        return ResponseEntity.ok(categories);
     }
 
     /**
