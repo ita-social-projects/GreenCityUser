@@ -993,6 +993,14 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public boolean checkIfActiveUserExistsByUuid(String uuid) {
+        return userRepo.existsActiveByUuid(uuid);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime) {
         userRepo.updateUserLastActivityTimeByEmail(email, userLastActivityTime);
     }
