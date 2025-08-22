@@ -81,7 +81,7 @@ class EmailServiceImplTest {
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         service = new EmailServiceImpl(
             javaMailSender,
             templateEngine,

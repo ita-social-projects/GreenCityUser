@@ -24,7 +24,7 @@ class WebSocketConfigTest {
     private WebSocketConfig webSocketConfig;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         webSocketConfig = new WebSocketConfig();
     }
 

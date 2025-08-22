@@ -99,7 +99,7 @@ class OwnSecurityServiceImplTest {
     private TestersSignInRequest request;
 
     @BeforeEach
-    public void init() {
+    void init() {
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo,
             loginAttemptService, cloudFlareClient, greenCityRemoteClient);
