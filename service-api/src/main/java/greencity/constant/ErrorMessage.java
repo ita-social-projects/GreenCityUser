@@ -56,8 +56,10 @@ public class ErrorMessage {
         "User account is blocked due to too many failed login attempts.";
     public static final String COULD_NOT_RETRIEVE_CHECKOUT_RESPONSE = "Could not retrieve checkout response";
     public static final String WRONG_CAPTCHA = "Wrong captcha";
+    public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_CAPTCHA =
+        "User account is blocked due to too many failed login attempts. Wrong captcha. Try again in %s minutes";
     public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS =
-        "User account is blocked due to too many failed login attempts. Try again in %s minutes";
+        "User account is blocked due to too many failed login attempts. Wrong password. Try again in %s minutes";
     public static final String WRONG_SECRET_KEY = "Wrong secret key";
     public static final String FB_TOKEN_OR_LANGUAGE_MISSING = "fbToken or language is missing";
     public static final String WARNING_GIT_DIRECTORY_NOT_FOUND =
