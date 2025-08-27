@@ -35,7 +35,7 @@ class LoginAttemptServiceImplTest {
         when(attemptsByCaptchaCache.asMap()).thenReturn(mockMap);
         when(attemptsByWrongPasswordCache.asMap()).thenReturn(mockMap);
 
-        loginAttemptService = new LoginAttemptServiceImpl(1, 15);
+        loginAttemptService = new LoginAttemptServiceImpl(5);
 
         Field byCaptchaCache = LoginAttemptServiceImpl.class
             .getDeclaredField("attemptsByCaptchaCache");

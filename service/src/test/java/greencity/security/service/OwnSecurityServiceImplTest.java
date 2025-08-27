@@ -667,6 +667,7 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void unblockUserTest() {
+        userForBruteForceTest.setUserStatus(UserStatus.BLOCKED);
         when(jwtTool.getEmailOutOfAccessToken(anyString())).thenReturn("test@mail.com");
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(userForBruteForceTest));
 
@@ -675,6 +676,19 @@ class OwnSecurityServiceImplTest {
         verify(jwtTool, times(1)).getEmailOutOfAccessToken(anyString());
         verify(userRepo, times(1)).findByEmail(anyString());
         verify(userRepo, times(1)).save(userForBruteForceTest);
+    }
+
+    @Test
+    void unblockUserWithStatusNotBlockedTest() {
+        userForBruteForceTest.setUserStatus(UserStatus.ACTIVATED);
+        when(jwtTool.getEmailOutOfAccessToken(anyString())).thenReturn("test@mail.com");
+        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(userForBruteForceTest));
+
+        ownSecurityService.unblockAccount("test@mail.com");
+
+        verify(jwtTool, times(1)).getEmailOutOfAccessToken(anyString());
+        verify(userRepo, times(1)).findByEmail(anyString());
+        verify(userRepo, never()).save(userForBruteForceTest);
     }
 
     @Test
