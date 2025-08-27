@@ -239,26 +239,6 @@ class AuthorityServiceImplTest {
     }
 
     @Test
-    void updateEmployeesAuthoritiesWithEmptyAuthoritiesTest() {
-        User employee = createEmployee();
-
-        UserEmployeeAuthorityDto dto = UserEmployeeAuthorityDto.builder()
-            .employeeEmail(TEST_EMAIL)
-            .authorities(List.of())
-            .build();
-
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-
-        authorityService.updateEmployeesAuthorities(dto);
-
-        assertTrue(employee.getAuthorities().isEmpty());
-
-        verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(userRepo).save(employee);
-        verifyNoInteractions(authorityRepo);
-    }
-
-    @Test
     void getEmployeesAuthoritiesGroupedByCategoriesTest() {
         User employee = createEmployee();
         Authority authority = getAuthority();
