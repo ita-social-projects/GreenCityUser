@@ -15,10 +15,9 @@ public class LoginAttemptServiceImpl implements LoginAttemptService {
     @Value("${bruteForceSettings.maxAttempts}")
     private int maxAttempt;
 
-    public LoginAttemptServiceImpl(@Value("${bruteForceSettings.blockTimeInHours}") int blockTimeInHours,
-        @Value("${bruteForceSettings.blockTimeInMinutes}") int blockTimeInMinutes) {
+    public LoginAttemptServiceImpl(@Value("${bruteForceSettings.blockTimeInMinutes}") int blockTimeInMinutes) {
         this.attemptsByCaptchaCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(blockTimeInHours, TimeUnit.HOURS)
+            .expireAfterWrite(blockTimeInMinutes, TimeUnit.MINUTES)
             .build(new CacheLoader<>() {
                 @Override
                 public Integer load(final String key) {

@@ -1,33 +1,28 @@
 package greencity.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
-import greencity.dto.socialnetwork.SocialNetworkVO;
-import greencity.dto.useraction.UserActionVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
 import greencity.enums.EmailNotification;
 import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.experimental.SuperBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Getter
 @Setter
-@Builder
+@SuperBuilder
 @EqualsAndHashCode
 public class UserVO {
     private Long id;
@@ -38,29 +33,17 @@ public class UserVO {
 
     private Role role;
 
-    private String userCredo;
-
     private UserStatus userStatus;
 
     private VerifyEmailVO verifyEmail;
-
-    private Double rating;
 
     private EmailNotification emailNotification;
 
     private LocalDateTime dateOfRegistration;
 
-    private List<SocialNetworkVO> socialNetworks;
-
-    private List<UserVO> userFriends = new ArrayList<>();
-
-    private List<UserAchievementVO> userAchievements = new ArrayList<>();
-
     private String refreshTokenKey;
 
     private OwnSecurityVO ownSecurity;
-
-    private String profilePicturePath;
 
     private ProfilePrivacyPolicy showLocation;
 
@@ -70,11 +53,9 @@ public class UserVO {
 
     private LocalDateTime lastActivityTime;
 
-    private List<UserActionVO> userActions = new ArrayList<>();
-
     private LanguageVO languageVO;
 
-    private UserLocationDto userLocationDto;
+    private String firstName;
 
     @JsonManagedReference
     private UserNotificationPreferenceDto userNotificationPreferenceDto;

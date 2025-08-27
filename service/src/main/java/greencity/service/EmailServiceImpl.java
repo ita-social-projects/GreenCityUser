@@ -9,10 +9,10 @@ import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
-import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import jakarta.mail.MessagingException;
@@ -20,6 +20,7 @@ import jakarta.mail.internet.MimeMessage;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +58,9 @@ public class EmailServiceImpl implements EmailService {
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
-        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo,
-        LanguageRepo languageRepo) {
+        @Value("${sender.email.address}") String senderEmailAddress,
+        MessageSource messageSource,
+        UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
@@ -253,7 +255,7 @@ public class EmailServiceImpl implements EmailService {
     private static Locale getLocale(String language) {
         if (language == null || language.equals("en")) {
             return Locale.ENGLISH;
-        } else if (language.equals("ua")) {
+        } else if (language.equals("uk")) {
             return Locale.of("uk", "UA");
         } else {
             throw new IllegalStateException("Unexpected value: " + language);
@@ -288,8 +290,26 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.BODY, message.getBody());
         model.put(EmailConstants.PROFILE_LINK, getProfileLink());
 
-        String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
-        sendEmail(message.getEmail(), message.getSubject(), template);
+        Long userId = message.getUserId();
+        String userUuid = message.getUserUuid();
+
+        Optional<String> userEmailOptional;
+        if (userId != null) {
+            userEmailOptional = userRepo.findEmailById(userId);
+        } else {
+            userEmailOptional = userRepo.findEmailByUuid(userUuid);
+        }
+
+        userEmailOptional.ifPresentOrElse(userEmail -> {
+            String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
+            sendEmail(userEmail, message.getSubject(), template);
+        }, () -> {
+            if (userId != null) {
+                throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId);
+            } else {
+                throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + userUuid);
+            }
+        });
     }
 
     @Override
