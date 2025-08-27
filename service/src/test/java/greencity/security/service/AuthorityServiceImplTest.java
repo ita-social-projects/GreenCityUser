@@ -41,6 +41,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.any;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -106,6 +108,30 @@ class AuthorityServiceImplTest {
     }
 
     @Test
+    void updateEmployeesAuthoritiesThrowsNotFoundAuthoritiesExceptionTest() {
+        User employee = createEmployee();
+        List<String> requestedAuthorities = List.of("EXISTING_AUTHORITY", "NON_EXISTING_AUTHORITY");
+        List<Authority> foundAuthorities = List.of(getAuthority());
+
+        UserEmployeeAuthorityDto dto = new UserEmployeeAuthorityDto();
+        dto.setEmployeeEmail(TEST_EMAIL);
+        dto.setAuthorities(requestedAuthorities);
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+        when(authorityRepo.findAuthoritiesByNames(requestedAuthorities)).thenReturn(foundAuthorities);
+
+        NotFoundException exception = assertThrows(NotFoundException.class,
+            () -> authorityService.updateEmployeesAuthorities(dto));
+
+        assertEquals(ErrorMessage.AUTHORITY_NOT_FOUND_BY_NAMES + List.of("NON_EXISTING_AUTHORITY"),
+            exception.getMessage());
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(authorityRepo).findAuthoritiesByNames(requestedAuthorities);
+        verify(userRepo, never()).save(any());
+    }
+
+    @Test
     void updateEmployeesAuthoritiesThrowsNotFoundExceptionTest() {
         var dto = getUserEmployeeAuthorityDto();
         when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
@@ -128,6 +154,25 @@ class AuthorityServiceImplTest {
             () -> authorityService.updateEmployeesAuthorities(dto));
 
         verify(userRepo).findByEmail(TEST_EMAIL);
+    }
+
+    @Test
+    void updateEmployeesAuthoritiesWithEmptyAuthoritiesTest() {
+        User employee = createEmployee();
+
+        UserEmployeeAuthorityDto dto = new UserEmployeeAuthorityDto();
+        dto.setEmployeeEmail(TEST_EMAIL);
+        dto.setAuthorities(Collections.emptyList());
+
+        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
+
+        authorityService.updateEmployeesAuthorities(dto);
+
+        assertTrue(employee.getAuthorities().isEmpty());
+
+        verify(userRepo).findByEmail(TEST_EMAIL);
+        verify(authorityRepo, never()).findAuthoritiesByNames(any());
+        verify(userRepo).save(employee);
     }
 
     @Test
@@ -191,26 +236,6 @@ class AuthorityServiceImplTest {
 
         verify(userRepo).findByEmail(TEST_EMAIL);
         verify(userRepo).save(employee);
-    }
-
-    @Test
-    void updateEmployeesAuthoritiesWithEmptyAuthoritiesTest() {
-        User employee = createEmployee();
-
-        UserEmployeeAuthorityDto dto = UserEmployeeAuthorityDto.builder()
-            .employeeEmail(TEST_EMAIL)
-            .authorities(List.of())
-            .build();
-
-        when(userRepo.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(employee));
-
-        authorityService.updateEmployeesAuthorities(dto);
-
-        assertTrue(employee.getAuthorities().isEmpty());
-
-        verify(userRepo).findByEmail(TEST_EMAIL);
-        verify(userRepo).save(employee);
-        verifyNoInteractions(authorityRepo);
     }
 
     @Test
