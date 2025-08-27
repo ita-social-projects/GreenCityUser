@@ -53,10 +53,19 @@ public class AuthorityServiceImpl implements AuthorityService {
         if (!employee.getRole().equals(Role.ROLE_UBS_EMPLOYEE)) {
             throw new BadRequestException(ErrorMessage.USER_HAS_NO_PERMISSION);
         }
+
         List<Authority> authorities = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(dto.getAuthorities())) {
-            authorities = authorityRepo.findAuthoritiesByNames(dto.getAuthorities());
+        List<String> requestedAuthorityNames = dto.getAuthorities();
+        if (CollectionUtils.isNotEmpty(requestedAuthorityNames)) {
+            authorities = authorityRepo.findAuthoritiesByNames(requestedAuthorityNames);
+            Set<String> foundAuthorityNames = authorities.stream().map(Authority::getName).collect(Collectors.toSet());
+            List<String> notFoundAuthorityNames =
+                requestedAuthorityNames.stream().filter(a -> !foundAuthorityNames.contains(a)).toList();
+            if (!notFoundAuthorityNames.isEmpty()) {
+                throw new NotFoundException(ErrorMessage.AUTHORITY_NOT_FOUND_BY_NAMES + notFoundAuthorityNames);
+            }
         }
+
         employee.setAuthorities(authorities);
         userRepo.save(employee);
     }
