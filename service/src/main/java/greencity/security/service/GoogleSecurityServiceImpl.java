@@ -3,7 +3,7 @@ package greencity.security.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import greencity.client.RestClient;
+import greencity.client.GreenCityRemoteClient;
 import static greencity.constant.AppConstant.*;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
@@ -58,10 +58,10 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     private final ModelMapper modelMapper;
     private final AchievementService achievementService;
     private final UserRepo userRepo;
-    private final RestClient restClient;
     private final PlatformTransactionManager transactionManager;
     private final HttpClient googleAccessTokenVerifier;
     private final ObjectMapper objectMapper;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${google.resource.userInfoUri}")
     private String userInfoUrl;
@@ -118,10 +118,10 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
     }
 
     private SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
-        User newUser = createNewUser(email, userName, profilePicture, language);
-        User savedUser = saveNewUser(newUser);
+        User newUser = createNewUser(email, userName, language);
+        User savedUser = saveNewUser(newUser, profilePicture);
         try {
-            restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
+            greenCityRemoteClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {
             log.error("Failed to create UBS profile for user - {}", savedUser.getEmail(), e);
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
@@ -131,7 +131,7 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         return getSuccessSignInDto(userVO);
     }
 
-    private User createNewUser(String email, String userName, String profilePicture, String language) {
+    private User createNewUser(String email, String userName, String language) {
         User user = User.builder()
             .email(email)
             .name(userName)
@@ -141,11 +141,9 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
-            .profilePicturePath(profilePicture)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-            .rating(DEFAULT_RATING)
             .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
         Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
@@ -159,12 +157,13 @@ public class GoogleSecurityServiceImpl implements GoogleSecurityService {
         return user;
     }
 
-    private User saveNewUser(User newUser) {
+    private User saveNewUser(User newUser, String profilePicture) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
+            userService.createGreenCityUser(newUser.getId(), profilePicture);
             return newUser;
         });
     }

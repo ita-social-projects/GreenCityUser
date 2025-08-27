@@ -8,7 +8,6 @@ import static greencity.ModelUtils.TEST_RESTORE_PASSWORD_EMAIL;
 import static greencity.ModelUtils.TEST_RESTORE_PASSWORD_EMAIL_EXPIRED_TOKEN;
 import static greencity.ModelUtils.TEST_USER;
 
-import greencity.entity.Language;
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
 import greencity.exception.exceptions.BadRequestException;
@@ -81,11 +80,8 @@ class PasswordRecoveryServiceImplTest {
     void sendPasswordRecoveryEmailToSimpleTest() {
         String email = "foo";
         boolean isUbs = true;
-        Language language = new Language();
-        language.setId(2L);
-        language.setCode("en");
         User user = new User();
-        user.setLanguage(language);
+        user.setLanguage(ModelUtils.getLanguage());
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
         String token = "bar";
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn(token);
@@ -115,7 +111,6 @@ class PasswordRecoveryServiceImplTest {
     @Test
     void testUpdatePasswordUsingToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
-        user.setLanguage(ModelUtils.getLanguage());
         TEST_OWN_RESTORE_DTO.setIsUbs(true);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))
@@ -143,7 +138,6 @@ class PasswordRecoveryServiceImplTest {
     @Test
     void testUpdatePasswordUsingGoogleToken() {
         User user = TEST_RESTORE_PASSWORD_EMAIL.getUser();
-        user.setLanguage(ModelUtils.getLanguage());
         TEST_OWN_RESTORE_DTO.setIsUbs(false);
 
         when(restorePasswordEmailRepo.findByToken(TEST_OWN_RESTORE_DTO.getToken()))

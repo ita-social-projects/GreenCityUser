@@ -1,38 +1,64 @@
 package greencity.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.TestConst;
-import greencity.constant.AppConstant;
 import static greencity.constant.AppConstant.AUTHORIZATION;
+import greencity.constant.AppConstant;
 import greencity.converters.UserArgumentResolver;
 import greencity.dto.EmployeePositionsDto;
 import greencity.dto.PageableAdvancedDto;
+import greencity.dto.PageableDto;
+import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.achievementcategory.AchievementCategoryVO;
+import greencity.dto.authorities.AuthorityCategoryDto;
+import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.language.LanguageVO;
 import greencity.dto.ubs.UbsTableCreationDto;
+import greencity.dto.user.DeactivateUserRequestDto;
+import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserCityDto;
+import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserManagementViewDto;
 import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserRegistrationStatisticDto;
+import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
+import greencity.dto.user.UserVOAdvancedDto;
+import greencity.dto.user.UserVOShort;
+import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
+import greencity.enums.EmailPreference;
+import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
+import greencity.enums.UserStatus;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.handler.CustomExceptionHandler;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
+import greencity.service.EmailService;
+import greencity.service.ManagementUserStatisticsService;
 import greencity.service.UserService;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,14 +69,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
@@ -58,10 +86,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -71,28 +98,46 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class UserControllerTest {
-    private static final String userLink = "/user";
-    private MockMvc mockMvc;
+    static final String userLink = "/user";
+    MockMvc mockMvc;
+
     @InjectMocks
-    private UserController userController;
+    UserController userController;
+
     @Mock
-    private UserService userService;
+    UserService userService;
+
     @Mock
-    private AuthorityService authorityService;
+    ManagementUserStatisticsService managementUserStatisticsService;
+
     @Mock
-    private PositionService positionService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    AuthorityService authorityService;
+
+    @Mock
+    PositionService positionService;
+
+    @Mock
+    EmailService emailService;
+
+    final ObjectMapper objectMapper = new ObjectMapper();
+    String idQueryParam = "id";
+    String uuidQueryParam = "uuid";
 
     @BeforeEach
     void setup() {
         this.mockMvc = MockMvcBuilders
             .standaloneSetup(userController)
+            .defaultRequest(MockMvcRequestBuilders.get("/")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON))
             .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver(),
                 new UserArgumentResolver(userService))
+            .setControllerAdvice(new CustomExceptionHandler(new DefaultErrorAttributes()))
             .build();
     }
 
@@ -165,6 +210,7 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(""))
             .andExpect(status().isBadRequest());
+        verify(userService, never()).updateRole(any(), any(), any());
     }
 
     @Test
@@ -324,7 +370,7 @@ class UserControllerTest {
     void deleteUserProfilePictureTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@email.com");
-        mockMvc.perform(delete(userLink + "/deleteProfilePicture")
+        mockMvc.perform(patch(userLink + "/deleteProfilePicture")
             .principal(principal))
             .andExpect(status().isOk());
 
@@ -480,14 +526,14 @@ class UserControllerTest {
 
     @Test
     void findByIdTest() throws Exception {
-        UserVO userVO = ModelUtils.getUserVO();
+        UserVOShort userVO = ModelUtils.getUserVOShortDto();
         when(userService.findById(1L)).thenReturn(userVO);
         mockMvc.perform(get(userLink + "/findById")
             .param("id", "1"))
             .andExpect(status().isOk())
             .andExpect(content().contentType("application/json"))
-            .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.name").value(TestConst.NAME))
+            .andExpect(jsonPath("$.id").value(13L))
+            .andExpect(jsonPath("$.name").value("user"))
             .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
     }
 
@@ -530,19 +576,6 @@ class UserControllerTest {
     }
 
     @Test
-    void searchByTest() throws Exception {
-        Pageable pageable = PageRequest.of(0, 20);
-        String query = "testQuery";
-        when(userService.searchBy(pageable, query)).thenReturn(ModelUtils.getPageableAdvancedDto());
-        mockMvc.perform(get(userLink + "/searchBy")
-            .param("query", query))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.page.length()").value(1))
-            .andExpect(jsonPath("$.totalElements").value(1L))
-            .andExpect(jsonPath("$.totalPages").value(1));
-    }
-
-    @Test
     void updateUserManagementTest() throws Exception {
         UserManagementUpdateDto userManagementDto = ModelUtils.getUserManagementUpdateDto();
         String content = objectMapper.writeValueAsString(userManagementDto);
@@ -563,23 +596,24 @@ class UserControllerTest {
 
     @Test
     void findAllTest() throws Exception {
-        when(userService.findAll()).thenReturn(List.of(ModelUtils.getUserVO()));
+        when(userService.findAll()).thenReturn(List.of(ModelUtils.getUserVOShortDto()));
         mockMvc.perform(get(userLink + "/findAll"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].name").value(TestConst.NAME))
-            .andExpect(jsonPath("$[0].id").value(1L))
+            .andExpect(jsonPath("$[0].name").value("user"))
+            .andExpect(jsonPath("$[0].id").value(13L))
             .andExpect(jsonPath("$[0].email").value(TestConst.EMAIL));
     }
 
     @Test
     void findNotDeactivatedByEmailTest() throws Exception {
-        when(userService.findNotDeactivatedByEmail(TestConst.EMAIL)).thenReturn(Optional.of(ModelUtils.getUserVO()));
+        when(userService.findNotDeactivatedByEmailReduced(TestConst.EMAIL))
+            .thenReturn(Optional.of(ModelUtils.getUserVOShortDto()));
         mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
             .param("email", TestConst.EMAIL))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.name").value(TestConst.NAME))
-            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.name").value("user"))
+            .andExpect(jsonPath("$.id").value(13L))
             .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
     }
 
@@ -711,12 +745,12 @@ class UserControllerTest {
     void findAllByEmailNotificationTest() throws Exception {
         EmailNotification notification = EmailNotification.DAILY;
         when(userService.findAllByEmailNotification(notification))
-            .thenReturn(List.of(ModelUtils.getUserVO()));
+            .thenReturn(List.of(ModelUtils.getUserVOShortDto()));
         mockMvc.perform(get(userLink + "/findAllByEmailNotification")
             .param("emailNotification", notification.toString()))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
-            .andExpect(jsonPath("$[0].id").value(1L));
+            .andExpect(jsonPath("$[0].id").value(13L));
 
     }
 
@@ -845,6 +879,37 @@ class UserControllerTest {
     }
 
     @Test
+    void getAuthoritiesGroupedByCategoriesTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn("testmail@gmail.com");
+
+        AuthorityCategoryDto categoryDto = AuthorityCategoryDto.builder()
+            .id(1L)
+            .nameEn("Clients")
+            .nameUk("Клієнти")
+            .authorities(List.of(AuthorityDto.builder()
+                .name("EDIT_ORDER")
+                .descriptionEn("Edit orders")
+                .descriptionUk("Редагувати замовлення")
+                .build()))
+            .build();
+
+        when(authorityService.getEmployeesAuthoritiesGroupedByCategories(principal.getName()))
+            .thenReturn(List.of(categoryDto));
+
+        mockMvc.perform(get(userLink + "/authorities/grouped-by-categories")
+            .principal(principal)
+            .param("email", principal.getName())
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.length()").value(1))
+            .andExpect(jsonPath("$[0].nameEn").value("Clients"))
+            .andExpect(jsonPath("$[0].authorities[0].name").value("EDIT_ORDER"));
+
+        verify(authorityService).getEmployeesAuthoritiesGroupedByCategories(principal.getName());
+    }
+
+    @Test
     void deactivateEmployeeByUUID() throws Exception {
         String uuid = "87df9ad5-6393-441f-8423-8b2e770b01a8";
         mockMvc.perform(put(userLink + "/deactivate-employee").param("uuid", uuid))
@@ -887,5 +952,352 @@ class UserControllerTest {
         var request = new UsersOnlineStatusRequestDto();
         userController.checkUsersOnlineStatus(request);
         verify(userService).checkUsersOnlineStatus(request);
+    }
+
+    @Test
+    void getUserRolesDistribution_returnsOkAndList() throws Exception {
+        Role role = Role.ROLE_ADMIN;
+        Long count = 10L;
+        List<UserRoleStatisticDto> roles = List.of(new UserRoleStatisticDto(role, count));
+
+        when(managementUserStatisticsService.getUserRolesDistribution()).thenReturn(roles);
+
+        mockMvc.perform(get(userLink + "/roles-distribution"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(roles.size()))
+            .andExpect(jsonPath("$[0].role").value(role.name()))
+            .andExpect(jsonPath("$[0].count").value(count));
+    }
+
+    @Test
+    void getUserStatusesDistribution_returnsOkAndList() throws Exception {
+        UserStatus userStatus = UserStatus.ACTIVATED;
+        Long count = 100L;
+        List<UserStatusStatisticDto> statuses = List.of(new UserStatusStatisticDto(userStatus, count));
+
+        when(managementUserStatisticsService.getUserStatusesDistribution()).thenReturn(statuses);
+
+        mockMvc.perform(get(userLink + "/statuses-distribution"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(statuses.size()))
+            .andExpect(jsonPath("$[0].status").value(userStatus.name()))
+            .andExpect(jsonPath("$[0].count").value(count));
+    }
+
+    @Test
+    void getUserEmailPreferencesDistributionTest() throws Exception {
+        Long count = 25L;
+        EmailPreference emailPreference = EmailPreference.LIKES;
+        List<UserEmailPreferencesStatisticDto> preferences =
+            List.of(new UserEmailPreferencesStatisticDto(emailPreference, EmailPreferencePeriodicity.DAILY, count));
+
+        when(managementUserStatisticsService.getUserEmailPreferencesDistribution()).thenReturn(preferences);
+
+        mockMvc.perform(get(userLink + "/email-preferences-distribution"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.size()").value(preferences.size()))
+            .andExpect(jsonPath("$[0].emailPreference").value(emailPreference.name()))
+            .andExpect(jsonPath("$[0].count").value(count));
+    }
+
+    @Test
+    void countActiveUsersTest() throws Exception {
+        Long amountOfActiveUsers = 123L;
+        String amountOfActiveUsersStr = String.valueOf(amountOfActiveUsers);
+
+        when(managementUserStatisticsService.countActiveUsers()).thenReturn(amountOfActiveUsers);
+
+        mockMvc.perform(get(userLink + "/count-active-users"))
+            .andExpect(status().isOk())
+            .andExpect(content().string(amountOfActiveUsersStr));
+    }
+
+    @Test
+    void getActivatedUsersIdsOkTest() throws Exception {
+        List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
+        List<String> stringIds = input.stream()
+            .map(String::valueOf)
+            .toList();
+
+        when(userService.findAllActivatedUserIds(input)).thenReturn(List.of(1L, 2L, 3L));
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("ids", stringIds.toArray(new String[0])))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
+        assertEquals(3, activatedUserIds.size());
+        verify(userService, times(1)).findAllActivatedUserIds(input);
+    }
+
+    @Test
+    void getActivatedUsersIdsNoResultsTest() throws Exception {
+        List<Long> input = List.of(1L, 2L, 3L, 4L, 5L);
+        List<String> stringIds = input.stream()
+            .map(String::valueOf)
+            .toList();
+
+        when(userService.findAllActivatedUserIds(input)).thenReturn(List.of());
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+            .accept(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("ids", stringIds.toArray(new String[0])))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
+        assertEquals(0, activatedUserIds.size());
+        verify(userService, times(1)).findAllActivatedUserIds(input);
+    }
+
+    @Test
+    void getActivatedUsersIdsWithNoArgsTest() throws Exception {
+        when(userService.findAllActivatedUserIds(null)).thenReturn(List.of(1L, 2L, 3L));
+
+        MvcResult result = mockMvc.perform(get(userLink + "/activated-ids")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+
+        List<Long> activatedUserIds = objectMapper.readValue(responseBody, new TypeReference<>() {
+        });
+        assertEquals(3, activatedUserIds.size());
+        verify(userService, times(1)).findAllActivatedUserIds(null);
+    }
+
+    @Test
+    void findNotDeactivatedByIdAdvancedTest() throws Exception {
+        UserVOAdvancedDto expected = ModelUtils.getUserVOAdvancedDto();
+        when(userService.findNotDeactivatedByIdAdvanced(13L)).thenReturn(Optional.of(expected));
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
+            .param("id", String.valueOf(13L)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value(expected.getName()))
+            .andExpect(jsonPath("$.id").value(13L))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findNotDeactivatedByIdAdvanced_NoResultTest() throws Exception {
+        Long userId = 999L;
+        when(userService.findNotDeactivatedByIdAdvanced(userId)).thenReturn(Optional.empty());
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
+            .param("id", String.valueOf(userId)))
+            .andExpect(status().isOk())
+            .andExpect(content().string(""));
+    }
+
+    @Test
+    void findAllByEmailInTest() throws Exception {
+        List<String> emails = List.of("email1", "email2");
+
+        mockMvc.perform(get(userLink + "/email/findAll")
+            .param("emails", String.join(", ", emails)))
+            .andExpect(status().isOk());
+
+        verify(userService).findAllByEmailIn(emails);
+    }
+
+    @Test
+    void findUserEmailsByUserIdsTest() throws Exception {
+        List<String> userIdsStr = List.of("1", "2", "3");
+        List<Long> userIds = List.of(1L, 2L, 3L);
+
+        mockMvc.perform(get(userLink + "/email/findByIds")
+            .param("userIds", String.join(", ", userIdsStr)))
+            .andExpect(status().isOk());
+
+        verify(userService).findUserEmailsByUserIds(userIds);
+    }
+
+    @Test
+    void findNotDeactivatedByIdTest() throws Exception {
+        Long userId = 1L;
+        String userIdStr = String.valueOf(userId);
+        UserVOShort userVOShort = new UserVOShort();
+
+        when(userService.findNotDeactivatedByIdReduced(userId))
+            .thenReturn(Optional.of(userVOShort));
+
+        mockMvc.perform(get(userLink + "/findNotDeactivatedById")
+            .param(idQueryParam, userIdStr))
+            .andExpect(status().isOk());
+
+        verify(userService).findNotDeactivatedByIdReduced(userId);
+    }
+
+    @Test
+    void findNotDeactivatedByIdNotFoundTest() throws Exception {
+        Long userId = 1L;
+        String userIdStr = String.valueOf(userId);
+
+        when(userService.findNotDeactivatedByIdReduced(userId))
+            .thenThrow(new NotFoundException());
+
+        mockMvc.perform(get(userLink + "/findNotDeactivatedById")
+            .param(idQueryParam, userIdStr))
+            .andExpect(status().isNotFound());
+
+        verify(userService).findNotDeactivatedByIdReduced(userId);
+    }
+
+    @Test
+    void deactivateUserTest() throws Exception {
+        DeactivateUserRequestDto request = new DeactivateUserRequestDto("reason");
+        String requestJson = objectMapper.writeValueAsString(request);
+        UserDeactivationReasonDto deactivationDto = new UserDeactivationReasonDto();
+        UserVO userVO = ModelUtils.getUserVO();
+        Principal principal = mock(Principal.class);
+
+        when(principal.getName())
+            .thenReturn(TestConst.EMAIL);
+        when(userService.findByEmail(principal.getName()))
+            .thenReturn(userVO);
+        when(userService.deactivateUser(TestConst.UUID, request, userVO))
+            .thenReturn(deactivationDto);
+
+        mockMvc.perform(put(userLink + "/deactivate")
+            .param(uuidQueryParam, TestConst.UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(requestJson)
+            .principal(principal))
+            .andExpect(status().isOk());
+
+        verify(userService).deactivateUser(TestConst.UUID, request, userVO);
+        verify(emailService).sendReasonOfDeactivation(deactivationDto);
+    }
+
+    @Test
+    void deactivateUserBadRequestTest() throws Exception {
+        Principal principal = mock(Principal.class);
+
+        mockMvc.perform(put(userLink + "/deactivate")
+            .param(uuidQueryParam, TestConst.UUID)
+            .contentType(MediaType.APPLICATION_JSON)
+            .principal(principal))
+            .andExpect(status().isBadRequest());
+
+        verify(userService, never()).deactivateUser(any(), any(), any());
+        verify(emailService, never()).sendReasonOfDeactivation(any());
+    }
+
+    @Test
+    void findUserLanguageByUuidTest() throws Exception {
+        String language = "en";
+
+        when(userService.findUserLanguageByUuid(TestConst.UUID))
+            .thenReturn(language);
+
+        mockMvc.perform(get(userLink + "/findUserLanguageByUuid")
+            .param(uuidQueryParam, TestConst.UUID))
+            .andExpect(status().isOk())
+            .andExpect(content().string(language));
+
+        verify(userService).findUserLanguageByUuid(TestConst.UUID);
+    }
+
+    @Test
+    void activateUserTest() throws Exception {
+        UserActivationDto activationDto = new UserActivationDto();
+        long userId = 1L;
+
+        when(userService.setActivatedStatus(userId))
+            .thenReturn(activationDto);
+
+        mockMvc.perform(put(userLink + "/activate")
+            .param(idQueryParam, "1"))
+            .andExpect(status().isOk());
+
+        verify(userService).setActivatedStatus(userId);
+        verify(emailService).sendMessageOfActivation(activationDto);
+    }
+
+    @Test
+    void findUserByNameTest() throws Exception {
+        String name = "TestUser";
+        Principal principal = mock(Principal.class);
+        UserVO userVO = ModelUtils.getUserVO();
+        Pageable page = PageRequest.of(0, 20);
+        PageableDto<UserAllFriendsDto> pageableDto = new PageableDto<>(
+            List.of(),
+            0,
+            0,
+            1);
+
+        when(userService.findByEmail(principal.getName()))
+            .thenReturn(userVO);
+        when(userService.findUserByName(name, page, userVO.getId()))
+            .thenReturn(pageableDto);
+
+        mockMvc.perform(get(userLink + "/findUserByName")
+            .param("name", name)
+            .param("page", "0")
+            .param("size", "20")
+            .principal(principal))
+            .andExpect(status().isOk());
+
+        verify(userService).findUserByName(name, page, userVO.getId());
+    }
+
+    @Test
+    void findByUuIdTest() throws Exception {
+        UbsCustomerDto ubsCustomerDto = new UbsCustomerDto(TestConst.NAME, TestConst.EMAIL, "phone number");
+
+        when(userService.findUbsCustomerDtoByUuid(TestConst.UUID))
+            .thenReturn(ubsCustomerDto);
+
+        mockMvc.perform(get(userLink + "/findByUuId")
+            .param(uuidQueryParam, TestConst.UUID))
+            .andExpect(status().isOk());
+
+        verify(userService).findUbsCustomerDtoByUuid(TestConst.UUID);
+    }
+
+    @Test
+    void findAllByEmailPreferenceAndEmailPeriodicityTest() throws Exception {
+        EmailPreference emailPreference = EmailPreference.LIKES;
+        EmailPreferencePeriodicity periodicity = EmailPreferencePeriodicity.DAILY;
+        List<UserVOShort> users = Arrays.asList(new UserVOShort(), new UserVOShort());
+
+        when(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity))
+            .thenReturn(users);
+
+        mockMvc.perform(get(userLink + "/email")
+            .param("email-preference", emailPreference.name())
+            .param("email-periodicity", periodicity.name()))
+            .andExpect(status().isOk());
+
+        verify(userService).findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity);
+    }
+
+    @Test
+    void getUserRegistrationsByDateRangeTest() throws Exception {
+        LocalDateTime startDate = LocalDateTime.of(2023, 1, 1, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2023, 12, 31, 23, 59);
+        DateGranularity granularity = DateGranularity.MONTH;
+        List<UserRegistrationStatisticDto> statistics = List.of(
+            new UserRegistrationStatisticDto(LocalDateTime.of(2024, Month.SEPTEMBER, 2, 1, 1), 10L));
+
+        when(managementUserStatisticsService.getUserRegistrationsByDateRange(startDate, endDate, granularity))
+            .thenReturn(statistics);
+
+        mockMvc.perform(get(userLink + "/registration-statistics")
+            .param("start-date", "2023-01-01T00:00:00")
+            .param("end-date", "2023-12-31T23:59:00")
+            .param("granularity", "MONTH"))
+            .andExpect(status().isOk());
+
+        verify(managementUserStatisticsService).getUserRegistrationsByDateRange(startDate, endDate, granularity);
     }
 }

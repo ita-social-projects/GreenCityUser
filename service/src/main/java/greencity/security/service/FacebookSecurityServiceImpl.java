@@ -2,7 +2,7 @@ package greencity.security.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import greencity.client.RestClient;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
@@ -16,10 +16,9 @@ import greencity.repository.UserRepo;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.client.HttpClient;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,24 +33,21 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import static greencity.constant.AppConstant.DEFAULT_RATING;
 
 /**
  * {@inheritDoc}
  */
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private final UserService userService;
     private final JwtTool jwtTool;
-    private final HttpClient httpClient;
     private final UserRepo userRepo;
     private final PlatformTransactionManager transactionManager;
     private final ModelMapper modelMapper;
-    private final RestClient restClient;
     private final ObjectMapper objectMapper;
     private final WebClient webClient;
+    private final GreenCityRemoteClient greenCityRemoteClient;
 
     @Value("${address}")
     private String address;
@@ -61,6 +57,25 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     private String facebookAppSecret;
     @Value("${facebook.resource.userInfoUri}")
     private String userInfoUrl;
+
+    public FacebookSecurityServiceImpl(
+        UserService userService,
+        JwtTool jwtTool,
+        UserRepo userRepo,
+        PlatformTransactionManager transactionManager,
+        ModelMapper modelMapper,
+        ObjectMapper objectMapper,
+        @Qualifier("facebookWebClient") WebClient webClient,
+        GreenCityRemoteClient greenCityRemoteClient) {
+        this.userService = userService;
+        this.jwtTool = jwtTool;
+        this.userRepo = userRepo;
+        this.transactionManager = transactionManager;
+        this.modelMapper = modelMapper;
+        this.objectMapper = objectMapper;
+        this.webClient = webClient;
+        this.greenCityRemoteClient = greenCityRemoteClient;
+    }
 
     @Override
     public String generateFacebookAuthorizeURL() {
@@ -140,7 +155,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         if (byEmail == null) {
             log.info("User with email {} not found. Creating a new one.", email);
             User newUser = createNewUser(email, name);
-            User savedUser = saveNewUser(newUser);
+            User savedUser = saveNewUser(newUser, null);
             byEmail = modelMapper.map(savedUser, UserVO.class);
             log.info("Created new user with ID: {}", byEmail.getId());
         } else {
@@ -164,7 +179,7 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .build();
     }
 
-    User createNewUser(String email, String userName, String profilePicture, String language) {
+    User createNewUser(String email, String userName, String language) {
         User user = User.builder()
             .email(email)
             .name(userName)
@@ -174,11 +189,9 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
             .userStatus(UserStatus.ACTIVATED)
             .emailNotification(EmailNotification.DISABLED)
             .refreshTokenKey(jwtTool.generateTokenKey())
-            .profilePicturePath(profilePicture)
             .showLocation(ProfilePrivacyPolicy.PUBLIC)
             .showEcoPlace(ProfilePrivacyPolicy.PUBLIC)
             .showToDoList(ProfilePrivacyPolicy.PUBLIC)
-            .rating(DEFAULT_RATING)
             .language(Language.builder().id(modelMapper.map(language, Long.class)).build())
             .build();
 
@@ -193,13 +206,14 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
         return user;
     }
 
-    User saveNewUser(User newUser) {
+    User saveNewUser(User newUser, String profilePicture) {
         TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
         return transactionTemplate.execute(status -> {
             newUser.setUuid(UUID.randomUUID().toString());
             Long id = userRepo.save(newUser).getId();
             newUser.setId(id);
             log.info("User saved with ID: {}", id);
+            userService.createGreenCityUser(newUser.getId(), profilePicture);
             return newUser;
         });
     }
@@ -245,10 +259,10 @@ public class FacebookSecurityServiceImpl implements FacebookSecurityService {
     }
 
     SuccessSignInDto handleNewUser(String email, String userName, String profilePicture, String language) {
-        User newUser = createNewUser(email, userName, profilePicture, language);
-        User savedUser = saveNewUser(newUser);
+        User newUser = createNewUser(email, userName, language);
+        User savedUser = saveNewUser(newUser, profilePicture);
         try {
-            restClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
+            greenCityRemoteClient.createUbsProfile(modelMapper.map(savedUser, UbsProfileCreationDto.class));
         } catch (RestClientException e) {
             throw new RestClientException(ErrorMessage.TRANSACTION_FAILED, e);
         }

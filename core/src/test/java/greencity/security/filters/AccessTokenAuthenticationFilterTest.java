@@ -94,7 +94,7 @@ class AccessTokenAuthenticationFilterTest {
         when(jwtTool.getTokenFromHttpServletRequest(request)).thenReturn(token);
         when(authenticationManager.authenticate(any()))
             .thenReturn(new UsernamePasswordAuthenticationToken("test@mail.com", null));
-        when(userService.findNotDeactivatedByEmail("test@mail.com")).thenThrow(RuntimeException.class);
+        when(userService.findNotDeactivatedByEmailReduced("test@mail.com")).thenThrow(RuntimeException.class);
         authenticationFilter.doFilterInternal(request, response, chain);
         assertTrue(systemOutContent.toString().contains("Access denied with token: "));
     }
