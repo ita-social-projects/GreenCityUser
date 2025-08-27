@@ -46,6 +46,7 @@ public class EmailServiceImpl implements EmailService {
     private final Executor executor;
     private final String clientLink;
     private final String senderEmailAddress;
+    private final String greenOfficeEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
     private final UserRepo userRepo;
@@ -59,6 +60,7 @@ public class EmailServiceImpl implements EmailService {
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
         @Value("${sender.email.address}") String senderEmailAddress,
+        @Value("${greenoffice.email.address}") String greenOfficeEmailAddress,
         MessageSource messageSource,
         UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
@@ -66,6 +68,7 @@ public class EmailServiceImpl implements EmailService {
         this.executor = executor;
         this.clientLink = clientLink;
         this.senderEmailAddress = senderEmailAddress;
+        this.greenOfficeEmailAddress = greenOfficeEmailAddress;
         this.messageSource = messageSource;
         this.userRepo = userRepo;
     }
@@ -373,7 +376,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.BODY, message.getBody());
 
         String template = createEmailTemplate(model, EmailConstants.GREEN_OFFICE_REQUEST_PAGE);
-        sendEmail(senderEmailAddress, message.getSubject(), template);
+        sendEmail(greenOfficeEmailAddress, message.getSubject(), template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {
