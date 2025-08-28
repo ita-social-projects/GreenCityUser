@@ -930,9 +930,9 @@ class UserControllerTest {
     void checkIfActiveUserExistsByUuidTest() throws Exception {
         when(userService.checkIfActiveUserExistsByUuid(TestConst.UUID)).thenReturn(true);
         mockMvc.perform(get(userLink + "/checkActiveUserByUuid")
-                .param("uuid", TestConst.UUID))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value(true));
+            .param("uuid", TestConst.UUID))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value(true));
     }
 
     @Test
