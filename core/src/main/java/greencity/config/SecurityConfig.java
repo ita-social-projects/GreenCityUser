@@ -247,7 +247,7 @@ public class SecurityConfig {
                     "/user/statuses-distribution",
                     "/user/roles-distribution",
                     "/user/findNotDeactivatedById",
-                    "user/checkActiveUserByUuid",
+                    "/user/checkActiveUserByUuid",
                     "/user/findNotDeactivatedByEmail")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
