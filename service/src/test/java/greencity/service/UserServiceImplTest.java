@@ -1268,6 +1268,20 @@ class UserServiceImplTest {
             Arguments.of("uuid", Optional.empty(), false));
     }
 
+    @ParameterizedTest
+    @MethodSource("provideUserUuidAndExistence")
+    void checkIfActiveUserExistsByUuidTest(String uuid, boolean existence) {
+        when (userRepo.existsActiveByUuid(uuid)).thenReturn(existence);
+        assertEquals(existence, userService.checkIfActiveUserExistsByUuid(uuid));
+    }
+
+    private static Stream<Arguments> provideUserUuidAndExistence(){
+        return Stream.of(
+                Arguments.of("activeUserUuid", true),
+                Arguments.of("inactiveUserUuid", false)
+        );
+    }
+
     @Test
     void editUserRatingTest() {
         UserAddRatingDto userRatingDto2 = UserAddRatingDto.builder()
