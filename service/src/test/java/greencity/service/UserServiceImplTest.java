@@ -1271,15 +1271,14 @@ class UserServiceImplTest {
     @ParameterizedTest
     @MethodSource("provideUserUuidAndExistence")
     void checkIfActiveUserExistsByUuidTest(String uuid, boolean existence) {
-        when (userRepo.existsActiveByUuid(uuid)).thenReturn(existence);
+        when(userRepo.existsActiveByUuid(uuid)).thenReturn(existence);
         assertEquals(existence, userService.checkIfActiveUserExistsByUuid(uuid));
     }
 
-    private static Stream<Arguments> provideUserUuidAndExistence(){
+    private static Stream<Arguments> provideUserUuidAndExistence() {
         return Stream.of(
-                Arguments.of("activeUserUuid", true),
-                Arguments.of("inactiveUserUuid", false)
-        );
+            Arguments.of("activeUserUuid", true),
+            Arguments.of("inactiveUserUuid", false));
     }
 
     @Test
