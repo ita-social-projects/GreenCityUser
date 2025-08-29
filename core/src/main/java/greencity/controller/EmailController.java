@@ -2,6 +2,7 @@ package greencity.controller;
 
 import greencity.constant.HttpStatuses;
 import greencity.dto.econews.InterestingEcoNewsDto;
+import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.*;
 import greencity.service.EmailService;
@@ -128,6 +129,18 @@ public class EmailController {
     @PostMapping("/sendPlaceStatusChange")
     public ResponseEntity<Object> sendPlaceStatusChange(@RequestBody PlaceStatusChangeDto dto) {
         emailService.sendPlaceStatusChangeNotification(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Send telegram user feedback to customer email")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/telegram-feedback")
+    public ResponseEntity<Void> sendTelegramFeedback(@RequestBody UserTelegramFeedbackDto dto) {
+        emailService.sendTelegramFeedbackEmail(dto);
         return ResponseEntity.ok().build();
     }
 }

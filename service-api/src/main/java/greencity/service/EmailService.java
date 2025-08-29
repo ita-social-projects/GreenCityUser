@@ -3,6 +3,7 @@ package greencity.service;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
@@ -156,4 +157,6 @@ public interface EmailService {
      * @param message {@link ScheduledEmailMessage}.
      */
     void sendGreenOfficeRequestEmailToManager(ScheduledEmailMessage message);
+
+    void sendTelegramFeedbackEmail(UserTelegramFeedbackDto dto);
 }
