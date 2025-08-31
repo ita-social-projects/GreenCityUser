@@ -1,26 +1,8 @@
 package greencity.exception.handler;
 
 import greencity.constant.AppConstant;
-import greencity.exception.exceptions.BadRefreshTokenException;
-import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadSocialNetworkLinksException;
-import greencity.exception.exceptions.BadUpdateRequestException;
-import greencity.exception.exceptions.BadUserStatusException;
-import greencity.exception.exceptions.EmailNotVerified;
-import greencity.exception.exceptions.InsufficientLocationDataException;
-import greencity.exception.exceptions.InvalidURLException;
-import greencity.exception.exceptions.LanguageNotSupportedException;
-import greencity.exception.exceptions.NotFoundException;
-import greencity.exception.exceptions.PasswordsDoNotMatchesException;
-import greencity.exception.exceptions.UserAlreadyHasPasswordException;
-import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.UserBlockedException;
-import greencity.exception.exceptions.WrongEmailException;
-import greencity.exception.exceptions.WrongPasswordException;
-import greencity.exception.exceptions.GoogleApiException;
-import greencity.exception.exceptions.UserDeactivationException;
-import greencity.exception.exceptions.Base64DecodedException;
-import greencity.exception.exceptions.ResourceNotFoundException;
+import greencity.constant.ErrorMessage;
+import greencity.exception.exceptions.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Collections;
@@ -44,6 +26,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 /**
@@ -138,8 +122,30 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<Object> handleNotFoundException(NotFoundException ex,
         WebRequest request) {
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
-        log.trace(ex.getMessage(), ex);
+        log.error(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
+    }
+
+    /**
+     * Method interceptor for server errors-related exceptions which can be thrown
+     * by WebClient during making and receiving requests to the GreenCity app such
+     * as {@link GreenCityServiceException}, {@link WebClientRequestException},
+     * {@link WebClientResponseException}.
+     *
+     * @param request Contains details about the occurred exception.
+     * @return ResponseEntity which contains the HTTP status and body with the
+     *         message of the exception.
+     */
+    @ExceptionHandler({GreenCityServiceException.class, WebClientRequestException.class,
+        WebClientResponseException.class})
+    public final ResponseEntity<Object> handleGreenCityServiceException(Exception ex, WebRequest request) {
+        if (ex instanceof WebClientRequestException) {
+            Map<String, String> errorBody = Map.of(AppConstant.MESSAGE, ErrorMessage.GREENCITY_APP_UNAVAILABLE);
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorBody);
+        }
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        log.error(exceptionResponse.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponse);
     }
 
     /**
@@ -375,7 +381,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
      *         exception.
      */
     @ExceptionHandler({LanguageNotSupportedException.class})
-    public ResponseEntity<Object> handleLanguageNotFoundException(LanguageNotSupportedException ex,
+    public ResponseEntity<Object> handleLanguageNotSupportedException(LanguageNotSupportedException ex,
         WebRequest request) {
         log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
@@ -383,40 +389,19 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Method interceptor exception {@link GoogleApiException}.
+     * Method intercept exception {@link LanguageNotFoundException}.
      *
-     * @param googleApiException Exception witch should be intercepted
+     * @param ex      Exception witch should be intercepted.
+     * @param request contain detail about occur exception
      * @return ResponseEntity witch contain http status and body with message of
      *         exception.
      */
-    @ExceptionHandler(GoogleApiException.class)
-    public ResponseEntity<Object> handleGoogleApiException(GoogleApiException googleApiException) {
-        ValidationExceptionDto validationExceptionDto =
-            new ValidationExceptionDto(AppConstant.GOOGLE_API, googleApiException.getMessage());
-        if (googleApiException.getMessage() != null
-            && googleApiException.getMessage().contains("Geocoding result was not found")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(validationExceptionDto);
-        } else {
-            validationExceptionDto.setMessage(googleApiException.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(validationExceptionDto);
-        }
-    }
-
-    /**
-     * Exception handler for InsufficientLocationDataException.
-     *
-     * @param exception which is being intercepted
-     * @param request   contains details about occurred exception
-     * @return ResponseEntity which contains details about exception and 400 status
-     *         code
-     */
-    @ExceptionHandler(InsufficientLocationDataException.class)
-    public final ResponseEntity<Object> handleInsufficientLocationDataException(
-        InsufficientLocationDataException exception, WebRequest request) {
-        log.error(exception.getMessage());
+    @ExceptionHandler({LanguageNotFoundException.class})
+    public ResponseEntity<ExceptionResponse> handleLanguageNotFoundException(LanguageNotFoundException ex,
+        WebRequest request) {
+        log.info(ex.getMessage());
         ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
     }
 
     /**
@@ -474,6 +459,23 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Handles exceptions of type {@link WrongCaptchaException}.
+     *
+     * @param exception the WrongCaptchaException instance
+     * @param request   the current web request
+     * @return a ResponseEntity containing the HTTP status code and error response
+     *         body
+     */
+    @ExceptionHandler(WrongCaptchaException.class)
+    public ResponseEntity<Object> handleWrongCaptchaException(WrongCaptchaException exception,
+        WebRequest request) {
+        log.error(exception.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
+    }
+
+    /**
      * Method intercepts exception {@link ResourceNotFoundException}.
      *
      * @param ex      Exception that should be intercepted.
@@ -490,5 +492,24 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         exceptionResponse.setMessage(ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponse);
+    }
+
+    /**
+     * Method intercepts exception {@link ErrorParsingException}.
+     *
+     * @param ex      Exception that should be intercepted.
+     * @param request Contains details about the occurred exception.
+     * @return {@code ResponseEntity} which contains the HTTP status and body with
+     *         the exception message.
+     */
+    @ExceptionHandler(ErrorParsingException.class)
+    public final ResponseEntity<Object> handleErrorParsingException(ErrorParsingException ex,
+        WebRequest request) {
+        log.error(ex.getMessage(), ex);
+
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        exceptionResponse.setMessage("Failed to parse JSON response: " + ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(exceptionResponse);
     }
 }

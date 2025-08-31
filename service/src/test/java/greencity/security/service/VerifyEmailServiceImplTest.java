@@ -1,23 +1,26 @@
 package greencity.security.service;
 
+import greencity.client.GreenCityRemoteClient;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.UserStatus;
+import greencity.exception.exceptions.GreenCityServiceException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import greencity.security.repository.VerifyEmailRepo;
 import java.util.List;
 import java.util.Optional;
+
+import greencity.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.web.client.RestClientException;
 import static greencity.ModelUtils.getUbsProfileCreationDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -27,17 +30,27 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
 class VerifyEmailServiceImplTest {
     @Mock
-    private VerifyEmailRepo verifyEmailRepo;
+    VerifyEmailRepo verifyEmailRepo;
+
     @Mock
-    private RestClient restClient;
+    RestClient restClient;
+
     @Mock
-    private ModelMapper modelMapper;
+    ModelMapper modelMapper;
+
     @Mock
-    private UserRepo userRepo;
+    UserRepo userRepo;
+
+    @Mock
+    GreenCityRemoteClient greenCityRemoteClient;
+
+    @Mock
+    UserService userService;
 
     User user = User.builder()
         .id(1L)
@@ -52,18 +65,22 @@ class VerifyEmailServiceImplTest {
         .build();
 
     @InjectMocks
-    private VerifyEmailServiceImpl verifyEmailService;
+    VerifyEmailServiceImpl verifyEmailService;
 
     @Test
     void verifyByTokenNotExpiredTokenTest() {
         UbsProfileCreationDto ubsProfile = getUbsProfileCreationDto();
+
         when(verifyEmailRepo.findByTokenAndUserId("token", 1L)).thenReturn(Optional.of(verifyEmail));
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(ubsProfile);
-        doReturn(1L).when(restClient).createUbsProfile(ubsProfile);
+        doReturn(1L).when(greenCityRemoteClient).createUbsProfile(ubsProfile);
         when(userRepo.save(any(User.class))).thenReturn(user);
+        doNothing().when(userService).createGreenCityUser(user.getId(), null);
+
         verifyEmailService.verifyByToken(1L, "token");
+
         verify(verifyEmailRepo).deleteByTokenAndUserId("token", 1L);
-        verify(restClient).createUbsProfile(ubsProfile);
+        verify(greenCityRemoteClient).createUbsProfile(ubsProfile);
     }
 
     @Test
@@ -79,12 +96,13 @@ class VerifyEmailServiceImplTest {
         when(verifyEmailRepo.findByTokenAndUserId(token, userId)).thenReturn(Optional.of(mockVerifyEmail));
         when(mockVerifyEmail.getUser()).thenReturn(mockUser);
         when(modelMapper.map(mockUser, UbsProfileCreationDto.class)).thenReturn(ubsProfile);
-        when(restClient.createUbsProfile(ubsProfile)).thenThrow(new RestClientException(exceptionMessage));
+        when(greenCityRemoteClient.createUbsProfile(ubsProfile)).thenThrow(
+            new GreenCityServiceException(exceptionMessage));
 
         boolean actualResult = verifyEmailService.verifyByToken(1L, "token");
 
         assertEquals(expectedResult, actualResult);
-        verify(restClient).createUbsProfile(ubsProfile);
+        verify(greenCityRemoteClient).createUbsProfile(ubsProfile);
         verify(mockUser, never()).setUserStatus(UserStatus.ACTIVATED);
         verify(userRepo, never()).save(any(User.class));
         verify(verifyEmailRepo, never()).deleteByTokenAndUserId(token, userId);
