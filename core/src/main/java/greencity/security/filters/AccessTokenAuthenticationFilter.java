@@ -64,7 +64,7 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         @SuppressWarnings("NullableProblems") FilterChain chain)
         throws IOException, ServletException {
         String token = extractToken(request);
-        log.info("token {}", token);
+        log.debug("token {}", token);
 
         if (token != null) {
             try {
@@ -72,7 +72,6 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
                     .authenticate(new UsernamePasswordAuthenticationToken(token, null));
                 Optional<UserVOShort> user =
                     userService.findNotDeactivatedByEmailReduced((String) authentication.getPrincipal());
-                log.info("user {}", user);
                 if (user.isPresent()) {
                     log.debug("User successfully authenticate - {}", authentication.getPrincipal());
                     SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -1093,9 +1093,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email) {
-        log.info("email {}", email);
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            .orElseThrow(() -> new NotFoundException(
+                ErrorMessage.USER_NOT_FOUND_BY_EMAIL + " Email: " + email));
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));
     }
 
