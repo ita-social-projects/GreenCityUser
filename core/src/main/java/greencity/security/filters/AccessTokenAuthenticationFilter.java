@@ -64,7 +64,6 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
         @SuppressWarnings("NullableProblems") FilterChain chain)
         throws IOException, ServletException {
         String token = extractToken(request);
-        log.debug("token {}", token);
 
         if (token != null) {
             try {
@@ -77,9 +76,9 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (ExpiredJwtException e) {
-                log.info("Token has expired: {}", token);
+                log.info("Token has expired");
             } catch (Exception e) {
-                log.info("Access denied with token: {}", e.getMessage());
+                log.info("Access denied during token authentication: {}", e.getMessage());
             }
         }
         chain.doFilter(request, response);
