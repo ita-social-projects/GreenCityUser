@@ -24,7 +24,7 @@ public class RetryableTaskServiceImpl implements RetryableTaskService {
     private final RetryableTaskRepository retryableTaskRepository;
     private final ObjectMapper objectMapper;
     private static final Integer LIMIT = 100;
-    private static final Integer TIMEOUTINSECONDS = 60;
+    private static final Integer TIMEOUTINSECONDS = 18000;
 
     @Transactional
     public <T> void saveRetryableTask(T payloadObject, RetryableTaskType type) {
