@@ -38,7 +38,6 @@ public class RetryableTaskScheduler {
                 repository.save(task);
             } catch (TaskProcessingException e) {
                 log.warn("TaskProcessingException for task {}: {}", task.getId(), e.getMessage());
-
             } catch (Exception e) {
                 log.error("Unexpected error for task {}: {}", task.getId(), e.getMessage(), e);
             }
