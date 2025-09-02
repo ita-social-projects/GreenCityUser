@@ -158,5 +158,13 @@ public interface EmailService {
      */
     void sendGreenOfficeRequestEmailToManager(ScheduledEmailMessage message);
 
+    /**
+     * Sends an email notification containing user feedback received from the
+     * Telegram bot.
+     *
+     * @param dto {@link UserTelegramFeedbackDto} the data transfer object
+     *            containing details such as chat ID, username, rating, comment and
+     *            email subject.
+     */
     void sendTelegramFeedbackEmail(UserTelegramFeedbackDto dto);
 }

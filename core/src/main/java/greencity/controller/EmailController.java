@@ -132,6 +132,13 @@ public class EmailController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * Send an email with user feedback received from the Telegram bot.
+     *
+     * @param dto {@link UserTelegramFeedbackDto} - object containing the feedback
+     *            details: chat ID, username, rating, optional comment and email
+     *            subject.
+     */
     @Operation(summary = "Send telegram user feedback to customer email")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
