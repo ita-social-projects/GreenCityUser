@@ -31,5 +31,5 @@
     <include file="db/changelog/logs/ch-create-retryable-task-table-Pohranychnyi.xml"/>
     <include file="db/changelog/logs/ch-insert-into-employee-positions-mapping-Lys.xml"/>
     <include file="db/changelog/logs/ch-add-authority-category-table-Popovych.xml"/>
-
+    <include file="db/changelog/logs/ch-insert-passwords-into-own-security-Lys.xml"/>
 </databaseChangeLog>
