@@ -213,6 +213,12 @@
             <artifactId>ldm-spring-boot-starter</artifactId>
             <version>${ldm.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.hakky54</groupId>
+            <artifactId>logcaptor</artifactId>
+            <version>2.12.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
