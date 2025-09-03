@@ -3,6 +3,7 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.InterestingEcoNewsDto;
+import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.enums.PlaceStatus;
 import greencity.message.PlaceStatusChangeDto;
@@ -222,5 +223,21 @@ class EmailControllerTest {
             .andExpect(status().isOk());
 
         verify(emailService, times(1)).sendGreenOfficeRequestEmailToManager(message);
+    }
+
+    @Test
+    public void testSendTelegramFeedback_Success() throws Exception {
+        UserTelegramFeedbackDto dto = new UserTelegramFeedbackDto();
+        dto.setChatId("12345");
+        dto.setName("John Doe");
+        dto.setRating(5);
+        dto.setComment("Great service!");
+        ObjectMapper objectMapper = new ObjectMapper();
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/telegram-feedback")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isOk());
+
+        verify(emailService, times(1)).sendTelegramFeedbackEmail(dto);
     }
 }
