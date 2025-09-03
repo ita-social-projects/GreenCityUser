@@ -226,7 +226,7 @@ class EmailControllerTest {
     }
 
     @Test
-    public void testSendTelegramFeedback_Success() throws Exception {
+    void testSendTelegramFeedback_Success() throws Exception {
         UserTelegramFeedbackDto dto = new UserTelegramFeedbackDto();
         dto.setChatId("12345");
         dto.setName("John Doe");
