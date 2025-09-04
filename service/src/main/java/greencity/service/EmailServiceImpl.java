@@ -7,6 +7,7 @@ import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
 import greencity.exception.exceptions.NotFoundException;
@@ -377,6 +378,18 @@ public class EmailServiceImpl implements EmailService {
 
         String template = createEmailTemplate(model, EmailConstants.GREEN_OFFICE_REQUEST_PAGE);
         sendEmail(greenOfficeEmailAddress, message.getSubject(), template);
+    }
+
+    @Override
+    public void sendTelegramFeedbackEmail(UserTelegramFeedbackDto dto) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CHAT_ID, dto.getChatId());
+        model.put(EmailConstants.USER_NAME, dto.getName());
+        model.put(EmailConstants.RATING, dto.getRating());
+        model.put(EmailConstants.COMMENT, dto.getComment());
+
+        String template = createEmailTemplate(model, EmailConstants.TELEGRAM_FEEDBACK);
+        sendEmail(greenOfficeEmailAddress, dto.getSubject(), template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {

@@ -2,12 +2,14 @@ package greencity.controller;
 
 import greencity.constant.HttpStatuses;
 import greencity.dto.econews.InterestingEcoNewsDto;
+import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.*;
 import greencity.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -128,6 +130,25 @@ public class EmailController {
     @PostMapping("/sendPlaceStatusChange")
     public ResponseEntity<Object> sendPlaceStatusChange(@RequestBody PlaceStatusChangeDto dto) {
         emailService.sendPlaceStatusChangeNotification(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Send an email with user feedback received from the Telegram bot.
+     *
+     * @param dto {@link UserTelegramFeedbackDto} - object containing the feedback
+     *            details: chat ID, username, rating, optional comment and email
+     *            subject.
+     */
+    @Operation(summary = "Send telegram user feedback to customer email")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/telegram-feedback")
+    public ResponseEntity<Void> sendTelegramFeedback(@RequestBody @Valid UserTelegramFeedbackDto dto) {
+        emailService.sendTelegramFeedbackEmail(dto);
         return ResponseEntity.ok().build();
     }
 }

@@ -24,6 +24,7 @@ import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.Language;
 import greencity.entity.User;
@@ -413,6 +414,19 @@ class EmailServiceImplTest {
             .build();
 
         service.sendGreenOfficeRequestEmailToManager(message);
+        verify(javaMailSender).createMimeMessage();
+    }
+
+    @Test
+    void testSendTelegramFeedbackEmail_Success() {
+        UserTelegramFeedbackDto feedbackDto = new UserTelegramFeedbackDto();
+        feedbackDto.setChatId("12345");
+        feedbackDto.setName("John Doe");
+        feedbackDto.setRating(5);
+        feedbackDto.setComment("Great service!");
+        feedbackDto.setSubject("Feedback Subject");
+        service.sendTelegramFeedbackEmail(feedbackDto);
+
         verify(javaMailSender).createMimeMessage();
     }
 }
