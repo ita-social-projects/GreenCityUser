@@ -9,6 +9,7 @@ import greencity.service.EmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -146,7 +147,7 @@ public class EmailController {
         @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PostMapping("/telegram-feedback")
-    public ResponseEntity<Void> sendTelegramFeedback(@RequestBody UserTelegramFeedbackDto dto) {
+    public ResponseEntity<Void> sendTelegramFeedback(@RequestBody @Valid UserTelegramFeedbackDto dto) {
         emailService.sendTelegramFeedbackEmail(dto);
         return ResponseEntity.ok().build();
     }
