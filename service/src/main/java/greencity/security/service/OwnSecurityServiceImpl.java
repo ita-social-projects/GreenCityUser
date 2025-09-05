@@ -63,6 +63,7 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.glassfish.jaxb.core.v2.TODO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -223,7 +224,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         handleUserStatus(user.getUserStatus());
         handleBruteForceProtection(email);
 
-        verifyCaptcha(dto, email);
+        // TODO remove func for captcha
+        // verifyCaptcha(dto, email);
 
         validatePassword(dto, user);
 
