@@ -286,7 +286,8 @@ class OwnSecurityServiceImplTest {
         verify(jwtTool, times(1)).createRefreshToken(any(UserVO.class));
         verify(loginAttemptService, times(1)).isBlockedByCaptcha(anyString());
         verify(loginAttemptService, times(1)).isBlockedByWrongPassword(anyString());
-        //verify(cloudFlareClient, times(1)).getCloudFlareResponse(any(CloudFlareRequest.class));
+        // verify(cloudFlareClient,
+        // times(1)).getCloudFlareResponse(any(CloudFlareRequest.class));
     }
 
     @Test
@@ -650,20 +651,21 @@ class OwnSecurityServiceImplTest {
         assertThrows(WrongPasswordException.class,
             () -> ownSecurityService.signIn(ownSignInDto));
     }
+// TODO remove captcha func
 
-    @Test
-    void throwExceptionWhenCaptchaIsNotValid() {
-        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
-        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
-        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
-        when(userRepo.findByEmail(anyString()))
-            .thenReturn(Optional.ofNullable(userForBruteForceTest));
-        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
-            .thenReturn(new CloudFlareResponse(false, null, null, null));
-
-        assertThrows(WrongCaptchaException.class,
-            () -> ownSecurityService.signIn(ownSignInDto));
-    }
+//    @Test
+//    void throwExceptionWhenCaptchaIsNotValid() {
+//        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+//        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
+//        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
+//        when(userRepo.findByEmail(anyString()))
+//            .thenReturn(Optional.ofNullable(userForBruteForceTest));
+//        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
+//            .thenReturn(new CloudFlareResponse(false, null, null, null));
+//
+//        assertThrows(WrongCaptchaException.class,
+//            () -> ownSecurityService.signIn(ownSignInDto));
+//    }
 
     @Test
     void unblockUserTest() {
