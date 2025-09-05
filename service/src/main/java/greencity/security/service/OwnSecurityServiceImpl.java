@@ -223,7 +223,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         handleUserStatus(user.getUserStatus());
         handleBruteForceProtection(email);
 
-        verifyCaptcha(dto, email);
+        // TODO remove func for captcha
+        // verifyCaptcha(dto, email);
 
         validatePassword(dto, user);
 
