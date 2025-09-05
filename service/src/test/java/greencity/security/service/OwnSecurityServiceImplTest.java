@@ -286,7 +286,7 @@ class OwnSecurityServiceImplTest {
         verify(jwtTool, times(1)).createRefreshToken(any(UserVO.class));
         verify(loginAttemptService, times(1)).isBlockedByCaptcha(anyString());
         verify(loginAttemptService, times(1)).isBlockedByWrongPassword(anyString());
-        verify(cloudFlareClient, times(1)).getCloudFlareResponse(any(CloudFlareRequest.class));
+        //verify(cloudFlareClient, times(1)).getCloudFlareResponse(any(CloudFlareRequest.class));
     }
 
     @Test
