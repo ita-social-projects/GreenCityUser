@@ -427,6 +427,13 @@ public interface UserService {
     Boolean checkIfUserExistsByUuid(String uuid);
 
     /**
+     * Method checks the existence of an active user by uuid.
+     * 
+     * @param uuid user's uuid.
+     */
+    boolean checkIfActiveUserExistsByUuid(String uuid);
+
+    /**
      * Updates last activity time for a given user by email.
      *
      * @param email                - {@link UserVO}'s email.
