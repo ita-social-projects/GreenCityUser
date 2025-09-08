@@ -53,10 +53,16 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
             return false;
         }
 
-        user.setUserStatus(UserStatus.ACTIVATED);
-        user = userRepo.save(user);
+        try {
+            userService.createGreenCityUser(user.getId(), null);
+            log.info("GreenCity profile with id {} has been created for user with uuid {}.", user.getId(), user.getUuid());
+        } catch (WebClientRequestException | GreenCityServiceException e) {
+            log.warn("GreenCity profile has not been created for user with uuid {}.", user.getUuid());
+            return false;
+        }
 
-        userService.createGreenCityUser(user.getId(), null);
+        user.setUserStatus(UserStatus.ACTIVATED);
+        userRepo.save(user);
 
         verifyEmailRepo.deleteByTokenAndUserId(token, userId);
         log.info("User has successfully verify the email by token {}.", token);
