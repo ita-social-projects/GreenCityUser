@@ -927,6 +927,15 @@ class UserControllerTest {
     }
 
     @Test
+    void checkIfActiveUserExistsByUuidTest() throws Exception {
+        when(userService.checkIfActiveUserExistsByUuid(TestConst.UUID)).thenReturn(true);
+        mockMvc.perform(get(userLink + "/checkActiveUserByUuid")
+            .param("uuid", TestConst.UUID))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value(true));
+    }
+
+    @Test
     void editUserRatingTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("testmail@gmail.com");
