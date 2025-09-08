@@ -20,7 +20,6 @@ public class ErrorMessage {
     public static final String BAD_GOOGLE_TOKEN = "Bad google token. ";
     public static final String EXPIRED_GOOGLE_ID_TOKEN = "Google id token is not valid or expired. ";
     public static final String TRANSACTION_FAILED = "Transaction failed and rolled back due to restClient failure. ";
-    public static final String BAD_FACEBOOK_TOKEN = "Bad facebook token";
     public static final String VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED = "Verification token not found or expired.";
     public static final String PASSWORD_RESTORE_LINK_ALREADY_SENT =
         "Password restore link already sent, please check your email: ";
