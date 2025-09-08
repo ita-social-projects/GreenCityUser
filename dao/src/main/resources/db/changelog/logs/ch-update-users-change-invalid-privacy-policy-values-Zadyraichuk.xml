@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet id="changeAllTruePrivacyPolicyValuesZadyraichuk" author="Rostyslav Zadyraichuk">
+        <update tableName="users">
+            <column name="show_location" value="PUBLIC"/>
+            <where>show_location = 'true'</where>
+        </update>
+        <update tableName="users">
+            <column name="show_location" value="PRIVATE"/>
+            <where>show_location = 'false'</where>
+        </update>
+        <update tableName="users">
+            <column name="show_eco_place" value="PUBLIC"/>
+            <where>show_eco_place = 'true'</where>
+        </update>
+        <update tableName="users">
+            <column name="show_eco_place" value="PRIVATE"/>
+            <where>show_eco_place = 'false'</where>
+        </update>
+        <update tableName="users">
+            <column name="show_to_do_list" value="PUBLIC"/>
+            <where>show_to_do_list = 'true'</where>
+        </update>
+        <update tableName="users">
+            <column name="show_to_do_list" value="PRIVATE"/>
+            <where>show_to_do_list = 'false'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

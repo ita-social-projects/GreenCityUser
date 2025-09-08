@@ -32,4 +32,5 @@
     <include file="db/changelog/logs/ch-insert-into-employee-positions-mapping-Lys.xml"/>
     <include file="db/changelog/logs/ch-add-authority-category-table-Popovych.xml"/>
     <include file="db/changelog/logs/ch-insert-passwords-into-own-security-Lys.xml"/>
+    <include file="db/changelog/logs/ch-update-users-change-invalid-privacy-policy-values-Zadyraichuk.xml"/>
 </databaseChangeLog>
