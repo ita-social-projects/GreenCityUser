@@ -152,6 +152,7 @@ public class SecurityConfig {
                     "/user/findUserByName/**",
                     "/user/findByUuId",
                     "/user/findUuidByEmail",
+                    "/user/checkActiveUserByUuid",
                     "/user/lang",
                     "/user/createUbsRecord",
                     "/user/{userId}/sixUserFriends/",
@@ -244,7 +245,6 @@ public class SecurityConfig {
                     "/user/statuses-distribution",
                     "/user/roles-distribution",
                     "/user/findNotDeactivatedById",
-                    "/user/checkActiveUserByUuid",
                     "/user/findNotDeactivatedByEmail")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
