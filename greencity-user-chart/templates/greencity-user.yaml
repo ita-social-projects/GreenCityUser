@@ -294,12 +294,6 @@ spec:
               name: {{ .Values.externalSecret.secretName }}
               key: GREEN-OFFICE-EMAIL-ADDRESS
 
-        - name: CLOUD_FLARE_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.externalSecret.secretName }}
-              key: CLOUD-FLARE-SECRET-KEY
-
         - name: SIGN_IN_TOKEN
           valueFrom:
             secretKeyRef:

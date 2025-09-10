@@ -459,23 +459,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Handles exceptions of type {@link WrongCaptchaException}.
-     *
-     * @param exception the WrongCaptchaException instance
-     * @param request   the current web request
-     * @return a ResponseEntity containing the HTTP status code and error response
-     *         body
-     */
-    @ExceptionHandler(WrongCaptchaException.class)
-    public ResponseEntity<Object> handleWrongCaptchaException(WrongCaptchaException exception,
-        WebRequest request) {
-        log.error(exception.getMessage());
-        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse);
-    }
-
-    /**
      * Method intercepts exception {@link ResourceNotFoundException}.
      *
      * @param ex      Exception that should be intercepted.

@@ -280,16 +280,6 @@ class CustomExceptionHandlerTest {
     }
 
     @Test
-    void handleWrongCaptchaExceptionTest() {
-        WrongCaptchaException actual = new WrongCaptchaException("Some string");
-        ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
-        when(errorAttributes.getErrorAttributes(eq(webRequest),
-            any(ErrorAttributeOptions.class))).thenReturn(objectMap);
-        assertEquals(customExceptionHandler.handleWrongCaptchaException(actual, webRequest),
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponse));
-    }
-
-    @Test
     void handleGreenCityServiceException500Test() {
         GreenCityServiceException actual = new GreenCityServiceException("Some error message");
         ExceptionResponse exceptionResponse = new ExceptionResponse(objectMap);
