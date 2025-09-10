@@ -93,8 +93,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private Integer expirationTime;
     @Value("${bruteForceSettings.blockTimeInMinutes}")
     private String blockTimeInMinutes;
-    @Value("${cloud-flare.secret-key}")
-    private String cloudFlareSecretKey;
     @Value("${testers.sign-in-token}")
     private String secretKey;
 
