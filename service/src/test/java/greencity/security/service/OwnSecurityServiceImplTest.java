@@ -269,7 +269,6 @@ class OwnSecurityServiceImplTest {
     @Test
     void signIn() {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
-        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
         when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
             .thenReturn(new CloudFlareResponse(true, null, null, null));
@@ -284,10 +283,7 @@ class OwnSecurityServiceImplTest {
         verify(passwordEncoder, times(1)).matches(anyString(), anyString());
         verify(jwtTool, times(1)).createAccessToken(anyString(), any(Role.class));
         verify(jwtTool, times(1)).createRefreshToken(any(UserVO.class));
-        verify(loginAttemptService, times(1)).isBlockedByCaptcha(anyString());
         verify(loginAttemptService, times(1)).isBlockedByWrongPassword(anyString());
-        // verify(cloudFlareClient,
-        // times(1)).getCloudFlareResponse(any(CloudFlareRequest.class));
     }
 
     @Test
@@ -296,7 +292,6 @@ class OwnSecurityServiceImplTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("new-access-token");
         when(jwtTool.createRefreshToken(any(UserVO.class))).thenReturn("new-refresh-token");
-        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
         when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
             .thenReturn(new CloudFlareResponse(true, null, null, null));
@@ -321,7 +316,6 @@ class OwnSecurityServiceImplTest {
             .role(Role.ROLE_USER)
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
-        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
         when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
             .thenReturn(new CloudFlareResponse(true, null, null, null));
@@ -630,20 +624,8 @@ class OwnSecurityServiceImplTest {
     }
 
     @Test
-    void singInBlockedUser() {
-        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
-        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
-        when(userRepo.findByEmail(anyString()))
-            .thenReturn(Optional.ofNullable(userForBruteForceTest));
-
-        assertThrows(UserBlockedException.class,
-            () -> ownSecurityService.signIn(ownSignInDto));
-    }
-
-    @Test
     void singInBlockedUserByPassword() {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
-        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(true);
         when(userRepo.findByEmail(anyString()))
             .thenReturn(Optional.ofNullable(userForBruteForceTest));
@@ -651,21 +633,6 @@ class OwnSecurityServiceImplTest {
         assertThrows(WrongPasswordException.class,
             () -> ownSecurityService.signIn(ownSignInDto));
     }
-// TODO remove captcha func
-
-//    @Test
-//    void throwExceptionWhenCaptchaIsNotValid() {
-//        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
-//        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
-//        when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
-//        when(userRepo.findByEmail(anyString()))
-//            .thenReturn(Optional.ofNullable(userForBruteForceTest));
-//        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
-//            .thenReturn(new CloudFlareResponse(false, null, null, null));
-//
-//        assertThrows(WrongCaptchaException.class,
-//            () -> ownSecurityService.signIn(ownSignInDto));
-//    }
 
     @Test
     void unblockUserTest() {
