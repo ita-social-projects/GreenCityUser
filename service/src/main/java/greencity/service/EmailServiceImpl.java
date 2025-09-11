@@ -7,12 +7,13 @@ import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.User;
+import greencity.exception.exceptions.NotFoundException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
-import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import jakarta.mail.MessagingException;
@@ -20,6 +21,7 @@ import jakarta.mail.internet.MimeMessage;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,7 @@ public class EmailServiceImpl implements EmailService {
     private final Executor executor;
     private final String clientLink;
     private final String senderEmailAddress;
+    private final String greenOfficeEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
     private final UserRepo userRepo;
@@ -57,13 +60,16 @@ public class EmailServiceImpl implements EmailService {
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
-        @Value("${sender.email.address}") String senderEmailAddress, MessageSource messageSource, UserRepo userRepo,
-        LanguageRepo languageRepo) {
+        @Value("${sender.email.address}") String senderEmailAddress,
+        @Value("${greenoffice.email.address}") String greenOfficeEmailAddress,
+        MessageSource messageSource,
+        UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
         this.clientLink = clientLink;
         this.senderEmailAddress = senderEmailAddress;
+        this.greenOfficeEmailAddress = greenOfficeEmailAddress;
         this.messageSource = messageSource;
         this.userRepo = userRepo;
     }
@@ -253,7 +259,7 @@ public class EmailServiceImpl implements EmailService {
     private static Locale getLocale(String language) {
         if (language == null || language.equals("en")) {
             return Locale.ENGLISH;
-        } else if (language.equals("ua")) {
+        } else if (language.equals("uk")) {
             return Locale.of("uk", "UA");
         } else {
             throw new IllegalStateException("Unexpected value: " + language);
@@ -288,8 +294,26 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.BODY, message.getBody());
         model.put(EmailConstants.PROFILE_LINK, getProfileLink());
 
-        String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
-        sendEmail(message.getEmail(), message.getSubject(), template);
+        Long userId = message.getUserId();
+        String userUuid = message.getUserUuid();
+
+        Optional<String> userEmailOptional;
+        if (userId != null) {
+            userEmailOptional = userRepo.findEmailById(userId);
+        } else {
+            userEmailOptional = userRepo.findEmailByUuid(userUuid);
+        }
+
+        userEmailOptional.ifPresentOrElse(userEmail -> {
+            String template = createEmailTemplate(model, EmailConstants.SCHEDULED_NOTIFICATION_PAGE);
+            sendEmail(userEmail, message.getSubject(), template);
+        }, () -> {
+            if (userId != null) {
+                throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId);
+            } else {
+                throw new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + userUuid);
+            }
+        });
     }
 
     @Override
@@ -341,6 +365,31 @@ public class EmailServiceImpl implements EmailService {
         String template = createEmailTemplate(model, EmailConstants.PLACE_STATUS_CHANGE_PAGE);
         sendEmail(userEmail, messageSource.getMessage(EmailConstants.UPDATE_STATUS, null,
             getLocale(userLanguageCode)), template);
+    }
+
+    @Override
+    public void sendGreenOfficeRequestEmailToManager(ScheduledEmailMessage message) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.USER_NAME, message.getUsername());
+        model.put(EmailConstants.IS_UBS, message.isUbs());
+        model.put(EmailConstants.LANGUAGE, message.getLanguage());
+        model.put(EmailConstants.TITLE, message.getSubject());
+        model.put(EmailConstants.BODY, message.getBody());
+
+        String template = createEmailTemplate(model, EmailConstants.GREEN_OFFICE_REQUEST_PAGE);
+        sendEmail(greenOfficeEmailAddress, message.getSubject(), template);
+    }
+
+    @Override
+    public void sendTelegramFeedbackEmail(UserTelegramFeedbackDto dto) {
+        Map<String, Object> model = new HashMap<>();
+        model.put(EmailConstants.CHAT_ID, dto.getChatId());
+        model.put(EmailConstants.USER_NAME, dto.getName());
+        model.put(EmailConstants.RATING, dto.getRating());
+        model.put(EmailConstants.COMMENT, dto.getComment());
+
+        String template = createEmailTemplate(model, EmailConstants.TELEGRAM_FEEDBACK);
+        sendEmail(greenOfficeEmailAddress, dto.getSubject(), template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {
