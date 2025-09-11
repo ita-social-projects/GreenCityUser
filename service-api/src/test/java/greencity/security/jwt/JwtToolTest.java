@@ -1,11 +1,8 @@
 package greencity.security.jwt;
 
 import static greencity.constant.AppConstant.ROLE;
-
-import greencity.constant.AppConstant;
 import greencity.dto.user.UserVO;
 import greencity.enums.Role;
-import greencity.security.service.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,19 +30,15 @@ import org.springframework.test.util.ReflectionTestUtils;
 class JwtToolTest {
     private final String expectedEmail = "test@gmail.com";
     private final Role expectedRole = Role.ROLE_USER;
-    private final Long expectedUserId = 4L;
 
     @Mock
     HttpServletRequest request;
-
-    @Mock
-    JwtService jwtService;
 
     @InjectMocks
     private JwtTool jwtTool;
 
     @BeforeEach
-    void init() {
+    public void init() {
         ReflectionTestUtils.setField(jwtTool, "accessTokenValidTimeInMinutes", 15);
         ReflectionTestUtils.setField(jwtTool, "refreshTokenValidTimeInMinutes", 15);
         ReflectionTestUtils.setField(jwtTool, "accessTokenKey", "123123123123123123123123123123123123");
@@ -53,12 +46,10 @@ class JwtToolTest {
 
     @Test
     void createAccessToken() {
-        SecretKey key = Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes());
-
-        when(jwtService.findUserIdByEmail(expectedEmail))
-            .thenReturn(expectedUserId);
-
         final String accessToken = jwtTool.createAccessToken(expectedEmail, expectedRole);
+        System.out.println(accessToken);
+
+        SecretKey key = Keys.hmacShaKeyFor(jwtTool.getAccessTokenKey().getBytes());
 
         String actualEmail = Jwts.parser()
             .verifyWith(key)
@@ -75,13 +66,6 @@ class JwtToolTest {
             .getPayload()
             .get(ROLE);
         assertEquals(expectedRole, Role.valueOf(authorities.getFirst()));
-        Long actualUserId = Jwts.parser()
-            .verifyWith(key)
-            .build()
-            .parseSignedClaims(accessToken)
-            .getPayload()
-            .get(AppConstant.JWT_USER_ID_CLAIM, Long.class);
-        assertEquals(expectedUserId, actualUserId);
     }
 
     @Test
@@ -91,10 +75,6 @@ class JwtToolTest {
         userVO.setEmail(expectedEmail);
         userVO.setRole(expectedRole);
         userVO.setRefreshTokenKey(s);
-
-        when(jwtService.findUserIdByEmail(expectedEmail))
-            .thenReturn(expectedUserId);
-
         SecretKey key = Keys.hmacShaKeyFor(userVO.getRefreshTokenKey().getBytes());
         String refreshToken = jwtTool.createRefreshToken(userVO);
         String actualEmail = Jwts.parser()
@@ -112,13 +92,6 @@ class JwtToolTest {
             .getPayload()
             .get(ROLE);
         assertEquals(expectedRole, Role.valueOf(authorities.getFirst()));
-        Long actualUserId = Jwts.parser()
-            .verifyWith(key)
-            .build()
-            .parseSignedClaims(refreshToken)
-            .getPayload()
-            .get(AppConstant.JWT_USER_ID_CLAIM, Long.class);
-        assertEquals(expectedUserId, actualUserId);
     }
 
     @Test

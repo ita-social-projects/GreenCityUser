@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.dto.econews.InterestingEcoNewsDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
@@ -149,22 +148,4 @@ public interface EmailService {
      *            APPROVED, DELETED).
      */
     void sendPlaceStatusChangeNotification(PlaceStatusChangeDto dto);
-
-    /**
-     * Sends an email notification to a manager about request for green office from
-     * user.
-     *
-     * @param message {@link ScheduledEmailMessage}.
-     */
-    void sendGreenOfficeRequestEmailToManager(ScheduledEmailMessage message);
-
-    /**
-     * Sends an email notification containing user feedback received from the
-     * Telegram bot.
-     *
-     * @param dto {@link UserTelegramFeedbackDto} the data transfer object
-     *            containing details such as chat ID, username, rating, comment and
-     *            email subject.
-     */
-    void sendTelegramFeedbackEmail(UserTelegramFeedbackDto dto);
 }

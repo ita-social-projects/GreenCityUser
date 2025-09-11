@@ -11,7 +11,6 @@ import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
 import greencity.dto.achievement.UserVOAchievement;
-import greencity.dto.authorities.AuthorityCategoryDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.position.PositionAuthoritiesDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
@@ -24,8 +23,6 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserEmailDto;
-import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserManagementDto;
@@ -35,27 +32,18 @@ import greencity.dto.user.UserManagementViewDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserProfileDtoResponse;
 import greencity.dto.user.UserProfileStatisticsDto;
-import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleDto;
-import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.dto.user.DeactivateUserRequestDto;
-import greencity.dto.user.UserVOAdvancedDto;
-import greencity.dto.user.UserVOShort;
-import greencity.enums.DateGranularity;
 import greencity.enums.EmailNotification;
-import greencity.enums.EmailPreference;
-import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
 import greencity.service.EmailService;
-import greencity.service.ManagementUserStatisticsService;
 import greencity.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -66,7 +54,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.security.Principal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,6 +67,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -100,7 +88,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Slf4j
 public class UserController {
     private final UserService userService;
-    private final ManagementUserStatisticsService managementUserStatisticsService;
     private final EmailService emailService;
     private final PositionService positionService;
     private final AuthorityService authorityService;
@@ -237,7 +224,7 @@ public class UserController {
     }
 
     /**
-     * Get {@link UserUpdateDto} dto by principal (email) from access token.
+     * Get {@link UserVO} dto by principal (email) from access token.
      *
      * @return {@link UserUpdateDto}.
      */
@@ -255,7 +242,7 @@ public class UserController {
     }
 
     /**
-     * Update {@link UserUpdateDto}.
+     * Update {@link UserVO}.
      *
      * @return {@link ResponseEntity}.
      */
@@ -354,7 +341,7 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
-    @PatchMapping(path = "/deleteProfilePicture")
+    @DeleteMapping(path = "/deleteProfilePicture")
     public ResponseEntity<HttpStatus> deleteUserProfilePicture(Principal principal) {
         userService.deleteUserProfilePicture(principal.getName());
         return ResponseEntity.ok().build();
@@ -484,9 +471,9 @@ public class UserController {
     }
 
     /**
-     * Get {@link UserVOShort} by id.
+     * Get {@link UserVO} by id.
      *
-     * @return {@link UserVOShort}.
+     * @return {@link UserUpdateDto}.
      */
     @Operation(summary = "Get User by id")
     @ApiResponses(value = {
@@ -495,7 +482,7 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
     @GetMapping("/findById")
-    public ResponseEntity<UserVOShort> findById(@RequestParam Long id) {
+    public ResponseEntity<UserVO> findById(@RequestParam Long id) {
         return ResponseEntity.ok().body(userService.findById(id));
     }
 
@@ -535,6 +522,26 @@ public class UserController {
     }
 
     /**
+     * Method that allow you to find {@link UserVO} by Id.
+     *
+     * @return {@link UserUpdateDto}.
+     */
+    @Operation(summary = "Get User by id")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/searchBy")
+    @ApiPageable
+    public ResponseEntity<PageableAdvancedDto<UserManagementDto>> searchBy(
+        @RequestParam(required = false, name = "query") String query,
+        @Parameter(hidden = true) Pageable pageable) {
+        return ResponseEntity.ok().body(userService.searchBy(pageable, query));
+    }
+
+    /**
      * Method that updates user data.
      *
      * @param userDto dto with updated fields.
@@ -550,9 +557,9 @@ public class UserController {
     }
 
     /**
-     * Method that allow you to find all users {@link UserVOShort}.
+     * Method that allow you to find all users {@link UserVO}.
      *
-     * @return {@link UserVOShort list}.
+     * @return {@link UserVO list}.
      */
     @Operation(summary = "Get all Users")
     @ApiResponses(value = {
@@ -562,44 +569,25 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/findAll")
-    public ResponseEntity<List<UserVOShort>> findAll() {
+    public ResponseEntity<List<UserVO>> findAll() {
         return ResponseEntity.ok().body(userService.findAll());
     }
 
     /**
-     * Method that allow you to find not 'DEACTIVATED' {@link UserVOShort} by email.
+     * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
      *
      * @param email - {@link UserVO}'s email
-     * @return {@link UserVOShort}.
+     * @return {@link UserVO}.
      */
     @Operation(summary = "Get find not 'DEACTIVATED' User by email")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/findNotDeactivatedByEmail")
-    public ResponseEntity<UserVOShort> findNotDeactivatedByEmail(@RequestParam String email) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailReduced(email).orElse(null));
-    }
-
-    /**
-     * Method that allow you to find not 'DEACTIVATED' {@link UserVOShort} by id.
-     *
-     * @param id - {@link UserVO}'s id
-     * @return {@link UserVOShort}.
-     */
-    @Operation(summary = "Get find not 'DEACTIVATED' User by id")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/findNotDeactivatedById")
-    public ResponseEntity<UserVOShort> findNotDeactivatedById(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdReduced(id).orElse(null));
+    public ResponseEntity<UserVO> findNotDeactivatedByEmail(@RequestParam String email) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmail(email).orElse(null));
     }
 
     /**
@@ -820,7 +808,7 @@ public class UserController {
      * Method that allow search users by their email notification.
      *
      * @param emailNotification enum with notification value.
-     * @return {@link List} of {@link UserVOShort}
+     * @return {@link List} of {@link UserVO}
      */
     @Operation(summary = "Search Users by email notification")
     @ApiResponses(value = {
@@ -828,8 +816,7 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
     })
     @GetMapping("/findAllByEmailNotification")
-    public ResponseEntity<List<UserVOShort>> findAllByEmailNotification(
-        @RequestParam EmailNotification emailNotification) {
+    public ResponseEntity<List<UserVO>> findAllByEmailNotification(@RequestParam EmailNotification emailNotification) {
         return ResponseEntity.ok().body(userService.findAllByEmailNotification(emailNotification));
     }
 
@@ -929,22 +916,6 @@ public class UserController {
     @GetMapping("/checkByUuid")
     public ResponseEntity<Boolean> checkIfUserExistsByUuId(@RequestParam String uuid) {
         return ResponseEntity.ok().body(userService.checkIfUserExistsByUuid(uuid));
-    }
-
-    /**
-     * Check the existence of an active user by uuid.
-     *
-     * @param uuid user's uuid.
-     * @return {@link Boolean}.
-     */
-    @Operation(summary = "Check the existence of an active user by uuid")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
-    })
-    @GetMapping("/checkActiveUserByUuid")
-    public ResponseEntity<Boolean> checkIfActiveUserExistsByUuId(@RequestParam String uuid) {
-        return ResponseEntity.ok().body(userService.checkIfActiveUserExistsByUuid(uuid));
     }
 
     /**
@@ -1070,27 +1041,6 @@ public class UserController {
     }
 
     /**
-     * Controller to get an employee's authorities grouped by categories.
-     *
-     * @param email {@link String} - employee email.
-     * @return {@link List} of {@link AuthorityCategoryDto}.
-     */
-    @Operation(summary = "Get all employee's authorities grouped by categories")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
-    })
-    @GetMapping("/authorities/grouped-by-categories")
-    public ResponseEntity<List<AuthorityCategoryDto>> getAuthoritiesGroupedByCategories(
-        @RequestParam String email) {
-        List<AuthorityCategoryDto> authorities = authorityService.getEmployeesAuthoritiesGroupedByCategories(email);
-        return ResponseEntity.ok(authorities);
-    }
-
-    /**
      * Controller that deactivate employee by uuid.
      *
      * @param uuid - uuid of Employee.
@@ -1123,202 +1073,11 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN),
-        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND),
-        @ApiResponse(responseCode = "503", description = HttpStatuses.SERVICE_UNAVAILABLE)
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
     })
     @PutMapping("/user-rating")
     public ResponseEntity<HttpStatus> updateUserRating(@Valid @RequestBody UserAddRatingDto userAddRatingDto) {
         userService.updateUserRating(userAddRatingDto);
         return ResponseEntity.ok().build();
-    }
-
-    /**
-     * Get user roles distribution.
-     *
-     * @return {@link List} of {@link UserRoleStatisticDto}.
-     */
-    @Operation(summary = "Get user roles distribution")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/roles-distribution")
-    public ResponseEntity<List<UserRoleStatisticDto>> getUserRolesDistribution() {
-        return ResponseEntity.ok().body(managementUserStatisticsService.getUserRolesDistribution());
-    }
-
-    /**
-     * Get user statuses distribution.
-     *
-     * @return {@link List} of {@link UserStatusStatisticDto}.
-     */
-    @Operation(summary = "Get user statuses distribution")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/statuses-distribution")
-    public ResponseEntity<List<UserStatusStatisticDto>> getUserStatusesDistribution() {
-        return ResponseEntity.ok().body(managementUserStatisticsService.getUserStatusesDistribution());
-    }
-
-    /**
-     * Get user email preferences distribution.
-     *
-     * @return {@link List} of {@link UserEmailPreferencesStatisticDto}.
-     */
-    @Operation(summary = "Get user email preferences distribution")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/email-preferences-distribution")
-    public ResponseEntity<List<UserEmailPreferencesStatisticDto>> getUserEmailPreferencesDistribution() {
-        return ResponseEntity.ok().body(managementUserStatisticsService.getUserEmailPreferencesDistribution());
-    }
-
-    /**
-     * Count total active users in the system.
-     *
-     * @return number of active users in the system
-     */
-    @Operation(summary = "Get user email preferences distribution")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/count-active-users")
-    public ResponseEntity<Long> countActiveUsers() {
-        return ResponseEntity.ok(managementUserStatisticsService.countActiveUsers());
-    }
-
-    /**
-     * Find users by email preference and email periodicity.
-     *
-     * @param emailPreference user's email preference.
-     * @param periodicity     email periodicity.
-     * @return list of {@link UserVOShort}
-     */
-    @Operation(summary = "Find users by email preference and email periodicity.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/email")
-    public ResponseEntity<List<UserVOShort>> findAllByEmailPreferenceAndEmailPeriodicity(
-        @RequestParam("email-preference") EmailPreference emailPreference,
-        @RequestParam("email-periodicity") EmailPreferencePeriodicity periodicity) {
-        return ResponseEntity.ok(userService.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference, periodicity));
-    }
-
-    /**
-     * Method to get list of dates and counts of registered users.
-     *
-     * @param startDate   {@code LocalDateTime} startDate.
-     * @param endDate     {@code LocalDateTime} endDate.
-     * @param granularity {@link DateGranularity} (eg. day, week, month, year).
-     * @return {@link List} of {@link UserRegistrationStatisticDto}.
-     */
-    @Operation(summary = "Get list of dates and counts of registered users.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/registration-statistics")
-    public ResponseEntity<List<UserRegistrationStatisticDto>> getUserRegistrationsByDateRange(
-        @RequestParam("start-date") LocalDateTime startDate,
-        @RequestParam("end-date") LocalDateTime endDate,
-        @RequestParam("granularity") DateGranularity granularity) {
-        return ResponseEntity
-            .ok(managementUserStatisticsService.getUserRegistrationsByDateRange(startDate, endDate, granularity));
-    }
-
-    /**
-     * Endpoint for retrieving IDs of all users with status {@code ACTIVATED}.
-     *
-     * @param ids {@link List} of ids to search for users in this range, not
-     *            required: if not specified - then the search is done through all
-     *            existing users.
-     * @return a {@link ResponseEntity} containing a list of activated user IDs
-     */
-    @Operation(summary = "Get the list of activated user ids")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/activated-ids")
-    public ResponseEntity<List<Long>> getActivatedUsersIds(
-        @RequestParam(value = "ids", required = false) List<Long> ids) {
-        return ResponseEntity.ok(userService.findAllActivatedUserIds(ids));
-    }
-
-    /**
-     * Method that allow you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
-     * id.
-     *
-     * @param id - {@link UserVOAdvancedDto}'s id
-     * @return {@link UserVOAdvancedDto}.
-     */
-    @Operation(summary = "Get find not 'DEACTIVATED' User by id")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/findNotDeactivatedByIdAdvanced")
-    public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdAdvanced(id).orElse(null));
-    }
-
-    /**
-     * Method to find all {@link UserVO} users by emails.
-     *
-     * @param emails {@link List} of emails to search for
-     * @return {@link List} of {@link UserVO} with matching emails
-     */
-    @Operation(summary = "Find users by emails")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/email/findAll")
-    public ResponseEntity<List<UserVO>> findAllByEmailIn(@RequestParam List<String> emails) {
-        return ResponseEntity.ok(userService.findAllByEmailIn(emails));
-    }
-
-    /**
-     * Method to find all {@link UserEmailDto} user emails by user ids.
-     *
-     * @param userIds list of user ids
-     * @return list of {@link UserEmailDto} containing information about user's
-     *         email
-     */
-    @Operation(summary = "Find emails of users by user ids")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/email/findByIds")
-    public ResponseEntity<List<UserEmailDto>> findUserEmailsByUserIds(@RequestParam List<Long> userIds) {
-        return ResponseEntity.ok(userService.findUserEmailsByUserIds(userIds));
     }
 }

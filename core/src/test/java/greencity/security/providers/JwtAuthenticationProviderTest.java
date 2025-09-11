@@ -29,7 +29,7 @@ class JwtAuthenticationProviderTest {
     private JwtAuthenticationProvider jwtAuthenticationProvider;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
         jwtAuthenticationProvider = new JwtAuthenticationProvider(jwtTool);
     }

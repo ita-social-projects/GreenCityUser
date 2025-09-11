@@ -7,7 +7,7 @@ class UpdateConstantsTest {
 
     @Test
     void testGetResultByLanguageCode_WithUACode_ReturnsSuccessUA() {
-        String languageCode = "uk";
+        String languageCode = "ua";
         String result = UpdateConstants.getResultByLanguageCode(languageCode);
         assertEquals(UpdateConstants.SUCCESS_UA, result);
     }

@@ -8,5 +8,4 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class CacheConstants {
     public static final String ALL_ACHIEVEMENTS_CACHE_NAME = "achievements_cache";
-    public static final String SOCIAL_NETWORK_IMAGE_CACHE_NAME = "social_network_image_cache";
 }

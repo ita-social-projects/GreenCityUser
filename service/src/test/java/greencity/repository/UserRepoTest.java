@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
@@ -127,6 +128,62 @@ class UserRepoTest {
     }
 
     @Test
+    void getAllUserFriendsTest() {
+        User user = ModelUtils.getUser();
+        user.setEmailNotification(EmailNotification.MONTHLY);
+        User user2 = ModelUtils.getUser();
+        user2.setEmailNotification(EmailNotification.DISABLED);
+        user2.setEmail("test2@email.com");
+        User user3 = ModelUtils.getUser();
+        user3.setEmailNotification(EmailNotification.MONTHLY);
+        User user4 = ModelUtils.getUser();
+        user4.setEmailNotification(EmailNotification.IMMEDIATELY);
+        User user5 = ModelUtils.getUser();
+        user5.setEmailNotification(EmailNotification.IMMEDIATELY);
+
+        List<User> users = Arrays.asList(user, user2, user3, user4, user5);
+        when(userRepo.getAllUserFriends(anyLong())).thenReturn(users);
+        List<User> actual = userRepo.getAllUserFriends(1L);
+        assertEquals(5, actual.size());
+        assertEquals(1, actual.get(1).getId());
+        verify(userRepo).getAllUserFriends(1L);
+    }
+
+    @Test
+    void getAllUserFriendsPageTest() {
+        Pageable pageable = PageRequest.of(0, 2);
+        List<User> users = Arrays.asList(new User(), new User());
+        Page<User> expectedPage = new PageImpl<>(users, pageable, users.size());
+        when(userRepo.getAllUserFriends(anyLong(), any())).thenReturn(expectedPage);
+
+        Page<User> actual = userRepo.getAllUserFriends(1L, pageable);
+        assertEquals(2, actual.getContent().size());
+        assertEquals(expectedPage.getContent(), actual.getContent());
+        verify(userRepo).getAllUserFriends(1L, pageable);
+    }
+
+    @Test
+    void getSixFriendsWithTheHighestRatingTest() {
+        User user1 = ModelUtils.getUser();
+        user1.setId(1L);
+        User user2 = ModelUtils.getUser();
+        user2.setId(2L);
+        User user3 = ModelUtils.getUser();
+        user3.setId(3L);
+
+        List<User> friends = Arrays.asList(user1, user2, user3);
+
+        when(userRepo.getSixFriendsWithTheHighestRating(anyLong())).thenReturn(friends);
+
+        List<User> highestRatedFriends = userRepo.getSixFriendsWithTheHighestRating(1L);
+        assertEquals(3, highestRatedFriends.size());
+        assertTrue(highestRatedFriends.contains(user1));
+        assertTrue(highestRatedFriends.contains(user2));
+        assertTrue(highestRatedFriends.contains(user3));
+        verify(userRepo).getSixFriendsWithTheHighestRating(1L);
+    }
+
+    @Test
     void deactivateSelectedUsersTest() {
         List<Long> ids = Arrays.asList(1L, 2L, 3L);
 
@@ -157,6 +214,28 @@ class UserRepoTest {
             userRepo.findByEmail("test3@email.com").get().getUserStatus().toString());
         verify(userRepo).deactivateSelectedUsers(ids);
         verify(userRepo, times(3)).findByEmail(anyString());
+    }
+
+    @Test
+    void searchByTest() {
+        Pageable pageable = PageRequest.of(0, 3);
+        User user3 = ModelUtils.getUser();
+        user3.setId(3L);
+        List<User> users = Arrays.asList(user3);
+        Page<User> expectedPage = new PageImpl<>(users, pageable, users.size());
+
+        when(userRepo.searchBy(any(Pageable.class), anyString())).thenReturn(expectedPage);
+
+        Page<User> actualPage = userRepo.searchBy(pageable, "test3@email.com");
+
+        List<Long> actualIds = actualPage.getContent().stream().map(User::getId)
+            .collect(Collectors.toList());
+        List<Long> expectedIds = expectedPage.getContent().stream().map(User::getId)
+            .collect(Collectors.toList());
+
+        assertEquals(1, expectedPage.getContent().size());
+        assertEquals(expectedIds, actualIds);
+        verify(userRepo).searchBy(pageable, "test3@email.com");
     }
 
     @Test

@@ -11,8 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ScheduledEmailMessage {
     private String username;
-    private Long userId;
-    private String userUuid;
+    private String email;
     private String baseLink;
     private String subject;
     private String body;

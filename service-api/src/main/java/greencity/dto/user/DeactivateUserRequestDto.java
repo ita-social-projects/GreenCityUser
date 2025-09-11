@@ -9,7 +9,6 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-@EqualsAndHashCode
 public class DeactivateUserRequestDto {
     @NotBlank
     @NotNull

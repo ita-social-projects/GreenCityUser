@@ -5,12 +5,14 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import greencity.ModelUtils;
 import greencity.TestConst;
-import greencity.client.GreenCityRemoteClient;
+import greencity.client.RestClient;
 import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserInfo;
 import greencity.dto.user.UserVO;
+import greencity.entity.Achievement;
 import greencity.entity.User;
+import greencity.entity.UserAchievement;
 import greencity.enums.EmailNotification;
 import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
@@ -28,6 +30,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import static greencity.ModelUtils.getUserInfo;
+import static greencity.constant.AppConstant.DEFAULT_RATING;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -55,6 +58,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @ExtendWith(MockitoExtension.class)
@@ -77,7 +81,7 @@ class GoogleSecurityServiceImplTest {
     @Mock
     private AchievementService achievementService;
     @Mock
-    private GreenCityRemoteClient greenCityRemoteClient;
+    private RestClient restClient;
     @Mock
     private PlatformTransactionManager platformTransactionManager;
     @Mock
@@ -99,7 +103,7 @@ class GoogleSecurityServiceImplTest {
         when(payload.getEmail()).thenReturn("test@mail.com");
         when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
 
-        SuccessSignInDto result = googleSecurityService.authenticate("token", "uk");
+        SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
         assertEquals(user.getName(), result.getName());
         assertEquals(user.getId(), result.getUserId());
 
@@ -123,7 +127,7 @@ class GoogleSecurityServiceImplTest {
         when(objectMapper.readValue(expectedJsonResponse, UserInfo.class)).thenReturn(userInfo);
         when(userService.findByEmail(userInfo.getEmail())).thenReturn(userVO);
 
-        SuccessSignInDto result = googleSecurityService.authenticate("token", "uk");
+        SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
 
         assertEquals(userVO.getName(), result.getName());
         assertEquals(userVO.getId(), result.getUserId());
@@ -140,12 +144,15 @@ class GoogleSecurityServiceImplTest {
         UserVO userVO = ModelUtils.getUserVO();
         User user = ModelUtils.getUser();
 
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
         List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
 
         userVO.setId(null);
         userVO.setName(null);
         user.setId(null);
         user.setName(null);
+        user.setUserAchievements(userAchievementList);
 
         when(googleIdTokenVerifier.verify("token")).thenReturn(googleIdToken);
         when(googleIdToken.getPayload()).thenReturn(payload);
@@ -156,10 +163,12 @@ class GoogleSecurityServiceImplTest {
         when(modelMapper.map(any(), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any())).thenReturn(user);
         when(achievementService.findAll()).thenReturn(achievementVOList);
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(UbsProfileCreationDto.builder().build());
-        when(greenCityRemoteClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
+        when(restClient.createUbsProfile(any(UbsProfileCreationDto.class))).thenReturn(1L);
 
-        SuccessSignInDto result = googleSecurityService.authenticate("token", "uk");
+        SuccessSignInDto result = googleSecurityService.authenticate("token", "ua");
 
         assertNull(result.getUserId());
         assertNull(result.getName());
@@ -178,6 +187,7 @@ class GoogleSecurityServiceImplTest {
             assertNotNull(savedUser.getLastActivityTime(), "Last activity time should be set.");
             assertEquals(EmailNotification.DISABLED, savedUser.getEmailNotification(),
                 "Email notification should be DISABLED.");
+            assertEquals(DEFAULT_RATING, savedUser.getRating());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowLocation());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowEcoPlace());
             assertEquals(ProfilePrivacyPolicy.PUBLIC, savedUser.getShowToDoList());
@@ -201,7 +211,7 @@ class GoogleSecurityServiceImplTest {
         when(userService.findByEmail("test@mail.com")).thenReturn(userVO);
 
         assertThrows(UserDeactivatedException.class,
-            () -> googleSecurityService.authenticate("token", "uk"));
+            () -> googleSecurityService.authenticate("token", "ua"));
 
         verify(googleIdTokenVerifier).verify("token");
         verify(googleIdToken, times(3)).getPayload();
@@ -223,7 +233,7 @@ class GoogleSecurityServiceImplTest {
         when(objectMapper.readValue(expectedJsonResponse, UserInfo.class)).thenReturn(userInfo);
 
         assertThrows(IllegalArgumentException.class,
-            () -> googleSecurityService.authenticate("token", "uk"));
+            () -> googleSecurityService.authenticate("token", "ua"));
 
         verify(googleIdTokenVerifier).verify("token");
         verify(googleAccessTokenVerifier).execute(any(HttpGet.class));
@@ -235,7 +245,7 @@ class GoogleSecurityServiceImplTest {
     void authenticateThrowsIdTokenExpiredExceptionTest() throws IOException, GeneralSecurityException {
         when(googleIdTokenVerifier.verify("token")).thenReturn(null);
         assertThrows(IdTokenExpiredException.class,
-            () -> googleSecurityService.authenticate("token", "uk"));
+            () -> googleSecurityService.authenticate("token", "ua"));
         verify(googleIdTokenVerifier).verify("token");
     }
 
@@ -244,7 +254,7 @@ class GoogleSecurityServiceImplTest {
         throws IOException, GeneralSecurityException {
         when(googleIdTokenVerifier.verify("token")).thenThrow(IOException.class);
         assertThrows(IllegalArgumentException.class,
-            () -> googleSecurityService.authenticate("token", "uk"));
+            () -> googleSecurityService.authenticate("token", "ua"));
         verify(googleIdTokenVerifier).verify("token");
     }
 
@@ -254,7 +264,7 @@ class GoogleSecurityServiceImplTest {
         when(googleIdTokenVerifier.verify("token")).thenThrow(IllegalArgumentException.class);
         when(googleAccessTokenVerifier.execute(any(HttpGet.class))).thenThrow(IOException.class);
         assertThrows(IllegalArgumentException.class,
-            () -> googleSecurityService.authenticate("token", "uk"));
+            () -> googleSecurityService.authenticate("token", "ua"));
         verify(googleIdTokenVerifier).verify("token");
     }
 }

@@ -16,7 +16,6 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserEmailDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
@@ -30,11 +29,7 @@ import greencity.dto.user.UserStatusDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.user.UsersOnlineStatusRequestDto;
-import greencity.dto.user.UserVOAdvancedDto;
-import greencity.dto.user.UserVOShort;
 import greencity.enums.EmailNotification;
-import greencity.enums.EmailPreference;
-import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import java.time.LocalDateTime;
@@ -57,12 +52,12 @@ public interface UserService {
     void updateUserRating(UserAddRatingDto userRatingDto);
 
     /**
-     * Find all {@link UserVOShort} with {@link EmailNotification} type.
+     * Find all {@link User}'s with {@link EmailNotification} type.
      *
      * @param emailNotification - type of {@link EmailNotification}
-     * @return list of {@link UserVOShort}
+     * @return list of {@link User}'s
      */
-    List<UserVOShort> findAllByEmailNotification(EmailNotification emailNotification);
+    List<UserVO> findAllByEmailNotification(EmailNotification emailNotification);
 
     /**
      * Delete from the database users that have status 'DEACTIVATED' and last
@@ -81,7 +76,7 @@ public interface UserService {
 
     /**
      * Find and return all registration months. Runs an SQL Query which is described
-     * in {@link UserVO} under {@link jakarta.persistence.NamedNativeQuery}
+     * in {@link User} under {@link jakarta.persistence.NamedNativeQuery}
      * annotation. Spring Data JPA can run a named native query that follows the
      * naming convention {entityClass.repositoryMethodName}.
      *
@@ -97,12 +92,12 @@ public interface UserService {
     UserVO save(UserVO user);
 
     /**
-     * Method that allow you to find {@link UserVOShort} by ID.
+     * Method that allow you to find {@link UserVO} by ID.
      *
      * @param id a value of {@link Long}
-     * @return {@link UserVOShort}
+     * @return {@link UserVO}
      */
-    UserVOShort findById(Long id);
+    UserVO findById(Long id);
 
     /**
      * Method that allow you to find {@link UserVO} by ID.
@@ -333,11 +328,20 @@ public interface UserService {
     UserActivationDto setActivatedStatus(Long id);
 
     /**
+     * Method for getting UserVO by search query.
+     *
+     * @param paging {@link Pageable}.
+     * @param query  query to search,
+     * @return {@link PageableAdvancedDto} of {@link UserManagementDto} instances.
+     */
+    PageableAdvancedDto<UserManagementDto> searchBy(Pageable paging, String query);
+
+    /**
      * Method for getting all Users.
      *
-     * @return {@link List} of {@link UserVOShort} instances.
+     * @return {@link List} of {@link UserVO} instances.
      */
-    List<UserVOShort> findAll();
+    List<UserVO> findAll();
 
     /**
      * Method that finds users by name.
@@ -387,16 +391,6 @@ public interface UserService {
     void updateUserLanguage(Long userId, Long languageId);
 
     /**
-     * Method that finds user ids by emailPreference and periodicity.
-     *
-     * @param emailPreference of user.
-     * @param periodicity     of notification.
-     * @return list of {@link UserVOShort}.
-     */
-    List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(EmailPreference emailPreference,
-        EmailPreferencePeriodicity periodicity);
-
-    /**
      * Method that return UserVo by UUid.
      *
      * @return {@link UserVO}
@@ -427,13 +421,6 @@ public interface UserService {
     Boolean checkIfUserExistsByUuid(String uuid);
 
     /**
-     * Method checks the existence of an active user by uuid.
-     * 
-     * @param uuid user's uuid.
-     */
-    boolean checkIfActiveUserExistsByUuid(String uuid);
-
-    /**
      * Updates last activity time for a given user by email.
      *
      * @param email                - {@link UserVO}'s email.
@@ -457,64 +444,4 @@ public interface UserService {
      * @return user language.
      */
     String findUserLanguageByUuid(String uuid);
-
-    /**
-     * Retrieves the list of IDs of all users who have the {@code UserStatus} set to
-     * {@code ACTIVATED}. This method is typically used to filter active users for
-     * further processing or analysis.
-     *
-     * @return a list of {@code Long} values representing the IDs of all activated
-     *         users
-     */
-    List<Long> findAllActivatedUserIds(List<Long> ids);
-
-    /**
-     * Method that allows you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
-     * id.
-     *
-     * @param id - {@link UserVOAdvancedDto}'s id
-     * @return {@link Optional} of found {@link UserVOAdvancedDto}.
-     */
-    Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id);
-
-    /**
-     * Method that allows you to create a user on the GreenCity microservice.
-     *
-     * @param newUserId      - {@link Long} user's id on GreenCityUser.
-     * @param profilePicture - {@link String} of user's profilePicture.
-     */
-    void createGreenCityUser(Long newUserId, String profilePicture);
-
-    /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by email.
-     *
-     * @param email - user's email
-     * @return {@link Optional} of found {@link UserVOShort}.
-     */
-    Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email);
-
-    /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by id.
-     *
-     * @param id - user's id
-     * @return {@link Optional} of found {@link UserVOShort}.
-     */
-    Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id);
-
-    /**
-     * Method to find all {@link UserVO} users by emails.
-     *
-     * @param emails {@link List} of emails to search for
-     * @return {@link List} of {@link UserVO} with matching emails
-     */
-    List<UserVO> findAllByEmailIn(List<String> emails);
-
-    /**
-     * Method to find all {@link UserEmailDto} user emails by user ids.
-     *
-     * @param userIds list of user ids
-     * @return list of {@link UserEmailDto} containing information about user's
-     *         email
-     */
-    List<UserEmailDto> findUserEmailsByUserIds(List<Long> userIds);
 }

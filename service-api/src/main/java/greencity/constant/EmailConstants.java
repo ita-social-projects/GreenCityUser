@@ -43,9 +43,6 @@ public class EmailConstants {
     public static final String NOTIFICATIONS_LINK = "notificationsLink";
     public static final String PLACE_NAME = "placeName";
     public static final String PLACE_STATUS = "placeStatus";
-    public static final String CHAT_ID = "chatId";
-    public static final String RATING = "rating";
-    public static final String COMMENT = "comment";
     // templates
     public static final String VERIFY_EMAIL_PAGE = "verify-email-page";
     public static final String RESTORE_EMAIL_PAGE = "restore-email-page";
@@ -60,6 +57,4 @@ public class EmailConstants {
     public static final String RECEIVE_INTERESTING_NEWS_EMAIL_PAGE = "receive-interesting-news-email-page";
     public static final String BLOCKED_USER_PAGE = "blocked-user-page";
     public static final String PLACE_STATUS_CHANGE_PAGE = "place-status-change";
-    public static final String GREEN_OFFICE_REQUEST_PAGE = "green-office-request";
-    public static final String TELEGRAM_FEEDBACK = "telegram-feedback";
 }

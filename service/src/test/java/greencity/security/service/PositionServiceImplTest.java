@@ -39,13 +39,13 @@ class PositionServiceImplTest {
     private PositionServiceImpl positionService;
 
     @BeforeEach
-    void initSecurityContext() {
+    public void initSecurityContext() {
         when(auth.getName()).thenReturn(TEST_EMAIL);
         SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     @AfterEach
-    void clearSecurityContext() {
+    public void clearSecurityContext() {
         SecurityContextHolder.clearContext();
     }
 

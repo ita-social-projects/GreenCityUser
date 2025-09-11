@@ -13,7 +13,7 @@ public class UpdateConstants {
      * @author Volodia Lesko
      */
     public static String getResultByLanguageCode(String code) {
-        if (code.equals("uk")) {
+        if (code.equals("ua")) {
             return SUCCESS_UA;
         }
         return SUCCESS_EN;

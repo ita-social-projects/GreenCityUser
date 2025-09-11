@@ -16,16 +16,7 @@
         <jjwt.version>0.12.3</jjwt.version>
         <modelmapper.version>3.2.0</modelmapper.version>
         <mockito-junit-jupiter.version>3.3.3</mockito-junit-jupiter.version>
-        <ldm.version>0.0.5</ldm.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>github</id>
-            <name>GitHub Repository</name>
-            <url>https://maven.pkg.github.com/ita-social-projects/LDM-spring-boot-starter</url>
-        </repository>
-    </repositories>
 
     <artifactId>core</artifactId>
     <dependencies>
@@ -207,17 +198,6 @@
             <artifactId>spring-cloud-dependencies</artifactId>
             <version>2023.0.3</version>
             <type>pom</type>
-        </dependency>
-        <dependency>
-            <groupId>com.softserve.ldm</groupId>
-            <artifactId>ldm-spring-boot-starter</artifactId>
-            <version>${ldm.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.hakky54</groupId>
-            <artifactId>logcaptor</artifactId>
-            <version>2.12.0</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
