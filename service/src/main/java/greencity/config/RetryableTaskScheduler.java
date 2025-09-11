@@ -24,7 +24,7 @@ public class RetryableTaskScheduler {
     private final RetryableTaskProcessorRegistry registry;
     private final ModelMapper modelMapper;
 
-    @Scheduled(fixedRate = 30000)
+    @Scheduled(fixedRate = 21600000)
     public void executePendingTasks() {
         List<RetryableTask> tasks = retryableTaskService.getRetryableTaskForProcessing();
         for (RetryableTask task : tasks) {

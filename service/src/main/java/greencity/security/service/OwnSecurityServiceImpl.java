@@ -3,8 +3,6 @@ package greencity.security.service;
 import greencity.client.CloudFlareClient;
 import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
-import greencity.dto.security.CloudFlareRequest;
-import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -30,7 +28,6 @@ import greencity.exception.exceptions.UserAlreadyHasPasswordException;
 import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.UserBlockedException;
 import greencity.exception.exceptions.UserDeactivatedException;
-import greencity.exception.exceptions.WrongCaptchaException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
@@ -96,8 +93,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private Integer expirationTime;
     @Value("${bruteForceSettings.blockTimeInMinutes}")
     private String blockTimeInMinutes;
-    @Value("${cloud-flare.secret-key}")
-    private String cloudFlareSecretKey;
     @Value("${testers.sign-in-token}")
     private String secretKey;
 
@@ -223,8 +218,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         handleUserStatus(user.getUserStatus());
         handleBruteForceProtection(email);
 
-        verifyCaptcha(dto, email);
-
         validatePassword(dto, user);
 
         if (!isEmailVerified(user)) {
@@ -243,38 +236,18 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     }
 
     /**
-     * Checks if user is blocked by brute-force protection (captcha or wrong
-     * password). If user is blocked, logs error and blocks user by email. If user
-     * exceeded wrong password attempts, throws WrongPasswordException.
+     * Checks if user is blocked by brute-force protection (wrong password). If user
+     * is blocked, logs error and blocks user by email. If user exceeded wrong
+     * password attempts, throws WrongPasswordException.
      *
      * @param email user email
      */
     private void handleBruteForceProtection(String email) {
-        if (loginAttemptService.isBlockedByCaptcha(email)) {
-            log.error("Too many failed login attempts - {}, account is blocked for {} minutes. Wrong Captcha", email,
-                blockTimeInMinutes);
-            blockUserByEmail(email);
-        }
-
         if (loginAttemptService.isBlockedByWrongPassword(email)) {
             log.error("Too many failed login attempts - {}, account is blocked for {} minutes. Wrong Password", email,
                 blockTimeInMinutes);
             throw new WrongPasswordException(
                 String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
-        }
-    }
-
-    /**
-     * Checks if captcha is valid. If captcha is not valid, logs error, increments
-     * wrong captcha attempts and throws WrongCaptchaException.
-     *
-     * @param dto   - {@link OwnSignInDto} that have sign-in information
-     * @param email - user email
-     */
-    private void verifyCaptcha(final OwnSignInDto dto, String email) {
-        if (!getCloudFlareResponse(dto).success()) {
-            loginAttemptService.loginFailedByCaptcha(email);
-            throw new WrongCaptchaException(ErrorMessage.WRONG_CAPTCHA);
         }
     }
 
@@ -317,54 +290,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         String accessToken = jwtTool.createAccessToken(email, user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), true);
-    }
-
-    /**
-     * Blocks user by email. Sets user status to {@link UserStatus#BLOCKED}, saves
-     * user and logs info about blocking. Then sends email with link to unblock and
-     * restore password page and throws {@link UserBlockedException} with message
-     * that contains time for which account is blocked.
-     *
-     * @param email email of user to be blocked
-     * @throws UserBlockedException if user is blocked
-     * @throws NotFoundException    if user with given email is not found
-     */
-    private void blockUserByEmail(String email) {
-        User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-
-        log.info("User with email {} is blocked", user.getEmail());
-
-        emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
-            user.getId(), user.getName(), user.getEmail(),
-            jwtTool.generateUnblockToken(email), getLanguageFromUser(user), false);
-
-        throw new UserBlockedException(
-            String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_CAPTCHA, blockTimeInMinutes));
-    }
-
-    /**
-     * Calls CloudFlare api to check if given captcha is valid.
-     *
-     * @param dto - {@link OwnSignInDto} that contains captcha token
-     * @return {@link CloudFlareResponse} with result of captcha validation
-     */
-    private CloudFlareResponse getCloudFlareResponse(OwnSignInDto dto) {
-        return cloudFlareClient.getCloudFlareResponse(CloudFlareRequest.builder()
-            .secret(cloudFlareSecretKey)
-            .response(dto.getCaptchaToken())
-            .build());
-    }
-
-    /**
-     * Gets user language from user object. If user language code is "1", method
-     * returns "uk", otherwise - "en".
-     *
-     * @param user user to get language from
-     * @return "uk" or "en" depending on user language code
-     */
-    private String getLanguageFromUser(User user) {
-        return user.getLanguage().getCode();
     }
 
     private boolean isPasswordCorrect(OwnSignInDto signInDto, UserVO user) {

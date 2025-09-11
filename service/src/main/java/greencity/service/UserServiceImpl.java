@@ -993,6 +993,14 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public boolean checkIfActiveUserExistsByUuid(String uuid) {
+        return userRepo.existsActiveByUuid(uuid);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public void updateUserLastActivityTimeByEmail(String email, LocalDateTime userLastActivityTime) {
         userRepo.updateUserLastActivityTimeByEmail(email, userLastActivityTime);
     }
@@ -1093,7 +1101,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email) {
-        log.info("email {}", email);
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));

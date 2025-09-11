@@ -932,6 +932,22 @@ public class UserController {
     }
 
     /**
+     * Check the existence of an active user by uuid.
+     *
+     * @param uuid user's uuid.
+     * @return {@link Boolean}.
+     */
+    @Operation(summary = "Check the existence of an active user by uuid")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST)
+    })
+    @GetMapping("/checkActiveUserByUuid")
+    public ResponseEntity<Boolean> checkIfActiveUserExistsByUuId(@RequestParam String uuid) {
+        return ResponseEntity.ok().body(userService.checkIfActiveUserExistsByUuid(uuid));
+    }
+
+    /**
      * Method for mark user like DEACTIVATED .
      *
      * @param uuid - for found user.

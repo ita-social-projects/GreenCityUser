@@ -389,6 +389,15 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     boolean existsNotDeactivatedByUuid(@Param("uuid") String uuid);
 
     /**
+     * Checks if there is an active user with the given uuid (userStatus == 2).
+     *
+     * @param uuid the UUID of the user
+     * @return true if such a user exists, false otherwise
+     */
+    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.uuid =:uuid AND u.userStatus = 2")
+    boolean existsActiveByUuid(@Param("uuid") String uuid);
+
+    /**
      * Finds a user by UUID if the user is not deactivated (userStatus ≠ 1).
      *
      * @param uuid the UUID of the user
