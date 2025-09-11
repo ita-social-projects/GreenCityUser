@@ -294,6 +294,13 @@ spec:
               name: {{ .Values.externalSecret.secretName }}
               key: GREEN-OFFICE-EMAIL-ADDRESS
 
+
+        - name: TG_BOT_FEEDBACKS_EMAIL_ADDRESS
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.externalSecret.secretName }}
+              key: TG-BOT-FEEDBACKS-EMAIL-ADDRESS
+
         - name: SIGN_IN_TOKEN
           valueFrom:
             secretKeyRef:
