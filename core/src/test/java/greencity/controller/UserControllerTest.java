@@ -47,7 +47,6 @@ import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.handler.CustomExceptionHandler;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
@@ -609,8 +608,7 @@ class UserControllerTest {
     void findNotDeactivatedByEmailTest() throws Exception {
         when(userService.findNotDeactivatedByEmailReduced(TestConst.EMAIL))
             .thenReturn(Optional.of(ModelUtils.getUserVOShortDto()));
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
-            .param("email", TestConst.EMAIL))
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail/" + TestConst.EMAIL))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value("user"))
             .andExpect(jsonPath("$.id").value(13L))
@@ -620,8 +618,7 @@ class UserControllerTest {
     @Test
     void findNotDeactivatedByEmailIfNullTest() throws Exception {
         when(userService.findNotDeactivatedByEmail(TestConst.EMAIL)).thenReturn(Optional.empty());
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
-            .param("email", TestConst.EMAIL))
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail/" + TestConst.EMAIL))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").doesNotExist());
     }
@@ -1086,11 +1083,12 @@ class UserControllerTest {
     }
 
     @Test
-    void findNotDeactivatedByIdAdvancedTest() throws Exception {
+    void findNotDeactivatedByEmailAdvancedTest() throws Exception {
         UserVOAdvancedDto expected = ModelUtils.getUserVOAdvancedDto();
-        when(userService.findNotDeactivatedByIdAdvanced(13L)).thenReturn(Optional.of(expected));
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
-            .param("id", String.valueOf(13L)))
+        String email = expected.getEmail();
+        when(userService.findNotDeactivatedByEmailAdvanced(email))
+            .thenReturn(Optional.of(expected));
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmailAdvanced/" + email))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value(expected.getName()))
             .andExpect(jsonPath("$.id").value(13L))
@@ -1098,11 +1096,10 @@ class UserControllerTest {
     }
 
     @Test
-    void findNotDeactivatedByIdAdvanced_NoResultTest() throws Exception {
-        Long userId = 999L;
-        when(userService.findNotDeactivatedByIdAdvanced(userId)).thenReturn(Optional.empty());
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
-            .param("id", String.valueOf(userId)))
+    void findNotDeactivatedByEmailAdvanced_NoResultTest() throws Exception {
+        String email = "email@email.com";
+        when(userService.findNotDeactivatedByEmailAdvanced(email)).thenReturn(Optional.empty());
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmailAdvanced/" + email))
             .andExpect(status().isOk())
             .andExpect(content().string(""));
     }
@@ -1116,49 +1113,6 @@ class UserControllerTest {
             .andExpect(status().isOk());
 
         verify(userService).findAllByEmailIn(emails);
-    }
-
-    @Test
-    void findUserEmailsByUserIdsTest() throws Exception {
-        List<String> userIdsStr = List.of("1", "2", "3");
-        List<Long> userIds = List.of(1L, 2L, 3L);
-
-        mockMvc.perform(get(userLink + "/email/findByIds")
-            .param("userIds", String.join(", ", userIdsStr)))
-            .andExpect(status().isOk());
-
-        verify(userService).findUserEmailsByUserIds(userIds);
-    }
-
-    @Test
-    void findNotDeactivatedByIdTest() throws Exception {
-        Long userId = 1L;
-        String userIdStr = String.valueOf(userId);
-        UserVOShort userVOShort = new UserVOShort();
-
-        when(userService.findNotDeactivatedByIdReduced(userId))
-            .thenReturn(Optional.of(userVOShort));
-
-        mockMvc.perform(get(userLink + "/findNotDeactivatedById")
-            .param(idQueryParam, userIdStr))
-            .andExpect(status().isOk());
-
-        verify(userService).findNotDeactivatedByIdReduced(userId);
-    }
-
-    @Test
-    void findNotDeactivatedByIdNotFoundTest() throws Exception {
-        Long userId = 1L;
-        String userIdStr = String.valueOf(userId);
-
-        when(userService.findNotDeactivatedByIdReduced(userId))
-            .thenThrow(new NotFoundException());
-
-        mockMvc.perform(get(userLink + "/findNotDeactivatedById")
-            .param(idQueryParam, userIdStr))
-            .andExpect(status().isNotFound());
-
-        verify(userService).findNotDeactivatedByIdReduced(userId);
     }
 
     @Test

@@ -1051,10 +1051,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional
-    public Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id) {
-        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        return Optional.of(modelMapper.map(notDeactivatedById, UserVOAdvancedDto.class));
+    public Optional<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(String email) {
+        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOAdvancedDto.class));
     }
 
     /**
@@ -1102,19 +1102,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email) {
         User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id) {
-        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        return Optional.of(modelMapper.map(notDeactivatedById, UserVOShort.class));
     }
 
     /**
@@ -1125,13 +1114,5 @@ public class UserServiceImpl implements UserService {
         return userRepo.findAllByEmailIn(emails).stream()
             .map(user -> modelMapper.map(user, UserVO.class))
             .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserEmailDto> findUserEmailsByUserIds(List<Long> userIds) {
-        return userRepo.findAllEmailsByIdIn(userIds);
     }
 }

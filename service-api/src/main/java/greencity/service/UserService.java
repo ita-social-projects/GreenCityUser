@@ -16,7 +16,6 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserEmailDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
@@ -470,12 +469,12 @@ public interface UserService {
 
     /**
      * Method that allows you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
-     * id.
+     * email.
      *
-     * @param id - {@link UserVOAdvancedDto}'s id
+     * @param email - {@link UserVOAdvancedDto}'s email.
      * @return {@link Optional} of found {@link UserVOAdvancedDto}.
      */
-    Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id);
+    Optional<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(String email);
 
     /**
      * Method that allows you to create a user on the GreenCity microservice.
@@ -494,27 +493,10 @@ public interface UserService {
     Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email);
 
     /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by id.
-     *
-     * @param id - user's id
-     * @return {@link Optional} of found {@link UserVOShort}.
-     */
-    Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id);
-
-    /**
      * Method to find all {@link UserVO} users by emails.
      *
      * @param emails {@link List} of emails to search for
      * @return {@link List} of {@link UserVO} with matching emails
      */
     List<UserVO> findAllByEmailIn(List<String> emails);
-
-    /**
-     * Method to find all {@link UserEmailDto} user emails by user ids.
-     *
-     * @param userIds list of user ids
-     * @return list of {@link UserEmailDto} containing information about user's
-     *         email
-     */
-    List<UserEmailDto> findUserEmailsByUserIds(List<Long> userIds);
 }
