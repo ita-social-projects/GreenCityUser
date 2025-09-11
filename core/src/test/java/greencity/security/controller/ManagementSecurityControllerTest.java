@@ -31,7 +31,6 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @ExtendWith(MockitoExtension.class)
 class ManagementSecurityControllerTest {
     private static final String LINK = "/management";
-    private static final String CAPTCHA_TOKEN = "token";
     private MockMvc mockMvc;
     private SuccessSignInDto successDto;
 
@@ -77,7 +76,7 @@ class ManagementSecurityControllerTest {
 
     @Test
     void signIn() throws Exception {
-        OwnSignInDto dto = new OwnSignInDto("test@gmail.com", "Vovk@1998", CAPTCHA_TOKEN);
+        OwnSignInDto dto = new OwnSignInDto("test@gmail.com", "Vovk@1998");
         when(ownSecurityService.signIn(any())).thenReturn(successDto);
         when(userService.findAdminById(successDto.getUserId())).thenReturn(TEST_USER_VO);
 
@@ -88,7 +87,7 @@ class ManagementSecurityControllerTest {
 
     @Test
     void signInWrongEmail() throws Exception {
-        OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998", CAPTCHA_TOKEN);
+        OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998");
         when(ownSecurityService.signIn(any())).thenThrow(WrongEmailException.class);
 
         mockMvc.perform(post(LINK + "/login")
@@ -98,7 +97,7 @@ class ManagementSecurityControllerTest {
 
     @Test
     void signInWrongPassword() throws Exception {
-        OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998", CAPTCHA_TOKEN);
+        OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998");
         when(ownSecurityService.signIn(any())).thenThrow(WrongPasswordException.class);
 
         mockMvc.perform(post(LINK + "/login")
@@ -108,7 +107,7 @@ class ManagementSecurityControllerTest {
 
     @Test
     void signInEmailNotVerified() throws Exception {
-        OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998", CAPTCHA_TOKEN);
+        OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998");
         when(ownSecurityService.signIn(any())).thenThrow(EmailNotVerified.class);
 
         mockMvc.perform(post(LINK + "/login")
@@ -118,7 +117,7 @@ class ManagementSecurityControllerTest {
 
     @Test
     void signInUserDeactivated() throws Exception {
-        OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998", CAPTCHA_TOKEN);
+        OwnSignInDto dto = new OwnSignInDto("tesssweqwest@gmail.com", "Vovk@1998");
         when(ownSecurityService.signIn(any())).thenThrow(UserDeactivatedException.class);
 
         mockMvc.perform(post(LINK + "/login")
@@ -128,7 +127,7 @@ class ManagementSecurityControllerTest {
 
     @Test
     void signInUserDoNotHaveAuthorities() throws Exception {
-        OwnSignInDto dto = new OwnSignInDto("test@mail.com", "Vovk@1998", CAPTCHA_TOKEN);
+        OwnSignInDto dto = new OwnSignInDto("test@mail.com", "Vovk@1998");
         when(ownSecurityService.signIn(any())).thenReturn(successDto);
         when(userService.findAdminById(1L)).thenThrow(LowRoleLevelException.class);
 

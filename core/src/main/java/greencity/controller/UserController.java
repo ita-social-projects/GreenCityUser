@@ -24,7 +24,6 @@ import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserEmailDto;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
 import greencity.dto.user.UserForListDto;
@@ -579,27 +578,9 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
-    @GetMapping("/findNotDeactivatedByEmail")
-    public ResponseEntity<UserVOShort> findNotDeactivatedByEmail(@RequestParam String email) {
+    @GetMapping("/findNotDeactivatedByEmail/{email}")
+    public ResponseEntity<UserVOShort> findNotDeactivatedByEmail(@PathVariable String email) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailReduced(email).orElse(null));
-    }
-
-    /**
-     * Method that allow you to find not 'DEACTIVATED' {@link UserVOShort} by id.
-     *
-     * @param id - {@link UserVO}'s id
-     * @return {@link UserVOShort}.
-     */
-    @Operation(summary = "Get find not 'DEACTIVATED' User by id")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/findNotDeactivatedById")
-    public ResponseEntity<UserVOShort> findNotDeactivatedById(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdReduced(id).orElse(null));
     }
 
     /**
@@ -1268,21 +1249,21 @@ public class UserController {
 
     /**
      * Method that allow you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
-     * id.
+     * email.
      *
-     * @param id - {@link UserVOAdvancedDto}'s id
+     * @param email - {@link UserVOAdvancedDto}'s email.
      * @return {@link UserVOAdvancedDto}.
      */
-    @Operation(summary = "Get find not 'DEACTIVATED' User by id")
+    @Operation(summary = "Get find not 'DEACTIVATED' User by email")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
-    @GetMapping("/findNotDeactivatedByIdAdvanced")
-    public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userService.findNotDeactivatedByIdAdvanced(id).orElse(null));
+    @GetMapping("/findNotDeactivatedByEmailAdvanced/{email}")
+    public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(@PathVariable String email) {
+        return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailAdvanced(email).orElse(null));
     }
 
     /**
@@ -1301,24 +1282,5 @@ public class UserController {
     @GetMapping("/email/findAll")
     public ResponseEntity<List<UserVO>> findAllByEmailIn(@RequestParam List<String> emails) {
         return ResponseEntity.ok(userService.findAllByEmailIn(emails));
-    }
-
-    /**
-     * Method to find all {@link UserEmailDto} user emails by user ids.
-     *
-     * @param userIds list of user ids
-     * @return list of {@link UserEmailDto} containing information about user's
-     *         email
-     */
-    @Operation(summary = "Find emails of users by user ids")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @GetMapping("/email/findByIds")
-    public ResponseEntity<List<UserEmailDto>> findUserEmailsByUserIds(@RequestParam List<Long> userIds) {
-        return ResponseEntity.ok(userService.findUserEmailsByUserIds(userIds));
     }
 }

@@ -76,7 +76,6 @@ import static greencity.ModelUtils.TEST_USER;
 import static greencity.ModelUtils.TEST_USER_VO;
 import static greencity.ModelUtils.getUser;
 import static greencity.ModelUtils.getUserVOAdvancedDto;
-import static greencity.ModelUtils.getUserVOShortDto;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -1605,29 +1604,29 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findNotDeactivatedByIdAdvancedTest() {
+    void findNotDeactivatedByEmailAdvancedTest() {
         User actual = ModelUtils.getUser();
 
         UserVOAdvancedDto expected = getUserVOAdvancedDto();
 
-        when(userRepo.findNotDeactivatedById(userId)).thenReturn(Optional.of(actual));
+        when(userRepo.findNotDeactivatedByEmail(userEmail)).thenReturn(Optional.of(actual));
         when(modelMapper.map(actual, UserVOAdvancedDto.class)).thenReturn(getUserVOAdvancedDto());
 
-        Optional<UserVOAdvancedDto> result = userService.findNotDeactivatedByIdAdvanced(userId);
+        Optional<UserVOAdvancedDto> result = userService.findNotDeactivatedByEmailAdvanced(userEmail);
         assertEquals(result.get(), expected);
-        verify(userRepo, times(1)).findNotDeactivatedById(userId);
+        verify(userRepo, times(1)).findNotDeactivatedByEmail(userEmail);
     }
 
     @Test
-    void findNotDeactivatedByIdAdvanced_NotFoundTest() {
-        when(userRepo.findNotDeactivatedById(userId)).thenReturn(Optional.empty());
+    void findNotDeactivatedByEmailAdvanced_NotFoundTest() {
+        when(userRepo.findNotDeactivatedByEmail(userEmail)).thenReturn(Optional.empty());
 
         NotFoundException exception = assertThrows(
             NotFoundException.class,
-            () -> userService.findNotDeactivatedByIdAdvanced(userId));
+            () -> userService.findNotDeactivatedByEmailAdvanced(userEmail));
 
-        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_ID, exception.getMessage());
-        verify(userRepo, times(1)).findNotDeactivatedById(userId);
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + userEmail, exception.getMessage());
+        verify(userRepo, times(1)).findNotDeactivatedByEmail(userEmail);
     }
 
     @Test
@@ -1715,25 +1714,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findNotDeactivatedByIdReducedTest() {
-        user.setUserStatus(ACTIVATED);
-        UserVOShort userVOShort = getUserVOShortDto();
-
-        when(userRepo.findNotDeactivatedById(user.getId())).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
-
-        assertEquals(userVOShort, userService.findNotDeactivatedByIdReduced(user.getId()).get());
-    }
-
-    @Test
-    void findNotDeactivatedByIdReducedNotFoundTest() {
-        Long nonexistentId = 777L;
-        when(userRepo.findNotDeactivatedById(nonexistentId)).thenReturn(Optional.empty());
-
-        assertThrows(NotFoundException.class, () -> userService.findNotDeactivatedByIdReduced(nonexistentId));
-    }
-
-    @Test
     void findAllByEmailInTest() {
         List<String> emails = List.of("email1", "email2");
         User firstMockUser = new User();
@@ -1753,21 +1733,6 @@ class UserServiceImplTest {
         List<UserVO> actualResult = userService.findAllByEmailIn(emails);
 
         assertEquals(expectedResult, actualResult);
-    }
-
-    @Test
-    void findUserEmailsByUserIdsTest() {
-        List<Long> userIds = List.of(1L, 2L, 3L);
-        List<UserEmailDto> userEmailDtos = userIds.stream()
-            .map(id -> new UserEmailDto(id, "email"))
-            .toList();
-
-        when(userRepo.findAllEmailsByIdIn(userIds))
-            .thenReturn(userEmailDtos);
-
-        List<UserEmailDto> actualResult = userService.findUserEmailsByUserIds(userIds);
-
-        assertEquals(userEmailDtos, actualResult);
     }
 
     @Test

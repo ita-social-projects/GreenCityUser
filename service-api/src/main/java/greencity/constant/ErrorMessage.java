@@ -20,7 +20,6 @@ public class ErrorMessage {
     public static final String BAD_GOOGLE_TOKEN = "Bad google token. ";
     public static final String EXPIRED_GOOGLE_ID_TOKEN = "Google id token is not valid or expired. ";
     public static final String TRANSACTION_FAILED = "Transaction failed and rolled back due to restClient failure. ";
-    public static final String BAD_FACEBOOK_TOKEN = "Bad facebook token";
     public static final String VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED = "Verification token not found or expired.";
     public static final String PASSWORD_RESTORE_LINK_ALREADY_SENT =
         "Password restore link already sent, please check your email: ";
@@ -55,13 +54,9 @@ public class ErrorMessage {
     public static final String BRUTEFORCE_PROTECTION_MESSAGE =
         "User account is blocked due to too many failed login attempts.";
     public static final String COULD_NOT_RETRIEVE_CHECKOUT_RESPONSE = "Could not retrieve checkout response";
-    public static final String WRONG_CAPTCHA = "Wrong captcha";
-    public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_CAPTCHA =
-        "User account is blocked due to too many failed login attempts. Wrong captcha. Try again in %s minutes";
     public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS =
         "User account is blocked due to too many failed login attempts. Wrong password. Try again in %s minutes";
     public static final String WRONG_SECRET_KEY = "Wrong secret key";
-    public static final String FB_TOKEN_OR_LANGUAGE_MISSING = "fbToken or language is missing";
     public static final String WARNING_GIT_DIRECTORY_NOT_FOUND =
         "WARNING: .git directory not found. Git commit info will be unavailable.";
     public static final String GIT_REPOSITORY_NOT_INITIALIZED =
