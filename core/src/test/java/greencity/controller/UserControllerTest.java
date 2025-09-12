@@ -608,7 +608,8 @@ class UserControllerTest {
     void findNotDeactivatedByEmailTest() throws Exception {
         when(userService.findNotDeactivatedByEmailReduced(TestConst.EMAIL))
             .thenReturn(Optional.of(ModelUtils.getUserVOShortDto()));
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail/" + TestConst.EMAIL))
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
+            .param("email", TestConst.EMAIL))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value("user"))
             .andExpect(jsonPath("$.id").value(13L))
@@ -618,7 +619,8 @@ class UserControllerTest {
     @Test
     void findNotDeactivatedByEmailIfNullTest() throws Exception {
         when(userService.findNotDeactivatedByEmail(TestConst.EMAIL)).thenReturn(Optional.empty());
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail/" + TestConst.EMAIL))
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmail")
+            .param("email", TestConst.EMAIL))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$").doesNotExist());
     }
@@ -1088,7 +1090,8 @@ class UserControllerTest {
         String email = expected.getEmail();
         when(userService.findNotDeactivatedByEmailAdvanced(email))
             .thenReturn(Optional.of(expected));
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmailAdvanced/" + email))
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmailAdvanced")
+            .param("email", email))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value(expected.getName()))
             .andExpect(jsonPath("$.id").value(13L))
@@ -1099,7 +1102,8 @@ class UserControllerTest {
     void findNotDeactivatedByEmailAdvanced_NoResultTest() throws Exception {
         String email = "email@email.com";
         when(userService.findNotDeactivatedByEmailAdvanced(email)).thenReturn(Optional.empty());
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmailAdvanced/" + email))
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmailAdvanced")
+            .param("email", email))
             .andExpect(status().isOk())
             .andExpect(content().string(""));
     }

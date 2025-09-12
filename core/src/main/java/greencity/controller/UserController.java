@@ -578,8 +578,8 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
-    @GetMapping("/findNotDeactivatedByEmail/{email}")
-    public ResponseEntity<UserVOShort> findNotDeactivatedByEmail(@PathVariable String email) {
+    @GetMapping("/findNotDeactivatedByEmail")
+    public ResponseEntity<UserVOShort> findNotDeactivatedByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailReduced(email).orElse(null));
     }
 
@@ -1261,8 +1261,8 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
-    @GetMapping("/findNotDeactivatedByEmailAdvanced/{email}")
-    public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(@PathVariable String email) {
+    @GetMapping("/findNotDeactivatedByEmailAdvanced")
+    public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailAdvanced(email).orElse(null));
     }
 
