@@ -26,7 +26,6 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.SqlResultSetMapping;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,7 +72,7 @@ public class User {
     @Column(nullable = false, length = 30)
     private String name;
 
-    @Column(unique = true, nullable = false, length = 50)
+    @Column(unique = true, nullable = false, length = 72)
     private String email;
 
     @Enumerated(value = EnumType.STRING)
@@ -103,32 +102,8 @@ public class User {
     @Column(name = "refresh_token_key", nullable = false)
     private String refreshTokenKey;
 
-    @Column(name = "profile_picture")
-    private String profilePicturePath;
-
-    @Builder.Default
-    @OneToMany
-    @JoinTable(name = "users_friends",
-        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-        inverseJoinColumns = @JoinColumn(name = "friend_id", referencedColumnName = "id"))
-    private List<User> userFriends = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<UserAchievement> userAchievements = new ArrayList<>();
-
-    @Column(name = "rating")
-    private Double rating;
-
     @Column(name = "first_name")
     private String firstName;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_location")
-    private UserLocation userLocation;
-
-    @Column(name = "user_credo")
-    private String userCredo;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.MERGE)
     @Column(name = "social_networks")
@@ -148,10 +123,6 @@ public class User {
 
     @Column(name = "last_activity_time")
     private LocalDateTime lastActivityTime;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserAction> userActions = new ArrayList<>();
 
     @Column(columnDefinition = "varchar(60)")
     private String uuid;
@@ -178,4 +149,8 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserNotificationPreference> notificationPreferences = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<UserNotificationPreference> emailPreference = new HashSet<>();
 }

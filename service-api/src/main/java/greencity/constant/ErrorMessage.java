@@ -20,7 +20,6 @@ public class ErrorMessage {
     public static final String BAD_GOOGLE_TOKEN = "Bad google token. ";
     public static final String EXPIRED_GOOGLE_ID_TOKEN = "Google id token is not valid or expired. ";
     public static final String TRANSACTION_FAILED = "Transaction failed and rolled back due to restClient failure. ";
-    public static final String BAD_FACEBOOK_TOKEN = "Bad facebook token";
     public static final String VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED = "Verification token not found or expired.";
     public static final String PASSWORD_RESTORE_LINK_ALREADY_SENT =
         "Password restore link already sent, please check your email: ";
@@ -32,6 +31,7 @@ public class ErrorMessage {
     public static final String SELECT_CORRECT_LANGUAGE = "Select correct language: 'en' or 'ua'";
     public static final String TOKEN_FOR_RESTORE_IS_INVALID = "Token is null or it doesn't exist.";
     public static final String LANGUAGE_NOT_FOUND_BY_ID = "The language does not exist by this id: ";
+    public static final String LANGUAGE_NOT_FOUND_BY_CODE = "The language does not exist by this code: ";
     public static final String USER_DEACTIVATION_REASON_IS_EMPTY = "The User deactivation reasons list is empty";
     public static final String USER_ALREADY_HAS_PASSWORD = "User already has password";
     public static final String USER_HAS_NO_PERMISSION = "Current user has no permission for this action";
@@ -40,28 +40,34 @@ public class ErrorMessage {
     public static final String USER_CREATED = "User is not activated";
     public static final String USER_DELETED = "User deleted";
     public static final String USER_EMAIL_IS_NOT_VERIFIED = "The user's email address has not been verified.";
-    public static final String NOT_FOUND_ADDRESS_BY_COORDINATES = "Not found address with such coordinates: ";
-    public static final String USER_DID_NOT_SET_ANY_CITY = "User did not set any city";
     public static final String NOT_VALID_BOOLEAN_VALUE = "%s is not a valid Boolean value for %s";
-    public static final String INSUFFICIENT_LOCATION_DATA_FOUND =
-        "Insufficient location data found for the provided coordinates.";
     public static final String USER_CANNOT_DEACTIVATE_YOURSELF = "You cannot deactivate yourself if you are not a USER";
     public static final String USER_CANNOT_DEACTIVATE_OTHERS = "USER cannot deactivate other users";
     public static final String ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN = "ADMIN cannot deactivate other ADMIN users";
     public static final String YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER =
         "You do not have permission to deactivate this user";
+    public static final String SOCIAL_NETWORK_IMAGE_NOT_SAVED = "Social network image hasn't been saved";
+    public static final String SOCIAL_NETWORK_IMAGE_FOUND_BY_ID = "Social network image doesn't exist by this id: ";
+    public static final String BAD_DEFAULT_SOCIAL_NETWORK_IMAGE_PATH =
+        "Bad default social network image host path (Row in database doesn't exists)";
     public static final String BASE64_DECODE_MESSAGE = "Can't decode from base64 format";
     public static final String BRUTEFORCE_PROTECTION_MESSAGE =
         "User account is blocked due to too many failed login attempts.";
     public static final String COULD_NOT_RETRIEVE_CHECKOUT_RESPONSE = "Could not retrieve checkout response";
-    public static final String WRONG_CAPTCHA = "Wrong captcha";
     public static final String BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS =
-        "User account is blocked due to too many failed login attempts. Try again in %s minutes";
+        "User account is blocked due to too many failed login attempts. Wrong password. Try again in %s minutes";
     public static final String WRONG_SECRET_KEY = "Wrong secret key";
-    public static final String FB_TOKEN_OR_LANGUAGE_MISSING = "fbToken or language is missing";
     public static final String WARNING_GIT_DIRECTORY_NOT_FOUND =
         "WARNING: .git directory not found. Git commit info will be unavailable.";
     public static final String GIT_REPOSITORY_NOT_INITIALIZED =
         "Git repository not initialized. Commit info is unavailable.";
     public static final String FAILED_TO_FETCH_COMMIT_INFO = "Failed to fetch commit info due to I/O error: ";
+    public static final String AUTHORITY_NOT_FOUND_BY_NAMES = "The following authorities not found: ";
+    public static final String INTERNAL_SERVER_ERROR = "Internal server error: ";
+    public static final String GREENCITY_APP_UNAVAILABLE = "The GreenCity service is unavailable";
+    public static final String FILE_NOT_SAVED = "File hasn't been saved";
+    public static final String MULTIPART_FILE_BAD_REQUEST =
+        "Can`t convert To Multipart Image. Bad inputted image string : ";
+    public static final String PARSING_URL_FAILED = "Can't parse image's url: ";
+    public static final String AUTHORITY_CATEGORY_NOT_FOUND = "The authority category does not exist by this id: %s";
 }

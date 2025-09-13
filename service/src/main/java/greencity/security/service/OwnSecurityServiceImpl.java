@@ -1,6 +1,7 @@
 package greencity.security.service;
 
-import greencity.constant.AppConstant;
+import greencity.client.CloudFlareClient;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
@@ -86,6 +87,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
     private final LoginAttemptService loginAttemptService;
+    private final CloudFlareClient cloudFlareClient;
+    private final GreenCityRemoteClient greenCityRemoteClient;
     @Value("${verifyEmailTimeHour}")
     private Integer expirationTime;
     @Value("${bruteForceSettings.blockTimeInMinutes}")
@@ -138,7 +141,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
-            .rating(AppConstant.DEFAULT_RATING)
             .language(Language.builder()
                 .id(modelMapper.map(language, Long.class))
                 .build())
@@ -234,20 +236,15 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     }
 
     /**
-     * Checks if user is blocked by brute-force protection (captcha or wrong
-     * password). If user is blocked, logs error and blocks user by email. If user
-     * exceeded wrong password attempts, throws WrongPasswordException.
+     * Checks if user is blocked by brute-force protection (wrong password). If user
+     * is blocked, logs error and blocks user by email. If user exceeded wrong
+     * password attempts, throws WrongPasswordException.
      *
      * @param email user email
      */
     private void handleBruteForceProtection(String email) {
-        if (loginAttemptService.isBlockedByCaptcha(email)) {
-            log.error("Brute force protection, user with email is blocked - {}", email);
-            blockUserByEmail(email);
-        }
-
         if (loginAttemptService.isBlockedByWrongPassword(email)) {
-            log.error("Too many failed login attempts - {}, account is blocked for {} minutes", email,
+            log.error("Too many failed login attempts - {}, account is blocked for {} minutes. Wrong Password", email,
                 blockTimeInMinutes);
             throw new WrongPasswordException(
                 String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
@@ -293,42 +290,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         String accessToken = jwtTool.createAccessToken(email, user.getRole());
         String refreshToken = jwtTool.createRefreshToken(user);
         return new SuccessSignInDto(user.getId(), accessToken, refreshToken, user.getName(), true);
-    }
-
-    /**
-     * Blocks user by email. Sets user status to {@link UserStatus#BLOCKED}, saves
-     * user and logs info about blocking. Then sends email with link to unblock and
-     * restore password page and throws {@link UserBlockedException} with message
-     * that contains time for which account is blocked.
-     *
-     * @param email email of user to be blocked
-     * @throws UserBlockedException if user is blocked
-     * @throws NotFoundException    if user with given email is not found
-     */
-    private void blockUserByEmail(String email) {
-        User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-
-        user.setUserStatus(UserStatus.BLOCKED);
-        userRepo.save(user);
-        log.info("User with email {} is blocked", user.getEmail());
-
-        emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
-            user.getId(), user.getName(), user.getEmail(),
-            jwtTool.generateUnblockToken(email), getLanguageFromUser(user), false);
-
-        throw new UserBlockedException(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE);
-    }
-
-    /**
-     * Gets user language from user object. If user language code is "1", method
-     * returns "ua", otherwise - "en".
-     *
-     * @param user user to get language from
-     * @return "ua" or "en" depending on user language code
-     */
-    private String getLanguageFromUser(User user) {
-        return user.getLanguage().getCode().equals("1") ? "ua" : "en";
     }
 
     private boolean isPasswordCorrect(OwnSignInDto signInDto, UserVO user) {
@@ -439,9 +400,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        user.setUserStatus(UserStatus.ACTIVATED);
-        userRepo.save(user);
-        log.info("User {} unblocked", user.getEmail());
+        UserStatus current = user.getUserStatus();
+        if (current == UserStatus.BLOCKED) {
+            user.setUserStatus(UserStatus.ACTIVATED);
+            userRepo.save(user);
+            log.info("User {} unblocked (status set to ACTIVATED)", user.getEmail());
+        } else {
+            log.info("User {} unblock link used (cache cleared); status remains {}", user.getEmail(), current);
+        }
     }
 
     /**
@@ -478,7 +444,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     /**
      * Converts a {@link TestersSignInRequest} to an {@link OwnSignInDto}.
-     * 
+     *
      * @param request the request to convert
      * @return the converted {@link OwnSignInDto}
      */
@@ -499,7 +465,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .lastActivityTime(LocalDateTime.now())
             .userStatus(dto.getUserStatus())
             .emailNotification(EmailNotification.DISABLED)
-            .rating(AppConstant.DEFAULT_RATING)
             .language(Language.builder()
                 .id(2L)
                 .code("en")
