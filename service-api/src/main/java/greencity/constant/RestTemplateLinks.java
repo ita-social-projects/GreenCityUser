@@ -6,6 +6,8 @@ import lombok.experimental.UtilityClass;
 public class RestTemplateLinks {
     public static final String CUSTOM_TO_DO_LIST_ITEMS = "/custom/to-do-list-items/";
     public static final String FILES = "/files";
+    public static final String SOCIAL_NETWORKS_IMAGE = "/social-networks/image";
+    public static final String SOCIAL_NETWORKS = "/social-networks";
     public static final String LANGUAGES = "/languages";
     public static final String CODES = "/codes";
     public static final String ECO_NEWS_COUNT = "/eco-news/count";

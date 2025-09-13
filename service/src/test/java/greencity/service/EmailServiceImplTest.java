@@ -1,22 +1,6 @@
 package greencity.service;
 
-import static greencity.ModelUtils.getSubscriberDto;
-import static greencity.TestConst.EMAIL;
-import static greencity.TestConst.ENGLISH_CODE;
-import static greencity.TestConst.NAME;
-import static greencity.TestConst.PLACE_NAME;
-import static greencity.TestConst.SIMPLE_LONG_NUMBER;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import greencity.ModelUtils;
-import greencity.constant.AppConstant;
 import greencity.constant.EmailConstants;
 import greencity.dto.category.CategoryDto;
 import greencity.dto.econews.InterestingEcoNewsDto;
@@ -24,27 +8,19 @@ import greencity.dto.place.PlaceNotificationDto;
 import greencity.dto.user.SubscriberDto;
 import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserDeactivationReasonDto;
-import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.entity.Language;
 import greencity.entity.User;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.PlaceStatus;
-import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
+import greencity.repository.LanguageRepo;
 import greencity.repository.UserRepo;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,41 +33,56 @@ import org.mockito.quality.Strictness;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.thymeleaf.ITemplateEngine;
+
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+
+import static greencity.ModelUtils.getSubscriberDto;
+
+import static greencity.TestConst.ENGLISH_CODE;
+import static greencity.TestConst.SIMPLE_LONG_NUMBER;
+import static greencity.TestConst.NAME;
+import static greencity.TestConst.EMAIL;
+import static greencity.TestConst.PLACE_NAME;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doAnswer;
+
 import org.thymeleaf.context.Context;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class EmailServiceImplTest {
-    static final Locale UA_LOCALE = Locale.of("uk", "UA");
-    EmailService service;
+    private EmailService service;
     @Mock
-    JavaMailSender javaMailSender;
+    private JavaMailSender javaMailSender;
     @Mock
-    ITemplateEngine templateEngine;
+    private ITemplateEngine templateEngine;
     @Mock
-    MessageSource messageSource;
+    private MessageSource messageSource;
     @Mock
-    UserRepo userRepo;
-
-    private static Locale getLocale(String language) {
-        return switch (language) {
-            case "uk" -> UA_LOCALE;
-            case "en" -> Locale.ENGLISH;
-            default -> throw new IllegalStateException("Unexpected value: " + language);
-        };
-    }
+    private UserRepo userRepo;
+    @Mock
+    LanguageRepo languageRepo;
+    private static final Locale UA_LOCALE = Locale.of("uk", "UA");
 
     @BeforeEach
-    void setup() {
+    public void setup() {
         service = new EmailServiceImpl(
             javaMailSender,
             templateEngine,
             Executors.newCachedThreadPool(),
             "http://localhost:4200",
             "test@email.com",
-            "test@email.com",
             messageSource,
-            userRepo);
+            userRepo,
+            languageRepo);
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
         when(templateEngine.process(any(String.class), any(Context.class))).thenReturn("<html></html>");
     }
@@ -120,9 +111,9 @@ class EmailServiceImplTest {
     @Test
     void sendInterestingEcoNewsTest() {
         InterestingEcoNewsDto dto = new InterestingEcoNewsDto();
-        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", "uk", UUID.randomUUID())));
+        dto.setSubscribers(List.of(new SubscriberDto("Ilia", "test@gmail.com", "ua", UUID.randomUUID())));
 
-        when(messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null, getLocale("uk")))
+        when(messageSource.getMessage(EmailConstants.INTERESTING_ECO_NEWS, null, getLocale("ua")))
             .thenReturn("Interesting Eco News");
 
         service.sendInterestingEcoNews(dto);
@@ -130,7 +121,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, uk",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua",
         "1, Test, test@gmail.com, token, en"})
     void sendVerificationEmail(Long id, String name, String email, String token, String language) {
         when(messageSource.getMessage(EmailConstants.VERIFY_EMAIL, null, getLocale(language)))
@@ -154,7 +145,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, uk, false",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
         "1, Test, test@gmail.com, token, en, false"})
     void sendRestoreEmail(Long id, String name, String email, String token, String language, Boolean isUbs) {
         when(messageSource.getMessage(EmailConstants.CONFIRM_RESTORING_PASS, null, getLocale(language)))
@@ -238,99 +229,21 @@ class EmailServiceImplTest {
     }
 
     @Test
-    void sendScheduledNotificationEmailTestWhenUserIdIsPresent() {
-        Long userId = 4L;
-        String absentUuid = null;
-        Optional<String> emailOptional = Optional.of("email@email.com");
+    void sendScheduledNotificationEmailTest() {
         ScheduledEmailMessage message = ScheduledEmailMessage.builder()
             .body("test body")
             .username("test user")
-            .userId(userId)
-            .userUuid(absentUuid)
+            .email("test@gmail.com")
             .subject("test subject")
             .baseLink("test link")
             .language("en")
             .build();
-
-        when(userRepo.findEmailById(userId))
-            .thenReturn(emailOptional);
-
         service.sendScheduledNotificationEmail(message);
         verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendScheduledNotificationEmailTestWhenUserUuidIsPresent() {
-        Long absentUserId = null;
-        String uuid = "uuid";
-        Optional<String> emailOptional = Optional.of("email@email.com");
-        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-            .body("test body")
-            .username("test user")
-            .userId(absentUserId)
-            .userUuid(uuid)
-            .subject("test subject")
-            .baseLink("test link")
-            .language("en")
-            .build();
-
-        when(userRepo.findEmailByUuid(uuid))
-            .thenReturn(emailOptional);
-
-        service.sendScheduledNotificationEmail(message);
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void sendScheduledNotificationEmailTestWhenUserNotFoundById() {
-        Long userId = 4L;
-        String absentUuid = null;
-        Optional<String> emptyEmailOptional = Optional.empty();
-        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-            .body("test body")
-            .username("test user")
-            .userId(userId)
-            .userUuid(absentUuid)
-            .subject("test subject")
-            .baseLink("test link")
-            .language("en")
-            .build();
-
-        when(userRepo.findEmailById(userId))
-            .thenReturn(emptyEmailOptional);
-
-        assertThrows(
-            NotFoundException.class,
-            () -> service.sendScheduledNotificationEmail(message));
-        verify(javaMailSender, never()).createMimeMessage();
-    }
-
-    @Test
-    void sendScheduledNotificationEmailTestWhenUserNotFoundByUuid() {
-        Long absentUserId = null;
-        String uuid = "uuid";
-        Optional<String> emptyEmailOptional = Optional.empty();
-        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-            .body("test body")
-            .username("test user")
-            .userId(absentUserId)
-            .userUuid(uuid)
-            .subject("test subject")
-            .baseLink("test link")
-            .language("en")
-            .build();
-
-        when(userRepo.findEmailByUuid(uuid))
-            .thenReturn(emptyEmailOptional);
-
-        assertThrows(
-            NotFoundException.class,
-            () -> service.sendScheduledNotificationEmail(message));
-        verify(javaMailSender, never()).createMimeMessage();
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, uk, false",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
         "1, Test, test@gmail.com, token, en, true"})
     void sendCreateNewPasswordForEmployee(Long id, String name, String email, String token, String language,
         Boolean isUbs) {
@@ -343,7 +256,7 @@ class EmailServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1, Test, test@gmail.com, token, uk, false",
+    @CsvSource(value = {"1, Test, test@gmail.com, token, ua, false",
         "1, Test, test@gmail.com, token, en, true"})
     void sendBlockAccountNotificationWithUnblockLinkEmailTest(Long id, String name, String email,
         String token, String language,
@@ -366,8 +279,7 @@ class EmailServiceImplTest {
         User user = new User();
         user.setEmail(EMAIL);
         user.setName(NAME);
-        Language language =
-            new Language(SIMPLE_LONG_NUMBER, ENGLISH_CODE, AppConstant.DEFAULT_LANGUAGE_NAME, List.of(user));
+        Language language = new Language(SIMPLE_LONG_NUMBER, ENGLISH_CODE, List.of(user));
         user.setLanguage(language);
         when(userRepo.findByEmail(dto.getEmail())).thenReturn(Optional.of(user));
         MimeMessage mimeMessage = mock(MimeMessage.class);
@@ -404,29 +316,11 @@ class EmailServiceImplTest {
         verify(userRepo).findByEmail(dto.getEmail());
     }
 
-    @Test
-    void sendGreenOfficeRequestEmailToManagerTest() {
-        ScheduledEmailMessage message = ScheduledEmailMessage.builder()
-            .body("test@test.com")
-            .username("John Doe")
-            .subject("some subject")
-            .language("uk")
-            .build();
-
-        service.sendGreenOfficeRequestEmailToManager(message);
-        verify(javaMailSender).createMimeMessage();
-    }
-
-    @Test
-    void testSendTelegramFeedbackEmail_Success() {
-        UserTelegramFeedbackDto feedbackDto = new UserTelegramFeedbackDto();
-        feedbackDto.setChatId("12345");
-        feedbackDto.setName("John Doe");
-        feedbackDto.setRating(5);
-        feedbackDto.setComment("Great service!");
-        feedbackDto.setSubject("Feedback Subject");
-        service.sendTelegramFeedbackEmail(feedbackDto);
-
-        verify(javaMailSender).createMimeMessage();
+    private static Locale getLocale(String language) {
+        return switch (language) {
+            case "ua" -> UA_LOCALE;
+            case "en" -> Locale.ENGLISH;
+            default -> throw new IllegalStateException("Unexpected value: " + language);
+        };
     }
 }

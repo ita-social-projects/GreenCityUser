@@ -12,7 +12,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Optional;
-import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,8 +48,6 @@ class AccessTokenAuthenticationFilterTest {
     @Mock
     UserService userService;
 
-    private LogCaptor logCaptor;
-
     @InjectMocks
     private AccessTokenAuthenticationFilter authenticationFilter;
 
@@ -59,7 +56,6 @@ class AccessTokenAuthenticationFilterTest {
         systemOut = System.out;
         systemOutContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(systemOutContent));
-        logCaptor = LogCaptor.forClass(AccessTokenAuthenticationFilter.class);
     }
 
     @AfterEach
@@ -89,7 +85,7 @@ class AccessTokenAuthenticationFilterTest {
             new UsernamePasswordAuthenticationToken(token, null)))
                 .thenThrow(ExpiredJwtException.class);
         authenticationFilter.doFilterInternal(request, response, chain);
-        assertTrue(logCaptor.getInfoLogs().contains("Token has expired"));
+        assertTrue(systemOutContent.toString().contains("Token has expired: "));
     }
 
     @Test
@@ -98,9 +94,8 @@ class AccessTokenAuthenticationFilterTest {
         when(jwtTool.getTokenFromHttpServletRequest(request)).thenReturn(token);
         when(authenticationManager.authenticate(any()))
             .thenReturn(new UsernamePasswordAuthenticationToken("test@mail.com", null));
-        when(userService.findNotDeactivatedByEmailReduced("test@mail.com")).thenThrow(RuntimeException.class);
+        when(userService.findNotDeactivatedByEmail("test@mail.com")).thenThrow(RuntimeException.class);
         authenticationFilter.doFilterInternal(request, response, chain);
-        assertTrue(logCaptor.getInfoLogs().stream()
-            .anyMatch(s -> s.contains("Access denied during token authentication")));
+        assertTrue(systemOutContent.toString().contains("Access denied with token: "));
     }
 }

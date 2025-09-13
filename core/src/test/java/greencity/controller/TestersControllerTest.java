@@ -32,7 +32,7 @@ class TestersControllerTest {
     private ObjectMapper objectMapper;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(testersController).build();
         objectMapper = new ObjectMapper();
     }

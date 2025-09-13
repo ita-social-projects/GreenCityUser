@@ -1,11 +1,11 @@
 package greencity.entity;
 
+import java.util.List;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.List;
 
 @Entity
 @Table(name = "languages")
@@ -20,9 +20,6 @@ public class Language {
 
     @Column(name = "code", nullable = false, unique = true, length = 35)
     private String code;
-
-    @Column(name = "name", nullable = false)
-    private String name;
 
     @OneToMany(mappedBy = "language")
     private List<User> users;

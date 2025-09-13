@@ -5,8 +5,6 @@ import static greencity.constant.AppConstant.EMPLOYEE;
 import static greencity.constant.AppConstant.MODERATOR;
 import static greencity.constant.AppConstant.UBS_EMPLOYEE;
 import static greencity.constant.AppConstant.USER;
-import static greencity.constant.AppConstant.LOGS_LINKS;
-import static greencity.constant.AppConstant.EXPORT_SETTINGS_LINKS;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
@@ -55,7 +53,6 @@ public class SecurityConfig {
     private final UserService userService;
     private static final String USER_LINK = "/user";
     private static final String COMMIT_INFO = "/commit-info";
-    private static final String FILES = "/files";
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Value("${spring.messaging.stomp.websocket.allowed-origins}")
@@ -115,7 +112,8 @@ public class SecurityConfig {
                     "/ownSecurity/updateAccessToken",
                     "/ownSecurity/restorePassword",
                     "/googleSecurity",
-                    "/user/emailNotifications",
+                    "/facebookSecurity/generateFacebookAuthorizeURL",
+                    "/facebookSecurity/facebook", "/user/emailNotifications",
                     "/user/activatedUsersAmount",
                     "/user/{userId}/habit/assign",
                     "/token",
@@ -132,6 +130,8 @@ public class SecurityConfig {
                     "/ownSecurity/unblockAccount",
                     "/api/testers/sign-in")
                 .permitAll()
+                .requestMatchers(HttpMethod.GET, "/facebookSecurity/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/facebookSecurity/login").permitAll()
                 .requestMatchers(HttpMethod.GET, "/check-auth").permitAll()
                 .requestMatchers(HttpMethod.GET,
                     "/user/to-do-list-items/habits/{habitId}/to-do-list",
@@ -143,8 +143,6 @@ public class SecurityConfig {
                     "/user/usersOnlineStatus",
                     "/user/findByIdForAchievement",
                     "/user/findNotDeactivatedByEmail",
-                    "/user/findNotDeactivatedByEmailRemote",
-                    "/user/findNotDeactivatedByIdRemote",
                     "/user/findByEmail",
                     "/user/findIdByEmail",
                     "/user/findAllUsersCities",
@@ -152,25 +150,16 @@ public class SecurityConfig {
                     "/user/findUserByName/**",
                     "/user/findByUuId",
                     "/user/findUuidByEmail",
-                    "/user/checkActiveUserByUuid",
                     "/user/lang",
                     "/user/createUbsRecord",
                     "/user/{userId}/sixUserFriends/",
                     "/ownSecurity/password-status",
-                    "/user/emailNotifications",
-                    "/lang",
-                    "/lang/**",
-                    LOGS_LINKS,
-                    EXPORT_SETTINGS_LINKS)
+                    "/user/emailNotifications")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
-                .requestMatchers(HttpMethod.POST,
-                    FILES)
-                .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",
                     "/user/{userId}/habit",
-                    "/ownSecurity/set-password",
-                    LOGS_LINKS)
+                    "/ownSecurity/set-password")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PUT,
                     "/ownSecurity/changePassword",
@@ -192,21 +181,16 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET,
                     "/user/findUserLanguageByUuid",
                     "/user/get-all-authorities",
-                    "/user/get-positions-authorities",
-                    "/user/authorities/grouped-by-categories",
-                    "/management/socialnetworkimages/get-all-remote",
-                    "/management/socialnetworkimages/find",
-                    "/ownSecurity/authorities/categories",
-                    "/ownSecurity/authorities/by-category")
+                    "/user/get-positions-authorities")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/to-do-list-items/{userToDoListItemId}",
-                    "/user/profilePicture")
+                    "/user/profilePicture",
+                    "/user/deleteProfilePicture")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.DELETE,
                     "/user/to-do-list-items/user-to-do-list-items",
                     "/user/to-do-list-items",
-                    "/user/deleteProfilePicture",
                     "/ownSecurity/user")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
@@ -225,39 +209,12 @@ public class SecurityConfig {
                     "/ownSecurity/register",
                     "/email/sendReport",
                     "/email/sendHabitNotification",
-                    "/email/sendInterestingEcoNews",
-                    "/management/socialnetworkimages/save-remote",
-                    "/user-notification-preference/search",
-                    FILES + "/single")
-                .hasAnyRole(ADMIN)
-                .requestMatchers(HttpMethod.PUT,
-                    "/management/socialnetworkimages/")
-                .hasAnyRole(ADMIN)
-                .requestMatchers(HttpMethod.GET,
-                    "/user/email/findAll",
-                    "/user/email/findByIds",
-                    "/user/findNotDeactivatedByIdAdvanced",
-                    "/user/activated-ids",
-                    "/user/registration-statistics",
-                    "/user/email",
-                    "/user/count-active-users",
-                    "/user/email-preferences-distribution",
-                    "/user/statuses-distribution",
-                    "/user/roles-distribution",
-                    "/user/findNotDeactivatedById",
-                    "/user/findNotDeactivatedByEmail")
-                .hasAnyRole(ADMIN)
-                .requestMatchers(HttpMethod.DELETE,
-                    "/management/socialnetworkimages/delete",
-                    "/management/socialnetworkimages/deleteAll",
-                    FILES,
-                    FILES + "/single")
+                    "/email/sendInterestingEcoNews")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",
                     "/user/role",
-                    "/user/update/role",
-                    "/user/{id}/role")
+                    "/user/update/role")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.POST, "/management/login")
                 .permitAll()

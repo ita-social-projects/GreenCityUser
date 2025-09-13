@@ -1,0 +1,62 @@
+package greencity.security.controller;
+
+import greencity.security.service.FacebookSecurityService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import static org.mockito.Mockito.verify;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+@ExtendWith(MockitoExtension.class)
+class FacebookSecurityControllerTest {
+    private MockMvc mockMvc;
+
+    @InjectMocks
+    private FacebookSecurityController facebookSecurityController;
+
+    @Mock
+    private FacebookSecurityService facebookSecurityService;
+
+    @BeforeEach
+    void setup() {
+        this.mockMvc = MockMvcBuilders
+            .standaloneSetup(facebookSecurityController)
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+            .build();
+    }
+
+    @Test
+    void generateFacebookAuthorizeURLTest() throws Exception {
+        mockMvc.perform(get("/facebookSecurity/generateFacebookAuthorizeURL"))
+            .andExpect(status().isOk());
+        verify(facebookSecurityService).generateFacebookAuthorizeURL();
+    }
+
+    @Test
+    void generateFacebookAccessTokenTest() throws Exception {
+        mockMvc.perform(get("/facebookSecurity/facebook")
+            .param("code", "almostSecretCode"))
+            .andExpect(status().isOk());
+        verify(facebookSecurityService).generateFacebookAccessToken("almostSecretCode");
+    }
+
+    @Test
+    void authenticateTest() throws Exception {
+        mockMvc.perform(post("/facebookSecurity/login")
+            .contentType("application/json")
+            .content("{\"token\":\"almostSecretToken\", \"lang\":\"en\"}"))
+            .andExpect(status().isOk());
+        verify(facebookSecurityService).authenticate("almostSecretToken", "en");
+    }
+}

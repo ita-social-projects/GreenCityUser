@@ -8,7 +8,7 @@ public class LanguageMapper extends AbstractConverter<String, Long> {
     @Override
     protected Long convert(String lang) {
         return switch (lang) {
-            case "uk" -> 1L;
+            case "ua" -> 1L;
             case "en" -> 2L;
             default -> throw new IllegalStateException("Unexpected value: " + lang);
         };

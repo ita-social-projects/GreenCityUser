@@ -1,6 +1,8 @@
 package greencity.service;
 
-import greencity.client.GreenCityRemoteClient;
+import com.google.maps.model.AddressComponentType;
+import com.google.maps.model.AddressType;
+import com.google.maps.model.GeocodingResult;
 import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -12,24 +14,56 @@ import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.*;
+import greencity.dto.user.DeactivateUserRequestDto;
+import greencity.dto.user.RoleDto;
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserAllFriendsDto;
+import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
+import greencity.dto.user.UserCityDto;
+import greencity.dto.user.UserDeactivationReasonDto;
+import greencity.dto.user.UserForListDto;
+import greencity.dto.user.UserLocationDto;
+import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementUpdateDto;
+import greencity.dto.user.UserManagementVO;
+import greencity.dto.user.UserManagementViewDto;
+import greencity.dto.user.UserNotificationPreferenceDto;
+import greencity.dto.user.UserProfileDtoRequest;
+import greencity.dto.user.UserProfileDtoResponse;
+import greencity.dto.user.UserProfileStatisticsDto;
+import greencity.dto.user.UserRoleDto;
+import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserUpdateDto;
+import greencity.dto.user.UserVO;
+import greencity.dto.user.UserWithOnlineStatusDto;
+import greencity.dto.user.UsersOnlineStatusRequestDto;
 import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
 import greencity.entity.UserDeactivationReason;
+import greencity.entity.UserLocation;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
-import greencity.enums.RetryableTaskType;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadUpdateRequestException;
+import greencity.exception.exceptions.Base64DecodedException;
+import greencity.exception.exceptions.InsufficientLocationDataException;
+import greencity.exception.exceptions.LowRoleLevelException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.UserDeactivationException;
+import greencity.exception.exceptions.WrongEmailException;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
 import greencity.repository.UserDeactivationRepo;
+import greencity.repository.UserLocationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
 import lombok.RequiredArgsConstructor;
@@ -44,17 +78,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -67,12 +101,10 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final RestClient restClient;
     private final LanguageRepo languageRepo;
-    private final GreenCityRemoteClient greenCityRemoteClient;
+    private final UserLocationRepo userLocationRepo;
     private final UserDeactivationRepo userDeactivationRepo;
+    private final GoogleApiService googleApiService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final SocialNetworkImageService socialNetworkImageService;
-    private final SocialNetworkService socialNetworkService;
-    private final RetryableTaskService retryableTaskService;
     private final ModelMapper modelMapper;
     @Value("${greencity.time.after.last.activity}")
     private long timeAfterLastActivity;
@@ -92,21 +124,17 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public void updateUserRating(UserAddRatingDto userRatingDto) {
-        try {
-            greenCityRemoteClient.updateUserRating(userRatingDto);
-        } catch (WebClientRequestException | GreenCityServiceException e) {
-            retryableTaskService.saveRetryableTask(userRatingDto, RetryableTaskType.UPDATE_USER_RATING);
-            log.warn("GreenCity service is unavailable: update user rating failed. Reason: {}",
-                e.getMessage());
-        }
+        User user = findUserById(userRatingDto.getId());
+        user.setRating(user.getRating() + userRatingDto.getRating());
+        userRepo.save(user);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public UserVOShort findById(Long id) {
-        return modelMapper.map(findUserById(id), UserVOShort.class);
+    public UserVO findById(Long id) {
+        return modelMapper.map(findUserById(id), UserVO.class);
     }
 
     /**
@@ -175,32 +203,11 @@ public class UserServiceImpl implements UserService {
      * @param user {@link UserVO} to be updated.
      */
     private void updateUserFromDto(UserManagementUpdateDto dto, User user) {
-        updateUserName(user, dto.getName());
+        user.setName(dto.getName());
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
+        user.setUserCredo(dto.getUserCredo());
         user.setUserStatus(dto.getUserStatus());
-        try {
-            greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
-        } catch (WebClientRequestException | GreenCityServiceException e) {
-            log.warn("GreenCity service is unavailable: update user credo failed");
-            UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(user.getId(),
-                dto.getUserCredo());
-            retryableTaskService.saveRetryableTask(updateUserCredoDto, RetryableTaskType.UPDATE_USER_CREDO);
-        }
-    }
-
-    private void updateUserName(User user, String name) {
-        try {
-            user.setName(name);
-            greenCityRemoteClient.updateUserName(user.getId(), name);
-        } catch (WebClientRequestException e) {
-            log.warn("GreenCity service is unavailable: update user name failed");
-            UpdateUserNameDto updateUserNameDto = UpdateUserNameDto.builder()
-                .id(user.getId())
-                .name(name)
-                .build();
-            retryableTaskService.saveRetryableTask(updateUserNameDto, RetryableTaskType.UPDATE_USERNAME);
-        }
     }
 
     /**
@@ -216,8 +223,8 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVOShort> findAll() {
-        return modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVOShort>>() {
+    public List<UserVO> findAll() {
+        return modelMapper.map(userRepo.findAll(), new TypeToken<List<UserVO>>() {
         }.getType());
     }
 
@@ -407,7 +414,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        updateUserName(user, dto.getName());
+        user.setName(dto.getName());
         user.setEmailNotification(dto.getEmailNotification());
         userRepo.save(user);
         return dto;
@@ -473,7 +480,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public List<CustomToDoListItemResponseDto> getAvailableCustomToDoListItems(Long userId, Long habitId) {
-        return greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId);
+        return restClient.getAllAvailableCustomToDoListItems(userId, habitId);
     }
 
     /**
@@ -501,8 +508,8 @@ public class UserServiceImpl implements UserService {
         }
         if (image != null) {
             String profilePicturePath;
-            profilePicturePath = greenCityRemoteClient.uploadFile(image);
-            updateUserProfilePicturePath(user.getId(), profilePicturePath);
+            profilePicturePath = restClient.uploadImage(image);
+            user.setProfilePicturePath(profilePicturePath);
         } else {
             throw new BadRequestException(ErrorMessage.IMAGE_EXISTS);
         }
@@ -517,7 +524,8 @@ public class UserServiceImpl implements UserService {
         User user = userRepo
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        updateUserProfilePicturePath(user.getId(), null);
+        user.setProfilePicturePath(null);
+        userRepo.save(user);
     }
 
     /**
@@ -529,39 +537,22 @@ public class UserServiceImpl implements UserService {
             .findByEmail(email)
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         if (userProfileDtoRequest.getName() != null) {
-            updateUserName(user, userProfileDtoRequest.getName());
+            user.setName(userProfileDtoRequest.getName());
         }
         if (userProfileDtoRequest.getUserCredo() != null) {
-            try {
-                greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
-            } catch (WebClientRequestException | GreenCityServiceException e) {
-                log.warn("GreenCity service is unavailable: update user credo failed");
-                UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(user.getId(),
-                    userProfileDtoRequest.getUserCredo());
-                retryableTaskService.saveRetryableTask(updateUserCredoDto, RetryableTaskType.UPDATE_USER_CREDO);
-            }
+            user.setUserCredo(userProfileDtoRequest.getUserCredo());
         }
-        Long userId = user.getId();
-        try {
-            greenCityRemoteClient.setLocationForUser(userId, userProfileDtoRequest);
-        } catch (WebClientRequestException | GreenCityServiceException e) {
-            SetLocationForUserDto setLocationForUserDto = SetLocationForUserDto.builder()
-                .id(userId)
-                .userProfileDtoRequest(userProfileDtoRequest)
-                .build();
-            log.warn("GreenCity service is unavailable: set user location failed");
-            retryableTaskService.saveRetryableTask(setLocationForUserDto, RetryableTaskType.SET_LOCATION_FOR_USER);
-        }
+        setLocationForUser(user, userProfileDtoRequest);
         List<SocialNetwork> socialNetworks = user.getSocialNetworks();
         if (userProfileDtoRequest.getSocialNetworks() != null) {
-            socialNetworks.forEach(socialNetwork -> socialNetworkService.delete(socialNetwork.getId()));
+            socialNetworks.forEach(socialNetwork -> restClient.deleteSocialNetwork(socialNetwork.getId()));
             user.getSocialNetworks().clear();
             user.getSocialNetworks().addAll(userProfileDtoRequest.getSocialNetworks()
                 .stream()
                 .map(url -> SocialNetwork.builder()
                     .url(url)
                     .user(user)
-                    .socialNetworkImage(modelMapper.map(socialNetworkImageService.getSocialNetworkImageByUrl(url),
+                    .socialNetworkImage(modelMapper.map(restClient.getSocialNetworkImageByUrl(url),
                         SocialNetworkImage.class))
                     .build())
                 .toList());
@@ -571,7 +562,6 @@ public class UserServiceImpl implements UserService {
         user.setShowToDoList(userProfileDtoRequest.getShowToDoList());
         setNotificationPreferencesForUser(user, userProfileDtoRequest);
         userRepo.save(user);
-
         return UpdateConstants.getResultByLanguageCode(user.getLanguage().getCode());
     }
 
@@ -610,13 +600,114 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    private void setLocationForUser(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        if (shouldSkipLocationUpdate(user, userProfileDtoRequest)) {
+            return;
+        }
+
+        if (user.getUserLocation() != null && (userProfileDtoRequest.getCoordinates().getLatitude() == null
+            || userProfileDtoRequest.getCoordinates().getLongitude() == null)) {
+            UserLocation old = user.getUserLocation();
+            old.getUsers().remove(user);
+            user.setUserLocation(null);
+        } else {
+            final AddressType[] addressTypes =
+                {AddressType.LOCALITY, AddressType.ADMINISTRATIVE_AREA_LEVEL_1, AddressType.COUNTRY};
+
+            GeocodingResult resultsUk = googleApiService.getLocationByCoordinates(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude(),
+                "uk", addressTypes);
+            GeocodingResult resultsEn = googleApiService.getLocationByCoordinates(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude(),
+                "en", addressTypes);
+            UserLocation userLocation = userLocationRepo.getUserLocationByLatitudeAndLongitude(
+                userProfileDtoRequest.getCoordinates().getLatitude(),
+                userProfileDtoRequest.getCoordinates().getLongitude()).orElse(new UserLocation());
+
+            /*
+             * check if user already has a location and if he is the only one assigned to
+             * this location. If user do not have a location check if such location is in
+             * database, if true then assign it to user, if not - add new location to
+             * database and assign it to user. If user has a location and this location
+             * belongs only to him, modify this location. If user has a location but there
+             * are more users assigned to this location, then create a new location for this
+             * user. If user inserted same location get his location and do not change
+             * anything.
+             */
+            if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() == 1) {
+                if (userLocation.getId() != null && user.getUserLocation() != userLocation) {
+                    UserLocation deleteLocation = user.getUserLocation();
+                    user.setUserLocation(userLocation);
+                    userLocationRepo.delete(deleteLocation);
+                } else {
+                    userLocation = user.getUserLocation();
+                }
+            } else if (user.getUserLocation() != null && user.getUserLocation().getUsers().size() > 1) {
+                UserLocation old = user.getUserLocation();
+                old.getUsers().remove(user);
+            }
+            initializeGeoCodingResults(initializeUkrainianGeoCodingResult(userLocation), resultsUk);
+            initializeGeoCodingResults(initializeEnglishGeoCodingResult(userLocation), resultsEn);
+            userLocation.setLatitude(userProfileDtoRequest.getCoordinates().getLatitude());
+            userLocation.setLongitude(userProfileDtoRequest.getCoordinates().getLongitude());
+            userLocation = userLocationRepo.save(userLocation);
+            user.setUserLocation(userLocation);
+        }
+    }
+
+    private boolean shouldSkipLocationUpdate(User user, UserProfileDtoRequest userProfileDtoRequest) {
+        return user.getUserLocation() == null
+            && (userProfileDtoRequest.getCoordinates().getLatitude() == null
+                || userProfileDtoRequest.getCoordinates().getLongitude() == null);
+    }
+
+    private void initializeGeoCodingResults(Map<AddressComponentType, Consumer<String>> initializedMap,
+        GeocodingResult geocodingResult) {
+        checkGeocodingResultContainsAllInformation(geocodingResult, initializedMap.size());
+        initializedMap
+            .forEach((key, value) -> Arrays.stream(geocodingResult.addressComponents)
+                .forEach(addressComponent -> Arrays.stream(addressComponent.types)
+                    .filter(componentType -> componentType.equals(key))
+                    .forEach(componentType -> value.accept(addressComponent.longName))));
+    }
+
+    private void checkGeocodingResultContainsAllInformation(GeocodingResult geocodingResult, int size) {
+        if (geocodingResult.addressComponents.length < size) {
+            throw new InsufficientLocationDataException(ErrorMessage.INSUFFICIENT_LOCATION_DATA_FOUND);
+        }
+    }
+
+    private Map<AddressComponentType, Consumer<String>> initializeEnglishGeoCodingResult(
+        UserLocation userLocation) {
+        return Map.of(
+            AddressComponentType.LOCALITY, userLocation::setCityEn,
+            AddressComponentType.COUNTRY, userLocation::setCountryEn,
+            AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionEn);
+    }
+
+    private Map<AddressComponentType, Consumer<String>> initializeUkrainianGeoCodingResult(
+        UserLocation userLocation) {
+        return Map.of(
+            AddressComponentType.LOCALITY, userLocation::setCityUk,
+            AddressComponentType.COUNTRY, userLocation::setCountryUk,
+            AddressComponentType.ADMINISTRATIVE_AREA_LEVEL_1, userLocation::setRegionUk);
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public UserProfileDtoResponse getUserProfileInformation(Long userId) {
         User user = findUserById(userId);
-        return modelMapper.map(user, UserProfileDtoResponse.class);
+
+        UserProfileDtoResponse userProfileDtoResponse = new UserProfileDtoResponse();
+        if (user.getUserLocation() != null) {
+            userProfileDtoResponse.setUserLocationDto(modelMapper.map(user.getUserLocation(), UserLocationDto.class));
+        }
+        modelMapper.map(user, userProfileDtoResponse);
+        return userProfileDtoResponse;
     }
 
     /**
@@ -643,12 +734,11 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserProfileStatisticsDto getUserProfileStatistics(Long userId) {
-        Long amountOfPublishedNewsByUserId = greenCityRemoteClient.findAmountOfPublishedNews(userId);
-        Long amountOfAcquiredHabitsByUserId = greenCityRemoteClient.findAmountOfAcquiredHabits(userId);
-        Long amountOfHabitsInProgressByUserId = greenCityRemoteClient.findAmountOfHabitsInProgress(userId);
+        Long amountOfPublishedNewsByUserId = restClient.findAmountOfPublishedNews(userId);
+        Long amountOfAcquiredHabitsByUserId = restClient.findAmountOfAcquiredHabits(userId);
+        Long amountOfHabitsInProgressByUserId = restClient.findAmountOfHabitsInProgress(userId);
         Long amountOfOrganizedAndAttendedEventsByUserId =
-            greenCityRemoteClient.findAmountOfEventsAttendedByUser(userId) + greenCityRemoteClient
-                .findAmountOfEventsOrganizedByUser(userId);
+            restClient.findAmountOfEventsAttendedByUser(userId) + restClient.findAmountOfEventsOrganizedByUser(userId);
 
         return UserProfileStatisticsDto.builder()
             .amountPublishedNews(amountOfPublishedNewsByUserId)
@@ -667,12 +757,12 @@ public class UserServiceImpl implements UserService {
             .id(userId)
             .onlineStatus(checkIfTheUserIsOnline(userId))
             .build();
-        List<Long> sixFriendsWithTheHighestRating = greenCityRemoteClient.getSixFriendsIdsWithTheHighestRating(userId);
+        List<User> sixFriendsWithTheHighestRating = userRepo.getSixFriendsWithTheHighestRating(userId);
         List<UserWithOnlineStatusDto> sixFriendsWithOnlineStatusDtos = new ArrayList<>();
         if (!sixFriendsWithTheHighestRating.isEmpty()) {
             sixFriendsWithOnlineStatusDtos = sixFriendsWithTheHighestRating
                 .stream()
-                .map(id -> new UserWithOnlineStatusDto(id, checkIfTheUserIsOnline(id)))
+                .map(u -> new UserWithOnlineStatusDto(u.getId(), checkIfTheUserIsOnline(u.getId())))
                 .toList();
         }
         return UserAndFriendsWithOnlineStatusDto.builder()
@@ -690,19 +780,19 @@ public class UserServiceImpl implements UserService {
             .id(userId)
             .onlineStatus(checkIfTheUserIsOnline(userId))
             .build();
-        PageableAdvancedDto<Long> friendsIds = greenCityRemoteClient.getAllUserFriendsIds(userId, pageable);
+        Page<User> friends = userRepo.getAllUserFriends(userId, pageable);
         List<UserWithOnlineStatusDto> friendsWithOnlineStatusDtos = new ArrayList<>();
-        if (!friendsIds.getPage().isEmpty()) {
-            friendsWithOnlineStatusDtos = friendsIds
-                .getPage()
+        if (!friends.isEmpty()) {
+            friendsWithOnlineStatusDtos = friends
+                .getContent()
                 .stream()
-                .map(friendId -> new UserWithOnlineStatusDto(friendId, checkIfTheUserIsOnline(friendId)))
+                .map(u -> new UserWithOnlineStatusDto(u.getId(), checkIfTheUserIsOnline(u.getId())))
                 .toList();
         }
         return UserAndAllFriendsWithOnlineStatusDto.builder()
             .user(userWithOnlineStatusDto)
-            .friends(new PageableDto<>(friendsWithOnlineStatusDtos, friendsIds.getTotalElements(),
-                friendsIds.getNumber(), friendsIds.getTotalPages()))
+            .friends(new PageableDto<>(friendsWithOnlineStatusDtos, friends.getTotalElements(),
+                friends.getPageable().getPageNumber(), friends.getTotalPages()))
             .build();
     }
 
@@ -769,7 +859,6 @@ public class UserServiceImpl implements UserService {
             .reason(reason)
             .user(foundUser)
             .build());
-
         return UserDeactivationReasonDto.builder()
             .email(foundUser.getEmail())
             .name(foundUser.getName())
@@ -786,7 +875,7 @@ public class UserServiceImpl implements UserService {
         UserDeactivationReason userReason = userDeactivationRepo.getLastDeactivationReasons(id)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DEACTIVATION_REASON_IS_EMPTY));
         if (adminLang.equals("uk")) {
-            adminLang = "uk";
+            adminLang = "ua";
         }
         return filterReasons(adminLang,
             userReason.getReason());
@@ -799,9 +888,9 @@ public class UserServiceImpl implements UserService {
             result = forAll.stream().filter(s -> s.contains("{en}"))
                 .map(filterEn -> filterEn.replace("{en}", "").trim()).toList();
         }
-        if (lang.equals("uk")) {
-            result = forAll.stream().filter(s -> s.contains("{uk}"))
-                .map(filterEn -> filterEn.replace("{uk}", "").trim()).toList();
+        if (lang.equals("ua")) {
+            result = forAll.stream().filter(s -> s.contains("{ua}"))
+                .map(filterEn -> filterEn.replace("{ua}", "").trim()).toList();
         }
         return result;
     }
@@ -815,7 +904,6 @@ public class UserServiceImpl implements UserService {
         User foundUser = findUserById(id);
         foundUser.setUserStatus(UserStatus.ACTIVATED);
         userRepo.save(foundUser);
-
         return UserActivationDto.builder()
             .email(foundUser.getEmail())
             .name(foundUser.getName())
@@ -838,17 +926,6 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
-    @Override
-    public List<UserVOShort> findAllByEmailPreferenceAndEmailPeriodicity(EmailPreference emailPreference,
-        EmailPreferencePeriodicity periodicity) {
-        return userRepo.findAllByEmailPreferenceAndEmailPeriodicity(emailPreference.name(), periodicity.name()).stream()
-            .map(user -> modelMapper.map(user, UserVOShort.class))
-            .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Transactional
     @Override
     public List<Long> deactivateAllUsers(List<Long> listId) {
@@ -860,9 +937,30 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<UserVOShort> findAllByEmailNotification(EmailNotification emailNotification) {
+    public PageableAdvancedDto<UserManagementDto> searchBy(Pageable paging, String query) {
+        Page<User> page = userRepo.searchBy(paging, query);
+        List<UserManagementDto> users = page.stream()
+            .map(user -> modelMapper.map(user, UserManagementDto.class))
+            .toList();
+        return new PageableAdvancedDto<>(
+            users,
+            page.getTotalElements(),
+            page.getPageable().getPageNumber(),
+            page.getTotalPages(),
+            page.getNumber(),
+            page.hasPrevious(),
+            page.hasNext(),
+            page.isFirst(),
+            page.isLast());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<UserVO> findAllByEmailNotification(EmailNotification emailNotification) {
         return userRepo.findAllByEmailNotification(emailNotification).stream()
-            .map(user -> modelMapper.map(user, UserVOShort.class))
+            .map(user -> modelMapper.map(user, UserVO.class))
             .toList();
     }
 
@@ -880,7 +978,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserCityDto findAllUsersCities(Long userId) {
-        return greenCityRemoteClient.findAllUsersCities(userId);
+        UserLocation userLocation = userLocationRepo.findAllUsersCities(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DID_NOT_SET_ANY_CITY));
+        return modelMapper.map(userLocation, UserCityDto.class);
     }
 
     /**
@@ -902,13 +1002,13 @@ public class UserServiceImpl implements UserService {
 
     private List<UserAllFriendsDto> allUsersMutualFriendsRecommendedOrRequest(Long id,
         List<UserAllFriendsDto> recommendedFriends) {
-        List<Long> allUserFriendsIds = greenCityRemoteClient.getAllUserFriendsIds(id);
+        List<User> allUserFriends = userRepo.getAllUserFriends(id);
         for (UserAllFriendsDto currentFriend : recommendedFriends) {
             long mutualFriendsCount = 0;
-            List<Long> allCurrentUserFriendsIds = greenCityRemoteClient.getAllUserFriendsIds(currentFriend.getId());
-            for (Long friendUserId : allCurrentUserFriendsIds) {
-                for (Long userId : allUserFriendsIds) {
-                    if (friendUserId.equals(userId)) {
+            List<User> allCurrentUserFriends = userRepo.getAllUserFriends(currentFriend.getId());
+            for (User friendUser : allCurrentUserFriends) {
+                for (User user : allUserFriends) {
+                    if (friendUser.getId().equals(user.getId())) {
                         mutualFriendsCount++;
                     }
                 }
@@ -964,16 +1064,6 @@ public class UserServiceImpl implements UserService {
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
         allFriends.forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
-        List<Long> allFriendIds = allFriends.stream().map(UserAllFriendsDto::getId).toList();
-        var allFriendGreenCityProfiles = greenCityRemoteClient.findGreenCityUserProfilesByUserIds(allFriendIds);
-        Map<Long, String> userIdToProfilePictureMap = allFriendGreenCityProfiles.stream()
-            .collect(Collectors.toMap(
-                GreenCityUserProfileDtoResponse::userId,
-                GreenCityUserProfileDtoResponse::profilePicturePath));
-        allFriends.forEach(f -> {
-            String profilePicturePath = userIdToProfilePictureMap.get(f.getId());
-            f.setProfilePicturePath(profilePicturePath);
-        });
         return new PageableDto<>(
             allUsersMutualFriendsRecommendedOrRequest(userId, allFriends),
             allUsers.getTotalElements(),
@@ -986,15 +1076,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Boolean checkIfUserExistsByUuid(String uuid) {
-        return userRepo.existsNotDeactivatedByUuid(uuid);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean checkIfActiveUserExistsByUuid(String uuid) {
-        return userRepo.existsActiveByUuid(uuid);
+        return userRepo.findUserByUuid(uuid).isPresent();
     }
 
     /**
@@ -1029,109 +1111,6 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String findUserLanguageByUuid(String uuid) {
-        User user = userRepo.findNotDeactivatedUserByUuid(uuid)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
-        return user.getLanguage().getCode();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<Long> findAllActivatedUserIds(List<Long> ids) {
-        if (ids != null) {
-            return userRepo.findAllActivatedUserIdsFromList(ids);
-        } else {
-            return userRepo.findAllActivatedUserIds();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public Optional<UserVOAdvancedDto> findNotDeactivatedByIdAdvanced(Long id) {
-        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        return Optional.of(modelMapper.map(notDeactivatedById, UserVOAdvancedDto.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void createGreenCityUser(Long newUserId, String profilePicture) {
-        User newUser =
-            userRepo.findById(newUserId).orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        CreateGreenCityUserDto createGreenCityUserDto = CreateGreenCityUserDto.builder()
-            .id(newUser.getId())
-            .email(newUser.getEmail())
-            .name(newUser.getName())
-            .profilePicturePath(profilePicture)
-            .build();
-        try {
-            greenCityRemoteClient.createUser(createGreenCityUserDto);
-        } catch (WebClientRequestException | GreenCityServiceException e) {
-            log.warn("GreenCity service is unavailable: {}", e.getMessage());
-            retryableTaskService.saveRetryableTask(createGreenCityUserDto, RetryableTaskType.CREATE_USER);
-        } catch (WebClientResponseException e) {
-            log.warn("Bad response from GreenCity: {}", e.getMessage());
-        } catch (Exception e) {
-            log.error("Unexpected error when calling GreenCity: {}", e.getMessage(), e);
-        }
-    }
-
-    private void updateUserProfilePicturePath(Long userId, String profilePicturePath) {
-        try {
-            greenCityRemoteClient.updateUserPicturePath(userId, profilePicturePath);
-        } catch (WebClientRequestException | GreenCityServiceException e) {
-            UpdateUserPicturePathDto dto = UpdateUserPicturePathDto.builder()
-                .userId(userId)
-                .picturePath(profilePicturePath)
-                .build();
-            log.warn("GreenCity service is unavailable: update user picture path failed");
-            retryableTaskService.saveRetryableTask(dto, RetryableTaskType.UPDATE_USER_PICTURE_PATH);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email) {
-        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public Optional<UserVOShort> findNotDeactivatedByIdReduced(Long id) {
-        User notDeactivatedById = userRepo.findNotDeactivatedById(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID));
-        return Optional.of(modelMapper.map(notDeactivatedById, UserVOShort.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserVO> findAllByEmailIn(List<String> emails) {
-        return userRepo.findAllByEmailIn(emails).stream()
-            .map(user -> modelMapper.map(user, UserVO.class))
-            .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<UserEmailDto> findUserEmailsByUserIds(List<Long> userIds) {
-        return userRepo.findAllEmailsByIdIn(userIds);
+        return findUserByUuid(uuid).getLanguage().getCode();
     }
 }

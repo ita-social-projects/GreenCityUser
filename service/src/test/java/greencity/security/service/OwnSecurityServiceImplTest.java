@@ -2,12 +2,9 @@ package greencity.security.service;
 
 import greencity.ModelUtils;
 import greencity.TestConst;
-import greencity.client.CloudFlareClient;
-import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
+import greencity.dto.achievement.AchievementVO;
 import greencity.dto.ownsecurity.OwnSecurityVO;
-import greencity.dto.security.CloudFlareRequest;
-import greencity.dto.security.CloudFlareResponse;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserVO;
@@ -28,6 +25,7 @@ import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +39,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -82,13 +81,7 @@ class OwnSecurityServiceImplTest {
     @Mock
     LoginAttemptService loginAttemptService;
 
-    @Mock
-    CloudFlareClient cloudFlareClient;
-
-    @Mock
-    GreenCityRemoteClient greenCityRemoteClient;
-
-    OwnSecurityService ownSecurityService;
+    private OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
     private OwnSignInDto ownSignInDto;
@@ -99,10 +92,10 @@ class OwnSecurityServiceImplTest {
     private TestersSignInRequest request;
 
     @BeforeEach
-    void init() {
+    public void init() {
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo,
-            loginAttemptService, cloudFlareClient, greenCityRemoteClient);
+            loginAttemptService);
 
         ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
         ReflectionTestUtils.setField(ownSecurityService, "secretKey", "secret-key");
@@ -153,13 +146,16 @@ class OwnSecurityServiceImplTest {
     void signUp() {
         User user = ModelUtils.getUser();
         UserVO userVO = ModelUtils.getUserVO();
-
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        user.setUserAchievements(userAchievementList);
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
-
         ownSecurityService.signUp(new OwnSignUpDto(), "en");
-
         verify(emailService, times(1)).sendVerificationEmail(
             refEq(user.getId()),
             refEq(user.getName()),
@@ -175,7 +171,12 @@ class OwnSecurityServiceImplTest {
         UserVO userVO = ModelUtils.getUserVO();
         EmployeeSignUpDto employeeSignUpDto = ModelUtils.getEmployeeSignUpDto_UA();
         OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
-
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        user.setUserAchievements(userAchievementList);
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
         when(userRepo.save(any(User.class))).thenReturn(user);
@@ -197,7 +198,13 @@ class OwnSecurityServiceImplTest {
         EmployeeSignUpDto employeeSignUpDto = ModelUtils.getEmployeeSignUpDto();
         employeeSignUpDto.setPositions(Collections.emptyList());
         OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        user.setUserAchievements(userAchievementList);
 
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
         when(userRepo.save(any(User.class))).thenReturn(user);
@@ -219,7 +226,13 @@ class OwnSecurityServiceImplTest {
         EmployeeSignUpDto employeeSignUpDto = ModelUtils.getEmployeeSignUpDto_EN();
         employeeSignUpDto.setPositions(Collections.emptyList());
         OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        user.setUserAchievements(userAchievementList);
 
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
         when(userRepo.save(any(User.class))).thenReturn(user);
@@ -236,10 +249,17 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void signUpWithDuplicatedEmployee() {
+        User user = ModelUtils.getUserWithUbsRole();
         UserVO userVO = ModelUtils.getUserVO();
         EmployeeSignUpDto employeeSignUpDto = ModelUtils.getEmployeeSignUpDto();
         OwnSignUpDto ownSignUpDto = ModelUtils.getOwnSignUpDto();
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        user.setUserAchievements(userAchievementList);
 
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
 
@@ -257,8 +277,14 @@ class OwnSecurityServiceImplTest {
     @Test
     void signUpThrowsUserAlreadyRegisteredExceptionTest() {
         OwnSignUpDto ownSignUpDto = new OwnSignUpDto();
+        User user = User.builder().verifyEmail(new VerifyEmail()).build();
         UserVO userVO = UserVO.builder().verifyEmail(new VerifyEmailVO()).build();
-
+        List<Achievement> achievementList = Collections.singletonList(ModelUtils.getAchievement());
+        List<AchievementVO> achievementVOList = Collections.singletonList(ModelUtils.getAchievementVO());
+        List<UserAchievement> userAchievementList = Collections.singletonList(ModelUtils.getUserAchievement());
+        user.setUserAchievements(userAchievementList);
+        when(modelMapper.map(achievementVOList, new TypeToken<List<Achievement>>() {
+        }.getType())).thenReturn(achievementList);
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
         when(userRepo.save(any(User.class))).thenThrow(DataIntegrityViolationException.class);
@@ -269,9 +295,8 @@ class OwnSecurityServiceImplTest {
     @Test
     void signIn() {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
-        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
-            .thenReturn(new CloudFlareResponse(true, null, null, null));
 
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("new-access-token");
@@ -283,6 +308,7 @@ class OwnSecurityServiceImplTest {
         verify(passwordEncoder, times(1)).matches(anyString(), anyString());
         verify(jwtTool, times(1)).createAccessToken(anyString(), any(Role.class));
         verify(jwtTool, times(1)).createRefreshToken(any(UserVO.class));
+        verify(loginAttemptService, times(1)).isBlockedByCaptcha(anyString());
         verify(loginAttemptService, times(1)).isBlockedByWrongPassword(anyString());
     }
 
@@ -292,9 +318,8 @@ class OwnSecurityServiceImplTest {
         when(passwordEncoder.matches(anyString(), anyString())).thenReturn(true);
         when(jwtTool.createAccessToken(anyString(), any(Role.class))).thenReturn("new-access-token");
         when(jwtTool.createRefreshToken(any(UserVO.class))).thenReturn("new-refresh-token");
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
-        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
-            .thenReturn(new CloudFlareResponse(true, null, null, null));
 
         assertThrows(EmailNotVerified.class,
             () -> ownSecurityService.signIn(ownSignInDto));
@@ -316,9 +341,8 @@ class OwnSecurityServiceImplTest {
             .role(Role.ROLE_USER)
             .build();
         when(userService.findByEmail("test@gmail.com")).thenReturn(user);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(false);
-        when(cloudFlareClient.getCloudFlareResponse(any(CloudFlareRequest.class)))
-            .thenReturn(new CloudFlareResponse(true, null, null, null));
 
         assertThrows(WrongPasswordException.class, () -> ownSecurityService.signIn(ownSignInDto));
     }
@@ -624,8 +648,20 @@ class OwnSecurityServiceImplTest {
     }
 
     @Test
+    void singInBlockedUser() {
+        when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(true);
+        when(userRepo.findByEmail(anyString()))
+            .thenReturn(Optional.ofNullable(userForBruteForceTest));
+
+        assertThrows(UserBlockedException.class,
+            () -> ownSecurityService.signIn(ownSignInDto));
+    }
+
+    @Test
     void singInBlockedUserByPassword() {
         when(userService.findByEmail(anyString())).thenReturn(verifiedUser);
+        when(loginAttemptService.isBlockedByCaptcha(anyString())).thenReturn(false);
         when(loginAttemptService.isBlockedByWrongPassword(anyString())).thenReturn(true);
         when(userRepo.findByEmail(anyString()))
             .thenReturn(Optional.ofNullable(userForBruteForceTest));
@@ -636,7 +672,6 @@ class OwnSecurityServiceImplTest {
 
     @Test
     void unblockUserTest() {
-        userForBruteForceTest.setUserStatus(UserStatus.BLOCKED);
         when(jwtTool.getEmailOutOfAccessToken(anyString())).thenReturn("test@mail.com");
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(userForBruteForceTest));
 
@@ -645,19 +680,6 @@ class OwnSecurityServiceImplTest {
         verify(jwtTool, times(1)).getEmailOutOfAccessToken(anyString());
         verify(userRepo, times(1)).findByEmail(anyString());
         verify(userRepo, times(1)).save(userForBruteForceTest);
-    }
-
-    @Test
-    void unblockUserWithStatusNotBlockedTest() {
-        userForBruteForceTest.setUserStatus(UserStatus.ACTIVATED);
-        when(jwtTool.getEmailOutOfAccessToken(anyString())).thenReturn("test@mail.com");
-        when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(userForBruteForceTest));
-
-        ownSecurityService.unblockAccount("test@mail.com");
-
-        verify(jwtTool, times(1)).getEmailOutOfAccessToken(anyString());
-        verify(userRepo, times(1)).findByEmail(anyString());
-        verify(userRepo, never()).save(userForBruteForceTest);
     }
 
     @Test

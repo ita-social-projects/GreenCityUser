@@ -13,7 +13,7 @@ class Base64ValidatorTest {
     private ConstraintValidatorContext context;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         base64Validator = new Base64Validator();
         context = mock(ConstraintValidatorContext.class);
     }

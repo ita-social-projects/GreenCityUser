@@ -26,7 +26,7 @@ public class UserProfileDtoResponse {
     private ProfilePrivacyPolicy showLocation;
     private ProfilePrivacyPolicy showEcoPlace;
     private ProfilePrivacyPolicy showToDoList;
-    private Double rating;
+    private Float rating;
     private Role role;
     private UserLocationDto userLocationDto;
     private Set<UserNotificationPreferenceDto> notificationPreferences;
