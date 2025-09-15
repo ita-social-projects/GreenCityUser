@@ -21,7 +21,6 @@ import lombok.Setter;
 public class UserProfileDtoResponse {
     private String profilePicturePath;
     private String name;
-    private String userCredo;
     private List<SocialNetworkResponseDTO> socialNetworks;
     private ProfilePrivacyPolicy showLocation;
     private ProfilePrivacyPolicy showEcoPlace;

@@ -1,7 +1,6 @@
 package greencity.mapping;
 
 import greencity.ModelUtils;
-import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
 import greencity.dto.user.UserForListDto;
@@ -29,10 +28,9 @@ class UserForListDtoMapperTest {
     void convertTest() {
         User user = ModelUtils.getUser();
         Long userId = user.getId();
-        String userCredo = TestConst.CREDO;
         String profilePicturePath = "profilePicturePath";
         var greenCityUserProfile =
-            new GreenCityUserProfileDtoResponse(userId, profilePicturePath, userCredo, 0., new UserLocationDto());
+            new GreenCityUserProfileDtoResponse(userId, profilePicturePath, 0., new UserLocationDto());
 
         UserForListDto expectedResult = UserForListDto.builder()
             .id(userId)
@@ -41,7 +39,6 @@ class UserForListDtoMapperTest {
             .email(user.getEmail())
             .userStatus(user.getUserStatus())
             .role(user.getRole())
-            .userCredo(userCredo)
             .build();
 
         when(greenCityRemoteClient.findGreenCityUserProfileByUserId(userId))

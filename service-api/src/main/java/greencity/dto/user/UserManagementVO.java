@@ -19,7 +19,6 @@ public class UserManagementVO {
     private Long id;
     private String name;
     private String email;
-    private String userCredo;
     private Role role;
     private UserStatus userStatus;
 }

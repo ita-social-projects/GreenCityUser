@@ -68,7 +68,6 @@ public class ModelUtils {
     public static UserProfileDtoRequest getUserProfileDtoRequest() {
         return new UserProfileDtoRequest(
             "name",
-            "credo",
             List.of("social network 1", "social network 2"),
             ProfilePrivacyPolicy.FRIENDS_ONLY,
             ProfilePrivacyPolicy.PRIVATE,
@@ -89,7 +88,6 @@ public class ModelUtils {
         return new GreenCityUserProfileDtoResponse(
             TestConst.USER_ID,
             TestConst.PROFILE_PICTURE_PATH,
-            TestConst.USER_CREDO,
             2.,
             new UserLocationDto());
     }

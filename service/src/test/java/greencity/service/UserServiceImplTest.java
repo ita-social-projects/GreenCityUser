@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
 import greencity.dto.CoordinatesDto;
@@ -110,9 +109,6 @@ class UserServiceImplTest {
 
     @Mock
     GreenCityRemoteClient greenCityRemoteClient;
-
-    @Mock
-    RestClient restClient;
 
     @Mock
     SimpMessagingTemplate messagingTemplate;
@@ -623,7 +619,6 @@ class UserServiceImplTest {
     void saveUserProfileUpdatesWithNullValuesTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName(null);
-        request.setUserCredo(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
@@ -648,7 +643,6 @@ class UserServiceImplTest {
     void saveUserProfileUpdatesWithNullLatitudeTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName(null);
-        request.setUserCredo(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
@@ -673,7 +667,6 @@ class UserServiceImplTest {
     void saveUserProfileUpdatesWithNullLongitudeTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName(null);
-        request.setUserCredo(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
@@ -870,23 +863,6 @@ class UserServiceImplTest {
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
         userService.updateUser(1L, userManagementUpdateDto);
         assertEquals(excepted, user);
-    }
-
-    @Test
-    void updateUserWhenUpdateCredoFailsRetryTaskIsSaved() {
-        UserManagementUpdateDto dto = ModelUtils.getUserManagementUpdateDto();
-        dto.setUserCredo("My credo");
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        doThrow(new WebClientRequestException(
-            new IOException("fail"),
-            HttpMethod.POST,
-            URI.create("http://localhost/fake"),
-            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserCredo(user.getId(), "My credo");
-        userService.updateUser(1L, dto);
-        verify(retryableTaskService).saveRetryableTask(
-            new UpdateUserCredoDto(user.getId(), "My credo"),
-            RetryableTaskType.UPDATE_USER_CREDO);
     }
 
     @Test
@@ -1122,7 +1098,6 @@ class UserServiceImplTest {
                 .id("1L")
                 .name("vivo")
                 .email("test@ukr.net")
-                .userCredo("Hello")
                 .role("1")
                 .userStatus("1")
                 .build();
@@ -1131,7 +1106,6 @@ class UserServiceImplTest {
                 .id(1L)
                 .name("vivo")
                 .email("test@ukr.net")
-                .userCredo("Hello")
                 .role(ROLE_USER)
                 .userStatus(ACTIVATED)
                 .build();

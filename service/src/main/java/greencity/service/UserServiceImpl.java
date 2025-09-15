@@ -1,7 +1,6 @@
 package greencity.service;
 
 import greencity.client.GreenCityRemoteClient;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.constant.UpdateConstants;
@@ -65,7 +64,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
-    private final RestClient restClient;
     private final LanguageRepo languageRepo;
     private final GreenCityRemoteClient greenCityRemoteClient;
     private final UserDeactivationRepo userDeactivationRepo;
@@ -179,14 +177,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(dto.getEmail());
         user.setRole(dto.getRole());
         user.setUserStatus(dto.getUserStatus());
-        try {
-            greenCityRemoteClient.updateUserCredo(user.getId(), dto.getUserCredo());
-        } catch (WebClientRequestException | GreenCityServiceException e) {
-            log.warn("GreenCity service is unavailable: update user credo failed");
-            UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(user.getId(),
-                dto.getUserCredo());
-            retryableTaskService.saveRetryableTask(updateUserCredoDto, RetryableTaskType.UPDATE_USER_CREDO);
-        }
+        userRepo.save(user);
     }
 
     private void updateUserName(User user, String name) {
@@ -263,7 +254,6 @@ public class UserServiceImpl implements UserService {
         setValueIfNotEmpty(searchCriteriaList, "id", userViewDto.getId());
         setValueIfNotEmpty(searchCriteriaList, "name", userViewDto.getName());
         setValueIfNotEmpty(searchCriteriaList, "email", userViewDto.getEmail());
-        setValueIfNotEmpty(searchCriteriaList, "userCredo", userViewDto.getUserCredo());
         setValueIfNotEmpty(searchCriteriaList, "role", userViewDto.getRole());
         setValueIfNotEmpty(searchCriteriaList, "userStatus", userViewDto.getUserStatus());
         return searchCriteriaList;
@@ -530,16 +520,6 @@ public class UserServiceImpl implements UserService {
             .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
         if (userProfileDtoRequest.getName() != null) {
             updateUserName(user, userProfileDtoRequest.getName());
-        }
-        if (userProfileDtoRequest.getUserCredo() != null) {
-            try {
-                greenCityRemoteClient.updateUserCredo(user.getId(), userProfileDtoRequest.getUserCredo());
-            } catch (WebClientRequestException | GreenCityServiceException e) {
-                log.warn("GreenCity service is unavailable: update user credo failed");
-                UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(user.getId(),
-                    userProfileDtoRequest.getUserCredo());
-                retryableTaskService.saveRetryableTask(updateUserCredoDto, RetryableTaskType.UPDATE_USER_CREDO);
-            }
         }
         Long userId = user.getId();
         try {
@@ -963,7 +943,6 @@ public class UserServiceImpl implements UserService {
             .map(allUsers.getContent(),
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
-        allFriends.forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         List<Long> allFriendIds = allFriends.stream().map(UserAllFriendsDto::getId).toList();
         var allFriendGreenCityProfiles = greenCityRemoteClient.findGreenCityUserProfilesByUserIds(allFriendIds);
         Map<Long, String> userIdToProfilePictureMap = allFriendGreenCityProfiles.stream()

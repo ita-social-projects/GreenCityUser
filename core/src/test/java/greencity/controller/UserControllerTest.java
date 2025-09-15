@@ -409,7 +409,6 @@ class UserControllerTest {
         String json = """
             {
                 "name": "Vovka",
-                "userCredo": "credo",
                 "socialNetworks": [],
                 "showLocation": "PUBLIC",
                 "showEcoPlace": "PUBLIC",
@@ -447,7 +446,6 @@ class UserControllerTest {
         String json = """
             {
                 "name": "Vovka",
-                "userCredo": "credo",
                 "socialNetworks": [],
                 "showLocation": "PUBLIC",
                 "showEcoPlace": "PUBLIC",
@@ -494,7 +492,6 @@ class UserControllerTest {
                 .id("1L")
                 .name("vivo")
                 .email("test@ukr.net")
-                .userCredo("Hello")
                 .role("1")
                 .userStatus("1")
                 .build();
