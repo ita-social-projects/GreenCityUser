@@ -24,14 +24,14 @@ class UserNotificationPreferenceServiceImplTest {
 
     @Test
     void existsByUserIdAndEmailPreferenceAndPeriodicityTest() {
-        Long userId = 1L;
+        String email = "test@gmailcom";
         EmailPreference emailPreference = EmailPreference.LIKES;
         EmailPreferencePeriodicity periodicity = EmailPreferencePeriodicity.WEEKLY;
         EmailPreferenceDto emailPreferenceDto = new EmailPreferenceDto(
-            userId, emailPreference, periodicity);
+            email, emailPreference, periodicity);
         boolean expectedResult = true;
 
-        when(userNotificationPreferenceRepo.existsByUserIdAndEmailPreferenceAndPeriodicity(userId, emailPreference,
+        when(userNotificationPreferenceRepo.existsByUserEmailAndEmailPreferenceAndPeriodicity(email, emailPreference,
             periodicity))
                 .thenReturn(expectedResult);
 
@@ -43,14 +43,14 @@ class UserNotificationPreferenceServiceImplTest {
 
     @Test
     void existsByUserIdAndEmailPreferenceAndPeriodicityWhenNotExistsTest() {
-        Long userId = 1L;
+        String email = "test@gmailcom";
         EmailPreference emailPreference = EmailPreference.LIKES;
         EmailPreferencePeriodicity periodicity = EmailPreferencePeriodicity.WEEKLY;
         EmailPreferenceDto emailPreferenceDto = new EmailPreferenceDto(
-            userId, emailPreference, periodicity);
+            email, emailPreference, periodicity);
         boolean expectedResult = false;
 
-        when(userNotificationPreferenceRepo.existsByUserIdAndEmailPreferenceAndPeriodicity(userId, emailPreference,
+        when(userNotificationPreferenceRepo.existsByUserEmailAndEmailPreferenceAndPeriodicity(email, emailPreference,
             periodicity))
                 .thenReturn(expectedResult);
 

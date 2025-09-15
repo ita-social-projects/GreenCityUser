@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -77,33 +76,24 @@ class UserSpecificationTest {
 
     @Test
     void toPredicate() {
+        when(criteriaBuilder.equal(any(), any(String.class))).thenReturn(expected);
+        when(criteriaBuilder.like(any(), any(String.class))).thenReturn(expected);
         when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(root.get(searchCriteriaList.getFirst().getKey())).thenReturn(objectPathExpected);
-        when(criteriaBuilder.equal(objectPathExpected, searchCriteriaList.getFirst().getValue()))
-            .thenThrow(NumberFormatException.class);
         when(criteriaBuilder.conjunction()).thenReturn(expected);
-        when(criteriaBuilder.disjunction()).thenReturn(expected);
         when(criteriaBuilder.and(expected, expected)).thenReturn(expected);
         when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(root.get(searchCriteriaList.get(1).getKey())).thenReturn(objectPathExpected);
         when(criteriaBuilder.and(expected, expected)).thenReturn(expected);
         when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(root.get(searchCriteriaList.get(2).getKey())).thenReturn(objectPathExpected);
-        when(criteriaBuilder.like(any(), eq("%" + searchCriteriaList.get(2).getValue() + "%"))).thenReturn(expected);
         when(criteriaBuilder.and(expected, expected)).thenReturn(expected);
         when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(root.get(searchCriteriaList.get(3).getKey())).thenReturn(objectPathExpected);
-        when(criteriaBuilder.like(any(), eq("%" + searchCriteriaList.get(3).getValue() + "%"))).thenReturn(expected);
         when(criteriaBuilder.and(expected, expected)).thenReturn(expected);
         when(criteriaBuilder.conjunction()).thenReturn(expected);
         when(root.get(searchCriteriaList.get(4).getKey())).thenReturn(objectPathExpected);
         when(objectPathExpected.as(Integer.class)).thenReturn(as);
-        when(criteriaBuilder.equal(as, searchCriteriaList.get(4).getValue())).thenReturn(expected);
-        when(criteriaBuilder.and(expected, expected)).thenReturn(expected);
-        when(criteriaBuilder.conjunction()).thenReturn(expected);
-        when(root.get(searchCriteriaList.get(5).getKey())).thenReturn(objectPathExpected);
-        when(objectPathExpected.as(Integer.class)).thenReturn(as);
-        when(criteriaBuilder.equal(as, searchCriteriaList.get(5).getValue())).thenReturn(expected);
         when(criteriaBuilder.and(expected, expected)).thenReturn(expected);
         Predicate actual = userSpecification.toPredicate(root, criteriaQuery, criteriaBuilder);
         assertEquals(expected, actual);

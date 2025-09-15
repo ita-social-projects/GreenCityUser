@@ -93,10 +93,10 @@ class CustomSpecificationTest {
 
     @Test
     void getEnumPredicate() {
-        when(root.get(searchCriteriaList.get(5).getKey())).thenReturn(objectPathExpected);
+        when(root.get(searchCriteriaList.get(4).getKey())).thenReturn(objectPathExpected);
         when(objectPathExpected.as(Integer.class)).thenReturn(as);
-        when(criteriaBuilder.equal(as, searchCriteriaList.get(5).getValue())).thenReturn(expected);
-        Predicate actual = userSpecification.getEnumPredicate(root, criteriaBuilder, searchCriteriaList.get(5));
+        when(criteriaBuilder.equal(as, searchCriteriaList.get(4).getValue())).thenReturn(expected);
+        Predicate actual = userSpecification.getEnumPredicate(root, criteriaBuilder, searchCriteriaList.get(4));
         assertEquals(expected, actual);
     }
 }

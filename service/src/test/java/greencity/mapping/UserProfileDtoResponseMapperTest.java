@@ -41,6 +41,7 @@ class UserProfileDtoResponseMapperTest {
         user.setSocialNetworks(List.of(new SocialNetwork()));
         user.setNotificationPreferences(Set.of(new UserNotificationPreference()));
         Long userId = user.getId();
+        String email = user.getEmail();
         Double userRating = 4.;
         String profilePicturePath = "http://testpicture.com.ua";
         UserLocationDto userLocationDto = new UserLocationDto();
@@ -49,7 +50,7 @@ class UserProfileDtoResponseMapperTest {
         UserNotificationPreferenceDto userNotificationPreferenceDto = new UserNotificationPreferenceDto();
         Set<UserNotificationPreferenceDto> expectedNotificationPreferences = Set.of(userNotificationPreferenceDto);
         var greenCityUserProfile =
-            new GreenCityUserProfileDtoResponse(userId, profilePicturePath, userRating, userLocationDto);
+            new GreenCityUserProfileDtoResponse(userId, email, profilePicturePath, userRating, userLocationDto);
 
         when(greenCityRemoteClient.findGreenCityUserProfileByUserId(userId)).thenReturn(greenCityUserProfile);
 

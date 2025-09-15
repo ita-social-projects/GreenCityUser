@@ -146,7 +146,7 @@ public class GreenCityRemoteWebClientConfig {
         }
     }
 
-    public ExchangeFilterFunction encodePlusInQuery() {
+    private ExchangeFilterFunction encodePlusInQuery() {
         return ExchangeFilterFunction.ofRequestProcessor(request -> {
             URI original = request.url();
 

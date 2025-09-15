@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import greencity.client.GreenCityRemoteClient;
-import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserAddRatingExternalDto;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,12 +20,12 @@ class UpdateUserRatingProcessorTest {
 
     @Test
     void getPayloadClass() {
-        assertEquals(UserAddRatingDto.class, processor.getPayloadClass());
+        assertEquals(UserAddRatingExternalDto.class, processor.getPayloadClass());
     }
 
     @Test
     void handle() {
-        UserAddRatingDto dto = new UserAddRatingDto();
+        UserAddRatingExternalDto dto = new UserAddRatingExternalDto();
         processor.handle(dto);
         verify(greenCityRemoteClient, times(1)).updateUserRating(dto);
     }

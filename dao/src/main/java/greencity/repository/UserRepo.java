@@ -219,15 +219,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     }
 
     /**
-     * Method that finds user.
-     *
-     * @param id {@link Long} -current user's id.
-     * @return {@link User}.
-     */
-    @Query(value = "select u from User u where u.id = :id")
-    Optional<User> findUserForAchievement(Long id);
-
-    /**
      * Find id by UUid.
      *
      * @param uuid - User uuid

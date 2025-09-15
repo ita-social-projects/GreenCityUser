@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
@@ -104,14 +103,6 @@ public interface UserService {
     UserVOShort findById(Long id);
 
     /**
-     * Method that allow you to find {@link UserVO} by ID.
-     *
-     * @param id a value of {@link Long}
-     * @return {@link UserVO}
-     */
-    UserVOAchievement findUserForAchievement(Long id);
-
-    /**
      * Method that allow you to find {@link UserVO} by email.
      *
      * @param email a value of {@link String}
@@ -153,6 +144,16 @@ public interface UserService {
     UserRoleDto updateRole(Long id, Role role, String email);
 
     /**
+     * Update {@code ROLE} of user.
+     *
+     * @param userEmail        {@link UserVO} email.
+     * @param role             {@link Role} for user.
+     * @param currentUserEmail current user email
+     * @return {@link UserRoleDto}
+     */
+    UserRoleDto updateRole(String userEmail, Role role, String currentUserEmail);
+
+    /**
      * Update status of user.
      *
      * @param id         {@link UserVO} id.
@@ -160,6 +161,15 @@ public interface UserService {
      * @return {@link UserStatusDto}
      */
     UserStatusDto updateStatus(Long id, UserStatus userStatus, String email);
+
+    /**
+     * Update status of user.
+     *
+     * @param userEmail  {@link UserVO} email.
+     * @param userStatus {@link UserStatus} for user.
+     * @return {@link UserStatusDto}
+     */
+    UserStatusDto updateStatus(String userEmail, UserStatus userStatus, String currentUserEmail);
 
     /**
      * Find {@link UserVO}-s by page .
@@ -170,12 +180,20 @@ public interface UserService {
     PageableDto<UserForListDto> findByPage(Pageable pageable);
 
     /**
-     * Find {@link UserVO} for management by page .
+     * Find {@link UserVO} for management by email.
+     *
+     * @param email user's email.
+     * @return a dto of {@link UserManagementDto}.
+     */
+    UserManagementDto findUserForManagement(String email);
+
+    /**
+     * Find {@link UserVO}s for management by page.
      *
      * @param pageable a value with pageable configuration.
      * @return a dto of {@link PageableAdvancedDto}.
      */
-    PageableAdvancedDto<UserManagementDto> findUserForManagementByPage(Pageable pageable);
+    PageableAdvancedDto<UserManagementDto> findUsersForManagement(Pageable pageable);
 
     /**
      * Method that allows you to update {@link UserVO} by dto.
@@ -184,6 +202,14 @@ public interface UserService {
      *            {@link UserVO}.
      */
     void updateUser(Long userId, UserManagementUpdateDto dto);
+
+    /**
+     * Method that allows you to update {@link UserVO} by email in dto.
+     *
+     * @param dto - dto {@link UserManagementDto} with updated fields for updating
+     *            {@link UserVO}.
+     */
+    void updateUser(UserManagementUpdateDto dto);
 
     /**
      * The method which return array of user role by user id.
@@ -287,6 +313,13 @@ public interface UserService {
      * @param userId - {@link UserVO}'s id
      */
     boolean checkIfTheUserIsOnline(Long userId);
+
+    /**
+     * The method checks by email if a {@link UserVO} is online.
+     *
+     * @param email - {@link UserVO}'s email
+     */
+    boolean checkIfTheUserIsOnline(String email);
 
     /**
      * Method return user profile information {@link UserVO}.
@@ -477,6 +510,14 @@ public interface UserService {
     Optional<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(String email);
 
     /**
+     * Method that allows you to find {@link UserVOAdvancedDto} by email.
+     *
+     * @param email - {@link UserVOAdvancedDto}'s email.
+     * @return {@link Optional} of found {@link UserVOAdvancedDto}.
+     */
+    Optional<UserVOAdvancedDto> findByEmailAdvanced(String email);
+
+    /**
      * Method that allows you to create a user on the GreenCity microservice.
      *
      * @param newUserId      - {@link Long} user's id on GreenCityUser.
@@ -499,4 +540,12 @@ public interface UserService {
      * @return {@link List} of {@link UserVO} with matching emails
      */
     List<UserVO> findAllByEmailIn(List<String> emails);
+
+    /**
+     * Method to find all emails by ids.
+     *
+     * @param ids {@link List} of ids to search for
+     * @return {@link List} of emails
+     */
+    List<String> findAllEmailsByIdIn(List<Long> ids);
 }
