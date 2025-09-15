@@ -142,9 +142,6 @@ public class SecurityConfig {
                     "/user/userAndAllFriendsWithOnlineStatus",
                     "/user/usersOnlineStatus",
                     "/user/findByIdForAchievement",
-                    "/user/findNotDeactivatedByEmail",
-                    "/user/findNotDeactivatedByEmailRemote",
-                    "/user/findNotDeactivatedByIdRemote",
                     "/user/findByEmail",
                     "/user/findIdByEmail",
                     "/user/findAllUsersCities",
@@ -235,8 +232,6 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.GET,
                     "/user/email/findAll",
-                    "/user/email/findByIds",
-                    "/user/findNotDeactivatedByIdAdvanced",
                     "/user/activated-ids",
                     "/user/registration-statistics",
                     "/user/email",
@@ -244,8 +239,8 @@ public class SecurityConfig {
                     "/user/email-preferences-distribution",
                     "/user/statuses-distribution",
                     "/user/roles-distribution",
-                    "/user/findNotDeactivatedById",
-                    "/user/findNotDeactivatedByEmail")
+                    "/user/findNotDeactivatedByEmail",
+                    "/user/findNotDeactivatedByEmailAdvanced")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
                     "/management/socialnetworkimages/delete",

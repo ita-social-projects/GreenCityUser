@@ -33,6 +33,9 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class GreenCityRemoteWebClientConfig {
+    private static final String PLUS_SYMBOL = "+";
+    private static final String ENCODED_PLUS_SYMBOL = "%2B";
+
     @Value("${greencity.server.address}")
     private String greenCityBaseUrl;
 
@@ -147,8 +150,8 @@ public class GreenCityRemoteWebClientConfig {
         return ExchangeFilterFunction.ofRequestProcessor(request -> {
             URI original = request.url();
 
-            if (original.getRawQuery() != null && original.getRawQuery().contains("+")) {
-                String strictlyEscapedQuery = original.getRawQuery().replace("+", "%2B");
+            if (original.getRawQuery() != null && original.getRawQuery().contains(PLUS_SYMBOL)) {
+                String strictlyEscapedQuery = original.getRawQuery().replace(PLUS_SYMBOL, ENCODED_PLUS_SYMBOL);
 
                 URI newUri = UriComponentsBuilder.fromUri(original)
                     .replaceQuery(strictlyEscapedQuery)
