@@ -1,6 +1,5 @@
 package greencity.dto.user;
 
-import greencity.dto.friends.FriendsChatDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -22,5 +21,4 @@ public class UserAllFriendsDto {
     private Long mutualFriends;
     private String profilePicturePath;
     private String friendStatus;
-    private FriendsChatDto friendsChatDto;
 }
