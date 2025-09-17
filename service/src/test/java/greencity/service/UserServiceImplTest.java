@@ -1269,29 +1269,6 @@ class UserServiceImplTest {
             () -> userService.markUserAsActivated(uuid));
     }
 
-//    @Test
-//    void findUserForAchievementTest() {
-//        Long id = 1L;
-//        UserVOAchievement userVOAchievement = UserVOAchievement.builder().id(id).build();
-//        User myUser = User.builder().id(id).build();
-//        when(userRepo.findById(id)).thenReturn(Optional.of(myUser));
-//        when(modelMapper.map(myUser, UserVOAchievement.class)).thenReturn(userVOAchievement);
-//        assertEquals(userVOAchievement, userService.findUserForAchievement(id));
-//        verify(userRepo, times(1)).findById(id);
-//    }
-//
-//    @Test
-//    void findUserForAchievementByEmailTest() {
-//        Long id = 1L;
-//        String email = "test@email";
-//        UserVOAchievement userVOAchievement = UserVOAchievement.builder().id(id).build();
-//        User myUser = User.builder().id(id).build();
-//        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
-//        when(modelMapper.map(myUser, UserVOAchievement.class)).thenReturn(userVOAchievement);
-//        assertEquals(userVOAchievement, userService.findUserForAchievement(email));
-//        verify(userRepo, times(1)).findByEmail(email);
-//    }
-
     @Test
     void createUbsRecordTest() {
         Long id = 1L;

@@ -596,60 +596,6 @@ class UserControllerTest {
             .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
     }
 
-//    @Test
-//    void findUserForAchievementTest() throws Exception {
-//        UserVOAchievement userVOAchievement = UserVOAchievement.builder()
-//            .id(1L)
-//            .name(TestConst.NAME)
-//            .userAchievements(List.of(
-//                UserAchievementVO.builder()
-//                    .id(10L)
-//                    .user(ModelUtils.getUserVO())
-//                    .achievement(AchievementVO.builder()
-//                        .id(20L)
-//                        .achievementCategory(AchievementCategoryVO.builder()
-//                            .id(30L)
-//                            .name("TestAchievementCategory")
-//                            .build())
-//                        .build())
-//                    .build()))
-//            .build();
-//        when(userService.findUserForAchievement(1L)).thenReturn(userVOAchievement);
-//        mockMvc.perform(get(userLink + "/findByIdForAchievement")
-//            .param("id", "1"))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.id").value(1L))
-//            .andExpect(jsonPath("$.name").value(TestConst.NAME))
-//            .andExpect(jsonPath("$.userAchievements.length()").value(1));
-//    }
-//
-//    @Test
-//    void findUserForAchievementByEmailTest() throws Exception {
-//        UserVOAchievement userVOAchievement = UserVOAchievement.builder()
-//            .id(1L)
-//            .name(TestConst.NAME)
-//            .userAchievements(List.of(
-//                UserAchievementVO.builder()
-//                    .id(10L)
-//                    .user(ModelUtils.getUserVO())
-//                    .achievement(AchievementVO.builder()
-//                        .id(20L)
-//                        .achievementCategory(AchievementCategoryVO.builder()
-//                            .id(30L)
-//                            .name("TestAchievementCategory")
-//                            .build())
-//                        .build())
-//                    .build()))
-//            .build();
-//        when(userService.findUserForAchievement(TestConst.EMAIL)).thenReturn(userVOAchievement);
-//        mockMvc.perform(get(userLink + "/findByEmailForAchievement")
-//            .param(emailQueryParam, TestConst.EMAIL))
-//            .andExpect(status().isOk())
-//            .andExpect(jsonPath("$.id").value(1L))
-//            .andExpect(jsonPath("$.name").value(TestConst.NAME))
-//            .andExpect(jsonPath("$.userAchievements.length()").value(1));
-//    }
-
     @Test
     void findUserForManagementTest() throws Exception {
         UserManagementDto userManagementDto = ModelUtils.getUserManagementDto();

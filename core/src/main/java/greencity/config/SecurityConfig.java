@@ -229,7 +229,7 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PUT,
                     "/management/socialnetworkimages/",
-                    "/user")
+                    USER_LINK)
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.GET,
                     "/user/email/findAll",
