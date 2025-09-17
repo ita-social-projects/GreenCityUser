@@ -34,4 +34,6 @@
     <include file="db/changelog/logs/ch-insert-passwords-into-own-security-Lys.xml"/>
     <include file="db/changelog/logs/ch-update-users-remove-user-credo-column-Zadyraichuk.xml"/>
     <include file="db/changelog/logs/ch-update-users-change-invalid-privacy-policy-values-Zadyraichuk.xml"/>
+    <include file="db/changelog/logs/ch-update-users-remove-rating-column-Zadyraichuk.xml"/>
+    <include file="db/changelog/logs/ch-update-users-remove-profile_picture-column-Zadyraichuk.xml"/>
 </databaseChangeLog>
