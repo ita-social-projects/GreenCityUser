@@ -3,7 +3,6 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
 import greencity.dto.CoordinatesDto;
@@ -111,9 +110,6 @@ class UserServiceImplTest {
 
     @Mock
     GreenCityRemoteClient greenCityRemoteClient;
-
-    @Mock
-    RestClient restClient;
 
     @Mock
     SimpMessagingTemplate messagingTemplate;
