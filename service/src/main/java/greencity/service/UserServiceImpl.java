@@ -1,7 +1,6 @@
 package greencity.service;
 
 import greencity.client.GreenCityRemoteClient;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
 import greencity.constant.UpdateConstants;
@@ -65,7 +64,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
-    private final RestClient restClient;
     private final LanguageRepo languageRepo;
     private final GreenCityRemoteClient greenCityRemoteClient;
     private final UserDeactivationRepo userDeactivationRepo;
@@ -963,7 +961,6 @@ public class UserServiceImpl implements UserService {
             .map(allUsers.getContent(),
                 new TypeToken<List<UserAllFriendsDto>>() {
                 }.getType());
-        allFriends.forEach(f -> f.setFriendsChatDto(restClient.chatBetweenTwo(f.getId(), userId)));
         List<Long> allFriendIds = allFriends.stream().map(UserAllFriendsDto::getId).toList();
         var allFriendGreenCityProfiles = greenCityRemoteClient.findGreenCityUserProfilesByUserIds(allFriendIds);
         Map<Long, String> userIdToProfilePictureMap = allFriendGreenCityProfiles.stream()
