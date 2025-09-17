@@ -3,6 +3,7 @@ package greencity.dto.user;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,6 +24,7 @@ public class UserNotificationPreferenceDto {
 
     @JsonBackReference
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    @Hidden
     private UserVO userVO;
 
     private EmailPreference emailPreference;

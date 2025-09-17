@@ -41,7 +41,6 @@ public class ModelUtils {
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
             .email(TestConst.EMAIL)
-            .userCredo(TestConst.CREDO)
             .build();
     }
 
@@ -50,7 +49,6 @@ public class ModelUtils {
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
             .email(TestConst.EMAIL)
-            .userCredo(TestConst.CREDO)
             .build();
     }
 

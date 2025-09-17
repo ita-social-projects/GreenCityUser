@@ -3,14 +3,12 @@ package greencity.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.constant.UpdateConstants;
 import greencity.dto.CoordinatesDto;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.socialnetwork.SocialNetworkImageVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
@@ -112,14 +110,13 @@ class UserServiceImplTest {
     GreenCityRemoteClient greenCityRemoteClient;
 
     @Mock
-    RestClient restClient;
-
-    @Mock
     SimpMessagingTemplate messagingTemplate;
     @Mock
     private UserAddRatingDto userRatingDto;
     @Mock
     private RetryableTaskService retryableTaskService;
+    @Mock
+    private FileService fileService;
 
     private final User user = User.builder()
         .id(1L)
@@ -210,6 +207,7 @@ class UserServiceImplTest {
 
         when(greenCityRemoteClient.findAllUsersCities(userId))
             .thenReturn(userCityDto);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
 
         UserCityDto actualResult = userService.findAllUsersCities(userId);
 
@@ -220,6 +218,7 @@ class UserServiceImplTest {
     void findAllUsersCitiesExceptionTest() {
         when(greenCityRemoteClient.findAllUsersCities(userId))
             .thenThrow(new RuntimeException());
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
 
         assertThrows(
             RuntimeException.class,
@@ -307,16 +306,55 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateUserStatusByEmailDeactivatedTest() {
+        UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
+
+        when(userRepo.findByEmail(userEmail)).thenReturn(Optional.of(user));
+        when(userRepo.findIdByEmail(userEmail)).thenReturn(Optional.of(userId));
+        when(userRepo.findById(userId2)).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
+        when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
+        when(modelMapper.map(Optional.of(user2), UserVO.class)).thenReturn(userVO2);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
+        when(userRepo.save(any())).thenReturn(user);
+
+        UserStatusDto value = new UserStatusDto();
+        value.setUserStatus(DEACTIVATED);
+        when(modelMapper.map(user, UserStatusDto.class)).thenReturn(value);
+        assertEquals(DEACTIVATED, userService.updateStatus(userEmail, DEACTIVATED, any()).getUserStatus());
+    }
+
+    @Test
     void updateUserStatusLowRoleLevelException() {
         user.setRole(Role.ROLE_MODERATOR);
         userVO.setRole(Role.ROLE_MODERATOR);
         UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
         userVOShort.setRole(Role.ROLE_MODERATOR);
+
         when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
         when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
         when(userRepo.findById(any())).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
+
         assertThrows(LowRoleLevelException.class, () -> userService.updateStatus(userId, DEACTIVATED, "email"));
+    }
+
+    @Test
+    void updateUserStatusByEmailLowRoleLevelException() {
+        user.setRole(Role.ROLE_MODERATOR);
+        userVO.setRole(Role.ROLE_MODERATOR);
+        UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
+        userVOShort.setRole(Role.ROLE_MODERATOR);
+
+        when(userRepo.findByEmail(userEmail)).thenReturn(Optional.of(user));
+        when(userRepo.findIdByEmail(userEmail)).thenReturn(Optional.of(userId));
+        when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
+        when(userRepo.findById(any())).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
+
+        assertThrows(LowRoleLevelException.class, () -> userService.updateStatus(userEmail, DEACTIVATED, "email"));
     }
 
     @Test
@@ -340,7 +378,6 @@ class UserServiceImplTest {
 
     @Test
     void updateRoleTest() {
-        // given
         ReflectionTestUtils.setField(userService, "modelMapper", new ModelMapper());
         UserRoleDto userRoleDto = new UserRoleDto();
         userRoleDto.setRole(Role.ROLE_MODERATOR);
@@ -349,10 +386,25 @@ class UserServiceImplTest {
         when(modelMapper.map(user, UserRoleDto.class)).thenReturn(userRoleDto);
         user.setRole(Role.ROLE_MODERATOR);
 
-        // then
         assertEquals(
             Role.ROLE_MODERATOR,
             userService.updateRole(userId, Role.ROLE_MODERATOR, user2.getEmail()).getRole());
+    }
+
+    @Test
+    void updateRoleByEmailTest() {
+        ReflectionTestUtils.setField(userService, "modelMapper", new ModelMapper());
+        UserRoleDto userRoleDto = new UserRoleDto();
+        userRoleDto.setRole(Role.ROLE_MODERATOR);
+        when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepo.findByEmail(user2.getEmail())).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user, UserRoleDto.class)).thenReturn(userRoleDto);
+        user.setRole(Role.ROLE_MODERATOR);
+
+        assertEquals(
+            Role.ROLE_MODERATOR,
+            userService.updateRole(user.getEmail(), Role.ROLE_MODERATOR, user2.getEmail()).getRole());
     }
 
     @Test
@@ -362,9 +414,25 @@ class UserServiceImplTest {
     }
 
     @Test
+    void updateRoleByEmailOnTheSameUserTest() {
+        when(userRepo.findByEmail(userEmail)).thenReturn(Optional.of(user));
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+        assertThrows(BadUpdateRequestException.class, () -> userService.updateRole(userEmail, null, userEmail));
+    }
+
+    @Test
     void updateRoleOfNonExistingUser() {
         when(userRepo.findById(userId)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> userService.updateRole(userId, null, userEmail));
+    }
+
+    @Test
+    void updateRoleByEmailOfNonExistingUser() {
+        when(userRepo.findByEmail(user.getEmail())).thenReturn(Optional.empty());
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+        String email1 = user.getEmail();
+        String email2 = user2.getEmail();
+        assertThrows(WrongEmailException.class, () -> userService.updateRole(email1, null, email2));
     }
 
     @Test
@@ -557,6 +625,8 @@ class UserServiceImplTest {
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
         when(greenCityRemoteClient.findAmountOfEventsOrganizedByUser(TestConst.SIMPLE_LONG_NUMBER))
             .thenReturn(TestConst.SIMPLE_LONG_NUMBER);
+        when(userRepo.findById(TestConst.SIMPLE_LONG_NUMBER)).thenReturn(Optional.of(user));
+        when(userRepo.findById(TestConst.SIMPLE_LONG_NUMBER_BAD_VALUE)).thenReturn(Optional.of(user2));
 
         assertEquals(ModelUtils.USER_PROFILE_STATISTICS_DTO,
             userService.getUserProfileStatistics(TestConst.SIMPLE_LONG_NUMBER));
@@ -576,6 +646,7 @@ class UserServiceImplTest {
         Page<User> pages = new PageImpl<>(List.of(user, user, user), pageable, 3);
         when(userRepo.findAllUsersByName(user.getName(), pageable, 1L))
             .thenReturn(pages);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(modelMapper.map(pages.getContent(), new TypeToken<List<UserAllFriendsDto>>() {
         }.getType()))
             .thenReturn(CREATE_USER_ALL_FRIENDS_DTO);
@@ -591,6 +662,7 @@ class UserServiceImplTest {
     void saveUserProfileTest() {
         var request = ModelUtils.getUserProfileDtoRequest();
         var myUser = ModelUtils.getUserWithSocialNetworks();
+        String email = myUser.getEmail();
         SocialNetworkImageVO socialNetworkImage = new SocialNetworkImageVO();
         Set<UserNotificationPreference> preferences = new HashSet<>();
         preferences.add(UserNotificationPreference.builder()
@@ -603,15 +675,15 @@ class UserServiceImplTest {
             .build());
 
         myUser.setNotificationPreferences(preferences);
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(myUser));
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
         when(socialNetworkImageService.getSocialNetworkImageByUrl(anyString()))
             .thenReturn(socialNetworkImage);
         when(userRepo.save(myUser)).thenReturn(myUser);
 
-        String actualResult = userService.saveUserProfile(request, "test@gmail.com");
+        String actualResult = userService.saveUserProfile(request, email);
 
         assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
-        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).findByEmail(userEmail);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
         verify(socialNetworkService).delete(anyLong());
         verify(socialNetworkImageService, times(request.getSocialNetworks().size()))
@@ -623,7 +695,6 @@ class UserServiceImplTest {
     void saveUserProfileUpdatesWithNullValuesTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName(null);
-        request.setUserCredo(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
@@ -631,13 +702,14 @@ class UserServiceImplTest {
         request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(null).build());
 
         var myUser = ModelUtils.getUserWithSocialNetworks();
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(myUser));
+        String email = myUser.getEmail();
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
         when(userRepo.save(myUser)).thenReturn(myUser);
 
-        String result = userService.saveUserProfile(request, "test@gmail.com");
+        String result = userService.saveUserProfile(request, email);
         assertEquals(UpdateConstants.SUCCESS_EN, result);
 
-        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).findByEmail(userEmail);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
         verify(socialNetworkService, never()).delete(anyLong());
         verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
@@ -648,7 +720,6 @@ class UserServiceImplTest {
     void saveUserProfileUpdatesWithNullLatitudeTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName(null);
-        request.setUserCredo(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
@@ -656,13 +727,14 @@ class UserServiceImplTest {
         request.setCoordinates(CoordinatesDto.builder().latitude(null).longitude(1.0d).build());
 
         var myUser = ModelUtils.getUserWithSocialNetworks();
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(myUser));
+        String email = myUser.getEmail();
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
         when(userRepo.save(myUser)).thenReturn(myUser);
 
-        String result = userService.saveUserProfile(request, "test@gmail.com");
+        String result = userService.saveUserProfile(request, email);
         assertEquals(UpdateConstants.SUCCESS_EN, result);
 
-        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).findByEmail(userEmail);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
         verify(socialNetworkService, never()).delete(anyLong());
         verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
@@ -673,7 +745,6 @@ class UserServiceImplTest {
     void saveUserProfileUpdatesWithNullLongitudeTest() {
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName(null);
-        request.setUserCredo(null);
         request.setSocialNetworks(null);
         request.setShowLocation(null);
         request.setShowEcoPlace(null);
@@ -681,13 +752,14 @@ class UserServiceImplTest {
         request.setCoordinates(CoordinatesDto.builder().latitude(1.0d).longitude(null).build());
 
         var myUser = ModelUtils.getUserWithSocialNetworks();
-        when(userRepo.findByEmail("test@gmail.com")).thenReturn(Optional.of(myUser));
+        String email = myUser.getEmail();
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
         when(userRepo.save(myUser)).thenReturn(myUser);
 
-        String result = userService.saveUserProfile(request, "test@gmail.com");
+        String result = userService.saveUserProfile(request, email);
         assertEquals(UpdateConstants.SUCCESS_EN, result);
 
-        verify(userRepo).findByEmail("test@gmail.com");
+        verify(userRepo).findByEmail(userEmail);
         verify(greenCityRemoteClient).setLocationForUser(userId, request);
         verify(socialNetworkService, never()).delete(anyLong());
         verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
@@ -698,7 +770,7 @@ class UserServiceImplTest {
     @MethodSource("provideUserProfileTestData")
     void updateUserProfileLocationTest(User myUser, CoordinatesDto coordinates, boolean shouldCallSave,
         boolean shouldDeleteSocial, boolean shouldGetSocialImage) {
-        String email = "test@gmail.com";
+        String email = myUser.getEmail();
         UserProfileDtoRequest request = new UserProfileDtoRequest();
         request.setName("Dmytro");
         request.setCoordinates(coordinates);
@@ -756,7 +828,7 @@ class UserServiceImplTest {
         CoordinatesDto coordinates = new CoordinatesDto(20.0000, 20.0000);
         request.setCoordinates(coordinates);
         var myUser = ModelUtils.getUserWithUserLocation();
-        String email = "test@gmail.com";
+        String email = myUser.getEmail();
 
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(myUser));
         when(userRepo.save(myUser)).thenReturn(myUser);
@@ -782,28 +854,18 @@ class UserServiceImplTest {
     }
 
     @Test
-    void getUserProfileInformationWithUserLocationTest() {
-        UserProfileDtoResponse response = new UserProfileDtoResponse();
-        UserLocationDto userLocationDto = new UserLocationDto();
-        response.setUserLocationDto(userLocationDto);
-
-        when(greenCityRemoteClient.findUserLocationByUserId(userId))
-            .thenReturn(Optional.of(userLocationDto));
-
-        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserProfileDtoResponse.class)).thenReturn(response);
-        assertEquals(response, userService.getUserProfileInformation(userId));
-        verify(userRepo).findById(userId);
-    }
-
-    @Test
     void getUserProfileInformationExceptionTest() {
         assertThrows(NotFoundException.class, () -> userService.getUserProfileInformation(null));
     }
 
     @Test
     void checkIfTheUserIsOnlineExceptionTest() {
-        assertThrows(NotFoundException.class, () -> userService.checkIfTheUserIsOnline(null));
+        assertThrows(NotFoundException.class, () -> userService.checkIfTheUserIsOnline((Long) null));
+    }
+
+    @Test
+    void checkIfTheUserIsOnlineByEmailExceptionTest() {
+        assertThrows(WrongEmailException.class, () -> userService.checkIfTheUserIsOnline((String) null));
     }
 
     @Test
@@ -833,7 +895,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findUserForManagementByPage() {
+    void findUsersForManagement() {
         int pageNumber = 5;
         int pageSize = 20;
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
@@ -854,12 +916,12 @@ class UserServiceImplTest {
             users.isFirst(),
             users.isLast());
         when(userRepo.findAll(pageable)).thenReturn(users);
-        assertEquals(userManagementDtoPageableDto, userService.findUserForManagementByPage(pageable));
+        assertEquals(userManagementDtoPageableDto, userService.findUsersForManagement(pageable));
         verify(userRepo).findAll(pageable);
     }
 
     @Test
-    void updateUser() {
+    void updateUserTest() {
         UserManagementUpdateDto userManagementUpdateDto = ModelUtils.getUserManagementUpdateDto();
         User excepted = user;
         excepted.setName(userManagementUpdateDto.getName());
@@ -873,20 +935,18 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUserWhenUpdateCredoFailsRetryTaskIsSaved() {
-        UserManagementUpdateDto dto = ModelUtils.getUserManagementUpdateDto();
-        dto.setUserCredo("My credo");
-        when(userRepo.findById(1L)).thenReturn(Optional.of(user));
+    void updateUserByEmailTest() {
+        UserManagementUpdateDto userManagementUpdateDto = ModelUtils.getUserManagementUpdateDto();
+        String email = userManagementUpdateDto.getEmail();
+        User excepted = user;
+        excepted.setName(userManagementUpdateDto.getName());
+        excepted.setEmail(userManagementUpdateDto.getEmail());
+        excepted.setRole(userManagementUpdateDto.getRole());
+        excepted.setUserStatus(userManagementUpdateDto.getUserStatus());
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
         when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
-        doThrow(new WebClientRequestException(
-            new IOException("fail"),
-            HttpMethod.POST,
-            URI.create("http://localhost/fake"),
-            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserCredo(user.getId(), "My credo");
-        userService.updateUser(1L, dto);
-        verify(retryableTaskService).saveRetryableTask(
-            new UpdateUserCredoDto(user.getId(), "My credo"),
-            RetryableTaskType.UPDATE_USER_CREDO);
+        userService.updateUser(userManagementUpdateDto);
+        assertEquals(excepted, user);
     }
 
     @Test
@@ -901,6 +961,24 @@ class UserServiceImplTest {
             URI.create("http://localhost/fake"),
             HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserName(user.getId(), "BrokenName");
         userService.updateUser(1L, dto);
+        verify(retryableTaskService).saveRetryableTask(
+            UpdateUserNameDto.builder().id(user.getId()).name("BrokenName").build(),
+            RetryableTaskType.UPDATE_USERNAME);
+    }
+
+    @Test
+    void updateUserByEmailWhenUpdateUserNameFailsRetryTaskIsSaved() {
+        UserManagementUpdateDto dto = ModelUtils.getUserManagementUpdateDto();
+        String email = dto.getEmail();
+        dto.setName("BrokenName");
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
+        when(modelMapper.map(user, UserVO.class)).thenReturn(userVO);
+        doThrow(new WebClientRequestException(
+            new IOException("fail"),
+            HttpMethod.POST,
+            URI.create("http://localhost/fake"),
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserName(user.getId(), "BrokenName");
+        userService.updateUser(dto);
         verify(retryableTaskService).saveRetryableTask(
             UpdateUserNameDto.builder().id(user.getId()).name("BrokenName").build(),
             RetryableTaskType.UPDATE_USERNAME);
@@ -1109,6 +1187,7 @@ class UserServiceImplTest {
 
         when(greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId))
             .thenReturn(Collections.singletonList(customToDoListItemResponseDto));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
 
         assertEquals(Collections.singletonList(customToDoListItemResponseDto),
             userService.getAvailableCustomToDoListItems(userId, habitId));
@@ -1122,7 +1201,6 @@ class UserServiceImplTest {
                 .id("1L")
                 .name("vivo")
                 .email("test@ukr.net")
-                .userCredo("Hello")
                 .role("1")
                 .userStatus("1")
                 .build();
@@ -1131,7 +1209,6 @@ class UserServiceImplTest {
                 .id(1L)
                 .name("vivo")
                 .email("test@ukr.net")
-                .userCredo("Hello")
                 .role(ROLE_USER)
                 .userStatus(ACTIVATED)
                 .build();
@@ -1183,7 +1260,6 @@ class UserServiceImplTest {
         when(userRepo.save(myUser)).thenReturn(myUser);
         userService.markUserAsActivated(uuid);
         verify(userRepo).save(myUser);
-
     }
 
     @Test
@@ -1191,17 +1267,6 @@ class UserServiceImplTest {
         String uuid = "uuid";
         assertThrows(NotFoundException.class,
             () -> userService.markUserAsActivated(uuid));
-    }
-
-    @Test
-    void findUserForAchievementTest() {
-        Long id = 1L;
-        UserVOAchievement userVOAchievement = UserVOAchievement.builder().id(id).build();
-        User myUser = User.builder().id(id).build();
-        when(userRepo.findUserForAchievement(id)).thenReturn(Optional.of(myUser));
-        when(modelMapper.map(myUser, UserVOAchievement.class)).thenReturn(userVOAchievement);
-        assertEquals(userVOAchievement, userService.findUserForAchievement(id));
-        verify(userRepo, times(1)).findUserForAchievement(id);
     }
 
     @Test
@@ -1286,18 +1351,41 @@ class UserServiceImplTest {
             .id(1L)
             .rating(200D)
             .build();
+        UserAddRatingExternalDto userRatingExternalDto2 = UserAddRatingExternalDto.builder()
+            .email(userEmail)
+            .rating(200D)
+            .build();
+
+        when(userRepo.findById(userRatingDto2.getId())).thenReturn(Optional.of(user));
 
         userService.updateUserRating(userRatingDto2);
-        verify(greenCityRemoteClient).updateUserRating(userRatingDto2);
+        verify(greenCityRemoteClient).updateUserRating(userRatingExternalDto2);
     }
 
     @Test
     void updateStatusWithFailedCheckUpdatableUserTest() {
         when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
         when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
+
         Long id = user2.getId();
         assertThrows(BadUpdateRequestException.class,
             () -> userService.updateStatus(id, DEACTIVATED, "email"));
+
+        verify(userRepo).findByEmail(any());
+        verify(modelMapper).map(user2, UserVO.class);
+    }
+
+    @Test
+    void updateStatusByEmailWithFailedCheckUpdatableUserTest() {
+        String email = user2.getEmail();
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(user2));
+        when(userRepo.findIdByEmail(email)).thenReturn(Optional.of(user2.getId()));
+        when(userRepo.findByEmail(any())).thenReturn(Optional.of(user2));
+        when(modelMapper.map(user2, UserVO.class)).thenReturn(userVO2);
+
+        assertThrows(BadUpdateRequestException.class,
+            () -> userService.updateStatus(email, DEACTIVATED, "email"));
+
         verify(userRepo).findByEmail(any());
         verify(modelMapper).map(user2, UserVO.class);
     }
@@ -1309,12 +1397,15 @@ class UserServiceImplTest {
         String picturePath = "picturePath";
         byte[] bytes = content.getBytes();
         MockMultipartFile file = new MockMultipartFile("file", fileName, "text/plain", bytes);
+
         when(userRepo.findByEmail(anyString())).thenReturn(Optional.of(user));
-        when(greenCityRemoteClient.uploadFile(any())).thenReturn(picturePath);
+        when(fileService.upload(file)).thenReturn(picturePath);
         when(modelMapper.map(any(), any())).thenReturn(userVO);
+
         UserVO actual = userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
+
         assertEquals(userVO, actual);
-        verify(greenCityRemoteClient).uploadFile(any());
+        verify(fileService).upload(file);
         verify(modelMapper).map(any(), any());
         verify(userRepo).findByEmail(anyString());
         verify(greenCityRemoteClient).updateUserPicturePath(user.getId(), picturePath);
@@ -1357,14 +1448,18 @@ class UserServiceImplTest {
     void updateUserProfilePictureWhenUpdatePathFailsRetryIsSaved() {
         var file = new MockMultipartFile("file", "name.jpg", "image/jpeg", "data".getBytes());
         var picturePath = "picturePath";
+
         when(userRepo.findByEmail("testmail@gmail.com")).thenReturn(Optional.of(user));
-        when(greenCityRemoteClient.uploadFile(file)).thenReturn(picturePath);
+        when(fileService.upload(file)).thenReturn(picturePath);
+
         doThrow(new WebClientRequestException(
             new IOException("fail"),
             HttpMethod.POST,
             URI.create("http://localhost/fake"),
             HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserPicturePath(user.getId(), picturePath);
+
         userService.updateUserProfilePicture(file, "testmail@gmail.com", null);
+
         verify(retryableTaskService).saveRetryableTask(
             UpdateUserPicturePathDto.builder()
                 .userId(user.getId())
@@ -1630,6 +1725,32 @@ class UserServiceImplTest {
     }
 
     @Test
+    void findByEmailAdvancedTest() {
+        User actual = ModelUtils.getUser();
+
+        UserVOAdvancedDto expected = getUserVOAdvancedDto();
+
+        when(userRepo.findByEmail(userEmail)).thenReturn(Optional.of(actual));
+        when(modelMapper.map(actual, UserVOAdvancedDto.class)).thenReturn(getUserVOAdvancedDto());
+
+        Optional<UserVOAdvancedDto> result = userService.findByEmailAdvanced(userEmail);
+        assertEquals(result.get(), expected);
+        verify(userRepo, times(1)).findByEmail(userEmail);
+    }
+
+    @Test
+    void findByEmailAdvanced_NotFoundTest() {
+        when(userRepo.findByEmail(userEmail)).thenReturn(Optional.empty());
+
+        NotFoundException exception = assertThrows(
+            NotFoundException.class,
+            () -> userService.findByEmailAdvanced(userEmail));
+
+        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + userEmail, exception.getMessage());
+        verify(userRepo, times(1)).findByEmail(userEmail);
+    }
+
+    @Test
     void createGreenCityUserTest() {
         CreateGreenCityUserDto createGreenCityUserDto = ModelUtils.getCreateGreenCityDto();
 
@@ -1737,29 +1858,59 @@ class UserServiceImplTest {
 
     @Test
     void updateUserRating_success_noRetry() {
+        UserAddRatingExternalDto externalDto = UserAddRatingExternalDto.builder()
+            .email(userEmail)
+            .rating(userRatingDto.getRating())
+            .build();
+        when(userRepo.findByEmail(userEmail)).thenReturn(Optional.of(user));
+        when(userRatingDto.getId()).thenReturn(userId);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+
         userService.updateUserRating(userRatingDto);
-        verify(greenCityRemoteClient).updateUserRating(userRatingDto);
+        verify(greenCityRemoteClient).updateUserRating(externalDto);
         verifyNoInteractions(retryableTaskService);
     }
 
     @Test
     void updateUserRating_webClientException_retrySaved() {
+        when(userRatingDto.getId()).thenReturn(userId);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         doThrow(new WebClientRequestException(
             new IOException("fail"),
             HttpMethod.POST,
             URI.create("http://localhost/fake"),
-            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserRating(userRatingDto);
+            HttpHeaders.EMPTY)).when(greenCityRemoteClient).updateUserRating(any());
         userService.updateUserRating(userRatingDto);
         verify(retryableTaskService).saveRetryableTask(userRatingDto, RetryableTaskType.UPDATE_USER_RATING);
     }
 
     @Test
     void updateUserRating_greenCityServiceException_retrySaved() {
+        when(userRatingDto.getId()).thenReturn(userId);
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
+
         doThrow(new GreenCityServiceException("fail")).when(greenCityRemoteClient)
-            .updateUserRating(userRatingDto);
+            .updateUserRating(any());
 
         userService.updateUserRating(userRatingDto);
 
         verify(retryableTaskService).saveRetryableTask(userRatingDto, RetryableTaskType.UPDATE_USER_RATING);
+    }
+
+    @Test
+    void findAllEmailsByIdInTest() {
+        List<Long> ids = List.of(1L, 2L, 3L);
+        List<UserEmailDto> mockDtos = List.of(
+            new UserEmailDto(1L, "user1@example.com"),
+            new UserEmailDto(2L, "user2@example.com"),
+            new UserEmailDto(3L, "user3@example.com"));
+        List<String> expectedEmails = List.of("user1@example.com", "user2@example.com", "user3@example.com");
+
+        when(userRepo.findAllEmailsByIdIn(ids)).thenReturn(mockDtos);
+
+        List<String> actualEmails = userService.findAllEmailsByIdIn(ids);
+
+        assertEquals(expectedEmails, actualEmails);
+        verify(userRepo).findAllEmailsByIdIn(ids);
     }
 }

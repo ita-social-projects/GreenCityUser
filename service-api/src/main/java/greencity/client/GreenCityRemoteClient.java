@@ -6,14 +6,14 @@ import greencity.dto.achievement.UserAchievementVO;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
-import greencity.dto.user.UpdateUserCredoDto;
 import greencity.dto.user.CreateGreenCityUserDto;
-import greencity.dto.user.UserAddRatingDto;
+import greencity.dto.user.UserAddRatingExternalDto;
 import greencity.dto.user.UserCityDto;
-import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserProfileDtoRequest;
+import greencity.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,24 +24,25 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
 public class GreenCityRemoteClient {
     private final WebClient webClient;
     private final WebClient greenCityUbsWebClient;
+    private final UserService userService;
 
-    private static final String USER_ID_QUERY_PARAM = "userId";
+    private static final String USER_EMAIL_QUERY_PARAM = "email";
     private static final String PROFILE_PICTURE_PATH_QUERY_PARAM = "profilePicturePath";
 
     public GreenCityRemoteClient(
         @Qualifier("greenCityWebClient") WebClient webClient,
-        @Qualifier("greenCityUbsWebClient") WebClient greenCityUbsWebClient) {
+        @Qualifier("greenCityUbsWebClient") WebClient greenCityUbsWebClient,
+        @Lazy UserService userService) {
         this.webClient = webClient;
         this.greenCityUbsWebClient = greenCityUbsWebClient;
+        this.userService = userService;
     }
 
     /**
@@ -114,8 +115,11 @@ public class GreenCityRemoteClient {
      * @return list of {@link UserAchievementVO}
      */
     public List<UserAchievementVO> findAllUserAchievementsByUserId(Long userId) {
+        String email = userService.findById(userId).getEmail();
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/achievements/user-achievements/{userId}").build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/achievements/user-achievements")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
+                .build())
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<UserAchievementVO>>() {
             })
@@ -129,29 +133,13 @@ public class GreenCityRemoteClient {
      * @return {@link UserCityDto}.
      */
     public UserCityDto findAllUsersCities(Long userId) {
+        String email = userService.findById(userId).getEmail();
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/cities").build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/user/cities")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
+                .build())
             .retrieve()
             .bodyToMono(UserCityDto.class)
-            .block();
-    }
-
-    /**
-     * Method to find {@link UserLocationDto} by user id.
-     *
-     * @param userId id of the user
-     * @return {@link UserLocationDto}.
-     */
-    public Optional<UserLocationDto> findUserLocationByUserId(Long userId) {
-        return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/location").build(userId))
-            .retrieve()
-            .onStatus(
-                httpStatusCode -> httpStatusCode.isSameCodeAs(HttpStatus.NOT_FOUND),
-                clientResponse -> Mono.empty())
-            .bodyToMono(UserLocationDto.class)
-            .map(Optional::of)
-            .switchIfEmpty(Mono.just(Optional.empty()))
             .block();
     }
 
@@ -162,8 +150,11 @@ public class GreenCityRemoteClient {
      * @param userProfileDtoRequest contains location data
      */
     public void setLocationForUser(Long userId, UserProfileDtoRequest userProfileDtoRequest) {
+        String email = userService.findById(userId).getEmail();
         webClient.patch()
-            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/location").build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/user/location")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
+                .build())
             .bodyValue(userProfileDtoRequest)
             .retrieve()
             .bodyToMono(Void.class)
@@ -177,8 +168,11 @@ public class GreenCityRemoteClient {
      * @return list of friends ids.
      */
     public List<Long> getAllUserFriendsIds(Long userId) {
+        String email = userService.findById(userId).getEmail();
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/all-friends").build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/user/all-friends")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
+                .build())
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
             })
@@ -193,11 +187,13 @@ public class GreenCityRemoteClient {
      * @return {@link Page}
      */
     public PageableAdvancedDto<Long> getAllUserFriendsIds(Long userId, Pageable pageable) {
+        String email = userService.findById(userId).getEmail();
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/friends")
+            .uri(uriBuilder -> uriBuilder.path("/users/user/friends")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
                 .queryParam("page", pageable.getPageNumber())
                 .queryParam("size", pageable.getPageSize())
-                .build(userId))
+                .build())
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<PageableAdvancedDto<Long>>() {
             })
@@ -211,8 +207,11 @@ public class GreenCityRemoteClient {
      * @return {@link List} of friends ids
      */
     public List<Long> getSixFriendsIdsWithTheHighestRating(Long userId) {
+        String email = userService.findById(userId).getEmail();
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/top-friends").build(userId))
+            .uri(uriBuilder -> uriBuilder.path("/users/user/top-friends")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
+                .build())
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<Long>>() {
             })
@@ -220,31 +219,14 @@ public class GreenCityRemoteClient {
     }
 
     /**
-     * Increase user rating by amount specified in {@link UserAddRatingDto}.
+     * Increase user rating by amount specified in {@link UserAddRatingExternalDto}.
      *
      * @param userAddRatingDto contains rating data.
      */
-    public void updateUserRating(UserAddRatingDto userAddRatingDto) {
+    public void updateUserRating(UserAddRatingExternalDto userAddRatingDto) {
         webClient.patch()
-            .uri("/users/rating")
+            .uri("/users/user-rating")
             .bodyValue(userAddRatingDto)
-            .retrieve()
-            .bodyToMono(Void.class)
-            .block();
-    }
-
-    /**
-     * Update user credo by user id.
-     *
-     * @param userId    user id
-     * @param userCredo new user credo
-     **/
-    public void updateUserCredo(Long userId, String userCredo) {
-        UpdateUserCredoDto updateUserCredoDto = new UpdateUserCredoDto(userId, userCredo);
-
-        webClient.patch()
-            .uri("/users/credo")
-            .bodyValue(updateUserCredoDto)
             .retrieve()
             .bodyToMono(Void.class)
             .block();
@@ -275,9 +257,10 @@ public class GreenCityRemoteClient {
      * @param profilePicturePath the new profile picture path to be set
      */
     public void updateUserPicturePath(Long userId, String profilePicturePath) {
+        String email = userService.findById(userId).getEmail();
         webClient.put()
-            .uri(uriBuilder -> uriBuilder.path("/users/picturePath")
-                .queryParam(USER_ID_QUERY_PARAM, userId)
+            .uri(uriBuilder -> uriBuilder.path("/users/user/picturePath")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
                 .queryParam(PROFILE_PICTURE_PATH_QUERY_PARAM, profilePicturePath)
                 .build())
             .retrieve()
@@ -292,10 +275,12 @@ public class GreenCityRemoteClient {
      * @param userName the new name to assign to the user
      */
     public void updateUserName(Long userId, String userName) {
+        String email = userService.findById(userId).getEmail();
         webClient.patch()
-            .uri(uriBuilder -> uriBuilder.path("/users/{userId}/name")
+            .uri(uriBuilder -> uriBuilder.path("/users/user/name")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
                 .queryParam("userName", userName)
-                .build(userId))
+                .build())
             .retrieve()
             .bodyToMono(Void.class)
             .block();
@@ -310,9 +295,10 @@ public class GreenCityRemoteClient {
      *         user profile information
      */
     public List<GreenCityUserProfileDtoResponse> findGreenCityUserProfilesByUserIds(List<Long> userIds) {
+        List<String> emails = userService.findAllEmailsByIdIn(userIds);
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/users/profiles")
-                .queryParam("userIds", userIds)
+            .uri(uriBuilder -> uriBuilder.path("/users/profiles/external")
+                .queryParam("emails", emails)
                 .build())
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<GreenCityUserProfileDtoResponse>>() {
@@ -328,9 +314,12 @@ public class GreenCityRemoteClient {
      * @author Orest Mamchuk
      */
     public List<CustomToDoListItemResponseDto> getAllAvailableCustomToDoListItems(Long userId, Long habitId) {
+        String email = userService.findById(userId).getEmail();
         return webClient.get()
-            .uri(uriBuilder -> uriBuilder.path("/custom/to-do-list-items/{userId}/{habitId}")
-                .build(userId, habitId))
+            .uri(uriBuilder -> uriBuilder.path("/custom/to-do-list-items")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
+                .queryParam("habitId", habitId)
+                .build())
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<List<CustomToDoListItemResponseDto>>() {
             })
@@ -345,8 +334,9 @@ public class GreenCityRemoteClient {
      * @author Orest Mamchuk
      */
     public Long findAmountOfPublishedNews(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/eco-news/count")
-            .queryParam("author-id", userId)
+        String email = userService.findById(userId).getEmail();
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/eco-news/count/external")
+            .queryParam("authorEmail", email)
             .build())
             .retrieve()
             .bodyToMono(Long.class)
@@ -361,8 +351,10 @@ public class GreenCityRemoteClient {
      * @author Orest Mamchuk
      */
     public Long findAmountOfAcquiredHabits(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/acquired/count")
-            .queryParam(USER_ID_QUERY_PARAM, userId)
+        String email = userService.findById(userId).getEmail();
+        return webClient.get().uri(uriBuilder -> uriBuilder
+            .path("/habit/statistic/acquired/count/external")
+            .queryParam(USER_EMAIL_QUERY_PARAM, email)
             .build())
             .retrieve()
             .bodyToMono(Long.class)
@@ -377,8 +369,10 @@ public class GreenCityRemoteClient {
      * @author Orest Mamchuk
      */
     public Long findAmountOfHabitsInProgress(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/habit/statistic/in-progress/count")
-            .queryParam(USER_ID_QUERY_PARAM, userId)
+        String email = userService.findById(userId).getEmail();
+        return webClient.get().uri(uriBuilder -> uriBuilder
+            .path("/habit/statistic/in-progress/count/external")
+            .queryParam(USER_EMAIL_QUERY_PARAM, email)
             .build())
             .retrieve()
             .bodyToMono(Long.class)
@@ -407,8 +401,9 @@ public class GreenCityRemoteClient {
      * @return {@link Long} count of attended by user events.
      */
     public Long findAmountOfEventsAttendedByUser(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/attenders/count")
-            .queryParam("user-id", userId)
+        String email = userService.findById(userId).getEmail();
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/attenders/count/external")
+            .queryParam(USER_EMAIL_QUERY_PARAM, email)
             .build())
             .retrieve()
             .bodyToMono(Long.class)
@@ -422,8 +417,9 @@ public class GreenCityRemoteClient {
      * @return {@link Long} count of organized by user events.
      */
     public Long findAmountOfEventsOrganizedByUser(Long userId) {
-        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/organizers/count")
-            .queryParam("user-id", userId)
+        String email = userService.findById(userId).getEmail();
+        return webClient.get().uri(uriBuilder -> uriBuilder.path("/events/organizers/count/external")
+            .queryParam(USER_EMAIL_QUERY_PARAM, email)
             .build())
             .retrieve()
             .bodyToMono(Long.class)

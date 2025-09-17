@@ -49,6 +49,7 @@ public class UserVOMapper extends AbstractConverter<User, UserVO> {
                 .code(user.getLanguage().getCode())
                 .build())
             .firstName(user.getFirstName())
+            .uuid(user.getUuid())
             .build();
     }
 }

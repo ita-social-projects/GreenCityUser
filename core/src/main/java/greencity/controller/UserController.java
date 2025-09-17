@@ -10,7 +10,6 @@ import greencity.dto.EmployeePositionsDto;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.UserVOAchievement;
 import greencity.dto.authorities.AuthorityCategoryDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.position.PositionAuthoritiesDto;
@@ -38,6 +37,7 @@ import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserStatusExternalDto;
 import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
@@ -127,6 +127,27 @@ public class UserController {
     }
 
     /**
+     * For external services usage. The method which update user status.
+     *
+     * @param userStatusDto - dto with updated filed.
+     * @return {@link UserStatusDto}
+     */
+    @Operation(summary = "Update status of user", description = "For external services usage")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+            content = @Content(schema = @Schema(implementation = UserStatus.class))),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @PatchMapping("/status/update")
+    public ResponseEntity<UserStatusDto> updateStatus(
+        @Valid @RequestBody UserStatusExternalDto userStatusDto, Principal principal) {
+        return ResponseEntity.ok().body(userService.updateStatus(
+            userStatusDto.getEmail(), userStatusDto.getUserStatus(), principal.getName()));
+    }
+
+    /**
      * The method which update user role. Parameter principal are ignored because
      * Spring automatically provide the Principal object.
      *
@@ -151,6 +172,32 @@ public class UserController {
         UserRoleDto userRoleDto = new UserRoleDto(id, role);
         return ResponseEntity.ok().body(userService.updateRole(
             userRoleDto.getId(), userRoleDto.getRole(), principal.getName()));
+    }
+
+    /**
+     * For external services usage. The method which update user role. Parameter
+     * principal are ignored because Spring automatically provide the Principal
+     * object.
+     *
+     * @param email of user to update
+     * @param body  contains new role
+     * @return {@link UserRoleDto}
+     */
+    @Operation(summary = "Update role of user", description = "For external services usage")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
+            content = @Content(schema = @Schema(implementation = UserRoleDto.class))),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @PatchMapping("/role")
+    public ResponseEntity<UserRoleDto> updateRole(
+        @RequestParam String email,
+        @NotNull @RequestBody Map<String, String> body,
+        Principal principal) {
+        Role role = Role.valueOf(body.get("role"));
+        return ResponseEntity.ok().body(userService.updateRole(email, role, principal.getName()));
     }
 
     /**
@@ -415,6 +462,23 @@ public class UserController {
     }
 
     /**
+     * For external services usage. The method checks by email if a {@link UserVO}
+     * is online.
+     *
+     * @return {@link ResponseEntity}.
+     */
+    @Operation(summary = "Check by email if the user is online")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+    })
+    @GetMapping("/isOnline")
+    public ResponseEntity<Boolean> checkIfTheUserIsOnline(@RequestParam String email) {
+        return ResponseEntity.ok().body(userService.checkIfTheUserIsOnline(email));
+    }
+
+    /**
      * Method returns user profile statistics.
      *
      * @return {@link UserProfileStatisticsDto}.
@@ -499,27 +563,12 @@ public class UserController {
     }
 
     /**
-     * Method that allow you to find {@link UserVO} by Id.
+     * For external service usage. Method that allow you to find {@link UserVO} by
+     * email for management.
      *
      * @return {@link UserUpdateDto}.
      */
-    @Operation(summary = "Get User by id")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-    })
-    @GetMapping("/findByIdForAchievement")
-    public ResponseEntity<UserVOAchievement> findUserForAchievement(@RequestParam Long id) {
-        return ResponseEntity.ok().body(userService.findUserForAchievement(id));
-    }
-
-    /**
-     * Method that allow you to find {@link UserVO} for management.
-     *
-     * @return {@link UserUpdateDto}.
-     */
-    @Operation(summary = "Get User for management")
+    @Operation(summary = "Get User for management", description = "For external services usage")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
@@ -527,10 +576,28 @@ public class UserController {
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @GetMapping("/findUserForManagement")
+    public ResponseEntity<UserManagementDto> findUserForManagement(@RequestParam String email) {
+        return ResponseEntity.ok().body(userService.findUserForManagement(email));
+    }
+
+    /**
+     * For external service usage. Method that allow you to find list of
+     * {@link UserVO}s for management.
+     *
+     * @return {@link PageableAdvancedDto} of {@link UserUpdateDto}.
+     */
+    @Operation(summary = "Get Users for management", description = "For external services usage")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/findUsersForManagement")
     @ApiPageable
-    public ResponseEntity<PageableAdvancedDto<UserManagementDto>> findUserForManagementByPage(
+    public ResponseEntity<PageableAdvancedDto<UserManagementDto>> findUsersForManagement(
         @Parameter(hidden = true) Pageable pageable) {
-        return ResponseEntity.ok().body(userService.findUserForManagementByPage(pageable));
+        return ResponseEntity.ok().body(userService.findUsersForManagement(pageable));
     }
 
     /**
@@ -546,6 +613,19 @@ public class UserController {
         @PathVariable @NotNull Long id,
         @RequestBody UserManagementUpdateDto userDto) {
         userService.updateUser(id, userDto);
+    }
+
+    /**
+     * For external services usage. Method that updates user data.
+     *
+     * @param userDto dto with updated fields.
+     */
+    @Operation(summary = "Update user by UserManagement", description = "For external services usage")
+    @ApiResponses(value = @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED))
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void updateUserManagement(@RequestBody UserManagementUpdateDto userDto) {
+        userService.updateUser(userDto);
     }
 
     /**
@@ -679,6 +759,24 @@ public class UserController {
     @GetMapping("/lang")
     public ResponseEntity<String> getUserLang(@Parameter(hidden = true) @CurrentUser UserVO userVO) {
         return ResponseEntity.ok().body(userVO.getLanguageVO().getCode());
+    }
+
+    /**
+     * For external services usage. Method for getting {@link String} user language.
+     *
+     * @param email email of user
+     * @return current user language {@link String}.
+     */
+    @Operation(summary = "Get the User language", description = "For external services usage")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED)
+    })
+    @GetMapping("/greencity/lang")
+    public ResponseEntity<String> getUserLang(@RequestParam String email) {
+        UserVO user = userService.findByEmail(email);
+        return ResponseEntity.ok().body(user.getLanguageVO().getCode());
     }
 
     /**
@@ -1264,6 +1362,25 @@ public class UserController {
     @GetMapping("/findNotDeactivatedByEmailAdvanced")
     public ResponseEntity<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.findNotDeactivatedByEmailAdvanced(email).orElse(null));
+    }
+
+    /**
+     * For external services usage. Method that allow you to find
+     * {@link UserVOAdvancedDto} by email.
+     *
+     * @param email - {@link UserVOAdvancedDto}'s email.
+     * @return {@link UserVOAdvancedDto}.
+     */
+    @Operation(summary = "Get advanced User by email", description = "For external services usage")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
+        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
+    })
+    @GetMapping("/findByEmailAdvanced")
+    public ResponseEntity<UserVOAdvancedDto> findByEmailAdvanced(@RequestParam String email) {
+        return ResponseEntity.ok().body(userService.findByEmailAdvanced(email).orElse(null));
     }
 
     /**

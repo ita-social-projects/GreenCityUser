@@ -63,7 +63,8 @@ import org.hibernate.type.descriptor.jdbc.IntegerJdbcType;
 @Setter
 @Builder
 @Table(name = "users")
-@EqualsAndHashCode(exclude = {"verifyEmail", "ownSecurity", "refreshTokenKey", "restorePasswordEmail", "userFriends"})
+@EqualsAndHashCode(exclude = {"verifyEmail", "ownSecurity", "refreshTokenKey", "restorePasswordEmail",
+    "socialNetworks"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

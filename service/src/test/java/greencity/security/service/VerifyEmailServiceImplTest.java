@@ -1,7 +1,6 @@
 package greencity.security.service;
 
 import greencity.client.GreenCityRemoteClient;
-import greencity.client.RestClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.entity.User;
@@ -36,9 +35,6 @@ import static org.mockito.Mockito.doNothing;
 class VerifyEmailServiceImplTest {
     @Mock
     VerifyEmailRepo verifyEmailRepo;
-
-    @Mock
-    RestClient restClient;
 
     @Mock
     ModelMapper modelMapper;

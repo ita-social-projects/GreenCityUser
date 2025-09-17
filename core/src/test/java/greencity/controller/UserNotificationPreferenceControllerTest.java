@@ -36,8 +36,8 @@ class UserNotificationPreferenceControllerTest {
     }
 
     @Test
-    void existsByUserIdAndEmailPreferenceAndPeriodicityTrueTest() throws Exception {
-        EmailPreferenceDto emailPreferenceDto = new EmailPreferenceDto(1L, SYSTEM, DAILY);
+    void existsByUserEmailAndEmailPreferenceAndPeriodicityTrueTest() throws Exception {
+        EmailPreferenceDto emailPreferenceDto = new EmailPreferenceDto("test@email", SYSTEM, DAILY);
         when(userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(
             emailPreferenceDto)).thenReturn(true);
         mockMvc.perform(post("/user-notification-preference/search").contentType(MediaType.APPLICATION_JSON)
@@ -46,8 +46,8 @@ class UserNotificationPreferenceControllerTest {
     }
 
     @Test
-    void existsByUserIdAndEmailPreferenceAndPeriodicityFalseTest() throws Exception {
-        EmailPreferenceDto emailPreferenceDto = new EmailPreferenceDto(1L, SYSTEM, DAILY);
+    void existsByUserEmailAndEmailPreferenceAndPeriodicityFalseTest() throws Exception {
+        EmailPreferenceDto emailPreferenceDto = new EmailPreferenceDto("test@email", SYSTEM, DAILY);
         when(userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(
             emailPreferenceDto)).thenReturn(false);
         mockMvc.perform(post("/user-notification-preference/search").contentType(MediaType.APPLICATION_JSON)

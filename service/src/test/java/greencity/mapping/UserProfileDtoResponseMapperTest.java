@@ -1,7 +1,6 @@
 package greencity.mapping;
 
 import greencity.ModelUtils;
-import greencity.TestConst;
 import greencity.client.GreenCityRemoteClient;
 import greencity.dto.socialnetwork.SocialNetworkResponseDTO;
 import greencity.dto.user.GreenCityUserProfileDtoResponse;
@@ -42,7 +41,7 @@ class UserProfileDtoResponseMapperTest {
         user.setSocialNetworks(List.of(new SocialNetwork()));
         user.setNotificationPreferences(Set.of(new UserNotificationPreference()));
         Long userId = user.getId();
-        String userCredo = TestConst.CREDO;
+        String email = user.getEmail();
         Double userRating = 4.;
         String profilePicturePath = "http://testpicture.com.ua";
         UserLocationDto userLocationDto = new UserLocationDto();
@@ -51,14 +50,13 @@ class UserProfileDtoResponseMapperTest {
         UserNotificationPreferenceDto userNotificationPreferenceDto = new UserNotificationPreferenceDto();
         Set<UserNotificationPreferenceDto> expectedNotificationPreferences = Set.of(userNotificationPreferenceDto);
         var greenCityUserProfile =
-            new GreenCityUserProfileDtoResponse(userId, profilePicturePath, userCredo, userRating, userLocationDto);
+            new GreenCityUserProfileDtoResponse(userId, email, profilePicturePath, userRating, userLocationDto);
 
         when(greenCityRemoteClient.findGreenCityUserProfileByUserId(userId)).thenReturn(greenCityUserProfile);
 
         UserProfileDtoResponse expectedResult = UserProfileDtoResponse.builder()
             .profilePicturePath(profilePicturePath)
             .name(user.getName())
-            .userCredo(userCredo)
             .socialNetworks(expectedSocialNetworks)
             .showLocation(user.getShowLocation())
             .showEcoPlace(user.getShowEcoPlace())

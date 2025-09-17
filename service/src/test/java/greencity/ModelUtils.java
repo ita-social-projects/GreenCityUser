@@ -114,7 +114,6 @@ public class ModelUtils {
             .id(1L)
             .name("Martin")
             .email("martin@gmail.com")
-            .userCredo("credo")
             .role(Role.ROLE_ADMIN)
             .userStatus(UserStatus.ACTIVATED).build();
     }
@@ -124,7 +123,6 @@ public class ModelUtils {
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
             .email(TestConst.EMAIL)
-            .userCredo(TestConst.CREDO)
             .build();
     }
 
@@ -314,7 +312,6 @@ public class ModelUtils {
     public static UserProfileDtoRequest getUserProfileDtoRequest() {
         return UserProfileDtoRequest.builder()
             .name("Name")
-            .userCredo("userCredo")
             .socialNetworks(List.of(
                 "https://www.facebook.com",
                 "https://www.instagram.com",

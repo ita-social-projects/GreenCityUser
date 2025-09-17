@@ -27,10 +27,6 @@ public class UserSpecification implements CustomSpecification<User> {
                 allPredicate =
                     criteriaBuilder.and(allPredicate, getStringPredicate(root, criteriaBuilder, searchCriteria));
             }
-            if (searchCriteria.getType().equals("userCredo")) {
-                allPredicate =
-                    criteriaBuilder.and(allPredicate, getStringPredicate(root, criteriaBuilder, searchCriteria));
-            }
             if (searchCriteria.getType().equals("role")) {
                 allPredicate =
                     criteriaBuilder.and(allPredicate, getEnumPredicate(root, criteriaBuilder, searchCriteria));

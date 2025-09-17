@@ -41,7 +41,6 @@ class CustomSpecificationTest {
             .id("1")
             .name("test")
             .email("test@ukr.net")
-            .userCredo("test")
             .role("1")
             .userStatus("2")
             .build();
@@ -59,11 +58,6 @@ class CustomSpecificationTest {
             .key("email")
             .type("email")
             .value(userViewDto.getEmail())
-            .build());
-        searchCriteriaList.add(SearchCriteria.builder()
-            .key("userCredo")
-            .type("userCredo")
-            .value(userViewDto.getUserCredo())
             .build());
         searchCriteriaList.add(SearchCriteria.builder()
             .key("role")
@@ -99,10 +93,10 @@ class CustomSpecificationTest {
 
     @Test
     void getEnumPredicate() {
-        when(root.get(searchCriteriaList.get(5).getKey())).thenReturn(objectPathExpected);
+        when(root.get(searchCriteriaList.get(4).getKey())).thenReturn(objectPathExpected);
         when(objectPathExpected.as(Integer.class)).thenReturn(as);
-        when(criteriaBuilder.equal(as, searchCriteriaList.get(5).getValue())).thenReturn(expected);
-        Predicate actual = userSpecification.getEnumPredicate(root, criteriaBuilder, searchCriteriaList.get(5));
+        when(criteriaBuilder.equal(as, searchCriteriaList.get(4).getValue())).thenReturn(expected);
+        Predicate actual = userSpecification.getEnumPredicate(root, criteriaBuilder, searchCriteriaList.get(4));
         assertEquals(expected, actual);
     }
 }

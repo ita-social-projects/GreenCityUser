@@ -6,6 +6,6 @@ import greencity.enums.EmailPreferencePeriodicity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserNotificationPreferenceRepo extends JpaRepository<UserNotificationPreference, Long> {
-    boolean existsByUserIdAndEmailPreferenceAndPeriodicity(Long id, EmailPreference emailPreference,
+    boolean existsByUserEmailAndEmailPreferenceAndPeriodicity(String userEmail, EmailPreference emailPreference,
         EmailPreferencePeriodicity periodicity);
 }
