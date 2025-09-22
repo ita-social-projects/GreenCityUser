@@ -40,13 +40,20 @@ stages:
               KeyVaultName: '$(azKeyVault)'
               SecretsFilter: 'ftpHost, ftpUser, ftpPass'
 
+          - task: AzureKeyVault@1
+            inputs:
+              azureSubscription: '$(azureSub)'
+              KeyVaultName: 'greencity-app'
+              SecretsFilter: 'LOGGING-ITA-TOKEN'
+              RunAsPreJob: false
+
           - script: |
               echo "<settings>" > $(Build.SourcesDirectory)/settings.xml
               echo "  <servers>" >> $(Build.SourcesDirectory)/settings.xml
               echo "    <server>" >> $(Build.SourcesDirectory)/settings.xml
               echo "      <id>github</id>" >> $(Build.SourcesDirectory)/settings.xml
               echo "      <username>ita-social-projects</username>" >> $(Build.SourcesDirectory)/settings.xml
-              echo "      <password>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</password>" >> $(Build.SourcesDirectory)/settings.xml
+              echo "      <password>$(LOGGING-ITA-TOKEN)</password>" >> $(Build.SourcesDirectory)/settings.xml
               echo "    </server>" >> $(Build.SourcesDirectory)/settings.xml
               echo "  </servers>" >> $(Build.SourcesDirectory)/settings.xml
               echo "</settings>" >> $(Build.SourcesDirectory)/settings.xml
