@@ -116,7 +116,6 @@ public class SecurityConfig {
                     "/ownSecurity/restorePassword",
                     "/googleSecurity",
                     "/user/emailNotifications",
-                    "/user/activatedUsersAmount",
                     "/user/{userId}/habit/assign",
                     "/token",
                     "/socket/**",
@@ -173,16 +172,11 @@ public class SecurityConfig {
                     "/user/{id}/updateUserLastActivityTime/{date}",
                     "/user/updateUserLastActivityTime/{date}",
                     "/user/language/{languageId}",
-                    "/user/employee-email",
-                    "/user/deactivate",
-                    "testers/unblockAccount")
+                    "/user/employee-email")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PUT,
                     "/user/edit-authorities",
-                    "/user/authorities",
-                    "/user/deactivate-employee",
-                    "/user/markUserAsDeactivated",
-                    "/user/markUserAsActivated")
+                    "/user/authorities")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     "/user/findUserLanguageByUuid",
@@ -221,6 +215,8 @@ public class SecurityConfig {
                     "/email/sendReport",
                     "/email/sendHabitNotification",
                     "/email/sendInterestingEcoNews",
+                    "/email/sendReasonOfDeactivation",
+                    "/email/sendMessageOfActivation",
                     "/management/socialnetworkimages/save-remote",
                     "/user-notification-preference/search",
                     FILES + "/single")
@@ -231,18 +227,15 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.GET,
                     "/user/email/findAll",
-                    "/user/activated-ids",
                     "/user/registration-statistics",
                     "/user/email",
-                    "/user/count-active-users",
                     "/user/email-preferences-distribution",
                     "/user/statuses-distribution",
                     "/user/roles-distribution",
                     "/user/findByEmailAdvanced",
-                    "/user/findNotDeactivatedByEmail",
-                    "/user/findNotDeactivatedByEmailAdvanced",
                     "/user/isOnline",
-                    "/user/greencity/lang")
+                    "/user/greencity/lang",
+                    "/user/findByUuid")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
                     "/management/socialnetworkimages/delete",
@@ -252,7 +245,6 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",
-                    "/user/status/update",
                     "/user/role",
                     "/user/{id}/role")
                 .hasAnyRole(ADMIN)
