@@ -6,15 +6,12 @@ import greencity.dto.UbsCustomerDto;
 import greencity.dto.filter.FilterUserDto;
 import greencity.dto.todolist.CustomToDoListItemResponseDto;
 import greencity.dto.ubs.UbsTableCreationDto;
-import greencity.dto.user.DeactivateUserRequestDto;
 import greencity.dto.user.RoleDto;
-import greencity.dto.user.UserActivationDto;
 import greencity.dto.user.UserAddRatingDto;
 import greencity.dto.user.UserAllFriendsDto;
 import greencity.dto.user.UserAndAllFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserAndFriendsWithOnlineStatusDto;
 import greencity.dto.user.UserCityDto;
-import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserForListDto;
 import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
@@ -33,8 +30,10 @@ import greencity.dto.user.UserVOShort;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.ProjectName;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import greencity.exception.exceptions.BadUserStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -63,14 +62,6 @@ public interface UserService {
     List<UserVOShort> findAllByEmailNotification(EmailNotification emailNotification);
 
     /**
-     * Delete from the database users that have status 'DEACTIVATED' and last
-     * visited the site 2 years ago.
-     *
-     * @return number of deleted rows.
-     */
-    int scheduleDeleteDeactivatedUsers();
-
-    /**
      * Find and return city and coordinates .
      *
      * @return {@link UserCityDto}
@@ -78,12 +69,9 @@ public interface UserService {
     UserCityDto findAllUsersCities(Long userId);
 
     /**
-     * Find and return all registration months. Runs an SQL Query which is described
-     * in {@link UserVO} under {@link jakarta.persistence.NamedNativeQuery}
-     * annotation. Spring Data JPA can run a named native query that follows the
-     * naming convention {entityClass.repositoryMethodName}.
+     * Find and return all registration months.
      *
-     * @return {@link List} of {@link RegistrationStatisticsDtoResponse}
+     * @return Map of registration months
      **/
     Map<Integer, Long> findAllRegistrationMonthsMap();
 
@@ -109,14 +97,6 @@ public interface UserService {
      * @return {@link UserVO} with this email.
      */
     UserVO findByEmail(String email);
-
-    /**
-     * Method that allow you to find not 'DEACTIVATED' {@link UserVO} by email.
-     *
-     * @param email - {@link UserVO}'s email
-     * @return {@link Optional} of found {@link UserVO}.
-     */
-    Optional<UserVO> findNotDeactivatedByEmail(String email);
 
     /**
      * Find UserVO's id by UserVO email.
@@ -161,15 +141,6 @@ public interface UserService {
      * @return {@link UserStatusDto}
      */
     UserStatusDto updateStatus(Long id, UserStatus userStatus, String email);
-
-    /**
-     * Update status of user.
-     *
-     * @param userEmail  {@link UserVO} email.
-     * @param userStatus {@link UserStatus} for user.
-     * @return {@link UserStatusDto}
-     */
-    UserStatusDto updateStatus(String userEmail, UserStatus userStatus, String currentUserEmail);
 
     /**
      * Find {@link UserVO}-s by page .
@@ -278,13 +249,6 @@ public interface UserService {
     List<CustomToDoListItemResponseDto> getAvailableCustomToDoListItems(Long userId, Long habitID);
 
     /**
-     * Counts all users by user {@link UserStatus} ACTIVATED.
-     *
-     * @return amount of users with {@link UserStatus} ACTIVATED.
-     */
-    long getActivatedUsersAmount();
-
-    /**
      * Update user profile picture {@link UserVO}.
      *
      * @param image  {@link MultipartFile}
@@ -350,21 +314,6 @@ public interface UserService {
     UserAndAllFriendsWithOnlineStatusDto getAllFriendsWithTheOnlineStatus(Long userId, Pageable pageable);
 
     /**
-     * Method deactivates all the {@link UserVO} by list of IDs.
-     *
-     * @param listId {@link List} of {@link UserVO}s` ids to be deactivated
-     * @return {@link List} of {@link UserVO}s` ids
-     */
-    List<Long> deactivateAllUsers(List<Long> listId);
-
-    /**
-     * change {@link UserVO}'s status to ACTIVATE.
-     *
-     * @param id {@link UserVO}'s id
-     */
-    UserActivationDto setActivatedStatus(Long id);
-
-    /**
      * Method for getting all Users.
      *
      * @return {@link List} of {@link UserVOShort} instances.
@@ -392,25 +341,6 @@ public interface UserService {
     UbsTableCreationDto createUbsRecord(UserVO currentUser);
 
     /**
-     * change {@link UserVO}'s status to DEACTIVATE.
-     *
-     * @param userVO  {@link UserVO} who send deactivation request.
-     * @param uuid    {@link UserVO}'s uuid.
-     * @param request {@link DeactivateUserRequestDto} deactivated information.
-     */
-    UserDeactivationReasonDto deactivateUser(String uuid, DeactivateUserRequestDto request, UserVO userVO);
-
-    /**
-     * Method for getting a {@link List} of {@link String} - reasons for
-     * deactivation of the current user.
-     *
-     * @param id        {@link Long} - user's id.
-     * @param adminLang {@link String} - current administrator language.
-     * @return {@link List} of {@link String}.
-     */
-    List<String> getDeactivationReason(Long id, String adminLang);
-
-    /**
      * Method that update user language column.
      *
      * @param userId     {@link Long} -current user's id.
@@ -436,16 +366,6 @@ public interface UserService {
     UbsCustomerDto findUbsCustomerDtoByUuid(String uuid);
 
     /**
-     * Method that mark User Deactivated.
-     */
-    void markUserAsDeactivated(String uuid);
-
-    /**
-     * Method that mark User Activated.
-     */
-    void markUserAsActivated(String uuid);
-
-    /**
      * Method find user with admin authority.
      */
     UserVO findAdminById(Long id);
@@ -457,13 +377,6 @@ public interface UserService {
      * @return {@link Boolean}.
      */
     Boolean checkIfUserExistsByUuid(String uuid);
-
-    /**
-     * Method checks the existence of an active user by uuid.
-     * 
-     * @param uuid user's uuid.
-     */
-    boolean checkIfActiveUserExistsByUuid(String uuid);
 
     /**
      * Updates last activity time for a given user by email.
@@ -491,25 +404,6 @@ public interface UserService {
     String findUserLanguageByUuid(String uuid);
 
     /**
-     * Retrieves the list of IDs of all users who have the {@code UserStatus} set to
-     * {@code ACTIVATED}. This method is typically used to filter active users for
-     * further processing or analysis.
-     *
-     * @return a list of {@code Long} values representing the IDs of all activated
-     *         users
-     */
-    List<Long> findAllActivatedUserIds(List<Long> ids);
-
-    /**
-     * Method that allows you to find not 'DEACTIVATED' {@link UserVOAdvancedDto} by
-     * email.
-     *
-     * @param email - {@link UserVOAdvancedDto}'s email.
-     * @return {@link Optional} of found {@link UserVOAdvancedDto}.
-     */
-    Optional<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(String email);
-
-    /**
      * Method that allows you to find {@link UserVOAdvancedDto} by email.
      *
      * @param email - {@link UserVOAdvancedDto}'s email.
@@ -526,14 +420,6 @@ public interface UserService {
     void createGreenCityUser(Long newUserId, String profilePicture);
 
     /**
-     * Method that allows to find not 'DEACTIVATED' {@link UserVOShort} by email.
-     *
-     * @param email - user's email
-     * @return {@link Optional} of found {@link UserVOShort}.
-     */
-    Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email);
-
-    /**
      * Method to find all {@link UserVO} users by emails.
      *
      * @param emails {@link List} of emails to search for
@@ -548,4 +434,31 @@ public interface UserService {
      * @return {@link List} of emails
      */
     List<String> findAllEmailsByIdIn(List<Long> ids);
+
+    /**
+     * Checks {@code UserStatus} and throws an exception if the user status is
+     * DEACTIVATED, BLOCKED, CREATED, or DELETED.
+     *
+     * @param user    the user whose status is to be checked
+     * @param projectName the name of the project (service)
+     * @throws BadUserStatusException if the user status is DEACTIVATED, BLOCKED,
+     *                                CREATED, or DELETED.
+     */
+    void verifyUserStatus(UserVO user, ProjectName projectName);
+
+    /**
+     * Method that allows to find user by uuid.
+     *
+     * @param uuid - {@link UserVO}'s uuid.
+     * @return {@link Optional} of found {@link UserVO}.
+     */
+    UserVO findByUuid(String uuid);
+
+    /**
+     * Method that allows to find user by email.
+     *
+     * @param email - {@link UserVO}'s email.
+     * @return {@link Optional} of found {@link UserVO}.
+     */
+    UserVOShort findByEmailShort(String email);
 }

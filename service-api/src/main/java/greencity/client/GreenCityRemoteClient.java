@@ -11,6 +11,7 @@ import greencity.dto.user.UserAddRatingExternalDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.service.UserService;
+import greencity.enums.ServiceUserStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Lazy;
@@ -429,6 +430,38 @@ public class GreenCityRemoteClient {
     public GreenCityUserProfileDtoResponse findGreenCityUserProfileByUserId(Long userId) {
         var greenCityUserProfiles = findGreenCityUserProfilesByUserIds(List.of(userId));
         return greenCityUserProfiles.getFirst();
+    }
+
+    /**
+     * Retrieves a user status from the GreenCity external service by a given user.
+     *
+     * @param email        the user email for which to retrieve the status.
+     * @return             the external service user status.
+     */
+    public ServiceUserStatus getGreenCityUserStatus(String email) {
+        return webClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/users/status")
+                .queryParam(USER_EMAIL_QUERY_PARAM, email)
+                .build())
+            .retrieve()
+            .bodyToMono(ServiceUserStatus.class)
+            .block();
+    }
+
+    /**
+     * Retrieves a user status from the UBS external service by a given user.
+     *
+     * @param uuid         the user uuid for which to retrieve the status.
+     * @return             the external service user status.
+     */
+    public ServiceUserStatus getUbsUserStatus(String uuid) {
+        return greenCityUbsWebClient.get()
+            .uri(uriBuilder -> uriBuilder.path("/ubs/userProfile/user/status")
+                .queryParam("uuid", uuid)
+                .build())
+            .retrieve()
+            .bodyToMono(ServiceUserStatus.class)
+            .block();
     }
 
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {

@@ -148,7 +148,6 @@ public class SecurityConfig {
                     "/user/findUserByName/**",
                     "/user/findByUuId",
                     "/user/findUuidByEmail",
-                    "/user/checkActiveUserByUuid",
                     "/user/lang",
                     "/user/createUbsRecord",
                     "/user/{userId}/sixUserFriends/",
@@ -202,8 +201,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE,
                     "/user/to-do-list-items/user-to-do-list-items",
                     "/user/to-do-list-items",
-                    "/user/deleteProfilePicture",
-                    "/ownSecurity/user")
+                    "/user/deleteProfilePicture")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     USER_LINK,

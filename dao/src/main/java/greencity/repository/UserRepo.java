@@ -8,7 +8,6 @@ import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusStatisticDto;
 import greencity.entity.User;
 import greencity.enums.EmailNotification;
-import greencity.enums.UserStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -107,24 +106,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     Optional<String> findUuidByEmail(String email);
 
     /**
-     * Find not 'DEACTIVATED' {@link User} by email.
-     *
-     * @param email - {@link User}'s email
-     * @return found {@link User}
-     */
-    @Query("FROM User WHERE email=:email AND userStatus <> 1")
-    Optional<User> findNotDeactivatedByEmail(String email);
-
-    /**
-     * Find not 'DEACTIVATED' {@link User} by id.
-     *
-     * @param id - {@link User}'s id
-     * @return found {@link User}
-     */
-    @Query("FROM User WHERE id=:id AND userStatus <> 1")
-    Optional<User> findNotDeactivatedById(Long id);
-
-    /**
      * Find all {@link User}'s with {@link EmailNotification} type.
      *
      * @param emailNotification - type of {@link EmailNotification}
@@ -144,13 +125,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     int updateUserRefreshToken(String refreshTokenKey, Long id);
 
     /**
-     * Counts all users by user {@link UserStatus}.
-     *
-     * @return amount of user with given {@link UserStatus}.
-     */
-    long countAllByUserStatus(UserStatus userStatus);
-
-    /**
      * Find the last activity time by {@link User}'s id.
      *
      * @param userId - {@link User}'s id
@@ -159,28 +133,6 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query(nativeQuery = true,
         value = "SELECT last_activity_time FROM users WHERE id=:userId")
     Optional<Timestamp> findLastActivityTimeById(Long userId);
-
-    /**
-     * Delete from the database users that have status_user 'DEACTIVATED' and last
-     * visited the site 2 years ago.
-     *
-     * @return number of deleted rows
-     **/
-    @Modifying
-    @Query(nativeQuery = true, value = """
-        DELETE FROM users where user_status = 1 \
-        AND last_activity_time + interval '2 year' <= CURRENT_TIMESTAMP\
-        """)
-    int scheduleDeleteDeactivatedUsers();
-
-    /**
-     * Set {@link User}s' statuses to 'DEACTIVATED'.
-     *
-     * @param ids - {@link List} of ids of {@link User} to be 'DEACTIVATED'
-     **/
-    @Modifying
-    @Query(value = "UPDATE User SET userStatus = 1 where id IN(:ids)")
-    void deactivateSelectedUsers(List<Long> ids);
 
     /**
      * Method that finds user ids by emailPreference and periodicity.
@@ -272,7 +224,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
     @Query("""
         SELECT new greencity.dto.user.UserRoleStatisticDto(u.role, COUNT(u.id))
         FROM User u
-        WHERE u.userStatus = 2
+        WHERE u.userStatus = 'VERIFIED'
         GROUP BY u.role
         """)
     List<UserRoleStatisticDto> getUserRolesDistribution();
@@ -303,16 +255,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
              )
              FROM UserNotificationPreference uep
              JOIN uep.user u
-             WHERE u.userStatus = 2
+             WHERE u.userStatus = 'VERIFIED'
              GROUP BY uep.emailPreference, uep.periodicity
         """)
     List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution();
-
-    /**
-     * Count total active users in the system.
-     */
-    @Query("SELECT COUNT(u) FROM User u WHERE u.userStatus IN (greencity.enums.UserStatus.ACTIVATED) ")
-    Long countActiveUsers();
 
     /**
      * Counts users grouped by their registration date within a specified date range
@@ -341,60 +287,10 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         @Param("granularity") String granularity);
 
     /**
-     * Retrieves the list of IDs of users from the given list who have the
-     * {@code UserStatus} set to {@code ACTIVATED}. This method is typically used to
-     * filter active users for further processing or analysis.
-     *
-     * @return a list of {@code Long} values representing the IDs of all activated
-     *         users
-     */
-    @Query("""
-        SELECT u.id
-        FROM User u
-        WHERE u.userStatus = 2 AND u.id IN :ids
-        """)
-    List<Long> findAllActivatedUserIdsFromList(@Param("ids") List<Long> ids);
-
-    /**
-     * Retrieves the list of IDs of users who have the {@code UserStatus} set to
-     * {@code ACTIVATED}.
-     *
-     * @return a list of {@code Long} values representing the IDs of all activated
-     *         users
-     */
-    @Query("""
-        SELECT u.id
-        FROM User u
-        WHERE u.userStatus = 2
-        """)
-    List<Long> findAllActivatedUserIds();
-
-    /**
-     * Checks if there is a user with the given uuid whose status is not deactivated
-     * (userStatus ≠ 1).
+     * Checks if there is a user with the given uuid
      *
      * @param uuid the uuid to search for
      * @return true if such a user exists, false otherwise
      */
-    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.uuid =:uuid AND u.userStatus <> 1")
-    boolean existsNotDeactivatedByUuid(@Param("uuid") String uuid);
-
-    /**
-     * Checks if there is an active user with the given uuid (userStatus == 2).
-     *
-     * @param uuid the UUID of the user
-     * @return true if such a user exists, false otherwise
-     */
-    @Query("SELECT COUNT(u) > 0 FROM User u WHERE u.uuid =:uuid AND u.userStatus = 2")
-    boolean existsActiveByUuid(@Param("uuid") String uuid);
-
-    /**
-     * Finds a user by UUID if the user is not deactivated (userStatus ≠ 1).
-     *
-     * @param uuid the UUID of the user
-     * @return an {@link Optional} containing the user if found and active, or empty
-     *         if not
-     */
-    @Query("SELECT u FROM User u WHERE u.uuid = :uuid AND u.userStatus <> 1")
-    Optional<User> findNotDeactivatedUserByUuid(@Param("uuid") String uuid);
+    boolean existsUserByUuid(String uuid);
 }

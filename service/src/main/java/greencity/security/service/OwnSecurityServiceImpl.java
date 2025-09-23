@@ -1,10 +1,8 @@
 package greencity.security.service;
 
-import greencity.client.CloudFlareClient;
-import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.user.UserAdminRegistrationDto;
-import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementCreateDto;
 import greencity.dto.user.UserVO;
 import greencity.entity.Language;
 import greencity.entity.OwnSecurity;
@@ -16,18 +14,16 @@ import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.ProfilePrivacyPolicy;
+import greencity.enums.ProjectName;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRefreshTokenException;
 import greencity.exception.exceptions.BadRequestException;
-import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.EmailNotVerified;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.PasswordsDoNotMatchesException;
 import greencity.exception.exceptions.UserAlreadyHasPasswordException;
 import greencity.exception.exceptions.UserAlreadyRegisteredException;
-import greencity.exception.exceptions.UserBlockedException;
-import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
@@ -87,8 +83,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
     private final LoginAttemptService loginAttemptService;
-    private final CloudFlareClient cloudFlareClient;
-    private final GreenCityRemoteClient greenCityRemoteClient;
     @Value("${verifyEmailTimeHour}")
     private Integer expirationTime;
     @Value("${bruteForceSettings.blockTimeInMinutes}")
@@ -215,7 +209,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         String email = dto.getEmail();
         UserVO user = validateUser(email);
 
-        handleUserStatus(user.getUserStatus());
+        userService.verifyUserStatus(user, dto.getProjectName());
         handleBruteForceProtection(email);
 
         validatePassword(dto, user);
@@ -246,6 +240,14 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         if (loginAttemptService.isBlockedByWrongPassword(email)) {
             log.error("Too many failed login attempts - {}, account is blocked for {} minutes. Wrong Password", email,
                 blockTimeInMinutes);
+
+            User user = userRepo.findByEmail(email)
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+
+            emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
+                user.getId(), user.getName(), user.getEmail(),
+                jwtTool.generateUnblockToken(email), user.getLanguage().getCode(), false);
+
             throw new WrongPasswordException(
                 String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
         }
@@ -304,7 +306,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Transactional
     @Override
-    public AccessRefreshTokensDto updateAccessTokens(String refreshToken) {
+    public AccessRefreshTokensDto updateAccessTokens(String refreshToken, ProjectName projectName) {
         String email;
         try {
             email = jwtTool.getEmailOutOfAccessToken(refreshToken);
@@ -312,7 +314,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             throw new BadRefreshTokenException(ErrorMessage.REFRESH_TOKEN_NOT_VALID);
         }
         UserVO user = userService.findByEmail(email);
-        checkUserStatus(user);
+        userService.verifyUserStatus(user, projectName);
         String newRefreshTokenKey = jwtTool.generateTokenKey();
         userService.updateUserRefreshToken(newRefreshTokenKey, user.getId());
         if (jwtTool.isTokenValid(refreshToken, user.getRefreshTokenKey())) {
@@ -324,15 +326,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         throw new BadRefreshTokenException(ErrorMessage.REFRESH_TOKEN_NOT_VALID);
     }
 
-    private void checkUserStatus(UserVO user) {
-        UserStatus status = user.getUserStatus();
-        if (status == UserStatus.BLOCKED) {
-            throw new UserBlockedException(ErrorMessage.USER_DEACTIVATED);
-        } else if (status == UserStatus.DEACTIVATED) {
-            throw new UserDeactivatedException(ErrorMessage.USER_DEACTIVATED);
-        }
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -341,7 +334,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     public void updateCurrentPassword(UpdatePasswordDto updatePasswordDto, String email) {
         UserVO user = userService.findByEmail(email);
 
-        if (user.getUserStatus() != UserStatus.ACTIVATED) {
+        if (user.getUserStatus() != UserStatus.VERIFIED) {
             throw new EmailNotVerified(ErrorMessage.USER_EMAIL_IS_NOT_VERIFIED);
         }
 
@@ -356,7 +349,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Transactional
     @Override
-    public UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto) {
+    public UserAdminRegistrationDto managementRegisterUser(UserManagementCreateDto dto) {
         if (userRepo.findByEmail(dto.getEmail()).isPresent()) {
             throw new UserAlreadyRegisteredException(ErrorMessage.USER_ALREADY_REGISTERED_WITH_THIS_EMAIL);
         }
@@ -372,23 +365,6 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      */
     @Transactional
     @Override
-    public void deleteUserByEmail(String email) {
-        User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new WrongEmailException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-
-        if (user.getUserStatus() != UserStatus.ACTIVATED) {
-            throw new EmailNotVerified(ErrorMessage.USER_EMAIL_IS_NOT_VERIFIED);
-        }
-
-        user.setUserStatus(UserStatus.DELETED);
-        userRepo.save(user);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Transactional
-    @Override
     public void unblockAccount(String token) {
         String email;
         try {
@@ -397,17 +373,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             throw new BadRequestException(ErrorMessage.TOKEN_FOR_RESTORE_IS_INVALID);
         }
         loginAttemptService.deleteEmailFromCache(email);
-
-        User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        UserStatus current = user.getUserStatus();
-        if (current == UserStatus.BLOCKED) {
-            user.setUserStatus(UserStatus.ACTIVATED);
-            userRepo.save(user);
-            log.info("User {} unblocked (status set to ACTIVATED)", user.getEmail());
-        } else {
-            log.info("User {} unblock link used (cache cleared); status remains {}", user.getEmail(), current);
-        }
+        log.info("User {} unblock link used (cache cleared)", email);
     }
 
     /**
@@ -418,7 +384,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         String email = request.email();
         UserVO user = validateUser(email);
 
-        handleUserStatus(user.getUserStatus());
+        userService.verifyUserStatus(user, request.projectName());
         validatePassword(convertRequestToDto(request), user);
         validateSecretKey(request.secretKey());
 
@@ -455,7 +421,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .build();
     }
 
-    private User managementCreateNewRegisteredUser(UserManagementDto dto, String refreshTokenKey) {
+    private User managementCreateNewRegisteredUser(UserManagementCreateDto dto, String refreshTokenKey) {
         return User.builder()
             .name(dto.getName())
             .email(dto.getEmail())
@@ -463,7 +429,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .role(dto.getRole())
             .refreshTokenKey(refreshTokenKey)
             .lastActivityTime(LocalDateTime.now())
-            .userStatus(dto.getUserStatus())
+            .userStatus(UserStatus.CREATED)
             .emailNotification(EmailNotification.DISABLED)
             .language(Language.builder()
                 .id(2L)
@@ -577,28 +543,5 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private void updatePassword(String pass, Long id) {
         String password = passwordEncoder.encode(pass);
         ownSecurityRepo.updatePassword(password, id);
-    }
-
-    /**
-     * Checks {@code UserStatus} and throws an exception if the user status is
-     * DEACTIVATED, BLOCKED, CREATED, or DELETED.
-     *
-     * @param status - the status of the User
-     * @throws BadUserStatusException if the user status is DEACTIVATED, BLOCKED,
-     *                                CREATED, or DELETED.
-     */
-    private void handleUserStatus(UserStatus status) {
-        switch (status) {
-            case DEACTIVATED:
-                throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED);
-            case BLOCKED:
-                throw new BadUserStatusException(ErrorMessage.USER_BLOCKED);
-            case CREATED:
-                throw new BadUserStatusException(ErrorMessage.USER_CREATED);
-            case DELETED:
-                throw new BadUserStatusException(ErrorMessage.USER_DELETED);
-            default:
-                break;
-        }
     }
 }
