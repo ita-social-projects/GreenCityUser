@@ -24,7 +24,7 @@ class UserManagementDtoTest {
             .id(1L)
             .name(name)
             .email("test@gmail.com")
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.VERIFIED)
             .role(Role.ROLE_USER)
             .build();
 
@@ -45,7 +45,7 @@ class UserManagementDtoTest {
             .id(1L)
             .name(name)
             .email("test@gmail.com")
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.VERIFIED)
             .role(Role.ROLE_USER)
             .build();
 

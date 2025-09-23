@@ -17,7 +17,9 @@ import greencity.dto.user.UserAddRatingExternalDto;
 import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserVOShort;
+import greencity.enums.ServiceUserStatus;
 import greencity.service.UserService;
+import java.util.UUID;
 import lombok.SneakyThrows;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -675,6 +677,45 @@ class GreenCityRemoteClientTest {
 
         Long actualCount = greenCityRemoteClient.findAmountOfEventsAttendedByUser(userId);
         assertEquals(expectedCount, actualCount);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void getGreenCityUserStatusTest() {
+        String expectedPath = "/users/status?email=" + userEmail;
+        String expectedMethod = HttpMethod.GET.name();
+        ServiceUserStatus expectedStatus = ServiceUserStatus.ACTIVATED;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(toJson(expectedStatus.name()))
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        ServiceUserStatus actualStatus = greenCityRemoteClient.getGreenCityUserStatus(userEmail);
+        assertEquals(expectedStatus, actualStatus);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedMethod, recordedRequest.getMethod());
+        assertEquals(expectedPath, recordedRequest.getPath());
+    }
+
+    @Test
+    @SneakyThrows
+    void getUbsUserStatus() {
+        String userUuid = UUID.randomUUID().toString();
+        String expectedPath = "/ubs/userProfile/user/status?uuid=" + userUuid;
+        String expectedMethod = HttpMethod.GET.name();
+        ServiceUserStatus expectedStatus = ServiceUserStatus.ACTIVATED;
+
+        mockWebServer.enqueue(new MockResponse()
+            .setBody(toJson(expectedStatus.name()))
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        ServiceUserStatus actualStatus = greenCityRemoteClient.getUbsUserStatus(userUuid);
+        assertEquals(expectedStatus, actualStatus);
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertEquals(expectedMethod, recordedRequest.getMethod());

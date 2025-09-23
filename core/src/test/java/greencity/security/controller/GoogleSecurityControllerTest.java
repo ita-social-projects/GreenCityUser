@@ -1,5 +1,6 @@
 package greencity.security.controller;
 
+import greencity.enums.ProjectName;
 import greencity.security.service.GoogleSecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,8 +37,9 @@ class GoogleSecurityControllerTest {
     void authenticateTest() throws Exception {
         mockMvc.perform(get("/googleSecurity")
             .param("token", "almostSecretToken")
+            .param("projectName", ProjectName.GREENCITY.name())
             .param("lang", "en"))
             .andExpect(status().isOk());
-        verify(googleSecurityService).authenticate("almostSecretToken", "en");
+        verify(googleSecurityService).authenticate("almostSecretToken", "en", ProjectName.GREENCITY);
     }
 }
