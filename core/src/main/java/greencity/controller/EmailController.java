@@ -176,8 +176,8 @@ public class EmailController {
     /**
      * Send an email that user account was activated.
      *
-     * @param dto {@link UserActivationDto} - object containing the activation details:
-     *            email, name, language.
+     * @param dto {@link UserActivationDto} - object containing the activation
+     *            details: email, name, language.
      */
     @Operation(summary = "Send an email that user account was activated")
     @ApiResponses(value = {

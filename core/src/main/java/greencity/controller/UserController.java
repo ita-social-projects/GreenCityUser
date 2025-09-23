@@ -830,8 +830,7 @@ public class UserController {
     }
 
     /**
-     * For external service usage.
-     * Get {@link UserVO} by uuid.
+     * For external service usage. Get {@link UserVO} by uuid.
      *
      * @return {@link UserVO}.
      */

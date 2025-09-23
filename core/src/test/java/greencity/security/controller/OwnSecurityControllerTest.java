@@ -298,8 +298,8 @@ class OwnSecurityControllerTest {
             """;
 
         mockMvc.perform(post(OWN_SECURITY_LINK + "/register")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(content))
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
             .andExpect(status().isCreated());
 
         UserManagementCreateDto dto = ModelUtils.getObjectMapper().readValue(content, UserManagementCreateDto.class);

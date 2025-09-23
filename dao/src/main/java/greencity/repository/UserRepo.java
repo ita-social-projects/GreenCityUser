@@ -287,7 +287,7 @@ public interface UserRepo extends JpaRepository<User, Long>, JpaSpecificationExe
         @Param("granularity") String granularity);
 
     /**
-     * Checks if there is a user with the given uuid
+     * Checks if there is a user with the given uuid.
      *
      * @param uuid the uuid to search for
      * @return true if such a user exists, false otherwise

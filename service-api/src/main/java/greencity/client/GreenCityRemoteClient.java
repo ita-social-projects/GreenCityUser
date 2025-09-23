@@ -435,8 +435,8 @@ public class GreenCityRemoteClient {
     /**
      * Retrieves a user status from the GreenCity external service by a given user.
      *
-     * @param email        the user email for which to retrieve the status.
-     * @return             the external service user status.
+     * @param email the user email for which to retrieve the status.
+     * @return the external service user status.
      */
     public ServiceUserStatus getGreenCityUserStatus(String email) {
         return webClient.get()
@@ -451,8 +451,8 @@ public class GreenCityRemoteClient {
     /**
      * Retrieves a user status from the UBS external service by a given user.
      *
-     * @param uuid         the user uuid for which to retrieve the status.
-     * @return             the external service user status.
+     * @param uuid the user uuid for which to retrieve the status.
+     * @return the external service user status.
      */
     public ServiceUserStatus getUbsUserStatus(String uuid) {
         return greenCityUbsWebClient.get()

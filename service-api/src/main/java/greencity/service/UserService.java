@@ -439,7 +439,7 @@ public interface UserService {
      * Checks {@code UserStatus} and throws an exception if the user status is
      * DEACTIVATED, BLOCKED, CREATED, or DELETED.
      *
-     * @param user    the user whose status is to be checked
+     * @param user        the user whose status is to be checked
      * @param projectName the name of the project (service)
      * @throws BadUserStatusException if the user status is DEACTIVATED, BLOCKED,
      *                                CREATED, or DELETED.

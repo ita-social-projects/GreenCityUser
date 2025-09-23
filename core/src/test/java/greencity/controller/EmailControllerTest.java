@@ -256,9 +256,9 @@ class EmailControllerTest {
         String content = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/sendReasonOfDeactivation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer your_token_here")
-                .content(content))
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer your_token_here")
+            .content(content))
             .andExpect(status().isOk());
 
         verify(emailService).sendReasonOfDeactivation(dto);
@@ -276,9 +276,9 @@ class EmailControllerTest {
         String content = objectMapper.writeValueAsString(dto);
 
         mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/sendMessageOfActivation")
-                .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer your_token_here")
-                .content(content))
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer your_token_here")
+            .content(content))
             .andExpect(status().isOk());
 
         verify(emailService).sendMessageOfActivation(dto);

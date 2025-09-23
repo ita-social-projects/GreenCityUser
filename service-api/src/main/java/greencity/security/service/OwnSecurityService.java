@@ -49,7 +49,7 @@ public interface OwnSecurityService {
      * Method that update your access token by refresh token.
      *
      * @param refreshToken a value of {@link String}
-     * @param projectName service from where this method is called
+     * @param projectName  service from where this method is called
      * @return {@link AccessRefreshTokensDto} this is DTO with new access token
      */
     AccessRefreshTokensDto updateAccessTokens(String refreshToken, ProjectName projectName);
