@@ -90,6 +90,7 @@ class EmailServiceImplTest {
             "http://localhost:4200",
             "test@email.com",
             "test@email.com",
+            "test@email.com",
             messageSource,
             userRepo);
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
