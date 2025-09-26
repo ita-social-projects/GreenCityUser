@@ -1,9 +1,8 @@
 package greencity.dto.user;
 
-import greencity.enums.Role;
 import greencity.enums.UserStatus;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,11 +13,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @EqualsAndHashCode
-@Builder
-public class UserManagementVO {
-    private Long id;
-    private String name;
+public class UserStatusExternalDto {
+    @NotNull
     private String email;
-    private Role role;
+
+    @NotNull
     private UserStatus userStatus;
 }

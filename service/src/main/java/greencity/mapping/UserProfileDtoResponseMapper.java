@@ -41,7 +41,6 @@ public class UserProfileDtoResponseMapper extends AbstractConverter<User, UserPr
         return UserProfileDtoResponse.builder()
             .profilePicturePath(greenCityUserProfileDtoResponse.profilePicturePath())
             .name(user.getName())
-            .userCredo(greenCityUserProfileDtoResponse.userCredo())
             .socialNetworks(socialNetworks)
             .showLocation(user.getShowLocation())
             .showEcoPlace(user.getShowEcoPlace())

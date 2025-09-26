@@ -15,6 +15,7 @@ import lombok.Setter;
 @EqualsAndHashCode
 public class UserAllFriendsDto {
     private Long id;
+    private String email;
     private String name;
     private String city;
     private Double rating;

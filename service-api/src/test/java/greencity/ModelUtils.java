@@ -12,6 +12,7 @@ import greencity.dto.user.UserLocationDto;
 import greencity.dto.user.UserNotificationPreferenceDto;
 import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserVO;
+import greencity.dto.user.UserVOShort;
 import greencity.enums.ProfilePrivacyPolicy;
 import greencity.enums.Role;
 import jakarta.validation.ConstraintValidatorContext;
@@ -45,6 +46,15 @@ public class ModelUtils {
             .build();
     }
 
+    public static UserVOShort getUserVOShort() {
+        return UserVOShort.builder()
+            .id(TestConst.USER_ID)
+            .email(TestConst.EMAIL)
+            .name(TestConst.NAME)
+            .role(Role.ROLE_USER)
+            .build();
+    }
+
     public static UserAchievementVO getUserAchievementVO() {
         return new UserAchievementVO(1L, getUserVO(), getAchievementVO(), false);
     }
@@ -68,7 +78,6 @@ public class ModelUtils {
     public static UserProfileDtoRequest getUserProfileDtoRequest() {
         return new UserProfileDtoRequest(
             "name",
-            "credo",
             List.of("social network 1", "social network 2"),
             ProfilePrivacyPolicy.FRIENDS_ONLY,
             ProfilePrivacyPolicy.PRIVATE,
@@ -88,8 +97,8 @@ public class ModelUtils {
     public static GreenCityUserProfileDtoResponse getGreenCityUserProfileDtoResponse() {
         return new GreenCityUserProfileDtoResponse(
             TestConst.USER_ID,
+            TestConst.EMAIL,
             TestConst.PROFILE_PICTURE_PATH,
-            TestConst.USER_CREDO,
             2.,
             new UserLocationDto());
     }

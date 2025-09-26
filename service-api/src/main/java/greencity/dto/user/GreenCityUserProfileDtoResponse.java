@@ -2,8 +2,8 @@ package greencity.dto.user;
 
 public record GreenCityUserProfileDtoResponse(
     Long userId,
+    String email,
     String profilePicturePath,
-    String userCredo,
     Double userRating,
     UserLocationDto userLocationDto) {
 }

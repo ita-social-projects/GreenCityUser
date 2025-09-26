@@ -28,8 +28,6 @@ public class UserManagementUpdateDto {
     @NotBlank
     private String email;
 
-    private String userCredo;
-
     @NotNull
     private Role role;
 
