@@ -5,9 +5,9 @@ import greencity.annotations.ValidName;
 import greencity.annotations.ValidSocialNetworkLinks;
 import greencity.dto.CoordinatesDto;
 import greencity.enums.ProfilePrivacyPolicy;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Set;
 import lombok.AllArgsConstructor;
@@ -28,12 +28,8 @@ public class UserProfileDtoRequest {
     @Schema(example = "John")
     private String name;
 
-    @Size(max = 170)
-    @Schema(example = "Lets Make The World A Better Place")
-    private String userCredo;
-
     @ValidSocialNetworkLinks
-    @Schema(example = "https://www.facebook.com/greencity")
+    @ArraySchema(items = @Schema(example = "https://www.facebook.com/greencity"))
     private List<String> socialNetworks;
 
     @NotNull

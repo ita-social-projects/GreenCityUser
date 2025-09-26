@@ -57,6 +57,8 @@ public class UserVO {
 
     private String firstName;
 
+    private String uuid;
+
     @JsonManagedReference
     private UserNotificationPreferenceDto userNotificationPreferenceDto;
 }

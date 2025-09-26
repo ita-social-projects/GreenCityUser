@@ -11,10 +11,6 @@ import greencity.dto.EmployeePositionsDto;
 import greencity.dto.PageableAdvancedDto;
 import greencity.dto.PageableDto;
 import greencity.dto.UbsCustomerDto;
-import greencity.dto.achievement.AchievementVO;
-import greencity.dto.achievement.UserAchievementVO;
-import greencity.dto.achievement.UserVOAchievement;
-import greencity.dto.achievementcategory.AchievementCategoryVO;
 import greencity.dto.authorities.AuthorityCategoryDto;
 import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.filter.FilterUserDto;
@@ -28,6 +24,7 @@ import greencity.dto.user.UserCityDto;
 import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserEmailPreferencesStatisticDto;
 import greencity.dto.user.UserEmployeeAuthorityDto;
+import greencity.dto.user.UserManagementDto;
 import greencity.dto.user.UserManagementUpdateDto;
 import greencity.dto.user.UserManagementVO;
 import greencity.dto.user.UserManagementViewDto;
@@ -35,6 +32,7 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserStatusExternalDto;
 import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
@@ -47,7 +45,6 @@ import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.handler.CustomExceptionHandler;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.PositionService;
@@ -126,6 +123,7 @@ class UserControllerTest {
 
     final ObjectMapper objectMapper = new ObjectMapper();
     String idQueryParam = "id";
+    String emailQueryParam = "email";
     String uuidQueryParam = "uuid";
 
     @BeforeEach
@@ -168,8 +166,41 @@ class UserControllerTest {
     }
 
     @Test
+    void updateStatusByEmailTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(TestConst.EMAIL);
+
+        String content = """
+            {
+              "email": "%s",
+              "userStatus": "BLOCKED"
+            }
+            """.formatted("test@mail");
+
+        mockMvc.perform(patch(userLink + "/status/update")
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+
+        ObjectMapper mapper = new ObjectMapper();
+        UserStatusExternalDto userStatusDto =
+            mapper.readValue(content, UserStatusExternalDto.class);
+
+        verify(userService).updateStatus("test@mail", userStatusDto.getUserStatus(), TestConst.EMAIL);
+    }
+
+    @Test
     void updateStatusBadRequestTest() throws Exception {
         mockMvc.perform(patch(userLink + "/status")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{}"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateStatusByEmailBadRequestTest() throws Exception {
+        mockMvc.perform(patch(userLink + "/status/update")
             .contentType(MediaType.APPLICATION_JSON)
             .content("{}"))
             .andExpect(status().isBadRequest());
@@ -196,6 +227,27 @@ class UserControllerTest {
     }
 
     @Test
+    void updateRoleByEmailTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(TestConst.EMAIL);
+
+        String content = """
+            {
+              "role": "ROLE_USER"
+            }\
+            """;
+
+        mockMvc.perform(patch(userLink + "/role")
+            .param(emailQueryParam, TestConst.EMAIL)
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+
+        verify(userService).updateRole(TestConst.EMAIL, Role.ROLE_USER, TestConst.EMAIL);
+    }
+
+    @Test
     void updateEmployeeEmailTest() throws Exception {
         mockMvc.perform(put(userLink + "/employee-email")
             .param("newEmployeeEmail", TestConst.EMAIL)
@@ -210,7 +262,17 @@ class UserControllerTest {
             .contentType(MediaType.APPLICATION_JSON)
             .content(""))
             .andExpect(status().isBadRequest());
-        verify(userService, never()).updateRole(any(), any(), any());
+        verify(userService, never()).updateRole(any(Long.class), any(), any());
+    }
+
+    @Test
+    void updateRoleByEmailBadRequestForEmptyBodyTest() throws Exception {
+        mockMvc.perform(patch(userLink + "/role")
+            .param(emailQueryParam, TestConst.EMAIL)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(""))
+            .andExpect(status().isBadRequest());
+        verify(userService, never()).updateRole(any(String.class), any(), any());
     }
 
     @Test
@@ -410,7 +472,6 @@ class UserControllerTest {
         String json = """
             {
                 "name": "Vovka",
-                "userCredo": "credo",
                 "socialNetworks": [],
                 "showLocation": "PUBLIC",
                 "showEcoPlace": "PUBLIC",
@@ -448,7 +509,6 @@ class UserControllerTest {
         String json = """
             {
                 "name": "Vovka",
-                "userCredo": "credo",
                 "socialNetworks": [],
                 "showLocation": "PUBLIC",
                 "showEcoPlace": "PUBLIC",
@@ -495,7 +555,6 @@ class UserControllerTest {
                 .id("1L")
                 .name("vivo")
                 .email("test@ukr.net")
-                .userCredo("Hello")
                 .role("1")
                 .userStatus("1")
                 .build();
@@ -538,37 +597,24 @@ class UserControllerTest {
     }
 
     @Test
-    void findUserForAchievementTest() throws Exception {
-        UserVOAchievement userVOAchievement = UserVOAchievement.builder()
-            .id(1L)
-            .name(TestConst.NAME)
-            .userAchievements(List.of(
-                UserAchievementVO.builder()
-                    .id(10L)
-                    .user(ModelUtils.getUserVO())
-                    .achievement(AchievementVO.builder()
-                        .id(20L)
-                        .achievementCategory(AchievementCategoryVO.builder()
-                            .id(30L)
-                            .name("TestAchievementCategory")
-                            .build())
-                        .build())
-                    .build()))
-            .build();
-        when(userService.findUserForAchievement(1L)).thenReturn(userVOAchievement);
-        mockMvc.perform(get(userLink + "/findByIdForAchievement")
-            .param("id", "1"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1L))
-            .andExpect(jsonPath("$.name").value(TestConst.NAME))
-            .andExpect(jsonPath("$.userAchievements.length()").value(1));
+    void findUserForManagementTest() throws Exception {
+        UserManagementDto userManagementDto = ModelUtils.getUserManagementDto();
+        String email = userManagementDto.getEmail();
+
+        when(userService.findUserForManagement(email)).thenReturn(userManagementDto);
+
+        mockMvc.perform(get(userLink + "/findUserForManagement")
+            .param("email", email))
+            .andExpect(status().isOk());
     }
 
     @Test
-    void findUserForManagementTest() throws Exception {
+    void findUsersForManagementTest() throws Exception {
         Pageable pageable = PageRequest.of(0, 20);
-        when(userService.findUserForManagementByPage(pageable)).thenReturn(ModelUtils.getPageableAdvancedDto());
-        mockMvc.perform(get(userLink + "/findUserForManagement"))
+
+        when(userService.findUsersForManagement(pageable)).thenReturn(ModelUtils.getPageableAdvancedDto());
+
+        mockMvc.perform(get(userLink + "/findUsersForManagement"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.page.length()").value(1))
             .andExpect(jsonPath("$.totalElements").value(1L))
@@ -586,12 +632,31 @@ class UserControllerTest {
     }
 
     @Test
+    void updateUserManagementByEmailTest() throws Exception {
+        UserManagementUpdateDto userManagementDto = ModelUtils.getUserManagementUpdateDto();
+        String content = objectMapper.writeValueAsString(userManagementDto);
+        mockMvc.perform(put(userLink)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+    }
+
+    @Test
     void updateUserManagementBadRequestTest() throws Exception {
         mockMvc.perform(put(userLink + "/1")
             .contentType(MediaType.APPLICATION_JSON)
             .content(""))
             .andExpect(status().isBadRequest());
         verify(userService, times(0)).updateUser(1L, ModelUtils.getUserManagementUpdateDto());
+    }
+
+    @Test
+    void updateUserManagementByEmailBadRequestTest() throws Exception {
+        mockMvc.perform(put(userLink)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(""))
+            .andExpect(status().isBadRequest());
+        verify(userService, times(0)).updateUser(ModelUtils.getUserManagementUpdateDto());
     }
 
     @Test
@@ -696,9 +761,10 @@ class UserControllerTest {
             .build());
 
         when(principal.getName()).thenReturn(TestConst.EMAIL);
-        when(userService.findByEmail(principal.getName())).thenReturn(userVO);
+        when(userService.findByEmail(userVO.getEmail())).thenReturn(userVO);
 
-        this.mockMvc.perform(get(userLink + "/lang" + "?id=1")
+        this.mockMvc.perform(get(userLink + "/greencity/lang")
+            .param(emailQueryParam, userVO.getEmail())
             .principal(principal))
             .andExpect(content().string(languageCode))
             .andExpect(status().isOk());
@@ -1086,11 +1152,13 @@ class UserControllerTest {
     }
 
     @Test
-    void findNotDeactivatedByIdAdvancedTest() throws Exception {
+    void findNotDeactivatedByEmailAdvancedTest() throws Exception {
         UserVOAdvancedDto expected = ModelUtils.getUserVOAdvancedDto();
-        when(userService.findNotDeactivatedByIdAdvanced(13L)).thenReturn(Optional.of(expected));
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
-            .param("id", String.valueOf(13L)))
+        String email = expected.getEmail();
+        when(userService.findNotDeactivatedByEmailAdvanced(email))
+            .thenReturn(Optional.of(expected));
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmailAdvanced")
+            .param("email", email))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.name").value(expected.getName()))
             .andExpect(jsonPath("$.id").value(13L))
@@ -1098,11 +1166,35 @@ class UserControllerTest {
     }
 
     @Test
-    void findNotDeactivatedByIdAdvanced_NoResultTest() throws Exception {
-        Long userId = 999L;
-        when(userService.findNotDeactivatedByIdAdvanced(userId)).thenReturn(Optional.empty());
-        mockMvc.perform(get(userLink + "/findNotDeactivatedByIdAdvanced")
-            .param("id", String.valueOf(userId)))
+    void findNotDeactivatedByEmailAdvanced_NoResultTest() throws Exception {
+        String email = "email@email.com";
+        when(userService.findNotDeactivatedByEmailAdvanced(email)).thenReturn(Optional.empty());
+        mockMvc.perform(get(userLink + "/findNotDeactivatedByEmailAdvanced")
+            .param("email", email))
+            .andExpect(status().isOk())
+            .andExpect(content().string(""));
+    }
+
+    @Test
+    void findByEmailAdvancedTest() throws Exception {
+        UserVOAdvancedDto expected = ModelUtils.getUserVOAdvancedDto();
+        String email = expected.getEmail();
+        when(userService.findByEmailAdvanced(email))
+            .thenReturn(Optional.of(expected));
+        mockMvc.perform(get(userLink + "/findByEmailAdvanced")
+            .param("email", email))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value(expected.getName()))
+            .andExpect(jsonPath("$.id").value(13L))
+            .andExpect(jsonPath("$.email").value(TestConst.EMAIL));
+    }
+
+    @Test
+    void findByEmailAdvanced_NoResultTest() throws Exception {
+        String email = "email@email.com";
+        when(userService.findByEmailAdvanced(email)).thenReturn(Optional.empty());
+        mockMvc.perform(get(userLink + "/findByEmailAdvanced")
+            .param("email", email))
             .andExpect(status().isOk())
             .andExpect(content().string(""));
     }
@@ -1116,49 +1208,6 @@ class UserControllerTest {
             .andExpect(status().isOk());
 
         verify(userService).findAllByEmailIn(emails);
-    }
-
-    @Test
-    void findUserEmailsByUserIdsTest() throws Exception {
-        List<String> userIdsStr = List.of("1", "2", "3");
-        List<Long> userIds = List.of(1L, 2L, 3L);
-
-        mockMvc.perform(get(userLink + "/email/findByIds")
-            .param("userIds", String.join(", ", userIdsStr)))
-            .andExpect(status().isOk());
-
-        verify(userService).findUserEmailsByUserIds(userIds);
-    }
-
-    @Test
-    void findNotDeactivatedByIdTest() throws Exception {
-        Long userId = 1L;
-        String userIdStr = String.valueOf(userId);
-        UserVOShort userVOShort = new UserVOShort();
-
-        when(userService.findNotDeactivatedByIdReduced(userId))
-            .thenReturn(Optional.of(userVOShort));
-
-        mockMvc.perform(get(userLink + "/findNotDeactivatedById")
-            .param(idQueryParam, userIdStr))
-            .andExpect(status().isOk());
-
-        verify(userService).findNotDeactivatedByIdReduced(userId);
-    }
-
-    @Test
-    void findNotDeactivatedByIdNotFoundTest() throws Exception {
-        Long userId = 1L;
-        String userIdStr = String.valueOf(userId);
-
-        when(userService.findNotDeactivatedByIdReduced(userId))
-            .thenThrow(new NotFoundException());
-
-        mockMvc.perform(get(userLink + "/findNotDeactivatedById")
-            .param(idQueryParam, userIdStr))
-            .andExpect(status().isNotFound());
-
-        verify(userService).findNotDeactivatedByIdReduced(userId);
     }
 
     @Test

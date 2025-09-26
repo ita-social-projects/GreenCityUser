@@ -35,7 +35,7 @@ public class UserNotificationPreferenceController {
         @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
     })
     @PostMapping("/search")
-    public ResponseEntity<Boolean> existsByUserIdAndEmailPreferenceAndPeriodicity(
+    public ResponseEntity<Boolean> existsByUserEmailAndEmailPreferenceAndPeriodicity(
         @RequestBody EmailPreferenceDto emailPreferenceDto) {
         return ResponseEntity.ok()
             .body(userNotificationPreferenceService.existsByUserIdAndEmailPreferenceAndPeriodicity(emailPreferenceDto));

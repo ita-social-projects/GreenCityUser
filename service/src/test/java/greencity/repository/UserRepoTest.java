@@ -160,19 +160,6 @@ class UserRepoTest {
     }
 
     @Test
-    void findUserForAchievementTest() {
-        User expectedUser = ModelUtils.getUser();
-        expectedUser.setId(1L);
-
-        when(userRepo.findUserForAchievement(anyLong())).thenReturn(Optional.of(expectedUser));
-
-        User actualUser = userRepo.findUserForAchievement(1L).orElse(null);
-
-        assertEquals(expectedUser, actualUser);
-        verify(userRepo).findUserForAchievement(1L);
-    }
-
-    @Test
     void findUserByUuidTest() {
         String uuid = "1488";
         User expectedUser = ModelUtils.getUser();

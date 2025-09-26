@@ -14,10 +14,10 @@ public class UserNotificationPreferenceServiceImpl implements UserNotificationPr
 
     @Override
     public boolean existsByUserIdAndEmailPreferenceAndPeriodicity(EmailPreferenceDto emailPreferenceDto) {
-        Long userId = emailPreferenceDto.userId();
+        String userEmail = emailPreferenceDto.userEmail();
         EmailPreference emailPreference = emailPreferenceDto.emailPreference();
         EmailPreferencePeriodicity periodicity = emailPreferenceDto.emailPreferencePeriodicity();
-        return userNotificationPreferenceRepo.existsByUserIdAndEmailPreferenceAndPeriodicity(userId, emailPreference,
-            periodicity);
+        return userNotificationPreferenceRepo.existsByUserEmailAndEmailPreferenceAndPeriodicity(userEmail,
+            emailPreference, periodicity);
     }
 }

@@ -141,10 +141,6 @@ public class SecurityConfig {
                     "/user/userAndSixFriendsWithOnlineStatus",
                     "/user/userAndAllFriendsWithOnlineStatus",
                     "/user/usersOnlineStatus",
-                    "/user/findByIdForAchievement",
-                    "/user/findNotDeactivatedByEmail",
-                    "/user/findNotDeactivatedByEmailRemote",
-                    "/user/findNotDeactivatedByIdRemote",
                     "/user/findByEmail",
                     "/user/findIdByEmail",
                     "/user/findAllUsersCities",
@@ -214,6 +210,7 @@ public class SecurityConfig {
                     "/user/all",
                     "/user/roles",
                     "/user/findUserForManagement",
+                    "/user/findUsersForManagement",
                     "/user/searchBy",
                     "/user/findAll")
                 .hasAnyRole(ADMIN, MODERATOR, EMPLOYEE)
@@ -231,12 +228,11 @@ public class SecurityConfig {
                     FILES + "/single")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PUT,
-                    "/management/socialnetworkimages/")
+                    "/management/socialnetworkimages/",
+                    USER_LINK)
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.GET,
                     "/user/email/findAll",
-                    "/user/email/findByIds",
-                    "/user/findNotDeactivatedByIdAdvanced",
                     "/user/activated-ids",
                     "/user/registration-statistics",
                     "/user/email",
@@ -244,8 +240,11 @@ public class SecurityConfig {
                     "/user/email-preferences-distribution",
                     "/user/statuses-distribution",
                     "/user/roles-distribution",
-                    "/user/findNotDeactivatedById",
-                    "/user/findNotDeactivatedByEmail")
+                    "/user/findByEmailAdvanced",
+                    "/user/findNotDeactivatedByEmail",
+                    "/user/findNotDeactivatedByEmailAdvanced",
+                    "/user/isOnline",
+                    "/user/greencity/lang")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
                     "/management/socialnetworkimages/delete",
@@ -255,8 +254,8 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",
+                    "/user/status/update",
                     "/user/role",
-                    "/user/update/role",
                     "/user/{id}/role")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.POST, "/management/login")
