@@ -12,8 +12,6 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.security.jwt.JwtTool;
 import io.netty.channel.ChannelOption;
 import java.net.URI;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -35,8 +34,8 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class GreenCityRemoteWebClientConfig {
-    private static final String EMAIL_PARAM_REGEX = "([?&][^&]*[eE]mail[^=&]*=[^&]+)";
-    private static final String PLUS_SYMBOL_IN_EMAIL = "+";
+    private static final String EMAIL_QUERY_PARAMETER = "email";
+    private static final String PLUS_SYMBOL = "+";
     private static final String ENCODED_PLUS_SYMBOL = "%2B";
 
     @Value("${greencity.server.address}")
@@ -155,18 +154,13 @@ public class GreenCityRemoteWebClientConfig {
             String originalQuery = original.getRawQuery();
 
             if (originalQuery != null
-                && originalQuery.contains(PLUS_SYMBOL_IN_EMAIL)
-                && originalQuery.matches(EMAIL_PARAM_REGEX)) {
-                String encodedQuery = encodeEmailParameter(originalQuery);
+                && originalQuery.contains(PLUS_SYMBOL)
+                && originalQuery.toLowerCase().contains(EMAIL_QUERY_PARAMETER)) {
+                URI encodedUri = encodeEmailParameter(original);
 
-                if (encodedQuery.equals(originalQuery)) {
-                    URI newUri = UriComponentsBuilder.fromUri(original)
-                        .replaceQuery(encodedQuery)
-                        .build(true)
-                        .toUri();
-
+                if (!encodedUri.equals(original)) {
                     ClientRequest mutated = ClientRequest.from(request)
-                        .url(newUri)
+                        .url(encodedUri)
                         .build();
 
                     return Mono.just(mutated);
@@ -177,23 +171,26 @@ public class GreenCityRemoteWebClientConfig {
         });
     }
 
-    private static String encodeEmailParameter(String query) {
-        Pattern pattern = Pattern.compile(EMAIL_PARAM_REGEX);
-        Matcher matcher = pattern.matcher(query);
-        StringBuilder encodedQuery = new StringBuilder();
+    private static URI encodeEmailParameter(URI uri) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri);
+        MultiValueMap<String, String> queryParams = builder.build().getQueryParams();
+        builder.replaceQuery(null);
 
-        while (matcher.find()) {
-            String queryBeforeEmailParam = matcher.group(1);
-            String emailParamKey = matcher.group(2);
-            String emailParamValue = matcher.group(3);
+        for (var entry : queryParams.entrySet()) {
+            String paramKey = entry.getKey();
 
-            String encodedValue = emailParamValue.replace(PLUS_SYMBOL_IN_EMAIL, ENCODED_PLUS_SYMBOL);
-
-            matcher.appendReplacement(encodedQuery,
-                Matcher.quoteReplacement(queryBeforeEmailParam + emailParamKey + encodedValue));
+            if (paramKey.toLowerCase().contains(EMAIL_QUERY_PARAMETER)) {
+                for (String value : entry.getValue()) {
+                    String encodedValue = value.replace(PLUS_SYMBOL, ENCODED_PLUS_SYMBOL);
+                    builder.queryParam(paramKey, encodedValue);
+                }
+            } else {
+                for (String value : entry.getValue()) {
+                    builder.queryParam(paramKey, value);
+                }
+            }
         }
 
-        matcher.appendTail(encodedQuery);
-        return encodedQuery.toString();
+        return builder.build().toUri();
     }
 }
