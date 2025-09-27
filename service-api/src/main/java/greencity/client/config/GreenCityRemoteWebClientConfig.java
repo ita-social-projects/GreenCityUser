@@ -191,6 +191,6 @@ public class GreenCityRemoteWebClientConfig {
             }
         }
 
-        return builder.build().toUri();
+        return builder.build(true).toUri();
     }
 }
