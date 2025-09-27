@@ -951,15 +951,12 @@ public class UserServiceImpl implements UserService {
         }
 
         switch (externalStatus) {
-            case ACTIVATED -> {
-            }
             case DEACTIVATED -> throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED
                 + " in %s service".formatted(projectName));
             case BLOCKED -> throw new BadUserStatusException(ErrorMessage.USER_BLOCKED
                 + " in %s service".formatted(projectName));
             case DELETED -> throw new BadUserStatusException(ErrorMessage.USER_DELETED
                 + " from %s service".formatted(projectName));
-            default -> throw new IllegalArgumentException("Unknown service status: " + externalStatus);
         }
     }
 

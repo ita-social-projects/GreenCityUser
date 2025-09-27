@@ -840,8 +840,8 @@ public class UserController {
         @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
         @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
     })
-    @GetMapping("/findByUuid")
-    public ResponseEntity<UserVO> findByUuid(@RequestParam String uuid) {
+    @GetMapping("/findByUuid/external")
+    public ResponseEntity<UserVO> findByUuidExternal(@RequestParam String uuid) {
         return ResponseEntity.ok().body(userService.findByUuid(uuid));
     }
 

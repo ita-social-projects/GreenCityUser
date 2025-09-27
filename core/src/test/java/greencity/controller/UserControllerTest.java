@@ -1001,7 +1001,7 @@ class UserControllerTest {
     }
 
     @Test
-    void findByUuIdTest() throws Exception {
+    void findByUuIdTestExternal() throws Exception {
         UbsCustomerDto ubsCustomerDto = new UbsCustomerDto(TestConst.NAME, TestConst.EMAIL, "phone number");
 
         when(userService.findUbsCustomerDtoByUuid(TestConst.UUID))

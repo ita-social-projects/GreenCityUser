@@ -1518,24 +1518,24 @@ class UserServiceImplTest {
 
     @Test
     void verifyUserStatusTest() {
-        UserVO user = ModelUtils.getUserVO();
-        user.setUserStatus(UserStatus.VERIFIED);
+        UserVO testUser = ModelUtils.getUserVO();
+        testUser.setUserStatus(UserStatus.VERIFIED);
         ProjectName projectName = ProjectName.GREENCITY;
         ServiceUserStatus status = ServiceUserStatus.ACTIVATED;
 
         when(greenCityRemoteClient.getGreenCityUserStatus(any())).thenReturn(status);
 
-        assertDoesNotThrow(() -> userService.verifyUserStatus(user, projectName));
+        assertDoesNotThrow(() -> userService.verifyUserStatus(testUser, projectName));
         verify(greenCityRemoteClient).getGreenCityUserStatus(any());
         verify(greenCityRemoteClient, never()).getUbsUserStatus(any());
     }
 
     @Test
     void verifyUserStatusWithNotVerifiedUserTest() {
-        UserVO user = ModelUtils.getUserVO();
-        user.setUserStatus(UserStatus.CREATED);
+        UserVO testUser = ModelUtils.getUserVO();
+        testUser.setUserStatus(UserStatus.CREATED);
 
-        assertThrows(BadUserStatusException.class, () -> userService.verifyUserStatus(user, ProjectName.PICKUP));
+        assertThrows(BadUserStatusException.class, () -> userService.verifyUserStatus(testUser, ProjectName.PICKUP));
         verify(greenCityRemoteClient, never()).getGreenCityUserStatus(any());
         verify(greenCityRemoteClient, never()).getUbsUserStatus(any());
     }
@@ -1543,13 +1543,13 @@ class UserServiceImplTest {
     @ParameterizedTest
     @ValueSource(strings = {"DEACTIVATED", "BLOCKED", "DELETED"})
     void verifyUserStatusWithBadUserStatusTest(String status) {
-        UserVO user = ModelUtils.getUserVO();
-        user.setUserStatus(UserStatus.VERIFIED);
+        UserVO testUser = ModelUtils.getUserVO();
+        testUser.setUserStatus(UserStatus.VERIFIED);
         ServiceUserStatus serviceStatus = ServiceUserStatus.valueOf(status);
 
         when(greenCityRemoteClient.getUbsUserStatus(any())).thenReturn(serviceStatus);
 
-        assertThrows(BadUserStatusException.class, () -> userService.verifyUserStatus(user, ProjectName.PICKUP));
+        assertThrows(BadUserStatusException.class, () -> userService.verifyUserStatus(testUser, ProjectName.PICKUP));
     }
 
     @Test
@@ -1566,14 +1566,14 @@ class UserServiceImplTest {
 
     @Test
     void findByEmailShortTest() {
-        UserVOShort userVO = ModelUtils.getUserVOShortDto();
+        UserVOShort userVOShort = ModelUtils.getUserVOShortDto();
 
         when(userRepo.findByEmail(userEmail)).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVO);
+        when(modelMapper.map(user, UserVOShort.class)).thenReturn(userVOShort);
 
         UserVOShort actualUser = userService.findByEmailShort(userEmail);
 
-        assertEquals(userVO, actualUser);
+        assertEquals(userVOShort, actualUser);
         verify(userRepo).findByEmail(userEmail);
     }
 
