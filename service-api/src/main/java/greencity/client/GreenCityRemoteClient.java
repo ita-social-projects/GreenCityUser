@@ -159,7 +159,7 @@ public class GreenCityRemoteClient {
             .bodyValue(userProfileDtoRequest)
             .retrieve()
             .bodyToMono(Void.class)
-            .subscribe();
+            .block();
     }
 
     /**
@@ -281,6 +281,24 @@ public class GreenCityRemoteClient {
             .uri(uriBuilder -> uriBuilder.path("/users/user/name")
                 .queryParam(USER_EMAIL_QUERY_PARAM, email)
                 .queryParam("userName", userName)
+                .build())
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
+    }
+
+    /**
+     * Updates the user's email in the GreenCity service.
+     *
+     * @param userId   the ID of the user whose name should be updated
+     * @param newEmail the new email to assign to the user
+     */
+    public void updateUserEmail(Long userId, String newEmail) {
+        String email = userService.findById(userId).getEmail();
+        webClient.patch()
+            .uri(uriBuilder -> uriBuilder.path("/users/user/email")
+                .queryParam("oldEmail", email)
+                .queryParam("newEmail", newEmail)
                 .build())
             .retrieve()
             .bodyToMono(Void.class)

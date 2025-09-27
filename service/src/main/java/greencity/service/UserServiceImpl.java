@@ -175,7 +175,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(Long userId, UserManagementUpdateDto dto) {
         User user = findUserById(userId);
         updateUserName(user, dto.getName());
-        user.setEmail(dto.getEmail());
+        updateUserEmail(user, dto.getEmail());
         user.setRole(dto.getRole());
         user.setUserStatus(dto.getUserStatus());
     }
@@ -204,6 +204,20 @@ public class UserServiceImpl implements UserService {
                 .name(name)
                 .build();
             retryableTaskService.saveRetryableTask(updateUserNameDto, RetryableTaskType.UPDATE_USERNAME);
+        }
+    }
+
+    private void updateUserEmail(User user, String newEmail) {
+        try {
+            user.setEmail(newEmail);
+            greenCityRemoteClient.updateUserEmail(user.getId(), newEmail);
+        } catch (WebClientRequestException e) {
+            log.warn("GreenCity service is unavailable: update user email failed");
+            UpdateUserEmailDto updateUserEmailDto = UpdateUserEmailDto.builder()
+                .id(user.getId())
+                .newEmail(newEmail)
+                .build();
+            retryableTaskService.saveRetryableTask(updateUserEmailDto, RetryableTaskType.UPDATE_EMAIL);
         }
     }
 

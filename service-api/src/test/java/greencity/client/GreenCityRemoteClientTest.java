@@ -449,6 +449,29 @@ class GreenCityRemoteClientTest {
 
     @Test
     @SneakyThrows
+    void updateUserEmailTest() {
+        String newEmail = "test2@gmail";
+        String expectedRequestPath = "/users/user/email?oldEmail=" + userEmail + "&newEmail=" + newEmail;
+        String expectedRequestMethod = HttpMethod.PATCH.name();
+
+        when(userService.findById(userId)).thenReturn(user);
+
+        mockWebServer.enqueue(new MockResponse()
+            .setResponseCode(200)
+            .addHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE));
+
+        greenCityRemoteClient.updateUserEmail(userId, newEmail);
+
+        RecordedRequest recordedRequest = mockWebServer.takeRequest();
+        assertEquals(expectedRequestMethod, recordedRequest.getMethod());
+        assertEquals(expectedRequestPath, recordedRequest.getPath());
+        assertNotNull(recordedRequest.getRequestUrl());
+        assertNotNull(recordedRequest.getRequestUrl().queryParameter("newEmail"));
+        assertEquals(newEmail, recordedRequest.getRequestUrl().queryParameter("newEmail"));
+    }
+
+    @Test
+    @SneakyThrows
     void findGreenCityUserProfilesByUserIdsTest() {
         List<Long> userIds = Arrays.asList(1L, 2L, 3L);
         List<GreenCityUserProfileDtoResponse> expectedProfiles = Arrays.asList(
