@@ -35,7 +35,6 @@ import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
-import greencity.dto.user.UserStatusExternalDto;
 import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
@@ -119,27 +118,6 @@ public class UserController {
         @Valid @RequestBody UserStatusDto userStatusDto, Principal principal) {
         return ResponseEntity.ok().body(userService.updateStatus(
             userStatusDto.getId(), userStatusDto.getUserStatus(), principal.getName()));
-    }
-
-    /**
-     * For external services usage. The method which update user status.
-     *
-     * @param userStatusDto - dto with updated filed.
-     * @return {@link UserStatusDto}
-     */
-    @Operation(summary = "Update status of user", description = "For external services usage")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK,
-            content = @Content(schema = @Schema(implementation = UserStatus.class))),
-        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
-        @ApiResponse(responseCode = "401", description = HttpStatuses.UNAUTHORIZED),
-        @ApiResponse(responseCode = "403", description = HttpStatuses.FORBIDDEN)
-    })
-    @PatchMapping("/status/update")
-    public ResponseEntity<UserStatusDto> updateStatus(
-        @Valid @RequestBody UserStatusExternalDto userStatusDto, Principal principal) {
-        return ResponseEntity.ok().body(userService.updateStatus(
-            userStatusDto.getEmail(), userStatusDto.getUserStatus(), principal.getName()));
     }
 
     /**

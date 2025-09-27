@@ -377,6 +377,19 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
+    public UserStatusDto updateStatus(String userEmail, UserStatus userStatus, String currentUserEmail) {
+        Long id = findIdByEmail(userEmail);
+        checkUpdatableUser(id, currentUserEmail);
+        accessForUpdateUserStatus(id, currentUserEmail);
+        User user = findUserById(id);
+        user.setUserStatus(userStatus);
+        return modelMapper.map(userRepo.save(user), UserStatusDto.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public RoleDto getRoles(Long id) {
         Role role = findUserById(id).getRole();
         return new RoleDto(new Role[] {role});
@@ -970,6 +983,8 @@ public class UserServiceImpl implements UserService {
                 + " in %s service".formatted(projectName));
             case DELETED -> throw new BadUserStatusException(ErrorMessage.USER_DELETED
                 + " from %s service".formatted(projectName));
+            default -> {
+            }
         }
     }
 

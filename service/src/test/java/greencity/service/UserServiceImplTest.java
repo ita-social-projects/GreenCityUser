@@ -1360,18 +1360,6 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findByEmailAdvanced_NotFoundTest() {
-        when(userRepo.findByEmail(userEmail)).thenReturn(Optional.empty());
-
-        NotFoundException exception = assertThrows(
-            NotFoundException.class,
-            () -> userService.findByEmailAdvanced(userEmail));
-
-        assertEquals(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + userEmail, exception.getMessage());
-        verify(userRepo, times(1)).findByEmail(userEmail);
-    }
-
-    @Test
     void createGreenCityUserTest() {
         CreateGreenCityUserDto createGreenCityUserDto = ModelUtils.getCreateGreenCityDto();
 
