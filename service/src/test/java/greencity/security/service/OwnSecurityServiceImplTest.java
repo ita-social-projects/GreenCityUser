@@ -116,7 +116,7 @@ class OwnSecurityServiceImplTest {
         notVerifiedUser = UserVO.builder()
             .email("test@gmail.com")
             .id(1L)
-            .userStatus(UserStatus.VERIFIED)
+            .userStatus(UserStatus.CREATED)
             .verifyEmail(new VerifyEmailVO())
             .ownSecurity(OwnSecurityVO.builder().password("password").build())
             .role(Role.ROLE_USER)

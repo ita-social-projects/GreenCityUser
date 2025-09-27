@@ -222,7 +222,7 @@ public class SecurityConfig {
                     FILES + "/single")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PUT,
-                    "/management/socialnetworkimages/",
+                    "/management/socialnetworkimages/**",
                     USER_LINK)
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.GET,

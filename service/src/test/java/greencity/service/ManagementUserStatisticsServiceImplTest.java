@@ -82,9 +82,8 @@ class ManagementUserStatisticsServiceImplTest {
     @Test
     void testGetUserStatusesDistribution() {
         List<UserStatusStatisticDto> expectedStats = Arrays.asList(
-            new UserStatusStatisticDto(UserStatus.VERIFIED, 80L),
-            new UserStatusStatisticDto(UserStatus.CREATED, 15L),
-            new UserStatusStatisticDto(UserStatus.VERIFIED, 5L));
+            new UserStatusStatisticDto(UserStatus.VERIFIED, 85L),
+            new UserStatusStatisticDto(UserStatus.CREATED, 15L));
 
         when(userRepo.getUserStatusesDistribution()).thenReturn(expectedStats);
 

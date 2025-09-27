@@ -650,7 +650,7 @@ class UserServiceImplTest {
 
         assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
         verify(userRepo).findByEmail(userEmail);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(greenCityRemoteClient).setLocationForUser(myUser.getId(), request);
         verify(socialNetworkService).delete(anyLong());
         verify(socialNetworkImageService, times(request.getSocialNetworks().size()))
             .getSocialNetworkImageByUrl(anyString());
@@ -676,7 +676,7 @@ class UserServiceImplTest {
         assertEquals(UpdateConstants.SUCCESS_EN, result);
 
         verify(userRepo).findByEmail(userEmail);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(greenCityRemoteClient).setLocationForUser(myUser.getId(), request);
         verify(socialNetworkService, never()).delete(anyLong());
         verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
@@ -701,7 +701,7 @@ class UserServiceImplTest {
         assertEquals(UpdateConstants.SUCCESS_EN, result);
 
         verify(userRepo).findByEmail(userEmail);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(greenCityRemoteClient).setLocationForUser(myUser.getId(), request);
         verify(socialNetworkService, never()).delete(anyLong());
         verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);
@@ -806,7 +806,7 @@ class UserServiceImplTest {
         assertEquals(UpdateConstants.SUCCESS_EN, actualResult);
 
         verify(userRepo).findByEmail(email);
-        verify(greenCityRemoteClient).setLocationForUser(userId, request);
+        verify(greenCityRemoteClient).setLocationForUser(myUser.getId(), request);
         verify(socialNetworkService, never()).delete(anyLong());
         verify(socialNetworkImageService, never()).getSocialNetworkImageByUrl(anyString());
         verify(userRepo).save(myUser);

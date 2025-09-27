@@ -449,16 +449,16 @@ public interface UserService {
     /**
      * Method that allows to find user by uuid.
      *
-     * @param uuid - {@link UserVO}'s uuid.
-     * @return {@link Optional} of found {@link UserVO}.
+     * @param uuid - user's uuid.
+     * @return found {@link UserVO}.
      */
     UserVO findByUuid(String uuid);
 
     /**
      * Method that allows to find user by email.
      *
-     * @param email - {@link UserVO}'s email.
-     * @return {@link Optional} of found {@link UserVO}.
+     * @param email - user's email.
+     * @return found {@link UserVOShort}.
      */
     UserVOShort findByEmailShort(String email);
 }

@@ -885,9 +885,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Optional<UserVOAdvancedDto> findByEmailAdvanced(String email) {
-        User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        return Optional.of(modelMapper.map(user, UserVOAdvancedDto.class));
+        return userRepo.findByEmail(email)
+            .map(user -> modelMapper.map(user, UserVOAdvancedDto.class));
     }
 
     /**

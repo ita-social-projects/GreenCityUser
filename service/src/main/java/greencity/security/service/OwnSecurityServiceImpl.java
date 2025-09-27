@@ -242,7 +242,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 blockTimeInMinutes);
 
             User user = userRepo.findByEmail(email)
-                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
+                .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
 
             emailService.sendBlockAccountNotificationWithUnblockLinkEmail(
                 user.getId(), user.getName(), user.getEmail(),
