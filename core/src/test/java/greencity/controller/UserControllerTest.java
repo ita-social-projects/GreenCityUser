@@ -28,6 +28,7 @@ import greencity.dto.user.UserProfileDtoRequest;
 import greencity.dto.user.UserRegistrationStatisticDto;
 import greencity.dto.user.UserRoleStatisticDto;
 import greencity.dto.user.UserStatusDto;
+import greencity.dto.user.UserStatusExternalDto;
 import greencity.dto.user.UserStatusStatisticDto;
 import greencity.dto.user.UserUpdateDto;
 import greencity.dto.user.UserVO;
@@ -154,8 +155,41 @@ class UserControllerTest {
     }
 
     @Test
+    void updateStatusByEmailTest() throws Exception {
+        Principal principal = mock(Principal.class);
+        when(principal.getName()).thenReturn(TestConst.EMAIL);
+
+        String content = """
+            {
+              "email": "%s",
+              "userStatus": "BLOCKED"
+            }
+            """.formatted("test@mail");
+
+        mockMvc.perform(patch(userLink + "/status/update")
+            .principal(principal)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isOk());
+
+        ObjectMapper mapper = new ObjectMapper();
+        UserStatusExternalDto userStatusDto =
+            mapper.readValue(content, UserStatusExternalDto.class);
+
+        verify(userService).updateStatus("test@mail", userStatusDto.getUserStatus(), TestConst.EMAIL);
+    }
+
+    @Test
     void updateStatusBadRequestTest() throws Exception {
         mockMvc.perform(patch(userLink + "/status")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{}"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateStatusByEmailBadRequestTest() throws Exception {
+        mockMvc.perform(patch(userLink + "/status/update")
             .contentType(MediaType.APPLICATION_JSON)
             .content("{}"))
             .andExpect(status().isBadRequest());

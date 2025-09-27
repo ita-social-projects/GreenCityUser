@@ -235,7 +235,7 @@ public class SecurityConfig {
                     "/user/findByEmailAdvanced",
                     "/user/isOnline",
                     "/user/greencity/lang",
-                    "/user/findByUuid")
+                    "/user/findByUuid/external")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
                     "/management/socialnetworkimages/delete",
@@ -245,6 +245,7 @@ public class SecurityConfig {
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/status",
+                    "/user/status/update",
                     "/user/role",
                     "/user/{id}/role")
                 .hasAnyRole(ADMIN)

@@ -48,6 +48,7 @@ public class EmailServiceImpl implements EmailService {
     private final String clientLink;
     private final String senderEmailAddress;
     private final String greenOfficeEmailAddress;
+    private final String tgBotFeedbacksEmailAddress;
     private final MessageSource messageSource;
     private static final String PARAM_USER_ID = "&user_id=";
     private final UserRepo userRepo;
@@ -62,6 +63,7 @@ public class EmailServiceImpl implements EmailService {
         @Value("${client.address}") String clientLink,
         @Value("${sender.email.address}") String senderEmailAddress,
         @Value("${greenoffice.email.address}") String greenOfficeEmailAddress,
+        @Value("${tgbotfeedbacks.email.address}") String tgBotFeedbacksEmailAddress,
         MessageSource messageSource,
         UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
@@ -70,6 +72,7 @@ public class EmailServiceImpl implements EmailService {
         this.clientLink = clientLink;
         this.senderEmailAddress = senderEmailAddress;
         this.greenOfficeEmailAddress = greenOfficeEmailAddress;
+        this.tgBotFeedbacksEmailAddress = tgBotFeedbacksEmailAddress;
         this.messageSource = messageSource;
         this.userRepo = userRepo;
     }
@@ -389,7 +392,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.COMMENT, dto.getComment());
 
         String template = createEmailTemplate(model, EmailConstants.TELEGRAM_FEEDBACK);
-        sendEmail(greenOfficeEmailAddress, dto.getSubject(), template);
+        sendEmail(tgBotFeedbacksEmailAddress, dto.getSubject(), template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {

@@ -143,6 +143,15 @@ public interface UserService {
     UserStatusDto updateStatus(Long id, UserStatus userStatus, String email);
 
     /**
+     * Update status of user.
+     *
+     * @param userEmail  {@link UserVO} email.
+     * @param userStatus {@link UserStatus} for user.
+     * @return {@link UserStatusDto}
+     */
+    UserStatusDto updateStatus(String userEmail, UserStatus userStatus, String currentUserEmail);
+
+    /**
      * Find {@link UserVO}-s by page .
      *
      * @param pageable a value with pageable configuration.
