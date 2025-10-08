@@ -42,7 +42,7 @@ public class GreenCityRemoteWebClientConfig {
     @Value("${greencityubs.server.address}")
     private String greenCityUbsBaseUrl;
 
-    @Value("${greencity.authorization.service-email}")
+    @Value("${contacts.authorization.system-email-address}")
     private String systemEmail;
 
     @Value("${webclient.connection-timeout-millis}")

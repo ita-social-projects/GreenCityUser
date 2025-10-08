@@ -46,8 +46,8 @@ class JwtToolTest {
 
     @BeforeEach
     void init() {
-        ReflectionTestUtils.setField(jwtTool, "accessTokenValidTimeInMinutes", 15);
-        ReflectionTestUtils.setField(jwtTool, "refreshTokenValidTimeInMinutes", 15);
+        ReflectionTestUtils.setField(jwtTool, "security.jwt.access-token.expiration-minutes", 15);
+        ReflectionTestUtils.setField(jwtTool, "security.jwt.refresh-token.expiration-minutes", 15);
         ReflectionTestUtils.setField(jwtTool, "accessTokenKey", "123123123123123123123123123123123123");
     }
 

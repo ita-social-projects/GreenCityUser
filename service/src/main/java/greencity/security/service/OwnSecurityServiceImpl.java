@@ -89,9 +89,9 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final LoginAttemptService loginAttemptService;
     private final CloudFlareClient cloudFlareClient;
     private final GreenCityRemoteClient greenCityRemoteClient;
-    @Value("${verifyEmailTimeHour}")
+    @Value("${security.jwt.verify-email.expiration-hours}")
     private Integer expirationTime;
-    @Value("${bruteForceSettings.blockTimeInMinutes}")
+    @Value("${security.brute-force.block-time-minutes}")
     private String blockTimeInMinutes;
     @Value("${testers.sign-in-token}")
     private String secretKey;
