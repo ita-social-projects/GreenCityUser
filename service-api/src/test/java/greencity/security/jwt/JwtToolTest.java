@@ -24,6 +24,7 @@ import org.mockito.Mock;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.util.ReflectionTestUtils;
 
 /**
@@ -46,8 +47,8 @@ class JwtToolTest {
 
     @BeforeEach
     void init() {
-        ReflectionTestUtils.setField(jwtTool, "security.jwt.access-token.expiration-minutes", 15);
-        ReflectionTestUtils.setField(jwtTool, "security.jwt.refresh-token.expiration-minutes", 15);
+        ReflectionTestUtils.setField(jwtTool, "accessTokenValidTimeInMinutes", 15);
+        ReflectionTestUtils.setField(jwtTool, "refreshTokenValidTimeInMinutes", 15);
         ReflectionTestUtils.setField(jwtTool, "accessTokenKey", "123123123123123123123123123123123123");
     }
 
