@@ -136,4 +136,11 @@
             <column name="name">TELEGRAM_MANAGEMENT</column>
         </insert>
     </changeSet>
+
+    <changeSet id="add-new-authority-settings-management" author="BohdanLys">
+        <insert tableName="employee_authorities">
+            <column name="id">35</column>
+            <column name="name">SETTINGS_MANAGEMENT</column>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
