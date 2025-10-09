@@ -52,6 +52,12 @@ spec:
               secretKeyRef:
                 name: {{ .Values.externalSecret.secretName }}
                 key: AZURE-TENANT-ID
+
+          - name: PROFILE
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalSecret.secretName }}
+                key: PROFILE
         ports:
         - containerPort: 8060
           name: tomcat
