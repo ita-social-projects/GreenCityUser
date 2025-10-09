@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class GoogleApiConfiguration {
-    @Value("${greencity.authorization.googleApiKey}")
+    @Value("${external.google.api-key}")
     private String googleApiKey;
 
     /**

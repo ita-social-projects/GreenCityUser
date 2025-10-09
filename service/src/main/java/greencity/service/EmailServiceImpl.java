@@ -61,9 +61,9 @@ public class EmailServiceImpl implements EmailService {
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
         @Value("${client.address}") String clientLink,
-        @Value("${sender.email.address}") String senderEmailAddress,
-        @Value("${greenoffice.email.address}") String greenOfficeEmailAddress,
-        @Value("${tgbotfeedbacks.email.address}") String tgBotFeedbacksEmailAddress,
+        @Value("${contacts.sender.email-address}") String senderEmailAddress,
+        @Value("${contacts.greenoffice.email-address}") String greenOfficeEmailAddress,
+        @Value("${contacts.tgbot.feedbacks-email-address}") String tgBotFeedbacksEmailAddress,
         MessageSource messageSource,
         UserRepo userRepo) {
         this.javaMailSender = javaMailSender;
