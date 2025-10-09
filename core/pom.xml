@@ -17,6 +17,7 @@
         <modelmapper.version>3.2.0</modelmapper.version>
         <mockito-junit-jupiter.version>3.3.3</mockito-junit-jupiter.version>
         <ldm.version>0.0.5</ldm.version>
+        <azure.spring.version>6.0.0</azure.spring.version>
     </properties>
 
     <repositories>
@@ -28,6 +29,19 @@
     </repositories>
 
     <artifactId>core</artifactId>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.azure.spring</groupId>
+                <artifactId>spring-cloud-azure-dependencies</artifactId>
+                <version>${azure.spring.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <dependency>
             <groupId>greencityuser</groupId>
@@ -218,6 +232,10 @@
             <artifactId>logcaptor</artifactId>
             <version>2.12.0</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.azure.spring</groupId>
+            <artifactId>spring-cloud-azure-starter-keyvault-secrets</artifactId>
         </dependency>
     </dependencies>
 
