@@ -16,7 +16,6 @@
         <commons-fileupload.version>1.6.0</commons-fileupload.version>
         <commons-io.version>2.19.0</commons-io.version>
         <google.maps.version>2.0.0</google.maps.version>
-        <azure.spring.version>6.0.0</azure.spring.version>
     </properties>
 
     <artifactId>service</artifactId>
@@ -166,18 +165,6 @@
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>${org.eclipse.jgit.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.azure.spring</groupId>
-            <artifactId>spring-cloud-azure-dependencies</artifactId>
-            <version>${azure.spring.version}</version>
-            <type>pom</type>
-            <scope>import</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.azure.spring</groupId>
-            <artifactId>spring-cloud-azure-starter-keyvault-secrets</artifactId>
-            <version>${azure.spring.version}</version>
         </dependency>
     </dependencies>
 </project>
