@@ -34,6 +34,24 @@ spec:
               port: 8060
           periodSeconds: 10
           failureThreshold: 20
+        env:
+          - name: AZURE_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalSecret.secretName }}
+                key: AZURE-CLIENT-ID
+
+          - name: AZURE_SECRET_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalSecret.secretName }}
+                key: AZURE-SECRET-ID
+
+          - name: AZURE_TENANT_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.externalSecret.secretName }}
+                key: AZURE-TENANT-ID
         ports:
         - containerPort: 8060
           name: tomcat
