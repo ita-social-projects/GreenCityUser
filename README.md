@@ -51,21 +51,9 @@ Though there are three GitHub projects ([GreenCity](https://github.com/ita-socia
 All these variables you can set in Intellij Idea. For instance,
 
 ```properties
-spring.datasource.url=${DATASOURCE_URL}
-spring.datasource.username=${DATASOURCE_USER}
-spring.datasource.password=${DATASOURCE_PASSWORD}
-spring.mail.username=${EMAIL_ADDRESS}
-spring.mail.password=${EMAIL_PASSWORD}
-cloud.name=${CLOUD_NAME}
-api.key=${API_KEY}
-api.secret=${API_SECRET}
-google.clientId=${GOOGLE_CLIENT_ID}
-spring.rabbitmq.host=${RABBITMQ_HOST}
-spring.rabbitmq.password=${RABBITMQ_PASSWORD}
-spring.rabbitmq.username=${RABBITMQ_USERNAME}
-bucketName=${BUCKET_NAME}
-staticUrl=${STATIC_URL}
-greencity.server.address = ${GREENCITY_SERVER_ADDRESS}
+spring.cloud.azure.credential.client-id=${AZURE_CLIENT_ID}
+spring.cloud.azure.credential.client-secret=${AZURE_SECRET_ID}
+spring.cloud.azure.profile.tenant-id=${AZURE_TENANT_ID}
 ```
 
 ![env-vars](./docs-photos/env-example.png)
