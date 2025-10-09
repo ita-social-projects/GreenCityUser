@@ -66,7 +66,7 @@ stages:
         javaHomeOption: 'JDKVersion'
         jdkVersionOption: '1.21'
         mavenVersionOption: 'Default'
-        options: '-Dmaven.test.skip=true -s $(Build.SourcesDirectory)/settings.xml'
+        options: '-Dmaven.test.skip=true -Dspring.profiles.active=prod -s $(Build.SourcesDirectory)/settings.xml'
         
     - script: mv $(userRepoName)/target/*.jar $(userRepoName)/target/$(onbootJarName)
       displayName: Rename user jar to app
