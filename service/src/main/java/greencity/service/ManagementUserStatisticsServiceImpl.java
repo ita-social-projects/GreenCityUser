@@ -49,12 +49,4 @@ public class ManagementUserStatisticsServiceImpl implements ManagementUserStatis
     public List<UserEmailPreferencesStatisticDto> getUserEmailPreferencesDistribution() {
         return userRepo.getUserEmailPreferencesDistribution();
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Long countActiveUsers() {
-        return userRepo.countActiveUsers();
-    }
 }

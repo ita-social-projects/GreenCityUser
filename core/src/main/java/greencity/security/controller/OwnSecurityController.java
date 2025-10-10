@@ -14,7 +14,8 @@ import greencity.constant.ValidationConstants;
 import greencity.dto.authorities.AuthorityCategoryDto;
 import greencity.dto.authorities.AuthorityDto;
 import greencity.dto.user.UserAdminRegistrationDto;
-import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementCreateDto;
+import greencity.enums.ProjectName;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
@@ -53,7 +54,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -163,8 +163,9 @@ public class OwnSecurityController {
         @ApiResponse(responseCode = "400", description = REFRESH_TOKEN_NOT_VALID)
     })
     @GetMapping("/updateAccessToken")
-    public ResponseEntity<Object> updateAccessToken(@RequestParam @NotBlank String refreshToken) {
-        return ResponseEntity.ok().body(service.updateAccessTokens(refreshToken));
+    public ResponseEntity<Object> updateAccessToken(@RequestParam @NotBlank String refreshToken,
+        @RequestParam ProjectName projectName) {
+        return ResponseEntity.ok().body(service.updateAccessTokens(refreshToken, projectName));
     }
 
     /**
@@ -247,7 +248,7 @@ public class OwnSecurityController {
     })
     @PostMapping("/register")
     public ResponseEntity<UserAdminRegistrationDto> managementRegisterUser(
-        @Valid @RequestBody UserManagementDto userDto) {
+        @Valid @RequestBody UserManagementCreateDto userDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.managementRegisterUser(userDto));
     }
 
@@ -326,24 +327,6 @@ public class OwnSecurityController {
         String email = authentication.getName();
         service.setPassword(dto, email);
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    /**
-     * Method for deleting (deactivating) a user by email.
-     *
-     * @return {@link ResponseEntity}
-     */
-    @Operation(summary = "Delete (deactivate) a user by email.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
-        @ApiResponse(responseCode = "404", description = ErrorMessage.USER_NOT_FOUND_BY_EMAIL)
-    })
-    @DeleteMapping("/user")
-    public ResponseEntity<Object> deleteUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        service.deleteUserByEmail(email);
-        return ResponseEntity.ok().build();
     }
 
     /**

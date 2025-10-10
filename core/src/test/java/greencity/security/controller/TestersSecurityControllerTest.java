@@ -1,6 +1,7 @@
 package greencity.security.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import greencity.enums.ProjectName;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.ownsecurity.TestersSignInRequest;
 import greencity.security.service.OwnSecurityServiceImpl;
@@ -46,6 +47,7 @@ class TestersSecurityControllerTest {
             .email("test@email.com")
             .password("password")
             .secretKey("secretKey")
+            .projectName(ProjectName.PICKUP)
             .build();
         this.objectMapper = new ObjectMapper();
     }

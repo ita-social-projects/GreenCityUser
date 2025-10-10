@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum RetryableTaskType {
     UPDATE_USER_RATING,
     UPDATE_USERNAME,
+    UPDATE_EMAIL,
     CREATE_USER,
     SET_LOCATION_FOR_USER,
     UPDATE_USER_PICTURE_PATH

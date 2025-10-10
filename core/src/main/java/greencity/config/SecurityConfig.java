@@ -116,7 +116,6 @@ public class SecurityConfig {
                     "/ownSecurity/restorePassword",
                     "/googleSecurity",
                     "/user/emailNotifications",
-                    "/user/activatedUsersAmount",
                     "/user/{userId}/habit/assign",
                     "/token",
                     "/socket/**",
@@ -148,7 +147,6 @@ public class SecurityConfig {
                     "/user/findUserByName/**",
                     "/user/findByUuId",
                     "/user/findUuidByEmail",
-                    "/user/checkActiveUserByUuid",
                     "/user/lang",
                     "/user/createUbsRecord",
                     "/user/{userId}/sixUserFriends/",
@@ -174,16 +172,11 @@ public class SecurityConfig {
                     "/user/{id}/updateUserLastActivityTime/{date}",
                     "/user/updateUserLastActivityTime/{date}",
                     "/user/language/{languageId}",
-                    "/user/employee-email",
-                    "/user/deactivate",
-                    "testers/unblockAccount")
+                    "/user/employee-email")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PUT,
                     "/user/edit-authorities",
-                    "/user/authorities",
-                    "/user/deactivate-employee",
-                    "/user/markUserAsDeactivated",
-                    "/user/markUserAsActivated")
+                    "/user/authorities")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     "/user/findUserLanguageByUuid",
@@ -202,8 +195,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE,
                     "/user/to-do-list-items/user-to-do-list-items",
                     "/user/to-do-list-items",
-                    "/user/deleteProfilePicture",
-                    "/ownSecurity/user")
+                    "/user/deleteProfilePicture")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
                     USER_LINK,
@@ -223,28 +215,27 @@ public class SecurityConfig {
                     "/email/sendReport",
                     "/email/sendHabitNotification",
                     "/email/sendInterestingEcoNews",
+                    "/email/sendReasonOfDeactivation",
+                    "/email/sendMessageOfActivation",
                     "/management/socialnetworkimages/save-remote",
                     "/user-notification-preference/search",
                     FILES + "/single")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.PUT,
-                    "/management/socialnetworkimages/",
+                    "/management/socialnetworkimages/**",
                     USER_LINK)
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.GET,
                     "/user/email/findAll",
-                    "/user/activated-ids",
                     "/user/registration-statistics",
                     "/user/email",
-                    "/user/count-active-users",
                     "/user/email-preferences-distribution",
                     "/user/statuses-distribution",
                     "/user/roles-distribution",
                     "/user/findByEmailAdvanced",
-                    "/user/findNotDeactivatedByEmail",
-                    "/user/findNotDeactivatedByEmailAdvanced",
                     "/user/isOnline",
-                    "/user/greencity/lang")
+                    "/user/greencity/lang",
+                    "/user/findByUuid/external")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
                     "/management/socialnetworkimages/delete",

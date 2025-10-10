@@ -9,11 +9,11 @@
         </update>
         <update tableName="users">
             <column name="show_eco_place" value="PUBLIC"/>
-            <where>show_location = 'true'</where>
+            <where>show_eco_place = 'true'</where>
         </update>
         <update tableName="users">
             <column name="show_to_do_list" value="PUBLIC"/>
-            <where>show_location = 'true'</where>
+            <where>show_to_do_list = 'true'</where>
         </update>
         <update tableName="users">
             <column name="show_location" value="PRIVATE"/>
@@ -21,11 +21,11 @@
         </update>
         <update tableName="users">
             <column name="show_eco_place" value="PRIVATE"/>
-            <where>show_location = 'false'</where>
+            <where>show_eco_place = 'false'</where>
         </update>
         <update tableName="users">
             <column name="show_to_do_list" value="PRIVATE"/>
-            <where>show_location = 'false'</where>
+            <where>show_to_do_list = 'false'</where>
         </update>
     </changeSet>
 </databaseChangeLog>

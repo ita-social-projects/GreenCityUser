@@ -82,9 +82,8 @@ class ManagementUserStatisticsServiceImplTest {
     @Test
     void testGetUserStatusesDistribution() {
         List<UserStatusStatisticDto> expectedStats = Arrays.asList(
-            new UserStatusStatisticDto(UserStatus.ACTIVATED, 80L),
-            new UserStatusStatisticDto(UserStatus.DEACTIVATED, 15L),
-            new UserStatusStatisticDto(UserStatus.ACTIVATED, 5L));
+            new UserStatusStatisticDto(UserStatus.VERIFIED, 85L),
+            new UserStatusStatisticDto(UserStatus.CREATED, 15L));
 
         when(userRepo.getUserStatusesDistribution()).thenReturn(expectedStats);
 
@@ -112,17 +111,5 @@ class ManagementUserStatisticsServiceImplTest {
         assertEquals(expectedStats.size(), result.size());
         assertEquals(expectedStats, result);
         verify(userRepo).getUserEmailPreferencesDistribution();
-    }
-
-    @Test
-    void testCountActiveUsers() {
-        Long expectedCount = 1250L;
-        when(userRepo.countActiveUsers()).thenReturn(expectedCount);
-
-        Long result = managementUserStatisticsService.countActiveUsers();
-
-        assertNotNull(result);
-        assertEquals(expectedCount, result);
-        verify(userRepo).countActiveUsers();
     }
 }

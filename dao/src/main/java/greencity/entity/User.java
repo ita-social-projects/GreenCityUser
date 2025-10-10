@@ -12,7 +12,6 @@ import jakarta.persistence.ConstructorResult;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -80,8 +79,8 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-    @Enumerated(value = EnumType.ORDINAL)
-    @JdbcType(IntegerJdbcType.class)
+    @Column(name = "user_status", nullable = false)
+    @Enumerated(value = EnumType.STRING)
     private UserStatus userStatus;
 
     @Column(nullable = false)
@@ -130,9 +129,6 @@ public class User {
 
     @ManyToOne
     private Language language;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<UserDeactivationReason> userDeactivationReasons;
 
     @ManyToMany
     @JoinTable(

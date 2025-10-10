@@ -15,21 +15,22 @@ import greencity.entity.Language;
 import greencity.entity.SocialNetwork;
 import greencity.entity.SocialNetworkImage;
 import greencity.entity.User;
-import greencity.entity.UserDeactivationReason;
 import greencity.entity.UserNotificationPreference;
 import greencity.enums.EmailNotification;
 import greencity.enums.EmailPreference;
 import greencity.enums.EmailPreferencePeriodicity;
+import greencity.enums.ProjectName;
 import greencity.enums.RetryableTaskType;
 import greencity.enums.Role;
+import greencity.enums.ServiceUserStatus;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.*;
 import greencity.filters.SearchCriteria;
 import greencity.filters.UserSpecification;
 import greencity.repository.LanguageRepo;
-import greencity.repository.UserDeactivationRepo;
 import greencity.repository.UserRepo;
 import greencity.repository.options.UserFilter;
+import java.util.Arrays;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,7 +67,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepo userRepo;
     private final LanguageRepo languageRepo;
     private final GreenCityRemoteClient greenCityRemoteClient;
-    private final UserDeactivationRepo userDeactivationRepo;
     private final SimpMessagingTemplate messagingTemplate;
     private final SocialNetworkImageService socialNetworkImageService;
     private final SocialNetworkService socialNetworkService;
@@ -83,6 +83,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserVO save(UserVO userVO) {
         User user = modelMapper.map(userVO, User.class);
+        Set<UserNotificationPreference> userNotificationPreferences = Arrays.stream(EmailPreference.values())
+            .map(emailPreference -> UserNotificationPreference.builder()
+                .user(user)
+                .emailPreference(emailPreference)
+                .periodicity(EmailPreferencePeriodicity.TWICE_A_DAY)
+                .build())
+            .collect(Collectors.toSet());
+        user.setNotificationPreferences(userNotificationPreferences);
         return modelMapper.map(userRepo.save(user), UserVO.class);
     }
 
@@ -167,10 +175,9 @@ public class UserServiceImpl implements UserService {
     public void updateUser(Long userId, UserManagementUpdateDto dto) {
         User user = findUserById(userId);
         updateUserName(user, dto.getName());
-        user.setEmail(dto.getEmail());
+        updateUserEmail(user, dto.getEmail());
         user.setRole(dto.getRole());
         user.setUserStatus(dto.getUserStatus());
-        userRepo.save(user);
     }
 
     /**
@@ -197,6 +204,20 @@ public class UserServiceImpl implements UserService {
                 .name(name)
                 .build();
             retryableTaskService.saveRetryableTask(updateUserNameDto, RetryableTaskType.UPDATE_USERNAME);
+        }
+    }
+
+    private void updateUserEmail(User user, String newEmail) {
+        try {
+            user.setEmail(newEmail);
+            greenCityRemoteClient.updateUserEmail(user.getId(), newEmail);
+        } catch (WebClientRequestException e) {
+            log.warn("GreenCity service is unavailable: update user email failed");
+            UpdateUserEmailDto updateUserEmailDto = UpdateUserEmailDto.builder()
+                .id(user.getId())
+                .newEmail(newEmail)
+                .build();
+            retryableTaskService.saveRetryableTask(updateUserEmailDto, RetryableTaskType.UPDATE_EMAIL);
         }
     }
 
@@ -273,19 +294,6 @@ public class UserServiceImpl implements UserService {
                 .value(value)
                 .build());
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public Optional<UserVO> findNotDeactivatedByEmail(String email) {
-        log.info("email {}", email);
-        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL));
-        log.info("user: {}", notDeactivatedByEmail);
-        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVO.class));
     }
 
     /**
@@ -495,14 +503,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<CustomToDoListItemResponseDto> getAvailableCustomToDoListItems(Long userId, Long habitId) {
         return greenCityRemoteClient.getAllAvailableCustomToDoListItems(userId, habitId);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public long getActivatedUsersAmount() {
-        return userRepo.countAllByUserStatus(UserStatus.ACTIVATED);
     }
 
     /**
@@ -729,123 +729,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public UserDeactivationReasonDto deactivateUser(String uuid, DeactivateUserRequestDto request, UserVO userVO) {
-        User requestedUser = findUserById(userVO.getId());
-        User foundUser = findUserByUuid(uuid);
-
-        if (requestedUser.getId().equals(foundUser.getId())) {
-            if (requestedUser.getRole().equals(Role.ROLE_USER)) {
-                return deactivateAndLogReason(foundUser, request.getReason());
-            } else {
-                throw new UserDeactivationException(ErrorMessage.USER_CANNOT_DEACTIVATE_YOURSELF);
-            }
-        }
-
-        if (foundUser.getRole().equals(Role.ROLE_USER)) {
-            if (isAuthorizedToDeactivate(requestedUser.getRole())) {
-                return deactivateAndLogReason(foundUser, request.getReason());
-            } else {
-                throw new UserDeactivationException(ErrorMessage.USER_CANNOT_DEACTIVATE_OTHERS);
-            }
-        }
-
-        if (requestedUser.getRole().equals(Role.ROLE_ADMIN)) {
-            if (!foundUser.getRole().equals(Role.ROLE_ADMIN)) {
-                return deactivateAndLogReason(foundUser, request.getReason());
-            } else {
-                throw new UserDeactivationException(ErrorMessage.ADMIN_CANNOT_DEACTIVATE_OTHER_ADMIN);
-            }
-        }
-
-        throw new UserDeactivationException(ErrorMessage.YOU_DO_NOT_HAVE_PERMISSIONS_TO_DEACTIVATE_THIS_USER);
-    }
-
-    /**
-     * Helper method to determine if a user is authorized to deactivate other users.
-     *
-     * @param role the role of the requesting user
-     * @return true if the user is authorized to deactivate others, false otherwise
-     */
-    private boolean isAuthorizedToDeactivate(Role role) {
-        return role.equals(Role.ROLE_ADMIN)
-            || role.equals(Role.ROLE_MODERATOR)
-            || role.equals(Role.ROLE_EMPLOYEE)
-            || role.equals(Role.ROLE_UBS_EMPLOYEE);
-    }
-
-    /**
-     * Performs user deactivation and logs the deactivation reason.
-     *
-     * @param foundUser the user to deactivate
-     * @param reason    the reason for deactivation
-     * @return a UserDeactivationReasonDto object containing deactivation details
-     */
-    private UserDeactivationReasonDto deactivateAndLogReason(User foundUser, String reason) {
-        foundUser.setUserStatus(UserStatus.DEACTIVATED);
-        userRepo.save(foundUser);
-        userDeactivationRepo.save(UserDeactivationReason.builder()
-            .dateTimeOfDeactivation(LocalDateTime.now())
-            .reason(reason)
-            .user(foundUser)
-            .build());
-
-        return UserDeactivationReasonDto.builder()
-            .email(foundUser.getEmail())
-            .name(foundUser.getName())
-            .deactivationReason(reason)
-            .lang(foundUser.getLanguage().getCode())
-            .build();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public List<String> getDeactivationReason(Long id, String adminLang) {
-        UserDeactivationReason userReason = userDeactivationRepo.getLastDeactivationReasons(id)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_DEACTIVATION_REASON_IS_EMPTY));
-        if (adminLang.equals("uk")) {
-            adminLang = "uk";
-        }
-        return filterReasons(adminLang,
-            userReason.getReason());
-    }
-
-    private List<String> filterReasons(String lang, String reasons) {
-        List<String> result = null;
-        List<String> forAll = List.of(reasons.split("/"));
-        if (lang.equals("en")) {
-            result = forAll.stream().filter(s -> s.contains("{en}"))
-                .map(filterEn -> filterEn.replace("{en}", "").trim()).toList();
-        }
-        if (lang.equals("uk")) {
-            result = forAll.stream().filter(s -> s.contains("{uk}"))
-                .map(filterEn -> filterEn.replace("{uk}", "").trim()).toList();
-        }
-        return result;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Transactional
-    @Override
-    public UserActivationDto setActivatedStatus(Long id) {
-        User foundUser = findUserById(id);
-        foundUser.setUserStatus(UserStatus.ACTIVATED);
-        userRepo.save(foundUser);
-
-        return UserActivationDto.builder()
-            .email(foundUser.getEmail())
-            .name(foundUser.getName())
-            .lang(foundUser.getLanguage().getCode())
-            .build();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void updateUserLanguage(Long userId, Long languageId) {
         Language language = languageRepo.findById(languageId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.LANGUAGE_NOT_FOUND_BY_ID + languageId));
@@ -868,30 +751,11 @@ public class UserServiceImpl implements UserService {
     /**
      * {@inheritDoc}
      */
-    @Transactional
-    @Override
-    public List<Long> deactivateAllUsers(List<Long> listId) {
-        userRepo.deactivateSelectedUsers(listId);
-        return listId;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public List<UserVOShort> findAllByEmailNotification(EmailNotification emailNotification) {
         return userRepo.findAllByEmailNotification(emailNotification).stream()
             .map(user -> modelMapper.map(user, UserVOShort.class))
             .toList();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public int scheduleDeleteDeactivatedUsers() {
-        return userRepo.scheduleDeleteDeactivatedUsers();
     }
 
     /**
@@ -954,26 +818,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public void markUserAsDeactivated(String uuid) {
-        User user = findUserByUuid(uuid);
-        user.setUserStatus(UserStatus.DEACTIVATED);
-        userRepo.save(user);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void markUserAsActivated(String uuid) {
-        User user = findUserByUuid(uuid);
-        user.setUserStatus(UserStatus.ACTIVATED);
-        userRepo.save(user);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public UserVO findAdminById(Long id) {
         User user = findUserById(id);
         if (user.getRole() == Role.ROLE_ADMIN) {
@@ -1008,15 +852,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public Boolean checkIfUserExistsByUuid(String uuid) {
-        return userRepo.existsNotDeactivatedByUuid(uuid);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean checkIfActiveUserExistsByUuid(String uuid) {
-        return userRepo.existsActiveByUuid(uuid);
+        return userRepo.existsUserByUuid(uuid);
     }
 
     /**
@@ -1051,7 +887,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public String findUserLanguageByUuid(String uuid) {
-        User user = userRepo.findNotDeactivatedUserByUuid(uuid)
+        User user = userRepo.findUserByUuid(uuid)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_UUID + uuid));
         return user.getLanguage().getCode();
     }
@@ -1060,34 +896,10 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    public List<Long> findAllActivatedUserIds(List<Long> ids) {
-        if (ids != null) {
-            return userRepo.findAllActivatedUserIdsFromList(ids);
-        } else {
-            return userRepo.findAllActivatedUserIds();
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Transactional
-    public Optional<UserVOAdvancedDto> findNotDeactivatedByEmailAdvanced(String email) {
-        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOAdvancedDto.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Transactional
     public Optional<UserVOAdvancedDto> findByEmailAdvanced(String email) {
-        User user = userRepo.findByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        return Optional.of(modelMapper.map(user, UserVOAdvancedDto.class));
+        return userRepo.findByEmail(email)
+            .map(user -> modelMapper.map(user, UserVOAdvancedDto.class));
     }
 
     /**
@@ -1132,17 +944,6 @@ public class UserServiceImpl implements UserService {
      * {@inheritDoc}
      */
     @Override
-    @Transactional
-    public Optional<UserVOShort> findNotDeactivatedByEmailReduced(String email) {
-        User notDeactivatedByEmail = userRepo.findNotDeactivatedByEmail(email)
-            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
-        return Optional.of(modelMapper.map(notDeactivatedByEmail, UserVOShort.class));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public List<UserVO> findAllByEmailIn(List<String> emails) {
         return userRepo.findAllByEmailIn(emails).stream()
             .map(user -> modelMapper.map(user, UserVO.class))
@@ -1157,5 +958,51 @@ public class UserServiceImpl implements UserService {
         return userRepo.findAllEmailsByIdIn(ids).stream()
             .map(UserEmailDto::userEmail)
             .toList();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void verifyUserStatus(UserVO user, ProjectName projectName) {
+        if (user.getUserStatus() == UserStatus.CREATED) {
+            throw new BadUserStatusException(ErrorMessage.USER_CREATED);
+        }
+
+        ServiceUserStatus externalStatus;
+        switch (projectName) {
+            case GREENCITY -> externalStatus = greenCityRemoteClient.getGreenCityUserStatus(user.getEmail());
+            case PICKUP -> externalStatus = greenCityRemoteClient.getUbsUserStatus(user.getUuid());
+            default -> throw new IllegalArgumentException("Unknown project name: " + projectName);
+        }
+
+        switch (externalStatus) {
+            case DEACTIVATED -> throw new BadUserStatusException(ErrorMessage.USER_DEACTIVATED
+                + " in %s service".formatted(projectName));
+            case BLOCKED -> throw new BadUserStatusException(ErrorMessage.USER_BLOCKED
+                + " in %s service".formatted(projectName));
+            case DELETED -> throw new BadUserStatusException(ErrorMessage.USER_DELETED
+                + " from %s service".formatted(projectName));
+            default -> {
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserVO findByUuid(String uuid) {
+        return modelMapper.map(findUserByUuid(uuid), UserVO.class);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public UserVOShort findByEmailShort(String email) {
+        return userRepo.findByEmail(email)
+            .map(user -> modelMapper.map(user, UserVOShort.class))
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
     }
 }

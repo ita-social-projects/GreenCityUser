@@ -4,6 +4,7 @@ import greencity.annotations.ApiLocale;
 import greencity.annotations.ValidLanguage;
 import static greencity.constant.ErrorMessage.BAD_GOOGLE_TOKEN;
 import greencity.constant.HttpStatuses;
+import greencity.enums.ProjectName;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.service.GoogleSecurityService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +50,8 @@ public class GoogleSecurityController {
     @GetMapping
     @ApiLocale
     public SuccessSignInDto authenticate(@RequestParam @NotBlank String token,
+        @RequestParam ProjectName projectName,
         @Parameter(hidden = true) @ValidLanguage Locale locale) {
-        return googleSecurityService.authenticate(token, locale.getLanguage());
+        return googleSecurityService.authenticate(token, locale.getLanguage(), projectName);
     }
 }

@@ -1,7 +1,8 @@
 package greencity.security.service;
 
 import greencity.dto.user.UserAdminRegistrationDto;
-import greencity.dto.user.UserManagementDto;
+import greencity.dto.user.UserManagementCreateDto;
+import greencity.enums.ProjectName;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
@@ -48,9 +49,10 @@ public interface OwnSecurityService {
      * Method that update your access token by refresh token.
      *
      * @param refreshToken a value of {@link String}
+     * @param projectName  service from where this method is called
      * @return {@link AccessRefreshTokensDto} this is DTO with new access token
      */
-    AccessRefreshTokensDto updateAccessTokens(String refreshToken);
+    AccessRefreshTokensDto updateAccessTokens(String refreshToken, ProjectName projectName);
 
     /**
      * Method for updating current password.
@@ -64,10 +66,10 @@ public interface OwnSecurityService {
     /**
      * Method for registering a user from admin panel.
      *
-     * @param dto a value of {@link UserManagementDto}
+     * @param dto a value of {@link UserManagementCreateDto}
      * @author Vasyl Zhovnir
      */
-    UserAdminRegistrationDto managementRegisterUser(UserManagementDto dto);
+    UserAdminRegistrationDto managementRegisterUser(UserManagementCreateDto dto);
 
     /**
      * Checks if user has password.
@@ -84,14 +86,6 @@ public interface OwnSecurityService {
      * @param email {@link String} email of user.
      */
     void setPassword(SetPasswordDto dto, String email);
-
-    /**
-     * Method to delete (deactivate) a user by email, setting their status to
-     * DELETED.
-     *
-     * @param email {@link String} email of the user to be deleted.
-     */
-    void deleteUserByEmail(String email);
 
     /**
      * Unblocks user account by provided token.

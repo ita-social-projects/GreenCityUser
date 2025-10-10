@@ -87,7 +87,7 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .userStatus(UserStatus.DEACTIVATED)
+            .userStatus(UserStatus.CREATED)
             .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
@@ -101,7 +101,7 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .userStatus(UserStatus.DEACTIVATED)
+            .userStatus(UserStatus.CREATED)
             .lastActivityTime(LocalDateTime.of(2020, 9, 29, 0, 0, 0))
             .verifyEmail(new VerifyEmail())
             .dateOfRegistration(LocalDateTime.now())
@@ -115,7 +115,7 @@ public class ModelUtils {
             .name("Martin")
             .email("martin@gmail.com")
             .role(Role.ROLE_ADMIN)
-            .userStatus(UserStatus.ACTIVATED).build();
+            .userStatus(UserStatus.VERIFIED).build();
     }
 
     public static UserManagementUpdateDto getUserManagementUpdateDto() {
@@ -281,7 +281,7 @@ public class ModelUtils {
             .email("namesurname1995@gmail.com")
             .role(Role.ROLE_USER)
             .emailNotification(EmailNotification.MONTHLY)
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.VERIFIED)
             .verifyEmail(VerifyEmailVO.builder()
                 .id(32L)
                 .user(UserVO.builder()
@@ -391,7 +391,7 @@ public class ModelUtils {
             .email(TestConst.EMAIL)
             .name(TestConst.NAME)
             .role(Role.ROLE_USER)
-            .userStatus(UserStatus.BLOCKED)
+            .userStatus(UserStatus.CREATED)
             .languageCode("en")
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
             .build();
@@ -780,7 +780,7 @@ public class ModelUtils {
             .name("user")
             .email("namesurname1995@gmail.com")
             .role(Role.ROLE_USER)
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.VERIFIED)
             .dateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47))
             .firstName("Julia")
             .language(getLanguageVO())
@@ -803,7 +803,7 @@ public class ModelUtils {
             .name("user")
             .email("taras@gmail.com")
             .role(Role.ROLE_USER)
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.VERIFIED)
             .languageVO(LanguageVO.builder()
                 .id(2L)
                 .code("en")

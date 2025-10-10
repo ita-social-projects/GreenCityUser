@@ -66,15 +66,6 @@ public class ModelUtils {
             0., 0.);
     }
 
-    public static UserLocationDto getUserLocationDto() {
-        return new UserLocationDto(
-            1L,
-            "cityEn", "cityUk",
-            "regionEn", "regionUk",
-            "countryEn", "countryUk",
-            0., 0.);
-    }
-
     public static UserProfileDtoRequest getUserProfileDtoRequest() {
         return new UserProfileDtoRequest(
             "name",

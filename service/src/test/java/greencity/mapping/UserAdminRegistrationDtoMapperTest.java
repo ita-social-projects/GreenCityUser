@@ -21,7 +21,7 @@ class UserAdminRegistrationDtoMapperTest {
     @Test
     void convert() {
         User user = ModelUtils.getUser();
-        user.setUserStatus(UserStatus.BLOCKED);
+        user.setUserStatus(UserStatus.CREATED);
         user.setLanguage(Language.builder().id(2L).code("en").build());
         user.setDateOfRegistration(LocalDateTime.of(2020, 6, 6, 13, 47));
 

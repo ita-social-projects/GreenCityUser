@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -69,12 +68,9 @@ public class AccessTokenAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Authentication authentication = authenticationManager
                     .authenticate(new UsernamePasswordAuthenticationToken(token, null));
-                Optional<UserVOShort> user =
-                    userService.findNotDeactivatedByEmailReduced((String) authentication.getPrincipal());
-                if (user.isPresent()) {
-                    log.debug("User successfully authenticate - {}", authentication.getPrincipal());
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                UserVOShort user = userService.findByEmailShort((String) authentication.getPrincipal());
+                log.debug("User successfully authenticate - {}", user.getEmail());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (ExpiredJwtException e) {
                 log.info("Token has expired");
             } catch (Exception e) {
