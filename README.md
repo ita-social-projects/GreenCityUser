@@ -54,6 +54,7 @@ All these variables you can set in Intellij Idea. For instance,
 spring.cloud.azure.credential.client-id=${AZURE_CLIENT_ID}
 spring.cloud.azure.credential.client-secret=${AZURE_SECRET_ID}
 spring.cloud.azure.profile.tenant-id=${AZURE_TENANT_ID}
+spring.profiles.active=${PROFILE}
 ```
 
 ![env-vars](./docs-photos/env-example.png)
