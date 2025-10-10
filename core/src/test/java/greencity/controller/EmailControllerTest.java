@@ -3,6 +3,8 @@ package greencity.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import greencity.dto.econews.InterestingEcoNewsDto;
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.enums.PlaceStatus;
@@ -239,5 +241,46 @@ class EmailControllerTest {
             .andExpect(status().isOk());
 
         verify(emailService, times(1)).sendTelegramFeedbackEmail(dto);
+    }
+
+    @Test
+    @SneakyThrows
+    void sendReasonOfDeactivationTest() {
+        UserDeactivationReasonDto dto = new UserDeactivationReasonDto();
+        dto.setDeactivationReason("test reason");
+        dto.setName("John Doe");
+        dto.setEmail("test@example.com");
+        dto.setLang("en");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/sendReasonOfDeactivation")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer your_token_here")
+            .content(content))
+            .andExpect(status().isOk());
+
+        verify(emailService).sendReasonOfDeactivation(dto);
+    }
+
+    @Test
+    @SneakyThrows
+    void sendMessageOfActivation() {
+        UserActivationDto dto = new UserActivationDto();
+        dto.setName("John Doe");
+        dto.setEmail("test@example.com");
+        dto.setLang("en");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String content = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(MockMvcRequestBuilders.post(LINK + "/sendMessageOfActivation")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer your_token_here")
+            .content(content))
+            .andExpect(status().isOk());
+
+        verify(emailService).sendMessageOfActivation(dto);
     }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import greencity.ModelUtils;
 import greencity.dto.authorities.AuthorityCategoryDto;
 import greencity.dto.authorities.AuthorityDto;
+import greencity.dto.user.UserManagementCreateDto;
+import greencity.enums.ProjectName;
 import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
@@ -34,7 +36,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -116,7 +117,8 @@ class OwnSecurityControllerTest {
         String content = """
             {
               "email": "test@mail.com",
-              "password": "String-123"
+              "password": "String-123",
+              "projectName": "PICKUP"
             }\
             """;
 
@@ -142,10 +144,11 @@ class OwnSecurityControllerTest {
     @Test
     void updateAccessTokenTest() throws Exception {
         mockMvc.perform(get(OWN_SECURITY_LINK + "/updateAccessToken")
-            .param("refreshToken", "12345"))
+            .param("refreshToken", "12345")
+            .param("projectName", "PICKUP"))
             .andExpect(status().isOk());
 
-        verify(ownSecurityService).updateAccessTokens("12345");
+        verify(ownSecurityService).updateAccessTokens("12345", ProjectName.PICKUP);
     }
 
     @Test
@@ -270,15 +273,6 @@ class OwnSecurityControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void deleteUser() {
-        mockMvc.perform(delete(OWN_SECURITY_LINK + "/user"))
-            .andExpect(status().isOk());
-
-        verify(ownSecurityService).deleteUserByEmail(email);
-    }
-
-    @Test
     void unblockUserTest() throws Exception {
         UnblockAccountDto accountDto = new UnblockAccountDto("token");
 
@@ -290,5 +284,25 @@ class OwnSecurityControllerTest {
             .andExpect(status().isOk());
 
         verify(ownSecurityService, times(1)).unblockAccount(accountDto.token());
+    }
+
+    @Test
+    void registerTest() throws Exception {
+        String content = """
+            {
+              "id": -1,
+              "name": "String-123",
+              "email": "test@mail.com",
+              "role": "ROLE_USER"
+            }\
+            """;
+
+        mockMvc.perform(post(OWN_SECURITY_LINK + "/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(content))
+            .andExpect(status().isCreated());
+
+        UserManagementCreateDto dto = ModelUtils.getObjectMapper().readValue(content, UserManagementCreateDto.class);
+        verify(ownSecurityService).managementRegisterUser(dto);
     }
 }

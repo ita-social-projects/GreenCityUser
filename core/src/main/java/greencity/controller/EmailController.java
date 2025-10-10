@@ -2,6 +2,8 @@ package greencity.controller;
 
 import greencity.constant.HttpStatuses;
 import greencity.dto.econews.InterestingEcoNewsDto;
+import greencity.dto.user.UserActivationDto;
+import greencity.dto.user.UserDeactivationReasonDto;
 import greencity.dto.user.UserTelegramFeedbackDto;
 import greencity.dto.violation.UserViolationMailDto;
 import greencity.message.*;
@@ -149,6 +151,43 @@ public class EmailController {
     @PostMapping("/telegram-feedback")
     public ResponseEntity<Void> sendTelegramFeedback(@RequestBody @Valid UserTelegramFeedbackDto dto) {
         emailService.sendTelegramFeedbackEmail(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Send an email with reason of deactivation.
+     *
+     * @param dto {@link UserDeactivationReasonDto} - object containing the
+     *            deactivation details: email, name, deactivation reason and
+     *            language.
+     */
+    @Operation(summary = "Send reason of deactivation to customer email")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/sendReasonOfDeactivation")
+    public ResponseEntity<Void> sendReasonOfDeactivation(@RequestBody UserDeactivationReasonDto dto) {
+        emailService.sendReasonOfDeactivation(dto);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Send an email that user account was activated.
+     *
+     * @param dto {@link UserActivationDto} - object containing the activation
+     *            details: email, name, language.
+     */
+    @Operation(summary = "Send an email that user account was activated")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = HttpStatuses.OK),
+        @ApiResponse(responseCode = "400", description = HttpStatuses.BAD_REQUEST),
+        @ApiResponse(responseCode = "404", description = HttpStatuses.NOT_FOUND)
+    })
+    @PostMapping("/sendMessageOfActivation")
+    public ResponseEntity<Void> sendMessageOfActivation(@RequestBody UserActivationDto dto) {
+        emailService.sendMessageOfActivation(dto);
         return ResponseEntity.ok().build();
     }
 }

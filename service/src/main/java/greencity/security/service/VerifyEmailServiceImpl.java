@@ -53,7 +53,7 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
             return false;
         }
 
-        user.setUserStatus(UserStatus.ACTIVATED);
+        user.setUserStatus(UserStatus.VERIFIED);
         user = userRepo.save(user);
 
         userService.createGreenCityUser(user.getId(), null);

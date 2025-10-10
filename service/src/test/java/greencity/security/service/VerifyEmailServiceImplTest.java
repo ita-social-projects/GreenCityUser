@@ -99,7 +99,7 @@ class VerifyEmailServiceImplTest {
 
         assertEquals(expectedResult, actualResult);
         verify(greenCityRemoteClient).createUbsProfile(ubsProfile);
-        verify(mockUser, never()).setUserStatus(UserStatus.ACTIVATED);
+        verify(mockUser, never()).setUserStatus(UserStatus.VERIFIED);
         verify(userRepo, never()).save(any(User.class));
         verify(verifyEmailRepo, never()).deleteByTokenAndUserId(token, userId);
     }

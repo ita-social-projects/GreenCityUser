@@ -1,5 +1,6 @@
 package greencity.security.service;
 
+import greencity.enums.ProjectName;
 import greencity.security.dto.SuccessSignInDto;
 
 /**
@@ -16,5 +17,5 @@ public interface GoogleSecurityService {
      * @param token {@link String} - Google id token.
      * @return {@link SuccessSignInDto} if token valid
      */
-    SuccessSignInDto authenticate(String token, String language);
+    SuccessSignInDto authenticate(String token, String language, ProjectName projectName);
 }

@@ -23,7 +23,7 @@ class UserManagementUpdateDtoTest {
         var dto = UserManagementUpdateDto.builder()
             .name(name)
             .email("test@gmail.com")
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.VERIFIED)
             .role(Role.ROLE_USER)
             .build();
 
@@ -43,7 +43,7 @@ class UserManagementUpdateDtoTest {
         var dto = UserManagementUpdateDto.builder()
             .name(name)
             .email("test@gmail.com")
-            .userStatus(UserStatus.ACTIVATED)
+            .userStatus(UserStatus.VERIFIED)
             .role(Role.ROLE_USER)
             .build();
 

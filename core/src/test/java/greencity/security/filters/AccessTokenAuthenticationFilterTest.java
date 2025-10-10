@@ -1,6 +1,6 @@
 package greencity.security.filters;
 
-import greencity.dto.user.UserVO;
+import greencity.dto.user.UserVOShort;
 import greencity.security.jwt.JwtTool;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,7 +11,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Optional;
 import nl.altindag.log.LogCaptor;
 import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -72,8 +71,8 @@ class AccessTokenAuthenticationFilterTest {
         when(jwtTool.getTokenFromHttpServletRequest(request)).thenReturn("SuperSecretAccessToken");
         when(authenticationManager.authenticate(any()))
             .thenReturn(new UsernamePasswordAuthenticationToken("test@mail.com", null));
-        when(userService.findNotDeactivatedByEmail("test@mail.com"))
-            .thenReturn(Optional.of(UserVO.builder().id(1L).build()));
+        when(userService.findByEmailShort("test@mail.com"))
+            .thenReturn(UserVOShort.builder().id(1L).build());
         doNothing().when(chain).doFilter(request, response);
 
         authenticationFilter.doFilterInternal(request, response, chain);
@@ -98,7 +97,7 @@ class AccessTokenAuthenticationFilterTest {
         when(jwtTool.getTokenFromHttpServletRequest(request)).thenReturn(token);
         when(authenticationManager.authenticate(any()))
             .thenReturn(new UsernamePasswordAuthenticationToken("test@mail.com", null));
-        when(userService.findNotDeactivatedByEmailReduced("test@mail.com")).thenThrow(RuntimeException.class);
+        when(userService.findByEmailShort("test@mail.com")).thenThrow(RuntimeException.class);
         authenticationFilter.doFilterInternal(request, response, chain);
         assertTrue(logCaptor.getInfoLogs().stream()
             .anyMatch(s -> s.contains("Access denied during token authentication")));

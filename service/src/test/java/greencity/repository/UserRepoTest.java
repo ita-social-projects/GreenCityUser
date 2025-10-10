@@ -5,7 +5,6 @@ import greencity.entity.User;
 import greencity.enums.EmailNotification;
 import static greencity.enums.EmailNotification.DISABLED;
 import static greencity.enums.EmailNotification.IMMEDIATELY;
-import greencity.enums.UserStatus;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -19,7 +18,6 @@ import static org.mockito.ArgumentMatchers.any;
 import org.mockito.Mock;
 import static org.mockito.Mockito.anyLong;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,14 +81,6 @@ class UserRepoTest {
     }
 
     @Test
-    void findNotDeactivatedByEmailTest() {
-        when(userRepo.findNotDeactivatedByEmail("test@email.com")).thenReturn(Optional.of(ModelUtils.getUser()));
-        User actual = userRepo.findNotDeactivatedByEmail("test@email.com").get();
-        assertEquals(1L, actual.getId());
-        verify(userRepo).findNotDeactivatedByEmail("test@email.com");
-    }
-
-    @Test
     void findAllByEmailNotificationTest() {
         User user = ModelUtils.getUser();
         user.setEmailNotification(EmailNotification.MONTHLY);
@@ -115,48 +105,6 @@ class UserRepoTest {
         assertEquals("test2@email.com", disabled.getFirst().getEmail());
         verify(userRepo).findAllByEmailNotification(EmailNotification.DISABLED);
         verify(userRepo, times(1)).findAllByEmailNotification(EmailNotification.IMMEDIATELY);
-    }
-
-    @Test
-    void countAllByUserStatusTest() {
-        Long expected = 8L;
-        when(userRepo.countAllByUserStatus(any())).thenReturn(expected);
-        Long actual = userRepo.countAllByUserStatus(UserStatus.ACTIVATED);
-        assertEquals(expected, actual);
-        verify(userRepo).countAllByUserStatus(UserStatus.ACTIVATED);
-    }
-
-    @Test
-    void deactivateSelectedUsersTest() {
-        List<Long> ids = Arrays.asList(1L, 2L, 3L);
-
-        doNothing().when(userRepo).deactivateSelectedUsers(ids);
-
-        userRepo.deactivateSelectedUsers(ids);
-
-        verify(userRepo).deactivateSelectedUsers(ids);
-
-        User deactivatedUser1 = new User();
-        deactivatedUser1.setUserStatus(UserStatus.DEACTIVATED);
-
-        User deactivatedUser2 = new User();
-        deactivatedUser2.setUserStatus(UserStatus.DEACTIVATED);
-
-        User activatedUser3 = new User();
-        activatedUser3.setUserStatus(UserStatus.ACTIVATED);
-
-        when(userRepo.findByEmail("test@email.com")).thenReturn(Optional.of(deactivatedUser1));
-        when(userRepo.findByEmail("test2@email.com")).thenReturn(Optional.of(deactivatedUser2));
-        when(userRepo.findByEmail("test3@email.com")).thenReturn(Optional.of(activatedUser3));
-
-        assertEquals(UserStatus.DEACTIVATED.toString(),
-            userRepo.findByEmail("test@email.com").get().getUserStatus().toString());
-        assertEquals(UserStatus.DEACTIVATED.toString(),
-            userRepo.findByEmail("test2@email.com").get().getUserStatus().toString());
-        assertEquals(UserStatus.ACTIVATED.toString(),
-            userRepo.findByEmail("test3@email.com").get().getUserStatus().toString());
-        verify(userRepo).deactivateSelectedUsers(ids);
-        verify(userRepo, times(3)).findByEmail(anyString());
     }
 
     @Test

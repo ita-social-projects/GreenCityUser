@@ -75,6 +75,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
         if (!form.getPassword().equals(form.getConfirmPassword())) {
             throw new BadRequestException(ErrorMessage.PASSWORDS_DO_NOT_MATCH);
         }
+
         User user = restorePasswordEmail.getUser();
         UserStatus userStatus = restorePasswordEmail.getUser().getUserStatus();
         if (isNotExpired(restorePasswordEmail.getExpiryDate())) {
@@ -93,7 +94,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             throw new UserActivationEmailTokenExpiredException(ErrorMessage.LINK_IS_NO_ACTIVE);
         }
         if (userStatus == UserStatus.CREATED) {
-            restorePasswordEmail.getUser().setUserStatus(UserStatus.ACTIVATED);
+            restorePasswordEmail.getUser().setUserStatus(UserStatus.VERIFIED);
         }
     }
 
