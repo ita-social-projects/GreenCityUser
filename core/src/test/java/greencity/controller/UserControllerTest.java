@@ -79,6 +79,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -379,7 +380,7 @@ class UserControllerTest {
     void deleteUserProfilePictureTest() throws Exception {
         Principal principal = mock(Principal.class);
         when(principal.getName()).thenReturn("test@email.com");
-        mockMvc.perform(patch(userLink + "/deleteProfilePicture")
+        mockMvc.perform(delete(userLink + "/deleteProfilePicture")
             .principal(principal))
             .andExpect(status().isOk());
 

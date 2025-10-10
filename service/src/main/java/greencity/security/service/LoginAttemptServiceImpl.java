@@ -11,10 +11,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class LoginAttemptServiceImpl implements LoginAttemptService {
     private final LoadingCache<String, Integer> attemptsByWrongPasswordCache;
-    @Value("${bruteForceSettings.maxAttempts}")
+    @Value("${security.brute-force.max-attempts}")
     private int maxAttempt;
 
-    public LoginAttemptServiceImpl(@Value("${bruteForceSettings.blockTimeInMinutes}") int blockTimeInMinutes) {
+    public LoginAttemptServiceImpl(@Value("${security.brute-force.block-time-minutes}") int blockTimeInMinutes) {
         this.attemptsByWrongPasswordCache = CacheBuilder.newBuilder()
             .expireAfterWrite(blockTimeInMinutes, TimeUnit.MINUTES)
             .build(new CacheLoader<>() {

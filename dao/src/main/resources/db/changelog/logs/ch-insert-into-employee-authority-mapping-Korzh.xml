@@ -136,4 +136,11 @@
             <column name="user_id" value="2"/>
         </insert>
     </changeSet>
+
+    <changeSet id="map-settings-authority-to-user" author="BohdanLys">
+        <insert tableName="employee_authorities_mapping">
+            <column name="authority_id" value="35"/>
+            <column name="user_id" value="2"/>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

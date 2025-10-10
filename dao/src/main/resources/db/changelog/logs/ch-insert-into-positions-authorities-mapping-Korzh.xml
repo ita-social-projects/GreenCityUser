@@ -365,4 +365,11 @@
                 ON CONFLICT (position_id, authorities_id) DO NOTHING;
         </sql>
     </changeSet>
+
+    <changeSet id="map-new-authority-to-super-admin" author="BohdanLys">
+        <insert tableName="positions_authorities_mapping">
+            <column name="position_id">6</column>
+            <column name="authorities_id">35</column>
+        </insert>
+    </changeSet>
 </databaseChangeLog>

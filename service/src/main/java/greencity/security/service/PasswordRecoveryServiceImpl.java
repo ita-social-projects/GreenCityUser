@@ -46,7 +46,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final JwtTool jwtTool;
     private final EmailService emailService;
-    @Value("${verifyEmailTimeHour}")
+    @Value("${security.jwt.verify-email.expiration-hours}")
     private Integer tokenExpirationTimeInHours;
 
     /**

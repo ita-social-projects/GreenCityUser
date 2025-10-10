@@ -46,9 +46,9 @@ public class JwtTool {
      */
     @Autowired
     public JwtTool(
-        @Value("${accessTokenValidTimeInMinutes}") Integer accessTokenValidTimeInMinutes,
-        @Value("${refreshTokenValidTimeInMinutes}") Integer refreshTokenValidTimeInMinutes,
-        @Value("${tokenKey}") String accessTokenKey,
+        @Value("${security.jwt.access-token.expiration-minutes}") Integer accessTokenValidTimeInMinutes,
+        @Value("${security.jwt.refresh-token.expiration-minutes}") Integer refreshTokenValidTimeInMinutes,
+        @Value("${security.jwt.secret-key}") String accessTokenKey,
         AuthorityService authorityService,
         JwtService jwtService) {
         this.accessTokenValidTimeInMinutes = accessTokenValidTimeInMinutes;

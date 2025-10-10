@@ -321,4 +321,21 @@
             </update>
         </rollback>
     </changeSet>
+
+    <changeSet id="add-new-authority-category-settings" author="BohdanLys">
+        <insert tableName="authority_category">
+            <column name="id" valueNumeric="10"/>
+            <column name="name_en" value="Settings"/>
+            <column name="name_uk" value="Налаштування"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="map-new-authority-to-category-settings" author="BohdanLys">
+        <update tableName="employee_authorities">
+            <column name="category_id" valueNumeric="10"/>
+            <column name="description_en" value="System settings"/>
+            <column name="description_uk" value="Налаштуванням системи"/>
+            <where>name = 'SETTINGS_MANAGEMENT'</where>
+        </update>
+    </changeSet>
 </databaseChangeLog>
