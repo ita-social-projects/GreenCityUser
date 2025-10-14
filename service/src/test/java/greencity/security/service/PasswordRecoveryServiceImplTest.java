@@ -10,7 +10,9 @@ import static greencity.ModelUtils.TEST_USER;
 
 import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
+import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.exception.exceptions.WrongEmailException;
@@ -63,6 +65,16 @@ class PasswordRecoveryServiceImplTest {
         boolean isUbs = false;
         when(userRepo.findByEmail(email)).thenReturn(empty());
         assertThrows(NotFoundException.class,
+            () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs));
+    }
+
+    @Test
+    void sendPasswordRecoveryEmailToNotVerifiedUserTest() {
+        String email = "foo";
+        boolean isUbs = false;
+        when(userRepo.findByEmail(email)).thenReturn(Optional.of(
+            User.builder().userStatus(UserStatus.CREATED).build()));
+        assertThrows(BadUserStatusException.class,
             () -> passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs));
     }
 
