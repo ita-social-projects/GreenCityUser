@@ -6,6 +6,7 @@ import greencity.entity.RestorePasswordEmail;
 import greencity.entity.User;
 import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.exception.exceptions.WrongEmailException;
@@ -57,6 +58,10 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     public void sendPasswordRecoveryEmailTo(String email, boolean isUbs) {
         User user = userRepo.findByEmail(email)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
+        if (user.getUserStatus() == UserStatus.CREATED) {
+            throw new BadUserStatusException(ErrorMessage.USER_CREATED);
+        }
+
         RestorePasswordEmail restorePasswordEmail = user.getRestorePasswordEmail();
         if (restorePasswordEmail != null) {
             throw new WrongEmailException(ErrorMessage.PASSWORD_RESTORE_LINK_ALREADY_SENT + email);
