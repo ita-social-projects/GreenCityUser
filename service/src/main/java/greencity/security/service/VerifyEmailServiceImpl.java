@@ -36,7 +36,7 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
             .orElseThrow(() -> new NotFoundException(ErrorMessage.VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED));
         User user = verifyEmail.getUser();
 
-        ownSecurityService.createUserProfiles(user.getId());
+        ownSecurityService.createExternalUserProfiles(user.getId());
         user.setUserStatus(UserStatus.VERIFIED);
         userRepo.save(user);
         verifyEmailRepo.deleteByTokenAndUserId(token, userId);

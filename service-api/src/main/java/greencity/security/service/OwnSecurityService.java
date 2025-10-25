@@ -44,7 +44,7 @@ public interface OwnSecurityService {
      * @param userId a value of {@link Long}
      * @throws UserProfileCreationException if user external profile wasn't created
      */
-    void createUserProfiles(Long userId);
+    void createExternalUserProfiles(Long userId);
 
     /**
      * Method that allow you sign-in user.

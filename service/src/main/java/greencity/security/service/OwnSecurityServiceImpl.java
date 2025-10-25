@@ -195,7 +195,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         try {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());
-            createUserProfiles(savedUser.getId());
+            createExternalUserProfiles(savedUser.getId());
             emailService.sendCreateNewPasswordForEmployee(savedUser.getId(), savedUser.getFirstName(),
                 employee.getEmail(), savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
@@ -205,8 +205,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return new SuccessSignUpDto(employee.getId(), employee.getName(), employee.getEmail(), true);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void createUserProfiles(Long userId) {
+    public void createExternalUserProfiles(Long userId) {
         User user = userRepo.findById(userId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
 
