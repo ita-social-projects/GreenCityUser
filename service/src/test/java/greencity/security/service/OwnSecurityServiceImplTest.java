@@ -666,10 +666,8 @@ class OwnSecurityServiceImplTest {
                 new RuntimeException("Connection refused"),
                 HttpMethod.POST,
                 URI.create("http://external-service"),
-                HttpHeaders.EMPTY
-            ), "WebClientRequestException"),
+                HttpHeaders.EMPTY), "WebClientRequestException"),
             Arguments.of(new GreenCityServiceException("Green City service error"),
-                "GreenCityServiceException")
-        );
+                "GreenCityServiceException"));
     }
 }

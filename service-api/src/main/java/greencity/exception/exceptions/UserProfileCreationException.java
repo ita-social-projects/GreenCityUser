@@ -3,7 +3,7 @@ package greencity.exception.exceptions;
 import lombok.experimental.StandardException;
 
 /**
- * Exception thrown when user profile in external service wasn't created
+ * Exception thrown when user profile in external service wasn't created.
  *
  * @author Rostyslav Zadyraichuk
  */
