@@ -1,25 +1,19 @@
 package greencity.security.service;
 
-import greencity.client.GreenCityRemoteClient;
 import greencity.constant.AppConstant;
 import greencity.constant.ErrorMessage;
-import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.entity.User;
 import greencity.entity.VerifyEmail;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.GreenCityServiceException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.repository.UserRepo;
 import greencity.security.repository.VerifyEmailRepo;
 import java.util.List;
-import greencity.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 /**
  * The class provides implementation of the {@code VerifyEmailService}.
@@ -31,9 +25,7 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 public class VerifyEmailServiceImpl implements VerifyEmailService {
     private final VerifyEmailRepo verifyEmailRepo;
     private final UserRepo userRepo;
-    private final ModelMapper modelMapper;
-    private final UserService userService;
-    private final GreenCityRemoteClient greenCityRemoteClient;
+    private final OwnSecurityService ownSecurityService;
 
     /**
      * {@inheritDoc}
@@ -42,25 +34,14 @@ public class VerifyEmailServiceImpl implements VerifyEmailService {
     public Boolean verifyByToken(Long userId, String token) {
         VerifyEmail verifyEmail = verifyEmailRepo.findByTokenAndUserId(token, userId)
             .orElseThrow(() -> new NotFoundException(ErrorMessage.VERIFICATION_TOKEN_NOT_FOUND_OR_EXPIRED));
-
         User user = verifyEmail.getUser();
-        try {
-            Long ubsProfileId = greenCityRemoteClient.createUbsProfile(modelMapper.map(user,
-                UbsProfileCreationDto.class));
-            log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId, user.getUuid());
-        } catch (WebClientRequestException | GreenCityServiceException e) {
-            log.warn("Ubs profile has not been created for user with uuid {}.", user.getUuid());
-            return false;
-        }
 
+        ownSecurityService.createUserProfiles(user.getId());
         user.setUserStatus(UserStatus.VERIFIED);
-        user = userRepo.save(user);
-
-        userService.createGreenCityUser(user.getId(), null);
-
+        userRepo.save(user);
         verifyEmailRepo.deleteByTokenAndUserId(token, userId);
-        log.info("User has successfully verify the email by token {}.", token);
 
+        log.info("User has successfully verified the email by token {}.", token);
         return true;
     }
 
