@@ -186,7 +186,12 @@ public class SecurityConfig {
                     "/management/socialnetworkimages/get-all-remote",
                     "/management/socialnetworkimages/find",
                     "/ownSecurity/authorities/categories",
-                    "/ownSecurity/authorities/by-category")
+                    "/ownSecurity/authorities/by-category",
+                    "/user/findByUuid/external")
+                .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
+                .requestMatchers(HttpMethod.POST,
+                    "/email/sendReasonOfDeactivation",
+                    "/email/sendMessageOfActivation")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
                     "/user/to-do-list-items/{userToDoListItemId}",
@@ -215,8 +220,6 @@ public class SecurityConfig {
                     "/email/sendReport",
                     "/email/sendHabitNotification",
                     "/email/sendInterestingEcoNews",
-                    "/email/sendReasonOfDeactivation",
-                    "/email/sendMessageOfActivation",
                     "/management/socialnetworkimages/save-remote",
                     "/user-notification-preference/search",
                     FILES + "/single")
@@ -234,8 +237,7 @@ public class SecurityConfig {
                     "/user/roles-distribution",
                     "/user/findByEmailAdvanced",
                     "/user/isOnline",
-                    "/user/greencity/lang",
-                    "/user/findByUuid/external")
+                    "/user/greencity/lang")
                 .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.DELETE,
                     "/management/socialnetworkimages/delete",
