@@ -638,22 +638,23 @@ class OwnSecurityServiceImplTest {
 
     @ParameterizedTest
     @MethodSource("provideExceptions")
-    void createExternalUserProfilesWhenServiceUnavailableTest(RuntimeException exception) throws Exception {
+    void createExternalUserProfilesWhenServiceUnavailableTest(RuntimeException exception) {
         User user = ModelUtils.getUser();
+        Long userId = user.getId();
         UbsProfileCreationDto ubsProfileDto = ModelUtils.getUbsProfileCreationDto();
 
         when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(ubsProfileDto);
-        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+        when(userRepo.findById(userId)).thenReturn(Optional.of(user));
         when(greenCityRemoteClient.createUbsProfile(ubsProfileDto)).thenThrow(exception);
 
         UserProfileCreationException result = assertThrows(UserProfileCreationException.class,
-            () -> ownSecurityService.createExternalUserProfiles(user.getId()));
+            () -> ownSecurityService.createExternalUserProfiles(userId));
 
         String expectedMessage = String.format("Ubs profile has not been created for user with uuid %s.",
             user.getUuid());
         assertEquals(expectedMessage, result.getMessage());
 
-        verify(userRepo).findById(user.getId());
+        verify(userRepo).findById(userId);
         verify(modelMapper).map(user, UbsProfileCreationDto.class);
         verify(greenCityRemoteClient).createUbsProfile(ubsProfileDto);
         verify(userRepo).delete(user);
