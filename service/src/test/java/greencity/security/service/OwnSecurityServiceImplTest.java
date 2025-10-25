@@ -3,45 +3,83 @@ package greencity.security.service;
 import greencity.ModelUtils;
 import greencity.TestConst;
 import greencity.client.CloudFlareClient;
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
 import greencity.dto.ownsecurity.OwnSecurityVO;
 import greencity.dto.security.CloudFlareRequest;
 import greencity.dto.security.CloudFlareResponse;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementCreateDto;
 import greencity.dto.user.UserVO;
 import greencity.dto.verifyemail.VerifyEmailVO;
-import greencity.entity.*;
+import greencity.entity.Language;
+import greencity.entity.User;
 import greencity.enums.ProjectName;
 import greencity.enums.Role;
 import greencity.enums.UserStatus;
-import greencity.exception.exceptions.*;
+import greencity.exception.exceptions.BadRefreshTokenException;
+import greencity.exception.exceptions.BadRequestException;
+import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.GreenCityServiceException;
+import greencity.exception.exceptions.NotFoundException;
+import greencity.exception.exceptions.PasswordsDoNotMatchesException;
+import greencity.exception.exceptions.UserAlreadyHasPasswordException;
+import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserProfileCreationException;
+import greencity.exception.exceptions.WrongEmailException;
+import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
-import greencity.security.dto.ownsecurity.*;
+import greencity.security.dto.ownsecurity.EmployeeSignUpDto;
+import greencity.security.dto.ownsecurity.OwnSignInDto;
+import greencity.security.dto.ownsecurity.OwnSignUpDto;
+import greencity.security.dto.ownsecurity.SetPasswordDto;
+import greencity.security.dto.ownsecurity.TestersSignInRequest;
+import greencity.security.dto.ownsecurity.UpdatePasswordDto;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
 import greencity.security.repository.RestorePasswordEmailRepo;
 import greencity.service.EmailService;
 import greencity.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.refEq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -83,6 +121,9 @@ class OwnSecurityServiceImplTest {
     @Mock
     CloudFlareClient cloudFlareClient;
 
+    @Mock
+    GreenCityRemoteClient greenCityRemoteClient;
+
     OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -97,7 +138,7 @@ class OwnSecurityServiceImplTest {
     void init() {
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo,
-            loginAttemptService);
+            loginAttemptService, greenCityRemoteClient);
 
         ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
         ReflectionTestUtils.setField(ownSecurityService, "secretKey", "secret-key");
@@ -173,12 +214,13 @@ class OwnSecurityServiceImplTest {
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
         when(userRepo.save(any(User.class))).thenReturn(user);
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn("New-token-key");
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(modelMapper, times(2)).map(any(), any());
+        verify(modelMapper, times(3)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
         verify(jwtTool, times(1)).generateTokenKey();
@@ -194,13 +236,14 @@ class OwnSecurityServiceImplTest {
 
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn("New-token-key");
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(modelMapper, times(2)).map(any(), any());
+        verify(modelMapper, times(3)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
         verify(jwtTool, times(1)).generateTokenKey();
@@ -216,13 +259,14 @@ class OwnSecurityServiceImplTest {
 
         when(modelMapper.map(any(User.class), eq(UserVO.class))).thenReturn(userVO);
         when(modelMapper.map(any(EmployeeSignUpDto.class), eq(OwnSignUpDto.class))).thenReturn(ownSignUpDto);
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepo.save(any(User.class))).thenReturn(user);
         when(jwtTool.generateTokenKey()).thenReturn("New-token-key");
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn("New-token-key");
 
         ownSecurityService.signUpEmployee(employeeSignUpDto, "en");
 
-        verify(modelMapper, times(2)).map(any(), any());
+        verify(modelMapper, times(3)).map(any(), any());
         verify(userRepo).save(any());
         verify(jwtTool, times(1)).generateTokenKeyWithCodedDate();
         verify(jwtTool, times(1)).generateTokenKey();
@@ -558,5 +602,74 @@ class OwnSecurityServiceImplTest {
 
         verify(userService).findByEmail(anyString());
         verify(passwordEncoder).matches(anyString(), anyString());
+    }
+
+    @Test
+    void createExternalUserProfilesTest() {
+        User user = ModelUtils.getUser();
+        UbsProfileCreationDto ubsProfileDto = ModelUtils.getUbsProfileCreationDto();
+
+        when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(ubsProfileDto);
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+        when(greenCityRemoteClient.createUbsProfile(ubsProfileDto)).thenReturn(1L);
+
+        ownSecurityService.createExternalUserProfiles(user.getId());
+
+        verify(userRepo).findById(user.getId());
+        verify(modelMapper).map(user, UbsProfileCreationDto.class);
+        verify(greenCityRemoteClient).createUbsProfile(ubsProfileDto);
+        verify(userService).createGreenCityUser(user.getId(), null);
+        verify(userRepo, never()).delete(any(User.class));
+    }
+
+    @Test
+    void createExternalUserProfilesWhenUserNotFoundTest() {
+        Long userId = 999L;
+
+        when(userRepo.findById(userId)).thenReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class,
+            () -> ownSecurityService.createExternalUserProfiles(userId));
+
+        verify(userRepo).findById(userId);
+        verify(greenCityRemoteClient, never()).createUbsProfile(any());
+        verify(userService, never()).createGreenCityUser(anyLong(), any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideExceptions")
+    void createExternalUserProfilesWhenServiceUnavailableTest(RuntimeException exception) throws Exception {
+        User user = ModelUtils.getUser();
+        UbsProfileCreationDto ubsProfileDto = ModelUtils.getUbsProfileCreationDto();
+
+        when(modelMapper.map(user, UbsProfileCreationDto.class)).thenReturn(ubsProfileDto);
+        when(userRepo.findById(user.getId())).thenReturn(Optional.of(user));
+        when(greenCityRemoteClient.createUbsProfile(ubsProfileDto)).thenThrow(exception);
+
+        UserProfileCreationException result = assertThrows(UserProfileCreationException.class,
+            () -> ownSecurityService.createExternalUserProfiles(user.getId()));
+
+        String expectedMessage = String.format("Ubs profile has not been created for user with uuid %s.",
+            user.getUuid());
+        assertEquals(expectedMessage, result.getMessage());
+
+        verify(userRepo).findById(user.getId());
+        verify(modelMapper).map(user, UbsProfileCreationDto.class);
+        verify(greenCityRemoteClient).createUbsProfile(ubsProfileDto);
+        verify(userRepo).delete(user);
+        verify(userService, never()).createGreenCityUser(anyLong(), any());
+    }
+
+    private static Stream<Arguments> provideExceptions() {
+        return Stream.of(
+            Arguments.of(new WebClientRequestException(
+                new RuntimeException("Connection refused"),
+                HttpMethod.POST,
+                URI.create("http://external-service"),
+                HttpHeaders.EMPTY
+            ), "WebClientRequestException"),
+            Arguments.of(new GreenCityServiceException("Green City service error"),
+                "GreenCityServiceException")
+        );
     }
 }
