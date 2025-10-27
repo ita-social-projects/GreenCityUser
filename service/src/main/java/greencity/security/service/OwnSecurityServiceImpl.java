@@ -1,6 +1,8 @@
 package greencity.security.service;
 
+import greencity.client.GreenCityRemoteClient;
 import greencity.constant.ErrorMessage;
+import greencity.dto.ubs.UbsProfileCreationDto;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementCreateDto;
 import greencity.dto.user.UserVO;
@@ -20,10 +22,12 @@ import greencity.enums.UserStatus;
 import greencity.exception.exceptions.BadRefreshTokenException;
 import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.EmailNotVerified;
+import greencity.exception.exceptions.GreenCityServiceException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.PasswordsDoNotMatchesException;
 import greencity.exception.exceptions.UserAlreadyHasPasswordException;
 import greencity.exception.exceptions.UserAlreadyRegisteredException;
+import greencity.exception.exceptions.UserProfileCreationException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
 import greencity.repository.AuthorityRepo;
@@ -62,6 +66,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 
 /**
  * The class provides implementation of the {@code OwnSecurityService}.
@@ -83,6 +88,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final EmailService emailService;
     private final AuthorityRepo authorityRepo;
     private final LoginAttemptService loginAttemptService;
+    private final GreenCityRemoteClient greenCityRemoteClient;
     @Value("${security.jwt.verify-email.expiration-hours}")
     private Integer expirationTime;
     @Value("${security.brute-force.block-time-minutes}")
@@ -166,6 +172,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     /**
      * {@inheritDoc}
      */
+    @Override
     public SuccessSignUpDto signUpEmployee(EmployeeSignUpDto employeeSignUpDto, String language) {
         String password = generatePassword();
         employeeSignUpDto.setPassword(password);
@@ -183,10 +190,12 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             .toList();
         employee.setAuthorities(authorityRepo.findAuthoritiesByPositions(positionNames));
         employee.setPositions(positionRepo.findPositionsByNames(positionNames));
+        employee.setUserStatus(UserStatus.VERIFIED);
 
         try {
             User savedUser = userRepo.save(employee);
             employee.setId(savedUser.getId());
+            createExternalUserProfiles(savedUser.getId());
             emailService.sendCreateNewPasswordForEmployee(savedUser.getId(), savedUser.getFirstName(),
                 employee.getEmail(), savedUser.getRestorePasswordEmail().getToken(), language, dto.isUbs());
         } catch (DataIntegrityViolationException e) {
@@ -196,9 +205,27 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         return new SuccessSignUpDto(employee.getId(), employee.getName(), employee.getEmail(), true);
     }
 
-    private LocalDateTime calculateExpirationDateTime() {
-        LocalDateTime now = LocalDateTime.now();
-        return now.plusHours(this.expirationTime);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createExternalUserProfiles(Long userId) {
+        User user = userRepo.findById(userId)
+            .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_ID + userId));
+
+        try {
+            Long ubsProfileId = greenCityRemoteClient.createUbsProfile(modelMapper.map(user,
+                UbsProfileCreationDto.class));
+            log.info("Ubs profile with id {} has been created for user with uuid {}.", ubsProfileId, user.getUuid());
+        } catch (WebClientRequestException | GreenCityServiceException e) {
+            userRepo.delete(user);
+            String exceptionMessage = String.format("Ubs profile has not been created for user with uuid %s.",
+                user.getUuid());
+            log.warn(exceptionMessage);
+            throw new UserProfileCreationException(exceptionMessage);
+        }
+
+        userService.createGreenCityUser(user.getId(), null);
     }
 
     /**
@@ -219,6 +246,11 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
         }
 
         return createSuccessSignInResponse(user, email);
+    }
+
+    private LocalDateTime calculateExpirationDateTime() {
+        LocalDateTime now = LocalDateTime.now();
+        return now.plusHours(this.expirationTime);
     }
 
     private UserVO validateUser(final String email) {

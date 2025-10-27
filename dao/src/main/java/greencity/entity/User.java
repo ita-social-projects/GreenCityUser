@@ -92,7 +92,7 @@ public class User {
     @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private VerifyEmail verifyEmail;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     private RestorePasswordEmail restorePasswordEmail;
 
     @Enumerated(value = EnumType.ORDINAL)

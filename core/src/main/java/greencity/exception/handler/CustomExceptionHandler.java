@@ -495,4 +495,12 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(exceptionResponse);
     }
+
+    @ExceptionHandler({UserProfileCreationException.class})
+    public ResponseEntity<ExceptionResponse> handleUserProfileCreationException(UserProfileCreationException ex,
+        WebRequest request) {
+        log.info(ex.getMessage());
+        ExceptionResponse exceptionResponse = new ExceptionResponse(getErrorAttributes(request));
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(exceptionResponse);
+    }
 }
