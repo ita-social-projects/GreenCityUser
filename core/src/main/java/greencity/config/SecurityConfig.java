@@ -108,6 +108,7 @@ public class SecurityConfig {
                     "/swagger-ui/index.html",
                     "/swagger-ui/**",
                     "/swagger-resources/**",
+                    "/actuator/prometheus",
                     "/webjars/**")
                 .permitAll()
                 .requestMatchers(HttpMethod.GET,
