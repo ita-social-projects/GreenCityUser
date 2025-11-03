@@ -3,6 +3,7 @@ package greencity.security.service;
 import greencity.dto.user.UserAdminRegistrationDto;
 import greencity.dto.user.UserManagementCreateDto;
 import greencity.enums.ProjectName;
+import greencity.exception.exceptions.UserProfileCreationException;
 import greencity.security.dto.AccessRefreshTokensDto;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.SuccessSignUpDto;
@@ -36,6 +37,14 @@ public interface OwnSecurityService {
      * @return {@link SuccessSignUpDto}
      */
     SuccessSignUpDto signUpEmployee(EmployeeSignUpDto dto, String language);
+
+    /**
+     * Method that allows you to create user UBS and GreenCity profiles.
+     *
+     * @param userId a value of {@link Long}
+     * @throws UserProfileCreationException if user external profile wasn't created
+     */
+    void createExternalUserProfiles(Long userId);
 
     /**
      * Method that allow you sign-in user.
