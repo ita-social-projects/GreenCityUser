@@ -38,4 +38,5 @@
     <include file="db/changelog/logs/ch-update-users-remove-profile_picture-column-Zadyraichuk.xml"/>
     <include file="db/changelog/logs/ch-update-users-change-user-status-column-Zadyraichuk.xml"/>
     <include file="db/changelog/logs/ch-drop-deactivation_reason-table-Zadyraichuk.xml"/>
+    <include file="db/changelog/logs/ch-update-positions-names-Rakuta.xml"/>
 </databaseChangeLog>
