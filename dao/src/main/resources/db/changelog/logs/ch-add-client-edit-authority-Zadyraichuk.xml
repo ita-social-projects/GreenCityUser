@@ -19,4 +19,11 @@
             <column name="authorities_id">36</column>
         </insert>
     </changeSet>
+
+    <changeSet id="updatePickupEmployeeWithNewAuthorityZadyraichuk" author="Rostyslav Zadyraichuk">
+        <insert tableName="employee_authorities_mapping">
+            <column name="user_id">2</column>
+            <column name="authority_id">36</column>
+        </insert>
+    </changeSet>
 </databaseChangeLog>
