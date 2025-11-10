@@ -40,4 +40,5 @@
     <include file="db/changelog/logs/ch-drop-deactivation_reason-table-Zadyraichuk.xml"/>
     <include file="db/changelog/logs/ch-update-positions-names-Rakuta.xml"/>
     <include file="db/changelog/logs/ch-insert-into-employee-authority-mapping-Rakuta.xml"/>
+    <include file="db/changelog/logs/ch-add-client-edit-authority-Zadyraichuk.xml"/>
 </databaseChangeLog>
