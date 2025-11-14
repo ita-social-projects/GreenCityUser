@@ -1,5 +1,6 @@
 package greencity.service;
 
+import static greencity.enums.SubscriptionType.ECO_NEWS;
 import greencity.constant.EmailConstants;
 import greencity.constant.ErrorMessage;
 import greencity.constant.LogMessage;
@@ -14,6 +15,8 @@ import greencity.exception.exceptions.NotFoundException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
+import greencity.properties.EmailProperties;
+import greencity.properties.RemoteWebClientProperties;
 import greencity.repository.UserRepo;
 import greencity.validator.EmailAddressValidator;
 import jakarta.mail.MessagingException;
@@ -26,14 +29,12 @@ import java.util.concurrent.Executor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
-import static greencity.enums.SubscriptionType.ECO_NEWS;
 
 /**
  * {@inheritDoc}
@@ -42,16 +43,14 @@ import static greencity.enums.SubscriptionType.ECO_NEWS;
 @Service
 public class EmailServiceImpl implements EmailService {
     private static final String UNBLOCK_ACCOUNT_URL = "/auth/unblock?token=";
+    private static final String PARAM_USER_ID = "&user_id=";
     private final JavaMailSender javaMailSender;
     private final ITemplateEngine templateEngine;
     private final Executor executor;
-    private final String clientLink;
-    private final String senderEmailAddress;
-    private final String greenOfficeEmailAddress;
-    private final String tgBotFeedbacksEmailAddress;
     private final MessageSource messageSource;
-    private static final String PARAM_USER_ID = "&user_id=";
     private final UserRepo userRepo;
+    private final EmailProperties emailProperties;
+    private final RemoteWebClientProperties remoteWebClientProperties;
 
     /**
      * Constructor.
@@ -60,21 +59,27 @@ public class EmailServiceImpl implements EmailService {
     public EmailServiceImpl(JavaMailSender javaMailSender,
         ITemplateEngine templateEngine,
         @Qualifier("sendEmailExecutor") Executor executor,
-        @Value("${client.address}") String clientLink,
-        @Value("${contacts.sender.email-address}") String senderEmailAddress,
-        @Value("${contacts.greenoffice.email-address}") String greenOfficeEmailAddress,
-        @Value("${contacts.tgbot.feedbacks-email-address}") String tgBotFeedbacksEmailAddress,
         MessageSource messageSource,
-        UserRepo userRepo) {
+        UserRepo userRepo,
+        EmailProperties emailProperties,
+        RemoteWebClientProperties remoteWebClientProperties) {
         this.javaMailSender = javaMailSender;
         this.templateEngine = templateEngine;
         this.executor = executor;
-        this.clientLink = clientLink;
-        this.senderEmailAddress = senderEmailAddress;
-        this.greenOfficeEmailAddress = greenOfficeEmailAddress;
-        this.tgBotFeedbacksEmailAddress = tgBotFeedbacksEmailAddress;
         this.messageSource = messageSource;
         this.userRepo = userRepo;
+        this.emailProperties = emailProperties;
+        this.remoteWebClientProperties = remoteWebClientProperties;
+    }
+
+    private static Locale getLocale(String language) {
+        if (language == null || language.equals("en")) {
+            return Locale.ENGLISH;
+        } else if (language.equals("uk")) {
+            return Locale.of("uk", "UA");
+        } else {
+            throw new IllegalStateException("Unexpected value: " + language);
+        }
     }
 
     /**
@@ -85,7 +90,7 @@ public class EmailServiceImpl implements EmailService {
         log.info(LogMessage.IN_SEND_ADDED_NEW_PLACES_REPORT_EMAIL, message.getSubscribers(),
             message.getCategoriesDtoWithPlacesDtoMap(), message.getPeriodicity());
         Map<String, Object> sharedModel = new HashMap<>();
-        sharedModel.put(EmailConstants.CLIENT_LINK, clientLink);
+        sharedModel.put(EmailConstants.CLIENT_LINK, remoteWebClientProperties.getClientAddress());
         sharedModel.put(EmailConstants.RESULT, message.getCategoriesDtoWithPlacesDtoMap());
         sharedModel.put(EmailConstants.REPORT_TYPE, message.getPeriodicity().name());
 
@@ -106,11 +111,11 @@ public class EmailServiceImpl implements EmailService {
     public void sendInterestingEcoNews(InterestingEcoNewsDto interestingEcoNews) {
         Map<String, Object> sharedModel = new HashMap<>();
         sharedModel.put(EmailConstants.ECO_NEWS_LIST, interestingEcoNews.getEcoNewsList());
-        sharedModel.put(EmailConstants.CLIENT_LINK, clientLink);
+        sharedModel.put(EmailConstants.CLIENT_LINK, remoteWebClientProperties.getClientAddress());
 
         for (SubscriberDto subscriber : interestingEcoNews.getSubscribers()) {
             Map<String, Object> model = new HashMap<>(sharedModel);
-            model.put(EmailConstants.UNSUBSCRIBE_LINK, clientLink + "/#/unsubscribe"
+            model.put(EmailConstants.UNSUBSCRIBE_LINK, remoteWebClientProperties.getClientAddress() + "/#/unsubscribe"
                 + "?token=" + subscriber.getUnsubscribeToken() + "&type=" + ECO_NEWS);
             model.put(EmailConstants.USER_NAME, subscriber.getName());
             model.put(EmailConstants.LANGUAGE, subscriber.getLanguage());
@@ -129,8 +134,9 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
         model.put(EmailConstants.USER_NAME, name);
-        model.put(EmailConstants.VERIFY_ADDRESS, clientLink + "/#" + (isUbs ? "/ubs" : "") + "?token=" + token
-            + PARAM_USER_ID + id);
+        model.put(EmailConstants.VERIFY_ADDRESS,
+            remoteWebClientProperties.getClientAddress() + "/#" + (isUbs ? "/ubs" : "") + "?token=" + token
+                + PARAM_USER_ID + id);
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
         String template = createEmailTemplate(model, EmailConstants.VERIFY_EMAIL_PAGE);
@@ -144,10 +150,11 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendApprovalEmail(Long userId, String name, String email, String token) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.CLIENT_LINK, remoteWebClientProperties.getClientAddress());
         model.put(EmailConstants.USER_NAME, name);
-        model.put(EmailConstants.APPROVE_REGISTRATION, clientLink + "/#/auth/restore?" + "token=" + token
-            + PARAM_USER_ID + userId);
+        model.put(EmailConstants.APPROVE_REGISTRATION,
+            remoteWebClientProperties.getClientAddress() + "/#/auth/restore?" + "token=" + token
+                + PARAM_USER_ID + userId);
         String template = createEmailTemplate(model, EmailConstants.USER_APPROVAL_EMAIL_PAGE);
         sendEmail(email, EmailConstants.APPROVE_REGISTRATION_SUBJECT, template);
     }
@@ -180,7 +187,7 @@ public class EmailServiceImpl implements EmailService {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
-            mimeMessageHelper.setFrom(senderEmailAddress);
+            mimeMessageHelper.setFrom(emailProperties.getSenderEmailAddress());
             mimeMessageHelper.setTo(receiverEmail);
             mimeMessageHelper.setSubject(subject);
             mimeMessageHelper.setText(content, true);
@@ -206,7 +213,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendReasonOfDeactivation(UserDeactivationReasonDto userDeactivationDto) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.CLIENT_LINK, remoteWebClientProperties.getClientAddress());
         model.put(EmailConstants.USER_NAME, userDeactivationDto.getName());
         model.put(EmailConstants.REASON, userDeactivationDto.getDeactivationReason());
         model.put(EmailConstants.LANGUAGE, userDeactivationDto.getLang());
@@ -221,7 +228,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendMessageOfActivation(UserActivationDto userActivationDto) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.CLIENT_LINK, remoteWebClientProperties.getClientAddress());
         model.put(EmailConstants.USER_NAME, userActivationDto.getName());
         model.put(EmailConstants.LANGUAGE, userActivationDto.getLang());
         String template = createEmailTemplate(model, EmailConstants.ACTIVATION_PAGE);
@@ -235,7 +242,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendUserViolationEmail(UserViolationMailDto dto) {
         Map<String, Object> model = new HashMap<>();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.CLIENT_LINK, remoteWebClientProperties.getClientAddress());
         model.put(EmailConstants.USER_NAME, dto.getName());
         model.put(EmailConstants.DESCRIPTION, dto.getViolationDescription());
         model.put(EmailConstants.LANGUAGE, dto.getLanguage());
@@ -257,16 +264,6 @@ public class EmailServiceImpl implements EmailService {
         String template = createEmailTemplate(model, EmailConstants.SUCCESS_RESTORED_PASSWORD_PAGE);
         sendEmail(email, messageSource.getMessage(EmailConstants.RESTORED_PASSWORD, null,
             getLocale(language)), template);
-    }
-
-    private static Locale getLocale(String language) {
-        if (language == null || language.equals("en")) {
-            return Locale.ENGLISH;
-        } else if (language.equals("uk")) {
-            return Locale.of("uk", "UA");
-        } else {
-            throw new IllegalStateException("Unexpected value: " + language);
-        }
     }
 
     /**
@@ -321,7 +318,8 @@ public class EmailServiceImpl implements EmailService {
 
     @Override
     public void sendBlockAccountNotificationWithUnblockLinkEmail(Long userId, String userFistName,
-        String userEmail, String token, String language, boolean isUbs) {
+        String userEmail, String token, String language,
+        boolean isUbs) {
         Map<String, Object> modelForRestorePassword = buildModelForUnblockAccount(userFistName, token, language, isUbs);
 
         String template = createEmailTemplate(modelForRestorePassword, EmailConstants.BLOCKED_USER_PAGE);
@@ -345,8 +343,9 @@ public class EmailServiceImpl implements EmailService {
         Map<String, Object> model = new HashMap<>();
         model.put(EmailConstants.CLIENT_LINK, getClientLinkByIsUbs(isUbs));
         model.put(EmailConstants.USER_NAME, name);
-        model.put(EmailConstants.RESTORE_PASS, clientLink + "/#" + (isUbs ? "/ubs" : "") + "/auth/restore?"
-            + "token=" + token + PARAM_USER_ID + userId);
+        model.put(EmailConstants.RESTORE_PASS,
+            remoteWebClientProperties.getClientAddress() + "/#" + (isUbs ? "/ubs" : "") + "/auth/restore?"
+                + "token=" + token + PARAM_USER_ID + userId);
         model.put(EmailConstants.IS_UBS, isUbs);
         model.put(EmailConstants.LANGUAGE, language);
         return model;
@@ -359,7 +358,7 @@ public class EmailServiceImpl implements EmailService {
         User user = userRepo.findByEmail(userEmail)
             .orElseThrow(() -> new RuntimeException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + userEmail));
         String userLanguageCode = user.getLanguage().getCode();
-        model.put(EmailConstants.CLIENT_LINK, clientLink);
+        model.put(EmailConstants.CLIENT_LINK, remoteWebClientProperties.getClientAddress());
         model.put(EmailConstants.USER_NAME, dto.getUserName());
         model.put(EmailConstants.PLACE_NAME, dto.getPlaceName());
         model.put(EmailConstants.PLACE_STATUS, dto.getNewStatus().name());
@@ -380,7 +379,7 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.BODY, message.getBody());
 
         String template = createEmailTemplate(model, EmailConstants.GREEN_OFFICE_REQUEST_PAGE);
-        sendEmail(greenOfficeEmailAddress, message.getSubject(), template);
+        sendEmail(emailProperties.getGreenCityOfficeEmailAddress(), message.getSubject(), template);
     }
 
     @Override
@@ -392,14 +391,14 @@ public class EmailServiceImpl implements EmailService {
         model.put(EmailConstants.COMMENT, dto.getComment());
 
         String template = createEmailTemplate(model, EmailConstants.TELEGRAM_FEEDBACK);
-        sendEmail(tgBotFeedbacksEmailAddress, dto.getSubject(), template);
+        sendEmail(emailProperties.getTelegramFeedbackEmailAddress(), dto.getSubject(), template);
     }
 
     private String getClientLinkByIsUbs(boolean isUbs) {
-        return clientLink + "/#" + (isUbs ? "/ubs" : "/greenCity");
+        return remoteWebClientProperties.getClientAddress() + "/#" + (isUbs ? "/ubs" : "/greenCity");
     }
 
     private String getProfileLink() {
-        return clientLink + "/#/profile";
+        return remoteWebClientProperties.getClientAddress() + "/#/profile";
     }
 }
