@@ -5,6 +5,7 @@ import static greencity.constant.AppConstant.ROLE;
 import greencity.constant.AppConstant;
 import greencity.dto.user.UserVO;
 import greencity.enums.Role;
+import greencity.properties.SecurityProperties;
 import greencity.security.service.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -24,12 +25,14 @@ import org.mockito.Mock;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 /**
  * @author Yurii Koval
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class JwtToolTest {
     private final String expectedEmail = "test@gmail.com";
     private final Role expectedRole = Role.ROLE_USER;
@@ -41,14 +44,17 @@ class JwtToolTest {
     @Mock
     JwtService jwtService;
 
+    @Mock
+    SecurityProperties securityProperties;
+
     @InjectMocks
     private JwtTool jwtTool;
 
     @BeforeEach
     void init() {
-        ReflectionTestUtils.setField(jwtTool, "accessTokenValidTimeInMinutes", 15);
-        ReflectionTestUtils.setField(jwtTool, "refreshTokenValidTimeInMinutes", 15);
-        ReflectionTestUtils.setField(jwtTool, "accessTokenKey", "123123123123123123123123123123123123");
+        when(securityProperties.getAccessTokenExpiration()).thenReturn(15);
+        when(securityProperties.getRefreshTokenExpiration()).thenReturn(15);
+        when(securityProperties.getAccessTokenKey()).thenReturn("123123123123123123123123123123123123");
     }
 
     @Test
