@@ -3,20 +3,20 @@ package greencity.security.service;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import greencity.properties.SecurityProperties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LoginAttemptServiceImpl implements LoginAttemptService {
     private final LoadingCache<String, Integer> attemptsByWrongPasswordCache;
-    @Value("${security.brute-force.max-attempts}")
-    private int maxAttempt;
+    private SecurityProperties securityProperties;
 
-    public LoginAttemptServiceImpl(@Value("${security.brute-force.block-time-minutes}") int blockTimeInMinutes) {
+    public LoginAttemptServiceImpl(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
         this.attemptsByWrongPasswordCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(blockTimeInMinutes, TimeUnit.MINUTES)
+            .expireAfterWrite(securityProperties.getBruteForceBlockTime(), TimeUnit.MINUTES)
             .build(new CacheLoader<>() {
                 @Override
                 public Integer load(final String key) {
@@ -39,7 +39,7 @@ public class LoginAttemptServiceImpl implements LoginAttemptService {
     @Override
     public boolean isBlockedByWrongPassword(String email) {
         try {
-            return attemptsByWrongPasswordCache.get(email) >= maxAttempt;
+            return attemptsByWrongPasswordCache.get(email) >= securityProperties.getBruteForceMaxAttempts();
         } catch (final ExecutionException e) {
             return false;
         }
