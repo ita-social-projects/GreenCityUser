@@ -35,6 +35,8 @@ import greencity.exception.exceptions.WrongEmailException;
 import greencity.message.PlaceStatusChangeDto;
 import greencity.message.ScheduledEmailMessage;
 import greencity.message.SendReportEmailMessage;
+import greencity.properties.EmailProperties;
+import greencity.properties.RemoteWebClientProperties;
 import greencity.repository.UserRepo;
 import jakarta.mail.Session;
 import jakarta.mail.internet.MimeMessage;
@@ -72,6 +74,10 @@ class EmailServiceImplTest {
     MessageSource messageSource;
     @Mock
     UserRepo userRepo;
+    @Mock
+    EmailProperties emailProperties;
+    @Mock
+    RemoteWebClientProperties remoteWebClientProperties;
 
     private static Locale getLocale(String language) {
         return switch (language) {
@@ -87,14 +93,16 @@ class EmailServiceImplTest {
             javaMailSender,
             templateEngine,
             Executors.newCachedThreadPool(),
-            "http://localhost:4200",
-            "test@email.com",
-            "test@email.com",
-            "test@email.com",
             messageSource,
-            userRepo);
+            userRepo,
+            emailProperties,
+            remoteWebClientProperties);
         when(javaMailSender.createMimeMessage()).thenReturn(new MimeMessage((Session) null));
         when(templateEngine.process(any(String.class), any(Context.class))).thenReturn("<html></html>");
+        when(remoteWebClientProperties.getClientAddress()).thenReturn("http://localhost:4200");
+        when(emailProperties.getSenderEmailAddress()).thenReturn("test@email.com");
+        when(emailProperties.getGreenCityOfficeEmailAddress()).thenReturn("test@email.com");
+        when(emailProperties.getTelegramFeedbackEmailAddress()).thenReturn("test@email.com");
     }
 
     @Test

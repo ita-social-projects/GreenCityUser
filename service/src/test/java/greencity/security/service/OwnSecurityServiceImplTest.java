@@ -29,6 +29,7 @@ import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.UserProfileCreationException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
+import greencity.properties.SecurityProperties;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
@@ -64,7 +65,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -124,6 +124,9 @@ class OwnSecurityServiceImplTest {
     @Mock
     GreenCityRemoteClient greenCityRemoteClient;
 
+    @Mock
+    SecurityProperties securityProperties;
+
     OwnSecurityService ownSecurityService;
 
     private UserVO verifiedUser;
@@ -138,10 +141,11 @@ class OwnSecurityServiceImplTest {
     void init() {
         ownSecurityService = new OwnSecurityServiceImpl(ownSecurityRepo, positionRepo, userService, passwordEncoder,
             jwtTool, restorePasswordEmailRepo, modelMapper, userRepo, emailService, authorityRepo,
-            loginAttemptService, greenCityRemoteClient);
+            loginAttemptService, greenCityRemoteClient, securityProperties);
 
-        ReflectionTestUtils.setField(ownSecurityService, "expirationTime", 1);
-        ReflectionTestUtils.setField(ownSecurityService, "secretKey", "secret-key");
+        when(securityProperties.getVerifyEmailExpiration()).thenReturn(1);
+        when(securityProperties.getAccessTokenKey()).thenReturn("secret-key");
+        when(securityProperties.getTesterSignInToken()).thenReturn("secret-key");
 
         verifiedUser = UserVO.builder()
             .email("test@gmail.com")

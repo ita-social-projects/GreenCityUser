@@ -9,11 +9,12 @@ import greencity.exception.exceptions.BadRequestException;
 import greencity.exception.exceptions.ErrorParsingException;
 import greencity.exception.exceptions.GreenCityServiceException;
 import greencity.exception.exceptions.NotFoundException;
+import greencity.properties.EmailProperties;
+import greencity.properties.RemoteWebClientProperties;
 import greencity.security.jwt.JwtTool;
 import io.netty.channel.ChannelOption;
 import java.net.URI;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -37,27 +38,14 @@ public class GreenCityRemoteWebClientConfig {
     private static final String EMAIL_QUERY_PARAMETER = "email";
     private static final String PLUS_SYMBOL = "+";
     private static final String ENCODED_PLUS_SYMBOL = "%2B";
-
-    @Value("${greencity.server.address}")
-    private String greenCityBaseUrl;
-
-    @Value("${greencityubs.server.address}")
-    private String greenCityUbsBaseUrl;
-
-    @Value("${contacts.authorization.system-email-address}")
-    private String systemEmail;
-
-    @Value("${webclient.connection-timeout-millis}")
-    private Integer connectionTimeoutMillis;
-
-    @Value("${webclient.response-timeout-millis}")
-    private Integer responseTimeoutMillis;
+    private final RemoteWebClientProperties remoteWebClientProperties;
+    private final EmailProperties emailProperties;
 
     private final JwtTool jwtTool;
 
     @Bean("greenCityWebClient")
     public WebClient webClient(WebClient.Builder builder) {
-        return builder.baseUrl(greenCityBaseUrl)
+        return builder.baseUrl(remoteWebClientProperties.getGreencityServerAddress())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .filter(authorizationHeaderFilter())
             .filter(handlingWebClientExceptions())
@@ -65,14 +53,14 @@ public class GreenCityRemoteWebClientConfig {
             .clientConnector(
                 new ReactorClientHttpConnector(
                     HttpClient.create()
-                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
-                        .responseTimeout(Duration.ofMillis(responseTimeoutMillis))))
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, remoteWebClientProperties.getConnectionTimeout())
+                        .responseTimeout(Duration.ofMillis(remoteWebClientProperties.getResponseTimeout()))))
             .build();
     }
 
     @Bean("greenCityUbsWebClient")
     public WebClient greenCityUbsWebClient(WebClient.Builder builder) {
-        return builder.baseUrl(greenCityUbsBaseUrl)
+        return builder.baseUrl(remoteWebClientProperties.getGreencityUbsServerAddress())
             .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
             .filter(authorizationHeaderFilterForGreenCityUbs())
             .filter(handlingWebClientExceptions())
@@ -80,8 +68,8 @@ public class GreenCityRemoteWebClientConfig {
             .clientConnector(
                 new ReactorClientHttpConnector(
                     HttpClient.create()
-                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, connectionTimeoutMillis)
-                        .responseTimeout(Duration.ofMillis(responseTimeoutMillis))))
+                        .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, remoteWebClientProperties.getConnectionTimeout())
+                        .responseTimeout(Duration.ofMillis(remoteWebClientProperties.getResponseTimeout()))))
             .build();
     }
 
@@ -89,7 +77,7 @@ public class GreenCityRemoteWebClientConfig {
         List<Role> roles = List.of(Role.ROLE_USER, Role.ROLE_ADMIN);
 
         return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-            String jwt = jwtTool.createAccessToken(systemEmail, roles);
+            String jwt = jwtTool.createAccessToken(emailProperties.getSystemEmailAddress(), roles);
             String authHeader = AppConstant.TOKEN_PREFIX + jwt;
 
             ClientRequest authorizedRequest = ClientRequest.from(clientRequest)
@@ -104,7 +92,7 @@ public class GreenCityRemoteWebClientConfig {
         List<Role> roles = List.of(Role.ROLE_USER, Role.ROLE_EMPLOYEE, Role.ROLE_UBS_EMPLOYEE);
 
         return ExchangeFilterFunction.ofRequestProcessor(clientRequest -> {
-            String jwt = jwtTool.createAccessToken(systemEmail, roles);
+            String jwt = jwtTool.createAccessToken(emailProperties.getSystemEmailAddress(), roles);
             String authHeader = AppConstant.TOKEN_PREFIX + jwt;
 
             ClientRequest authorizedRequest = ClientRequest.from(clientRequest)

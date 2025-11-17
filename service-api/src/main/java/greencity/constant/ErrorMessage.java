@@ -62,4 +62,23 @@ public class ErrorMessage {
         "Can`t convert To Multipart Image. Bad inputted image string : ";
     public static final String PARSING_URL_FAILED = "Can't parse image's url: ";
     public static final String AUTHORITY_CATEGORY_NOT_FOUND = "The authority category does not exist by this id: %s";
+    public static final String ACCESS_TOKEN_EXPIRATION_NOT_SET = "access token expiration not set.";
+    public static final String REFRESH_TOKEN_EXPIRATION_NOT_SET = "refresh token expiration not set.";
+    public static final String ACCESS_TOKEN_NOT_SET = "access token key not set.";
+    public static final String VERIFY_EMAIL_EXPIRATION_NOT_SET = "verify email expiration not set.";
+    public static final String BRUTEFORCE_MAX_ATTEMPTS_NOT_SET = "security bruteforce max attempts not set.";
+    public static final String BRUTEFORCE_BLOCK_TIME_NOT_SET = "security bruteforce block time not set.";
+    public static final String TESTER_SIGN_IN_TOKEN_NOT_SET = "tester signin token not set.";
+    public static final String GREENCITY_SERVER_ADDRESS_NOT_SET = "greencity server address not set.";
+    public static final String GREENCITY_UBS_SERVER_ADDRESS_NOT_SET = "greencity ubs server address not set.";
+    public static final String WEBCLIENT_CONNECTION_TIMEOUT_NOT_SET = "webclient connection timeout not set.";
+    public static final String WEBCLIENT_RESPONSE_TIMEOUT_NOT_SET = "webclient response timeout not set.";
+    public static final String CLIENT_ADDRESS_NOT_SET = "client address not set.";
+    public static final String AZURE_CONNECTION_STRING_NOT_SET = "azure connection string not set.";
+    public static final String AZURE_CONTAINER_NAME_NOT_SET = "azure container name not set.";
+    public static final String GOOGLE_API_KEY_NOT_SET = "google api key not set.";
+    public static final String SENDER_EMAIL_ADDRESS_NOT_SET = "sender email address not set.";
+    public static final String GREENCITY_OFFICE_EMAIL_ADDRESS_NOT_SET = "greencity office email address not set.";
+    public static final String TELEGRAM_EMAIL_ADDRESS_NOT_SET = "telegram email address not set.";
+    public static final String SYSTEM_EMAIL_ADDRESS_NOT_SET = "system email address not set.";
 }

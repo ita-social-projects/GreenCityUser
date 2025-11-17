@@ -4,6 +4,8 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import greencity.client.config.GreenCityRemoteWebClientConfig;
+import greencity.properties.EmailProperties;
+import greencity.properties.RemoteWebClientProperties;
 import greencity.security.jwt.JwtTool;
 import java.io.IOException;
 import okhttp3.mockwebserver.MockResponse;
@@ -17,13 +19,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class GreenCityRemoteWebClientConfigTest {
+    @Mock
+    private RemoteWebClientProperties remoteWebClientProperties;
+    @Mock
+    private EmailProperties emailProperties;
+
     static MockWebServer mockWebServer;
 
     @Mock
@@ -50,10 +60,11 @@ class GreenCityRemoteWebClientConfigTest {
         when(jwtTool.createAccessToken(anyString(), anyList()))
             .thenReturn("mocked-jwt-token");
 
-        setField(config, "greenCityBaseUrl", mockWebServer.url("/").toString());
-        setField(config, "systemEmail", "test@greencity.com");
-        setField(config, "connectionTimeoutMillis", 1000);
-        setField(config, "responseTimeoutMillis", 1000);
+        when(emailProperties.getSystemEmailAddress()).thenReturn("test@greencity.com");
+        when(remoteWebClientProperties.getConnectionTimeout()).thenReturn(1000);
+        when(remoteWebClientProperties.getResponseTimeout()).thenReturn(1000);
+        when(remoteWebClientProperties.getGreencityServerAddress())
+            .thenReturn(mockWebServer.url("/").toString());
 
         webClient = config.webClient(WebClient.builder());
     }
@@ -128,15 +139,5 @@ class GreenCityRemoteWebClientConfigTest {
         String response = webClient.get().uri("/").retrieve().bodyToMono(String.class).block();
 
         Assertions.assertEquals("Success", response);
-    }
-
-    private void setField(Object target, String name, Object value) {
-        try {
-            var field = target.getClass().getDeclaredField(name);
-            field.setAccessible(true);
-            field.set(target, value);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

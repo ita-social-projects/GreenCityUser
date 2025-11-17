@@ -131,5 +131,5 @@ stages:
                 chartType: 'FilePath'
                 chartPath: '$(System.ArtifactsDirectory)/drop/greencity-user-chart'
                 releaseName: 'user'
-                overrideValues: 'ingress.hostname=greencity-user.pick-up.city,deployment.image=skyere/greencityuser:$(Build.BuildId),externalSecret.tenantId=20002ba7-39e2-4b00-adc3-3926758f2008,externalSecret.vaultUrl=https://greencity-values.vault.azure.net'
+                overrideValues: 'ingress.hostname=greencity-user.pick-up.city,deployment.image=skyere/greencityuser:$(Build.BuildId)'
                 arguments: '--debug'

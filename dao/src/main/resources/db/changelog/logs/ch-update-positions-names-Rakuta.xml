@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="rename-positions-names" author="AnastasiaRakuta">
+        <update tableName="positions">
+            <column name="name_uk" value="Менеджер"/>
+            <where>name_uk = 'Менеджер обдзвону'</where>
+        </update>
+        <update tableName="positions">
+            <column name="name_en" value="Manager"/>
+            <where>name_en ='Call Manager'</where>
+        </update>
+    </changeSet>
+</databaseChangeLog>

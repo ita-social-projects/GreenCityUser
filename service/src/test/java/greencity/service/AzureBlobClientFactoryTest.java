@@ -1,20 +1,25 @@
 package greencity.service;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import greencity.properties.AzureProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class AzureBlobClientFactoryTest {
+    @Mock
+    private AzureProperties azureProperties;
+
     @Test
     void getContainerClient_doesNotThrow() {
-        AzureBlobClientFactory factory = new AzureBlobClientFactory();
+        AzureBlobClientFactory factory = new AzureBlobClientFactory(azureProperties);
 
-        ReflectionTestUtils.setField(factory, "connectionString",
+        when(azureProperties.getAzureConnectionString()).thenReturn(
             "DefaultEndpointsProtocol=https;AccountName=fake;AccountKey=fakeKey;EndpointSuffix=core.windows.net");
-        ReflectionTestUtils.setField(factory, "containerName", "test-container");
+        when(azureProperties.getAzureContainerName()).thenReturn("test-container");
 
         assertDoesNotThrow(factory::getContainerClient);
     }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet id="addClientEditAuthorityZadyraichuk" author="Rostyslav Zadyraichuk">
+        <insert tableName="employee_authorities">
+            <column name="id">36</column>
+            <column name="name">EDIT_CLIENT</column>
+            <column name="category_id">1</column>
+            <column name="description_en">Edit a client</column>
+            <column name="description_uk">Редагування клієнта</column>
+        </insert>
+        <insert tableName="positions_authorities_mapping">
+            <column name="position_id">6</column>
+            <column name="authorities_id">36</column>
+        </insert>
+        <insert tableName="positions_authorities_mapping">
+            <column name="position_id">7</column>
+            <column name="authorities_id">36</column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="updatePickupEmployeeWithNewAuthorityZadyraichuk" author="Rostyslav Zadyraichuk">
+        <insert tableName="employee_authorities_mapping">
+            <column name="user_id">2</column>
+            <column name="authority_id">36</column>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
