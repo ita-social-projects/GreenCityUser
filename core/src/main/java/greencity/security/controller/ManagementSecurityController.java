@@ -1,6 +1,7 @@
 package greencity.security.controller;
 
 import greencity.exception.exceptions.*;
+import greencity.properties.RemoteWebClientProperties;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.service.OwnSecurityService;
@@ -8,7 +9,6 @@ import greencity.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -26,8 +26,7 @@ public class ManagementSecurityController {
     private static final String MANAGEMENT_LOGIN_PAGE = "core/management_login";
     private final OwnSecurityService service;
     private final UserService userService;
-    @Value("${greencity.server.address}")
-    private String greenCityServerAddress;
+    private final RemoteWebClientProperties remoteWebClientProperties;
 
     /**
      * Controller returns view for management log in.
@@ -83,6 +82,7 @@ public class ManagementSecurityController {
             return MANAGEMENT_LOGIN_PAGE;
         }
 
-        return "redirect:" + greenCityServerAddress + "/token?accessToken=" + result.getAccessToken();
+        return "redirect:" + remoteWebClientProperties.getGreencityServerAddress() + "/token?accessToken="
+            + result.getAccessToken();
     }
 }

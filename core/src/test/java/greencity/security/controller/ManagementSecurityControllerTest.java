@@ -7,6 +7,7 @@ import greencity.exception.exceptions.LowRoleLevelException;
 import greencity.exception.exceptions.UserDeactivatedException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
+import greencity.properties.RemoteWebClientProperties;
 import greencity.security.dto.SuccessSignInDto;
 import greencity.security.dto.ownsecurity.OwnSignInDto;
 import greencity.security.service.OwnSecurityService;
@@ -46,6 +47,9 @@ class ManagementSecurityControllerTest {
 
     @Mock
     BindingResult bindingResult;
+
+    @Mock
+    private RemoteWebClientProperties remoteWebClientProperties;
 
     @BeforeEach
     void setUp() {

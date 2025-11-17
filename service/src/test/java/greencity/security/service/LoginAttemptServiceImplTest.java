@@ -1,6 +1,7 @@
 package greencity.security.service;
 
 import com.google.common.cache.LoadingCache;
+import greencity.properties.SecurityProperties;
 import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
@@ -23,6 +24,8 @@ import static org.mockito.Mockito.when;
 class LoginAttemptServiceImplTest {
     @Mock
     private LoadingCache<String, Integer> attemptsByWrongPasswordCache;
+    @Mock
+    private SecurityProperties securityProperties;
     private LoginAttemptServiceImpl loginAttemptService;
 
     @BeforeEach
@@ -31,17 +34,15 @@ class LoginAttemptServiceImplTest {
 
         ConcurrentMap<String, Integer> mockMap = Mockito.mock(ConcurrentMap.class);
         when(attemptsByWrongPasswordCache.asMap()).thenReturn(mockMap);
+        when(securityProperties.getBruteForceBlockTime()).thenReturn(5L);
+        when(securityProperties.getBruteForceMaxAttempts()).thenReturn(3);
 
-        loginAttemptService = new LoginAttemptServiceImpl(5);
+        loginAttemptService = new LoginAttemptServiceImpl(securityProperties);
 
         Field byWrongPasswordCache = LoginAttemptServiceImpl.class
             .getDeclaredField("attemptsByWrongPasswordCache");
         byWrongPasswordCache.setAccessible(true);
         byWrongPasswordCache.set(this.loginAttemptService, this.attemptsByWrongPasswordCache);
-
-        Field maxAttemptField = LoginAttemptServiceImpl.class.getDeclaredField("maxAttempt");
-        maxAttemptField.setAccessible(true);
-        maxAttemptField.set(this.loginAttemptService, 5);
     }
 
     @Test

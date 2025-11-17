@@ -3,19 +3,18 @@ package greencity.service;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
-import org.springframework.beans.factory.annotation.Value;
+import greencity.properties.AzureProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class AzureBlobClientFactory {
-    @Value("${azure.connection.string}")
-    private String connectionString;
-    @Value("${azure.container.name}")
-    private String containerName;
+    private final AzureProperties azureProperties;
 
     public BlobContainerClient getContainerClient() {
         BlobServiceClient serviceClient = new BlobServiceClientBuilder()
-            .connectionString(connectionString).buildClient();
-        return serviceClient.getBlobContainerClient(containerName);
+            .connectionString(azureProperties.getAzureConnectionString()).buildClient();
+        return serviceClient.getBlobContainerClient(azureProperties.getAzureContainerName());
     }
 }
