@@ -30,6 +30,7 @@ import greencity.exception.exceptions.UserAlreadyRegisteredException;
 import greencity.exception.exceptions.UserProfileCreationException;
 import greencity.exception.exceptions.WrongEmailException;
 import greencity.exception.exceptions.WrongPasswordException;
+import greencity.properties.SecurityProperties;
 import greencity.repository.AuthorityRepo;
 import greencity.repository.PositionRepo;
 import greencity.repository.UserRepo;
@@ -61,7 +62,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -89,12 +89,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private final AuthorityRepo authorityRepo;
     private final LoginAttemptService loginAttemptService;
     private final GreenCityRemoteClient greenCityRemoteClient;
-    @Value("${security.jwt.verify-email.expiration-hours}")
-    private Integer expirationTime;
-    @Value("${security.brute-force.block-time-minutes}")
-    private String blockTimeInMinutes;
-    @Value("${testers.sign-in-token}")
-    private String secretKey;
+    private final SecurityProperties securityProperties;
 
     /**
      * {@inheritDoc}
@@ -250,7 +245,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
 
     private LocalDateTime calculateExpirationDateTime() {
         LocalDateTime now = LocalDateTime.now();
-        return now.plusHours(this.expirationTime);
+        return now.plusHours(securityProperties.getVerifyEmailExpiration());
     }
 
     private UserVO validateUser(final String email) {
@@ -271,7 +266,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
     private void handleBruteForceProtection(String email) {
         if (loginAttemptService.isBlockedByWrongPassword(email)) {
             log.error("Too many failed login attempts - {}, account is blocked for {} minutes. Wrong Password", email,
-                blockTimeInMinutes);
+                securityProperties.getBruteForceBlockTime());
 
             User user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(ErrorMessage.USER_NOT_FOUND_BY_EMAIL + email));
@@ -281,7 +276,8 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
                 jwtTool.generateUnblockToken(email), user.getLanguage().getCode(), false);
 
             throw new WrongPasswordException(
-                String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS, blockTimeInMinutes));
+                String.format(ErrorMessage.BRUTEFORCE_PROTECTION_MESSAGE_WRONG_PASS,
+                    securityProperties.getBruteForceBlockTime()));
         }
     }
 
@@ -435,7 +431,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
      * @throws BadRequestException if the provided key is incorrect
      */
     private void validateSecretKey(String key) {
-        if (!secretKey.equals(key)) {
+        if (!securityProperties.getTesterSignInToken().equals(key)) {
             throw new BadRequestException(ErrorMessage.WRONG_SECRET_KEY);
         }
     }
@@ -519,7 +515,7 @@ public class OwnSecurityServiceImpl implements OwnSecurityService {
             RestorePasswordEmail.builder()
                 .user(user)
                 .token(token)
-                .expiryDate(calculateExpirationDate(expirationTime))
+                .expiryDate(calculateExpirationDate(securityProperties.getVerifyEmailExpiration()))
                 .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
         user = userRepo.save(user);

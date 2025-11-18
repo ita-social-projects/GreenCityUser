@@ -16,6 +16,7 @@ import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.exception.exceptions.WrongEmailException;
+import greencity.properties.SecurityProperties;
 import greencity.repository.UserRepo;
 import greencity.security.jwt.JwtTool;
 import greencity.security.repository.OwnSecurityRepo;
@@ -38,7 +39,6 @@ import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class PasswordRecoveryServiceImplTest {
@@ -56,6 +56,8 @@ class PasswordRecoveryServiceImplTest {
     private OwnSecurityRepo ownSecurityRepo;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private SecurityProperties securityProperties;
     @InjectMocks
     private PasswordRecoveryServiceImpl passwordRecoveryService;
 
@@ -97,7 +99,7 @@ class PasswordRecoveryServiceImplTest {
         when(userRepo.findByEmail(email)).thenReturn(Optional.of(user));
         String token = "bar";
         when(jwtTool.generateTokenKeyWithCodedDate()).thenReturn(token);
-        ReflectionTestUtils.setField(passwordRecoveryService, "tokenExpirationTimeInHours", 24);
+        when(securityProperties.getVerifyEmailExpiration()).thenReturn(24);
         passwordRecoveryService.sendPasswordRecoveryEmailTo(email, isUbs);
         verify(restorePasswordEmailRepo).save(refEq(
             RestorePasswordEmail.builder()

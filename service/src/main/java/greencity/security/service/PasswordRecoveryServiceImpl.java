@@ -10,6 +10,7 @@ import greencity.exception.exceptions.BadUserStatusException;
 import greencity.exception.exceptions.NotFoundException;
 import greencity.exception.exceptions.UserActivationEmailTokenExpiredException;
 import greencity.exception.exceptions.WrongEmailException;
+import greencity.properties.SecurityProperties;
 import greencity.repository.UserRepo;
 import greencity.security.dto.ownsecurity.OwnRestoreDto;
 import greencity.security.events.UpdatePasswordEvent;
@@ -23,7 +24,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,8 +47,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
     private final ApplicationEventPublisher applicationEventPublisher;
     private final JwtTool jwtTool;
     private final EmailService emailService;
-    @Value("${security.jwt.verify-email.expiration-hours}")
-    private Integer tokenExpirationTimeInHours;
+    private final SecurityProperties securityProperties;
 
     /**
      * {@inheritDoc}
@@ -115,7 +114,7 @@ public class PasswordRecoveryServiceImpl implements PasswordRecoveryService {
             RestorePasswordEmail.builder()
                 .user(user)
                 .token(token)
-                .expiryDate(calculateExpirationDate(tokenExpirationTimeInHours))
+                .expiryDate(calculateExpirationDate(securityProperties.getVerifyEmailExpiration()))
                 .build();
         restorePasswordEmailRepo.save(restorePasswordEmail);
         emailService.sendRestoreEmail(

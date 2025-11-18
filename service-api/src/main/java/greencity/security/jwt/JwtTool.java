@@ -6,6 +6,7 @@ import static greencity.constant.AppConstant.ROLE;
 import greencity.constant.AppConstant;
 import greencity.dto.user.UserVO;
 import greencity.enums.Role;
+import greencity.properties.SecurityProperties;
 import greencity.security.service.AuthorityService;
 import greencity.security.service.JwtService;
 import io.jsonwebtoken.Claims;
@@ -23,7 +24,6 @@ import java.util.UUID;
 import javax.crypto.SecretKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -35,9 +35,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class JwtTool {
-    private final Integer accessTokenValidTimeInMinutes;
-    private final Integer refreshTokenValidTimeInMinutes;
-    private final String accessTokenKey;
+    private final SecurityProperties securityProperties;
     private final AuthorityService authorityService;
     private final JwtService jwtService;
 
@@ -46,14 +44,10 @@ public class JwtTool {
      */
     @Autowired
     public JwtTool(
-        @Value("${security.jwt.access-token.expiration-minutes}") Integer accessTokenValidTimeInMinutes,
-        @Value("${security.jwt.refresh-token.expiration-minutes}") Integer refreshTokenValidTimeInMinutes,
-        @Value("${security.jwt.secret-key}") String accessTokenKey,
+        SecurityProperties securityProperties,
         AuthorityService authorityService,
         JwtService jwtService) {
-        this.accessTokenValidTimeInMinutes = accessTokenValidTimeInMinutes;
-        this.refreshTokenValidTimeInMinutes = refreshTokenValidTimeInMinutes;
-        this.accessTokenKey = accessTokenKey;
+        this.securityProperties = securityProperties;
         this.authorityService = authorityService;
         this.jwtService = jwtService;
     }
@@ -81,8 +75,9 @@ public class JwtTool {
             claims.add("employee_authorities", authorityService.getAllEmployeesAuthorities(email));
         }
 
-        return createAccessToken(claims.build(), accessTokenKey.getBytes(StandardCharsets.UTF_8),
-            accessTokenValidTimeInMinutes);
+        return createAccessToken(claims.build(),
+            securityProperties.getAccessTokenKey().getBytes(StandardCharsets.UTF_8),
+            securityProperties.getAccessTokenExpiration());
     }
 
     private String createAccessToken(Claims claims, byte[] signature, Integer validTimeMinutes) {
@@ -108,7 +103,7 @@ public class JwtTool {
     public String createRefreshToken(UserVO user) {
         ClaimsBuilder claims = userClaimsBuilder(user.getEmail(), List.of(user.getRole()));
         return createAccessToken(claims.build(), user.getRefreshTokenKey().getBytes(StandardCharsets.UTF_8),
-            refreshTokenValidTimeInMinutes);
+            securityProperties.getRefreshTokenExpiration());
     }
 
     /**
@@ -159,7 +154,7 @@ public class JwtTool {
      * @return accessTokenKey
      */
     public String getAccessTokenKey() {
-        return accessTokenKey;
+        return securityProperties.getAccessTokenKey();
     }
 
     /**
@@ -214,7 +209,7 @@ public class JwtTool {
         return Jwts.builder()
             .claims(claims.build())
             .signWith(Keys.hmacShaKeyFor(
-                accessTokenKey.getBytes(StandardCharsets.UTF_8)),
+                securityProperties.getAccessTokenKey().getBytes(StandardCharsets.UTF_8)),
                 Jwts.SIG.HS256)
             .issuedAt(now)
             .expiration(calendar.getTime())
