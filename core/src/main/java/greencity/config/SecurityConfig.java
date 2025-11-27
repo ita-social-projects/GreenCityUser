@@ -123,7 +123,8 @@ public class SecurityConfig {
                     "/user/checkByUuid",
                     "/user/get-user-rating",
                     COMMIT_INFO,
-                    LOGS_LINKS)
+                    LOGS_LINKS,
+                    EXPORT_SETTINGS_LINKS)
                 .permitAll()
                 .requestMatchers(HttpMethod.POST,
                     "/ownSecurity/signUp",
@@ -155,8 +156,7 @@ public class SecurityConfig {
                     "/ownSecurity/password-status",
                     "/user/emailNotifications",
                     "/lang",
-                    "/lang/**",
-                    EXPORT_SETTINGS_LINKS)
+                    "/lang/**")
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
                     FILES)
