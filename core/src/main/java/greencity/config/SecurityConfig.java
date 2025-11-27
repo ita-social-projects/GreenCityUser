@@ -122,17 +122,14 @@ public class SecurityConfig {
                     "/user/findAllByEmailNotification",
                     "/user/checkByUuid",
                     "/user/get-user-rating",
-                    COMMIT_INFO,
-                    LOGS_LINKS,
-                    EXPORT_SETTINGS_LINKS)
+                    COMMIT_INFO)
                 .permitAll()
                 .requestMatchers(HttpMethod.POST,
                     "/ownSecurity/signUp",
                     "/ownSecurity/signIn",
                     "/ownSecurity/updatePassword",
                     "/ownSecurity/unblockAccount",
-                    "/api/testers/sign-in",
-                    LOGS_LINKS)
+                    "/api/testers/sign-in")
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, "/check-auth").permitAll()
                 .requestMatchers(HttpMethod.GET,
@@ -156,7 +153,9 @@ public class SecurityConfig {
                     "/ownSecurity/password-status",
                     "/user/emailNotifications",
                     "/lang",
-                    "/lang/**")
+                    "/lang/**",
+                    LOGS_LINKS,
+                    EXPORT_SETTINGS_LINKS)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
                     FILES)
@@ -164,7 +163,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, USER_LINK,
                     "/user/to-do-list-items",
                     "/user/{userId}/habit",
-                    "/ownSecurity/set-password")
+                    "/ownSecurity/set-password",
+                    LOGS_LINKS)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PUT,
                     "/ownSecurity/changePassword",
