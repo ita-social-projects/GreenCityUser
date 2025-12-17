@@ -100,6 +100,7 @@ public class SecurityConfig {
                 .requestMatchers("/static/css/**", "/static/img/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/actuator/prometheus").permitAll()
                 .requestMatchers(
                     "/v2/api-docs/**",
                     "/v3/api-docs/**",
