@@ -47,7 +47,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN_USER }}
         run: |
           git fetch --unshallow
-          mvn clean install verify sonar:sonar \
+          mvn clean install sonar:sonar \
             -Dsonar.projectKey=ita-social-projects-green-city-user \
             -Dsonar.organization=ita-social-projects \
             -Dsonar.host.url=https://sonarcloud.io \
