@@ -153,6 +153,7 @@ public class SecurityConfig {
                     "/ownSecurity/password-status",
                     "/user/emailNotifications",
                     "/lang",
+                    "/user/findUserLanguageByUuid",
                     "/lang/**",
                     LOGS_LINKS,
                     EXPORT_SETTINGS_LINKS)
@@ -179,7 +180,6 @@ public class SecurityConfig {
                     "/user/authorities")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
-                    "/user/findUserLanguageByUuid",
                     "/user/get-all-authorities",
                     "/user/get-positions-authorities",
                     "/user/authorities/grouped-by-categories",
