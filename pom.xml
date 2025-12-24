@@ -101,9 +101,7 @@
                 </executions>
                 <configuration>
                     <configLocation>checkstyle.xml</configLocation>
-                    <excludes>
-                        <exclude>**/generated-sources/annotations/**</exclude>
-                    </excludes>
+                    <excludes>**/generated-sources/annotations/**</excludes>
                 </configuration>
             </plugin>
         </plugins>
