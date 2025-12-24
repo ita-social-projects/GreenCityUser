@@ -56,7 +56,7 @@ jobs:
       
       - name: Test Reporter
         #v1.5.0
-        uses: dorny/test-reporter@0d00bb1
+        uses: dorny/test-reporter@0d00bb14cb0cc2c9b8985df6e81dd333188224e1
 
         if: success() || failure()
         with:
@@ -72,14 +72,14 @@ jobs:
 
       - name: Docker Login
         #v2.0.0
-        uses: docker/login-action@49ed152
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push Docker images
         #v3.0.0
-        uses: docker/build-push-action@e551b19
+        uses: docker/build-push-action@e551b19e49efd4e98792db7592c17c09b89db8d8
         with:
           context: .
           file: Dockerfile
@@ -106,7 +106,7 @@ jobs:
       - name: Deploy 🚀
         if: ${{ github.event_name == 'push' }}
         #v3.7.1
-        uses: JamesIves/github-pages-deploy-action@132898c
+        uses: JamesIves/github-pages-deploy-action@132898c54c57c7cc6b80eb3a89968de8fc283505
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages
