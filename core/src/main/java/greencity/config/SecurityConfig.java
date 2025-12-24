@@ -159,6 +159,7 @@ public class SecurityConfig {
                     EXPORT_SETTINGS_LINKS)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
+                    "/email/sendReasonOfDeactivation",
                     FILES)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
@@ -190,7 +191,6 @@ public class SecurityConfig {
                     "/user/findByUuid/external")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
-                    "/email/sendReasonOfDeactivation",
                     "/email/sendMessageOfActivation")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
