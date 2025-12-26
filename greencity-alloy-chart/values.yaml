@@ -7,25 +7,25 @@ alloy:
       valueFrom:
         secretKeyRef:
           name: greencity-secret
-          key: GRAFANA-PROMETHEUS-USERNAME
+          key: GREENCITY-PROMETHEUS-USERNAME
 
     - name: GRAFANA_PROMETHEUS_PASSWORD
       valueFrom:
         secretKeyRef:
           name: greencity-secret
-          key: GRAFANA-PROMETHEUS-PASSWORD
+          key: GREENCITY-PROMETHEUS-PASSWORD
 
     - name: GRAFANA_PROMTAIL_USERNAME
       valueFrom:
         secretKeyRef:
           name: greencity-secret
-          key: GRAFANA-PROMTAIL-USERNAME
+          key: GREENCITY-PROMTAIL-USERNAME
 
     - name: GRAFANA_PROMTAIL_PASSWORD
       valueFrom:
         secretKeyRef:
           name: greencity-secret
-          key: GRAFANA-PROMTAIL-PASSWORD
+          key: GREENCITY-PROMTAIL-PASSWORD
 
   configMap:
     create: true
