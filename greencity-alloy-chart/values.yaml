@@ -1,0 +1,164 @@
+controller:
+  type: daemonset
+
+externalSecret:
+  secretName: greencity-secret
+
+alloy:
+  extraEnv:
+    - name: GRAFANA_PROMETHEUS_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.externalSecret.secretName }}
+          key: GRAFANA-PROMETHEUS-USERNAME
+
+    - name: GRAFANA_PROMETHEUS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.externalSecret.secretName }}
+          key: GRAFANA-PROMETHEUS-PASSWORD
+
+    - name: GRAFANA_PROMTAIL_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.externalSecret.secretName }}
+          key: GRAFANA-PROMTAIL-USERNAME
+
+    - name: GRAFANA_PROMTAIL_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: {{ .Values.externalSecret.secretName }}
+          key: GRAFANA-PROMTAIL-PASSWORD
+
+  configMap:
+    create: true
+    content: |
+      logging {
+        level = "info"
+      }
+
+      discovery.kubernetes "pods" {
+        role = "pod"
+      }
+
+      discovery.relabel "filter" {
+        targets = discovery.kubernetes.pods.targets
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_logs_app"]
+          regex         = "greencity|greencity-ubs|greencity-user"
+          action        = "keep"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_logs_app"]
+          target_label  = "service"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          target_label  = "namespace"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          target_label  = "pod"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          target_label  = "container"
+        }
+      }
+
+      loki.source.kubernetes "logs" {
+        targets    = discovery.relabel.filter.output
+        forward_to = [loki.process.pipeline.receiver]
+      }
+
+      loki.process "pipeline" {
+        forward_to = [loki.write.grafana_cloud.receiver]
+
+        stage.cri {}
+
+        stage.replace {
+          expression = "\\x1b\\[[0-9;]*[A-Za-z]"
+          replace    = ""
+        }
+
+        stage.regex {
+          expression = "^\\[(?P<timestamp>[^\\]]+)\\]\\s+(?P<level>[A-Z]+)\\s+(?P<logger>[^\\s]+)\\s+:\\d+\\s+(?P<message>.+)$"
+        }
+
+        stage.labels {
+          values = {
+            level  = "level",
+            logger = "logger",
+          }
+        }
+
+        stage.output {
+          source = "message"
+        }
+      }
+
+      loki.write "grafana_cloud" {
+        endpoint {
+          url = "https://logs-prod-012.grafana.net/loki/api/v1/push"
+          basic_auth {
+            username = sys.env("GRAFANA_PROMTAIL_USERNAME")
+            password = sys.env("GRAFANA_PROMTAIL_PASSWORD")
+          }
+          batch_wait     = "10s"
+        }
+      }
+      
+      discovery.kubernetes "services" {
+        role = "service"
+      }
+
+      discovery.relabel "metrics_filter" {
+        targets = discovery.kubernetes.services.targets
+
+        rule {
+          source_labels = ["__meta_kubernetes_service_name"]
+          regex         = "greencity-greencity-service|ubs-greencity-ubs-service|user-greencity-user-service"
+          action        = "keep"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_service_name"]
+          target_label  = "application"
+        }
+
+        rule {
+          source_labels = ["__meta_kubernetes_service_name"]
+          target_label  = "service"
+        }
+      }
+
+      prometheus.scrape "greencity_metrics" {
+        targets    = discovery.relabel.metrics_filter.output
+        forward_to = [prometheus.remote_write.grafana_cloud.receiver]
+
+        scrape_interval = "15s"
+        metrics_path    = "/actuator/prometheus"
+      }
+
+      prometheus.remote_write "grafana_cloud" {
+        endpoint {
+          url = "https://prometheus-prod-65-prod-eu-west-2.grafana.net/api/prom/push"
+          basic_auth {
+            username = sys.env("GRAFANA_PROMETHEUS_USERNAME")
+            password = sys.env("GRAFANA_PROMETHEUS_PASSWORD")
+          }
+        }
+      }
+
+resources:
+  requests:
+    cpu: 5m
+    memory: 200Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
