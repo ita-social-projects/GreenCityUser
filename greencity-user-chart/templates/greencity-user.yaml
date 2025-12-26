@@ -15,7 +15,6 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}-greencity-user
-        logs_app: greencity-user
     spec:
       nodeSelector:
         "kubernetes.io/os": linux
