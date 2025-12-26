@@ -33,6 +33,11 @@ stages:
                     helmVersion: '3.9.0'
                     installKubectl: true
 
+                - script: |
+                    helm repo add grafana https://grafana.github.io/helm-charts
+                    helm repo update
+                  displayName: "Add Grafana Helm Repo"
+
                 - task: HelmDeploy@0
                   displayName: Helm upgrade/install Alloy
                   inputs:
