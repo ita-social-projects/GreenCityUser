@@ -22,6 +22,7 @@ In this project Alloy is used to:
 ## 🧩 What is collected?
 
 ### 🔹 Logs
+
 - Kubernetes pod logs
 - Filtered by application labels:
     - `greencity`

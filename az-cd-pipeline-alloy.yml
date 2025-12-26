@@ -40,8 +40,9 @@ stages:
                     kubernetesServiceConnection: 'k8s-stage'
                     namespace: 'default'
                     command: 'upgrade'
-                    chartType: 'FilePath'
-                    chartPath: '$(Build.SourcesDirectory)/greencity-alloy-chart'
+                    install: true
+                    chartType: 'Name'
+                    chartName: 'grafana/alloy'
                     releaseName: 'alloy'
                     valueFile: '$(Build.SourcesDirectory)/greencity-alloy-chart/values.yaml'
                     arguments: '--debug'
