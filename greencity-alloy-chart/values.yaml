@@ -1,30 +1,33 @@
 controller:
   type: daemonset
 
+externalSecret:
+  secretName: greencity-secret
+
 alloy:
   extraEnv:
     - name: GRAFANA_PROMETHEUS_USERNAME
       valueFrom:
         secretKeyRef:
-          name: dev-api-credentials
+          name: {{ .Values.externalSecret.secretName }}
           key: GRAFANA-PROMETHEUS-USERNAME
 
     - name: GRAFANA_PROMETHEUS_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: dev-api-credentials
+          name: {{ .Values.externalSecret.secretName }}
           key: GRAFANA-PROMETHEUS-PASSWORD
 
     - name: GRAFANA_PROMTAIL_USERNAME
       valueFrom:
         secretKeyRef:
-          name: dev-api-credentials
+          name: {{ .Values.externalSecret.secretName }}
           key: GRAFANA-PROMTAIL-USERNAME
 
     - name: GRAFANA_PROMTAIL_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: dev-api-credentials
+          name: {{ .Values.externalSecret.secretName }}
           key: GRAFANA-PROMTAIL-PASSWORD
 
   configMap:

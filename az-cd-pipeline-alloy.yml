@@ -38,7 +38,7 @@ stages:
                   inputs:
                     connectionType: 'Kubernetes Service Connection'
                     kubernetesServiceConnection: 'k8s-stage'
-                    namespace: 'observability'
+                    namespace: 'default'
                     command: 'upgrade'
                     chartType: 'Repo'
                     chartName: 'grafana/alloy'
