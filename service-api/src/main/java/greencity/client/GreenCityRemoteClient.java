@@ -482,6 +482,22 @@ public class GreenCityRemoteClient {
             .block();
     }
 
+    /**
+     * Retrieves a user status from the UBS external service by a given user.
+     *
+     * @param email the user email for which to retrieve the status.
+     * @return the external service user status.
+     */
+    public ServiceUserStatus getUbsUserStatusByEmail(String email) {
+        return greenCityUbsWebClient.get()
+                .uri(uriBuilder -> uriBuilder.path("/ubs/userProfile/user/status/by_email")
+                        .queryParam("email", email)
+                        .build())
+                .retrieve()
+                .bodyToMono(ServiceUserStatus.class)
+                .block();
+    }
+
     private BodyInserters.MultipartInserter multipartInserter(MultipartFile... multipartFiles) {
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
 

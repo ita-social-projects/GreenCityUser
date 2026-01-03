@@ -972,7 +972,7 @@ public class UserServiceImpl implements UserService {
         ServiceUserStatus externalStatus;
         switch (projectName) {
             case GREENCITY -> externalStatus = greenCityRemoteClient.getGreenCityUserStatus(user.getEmail());
-            case PICKUP -> externalStatus = greenCityRemoteClient.getUbsUserStatus(user.getUuid());
+            case PICKUP -> externalStatus = greenCityRemoteClient.getUbsUserStatusByEmail(user.getEmail());
             default -> throw new IllegalArgumentException("Unknown project name: " + projectName);
         }
 
