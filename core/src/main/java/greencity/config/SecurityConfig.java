@@ -133,7 +133,9 @@ public class SecurityConfig {
                     "/api/testers/sign-in")
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, "/check-auth").permitAll()
-                .requestMatchers("/actuator/**").hasAnyRole(ADMIN)
+                .requestMatchers("/actuator/**",
+                    "/metrics")
+                .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.GET,
                     "/user/to-do-list-items/habits/{habitId}/to-do-list",
                     "/user/{userId}/{habitId}/custom-to-do-list-items/available",
