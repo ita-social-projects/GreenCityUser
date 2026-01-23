@@ -1535,7 +1535,7 @@ class UserServiceImplTest {
         testUser.setUserStatus(UserStatus.VERIFIED);
         ServiceUserStatus serviceStatus = ServiceUserStatus.valueOf(status);
 
-        when(greenCityRemoteClient.getUbsUserStatus(any())).thenReturn(serviceStatus);
+        when(greenCityRemoteClient.getUbsUserStatusByEmail(any())).thenReturn(serviceStatus);
 
         assertThrows(BadUserStatusException.class, () -> userService.verifyUserStatus(testUser, ProjectName.PICKUP));
     }
