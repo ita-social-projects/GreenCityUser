@@ -157,11 +157,13 @@ public class SecurityConfig {
                     "/ownSecurity/password-status",
                     "/user/emailNotifications",
                     "/lang",
+                    "/user/findUserLanguageByUuid",
                     "/lang/**",
                     LOGS_LINKS,
                     EXPORT_SETTINGS_LINKS)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
+                    "/email/sendReasonOfDeactivation",
                     FILES)
                 .hasAnyRole(USER, ADMIN, UBS_EMPLOYEE, MODERATOR)
                 .requestMatchers(HttpMethod.POST, USER_LINK,
@@ -183,7 +185,6 @@ public class SecurityConfig {
                     "/user/authorities")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.GET,
-                    "/user/findUserLanguageByUuid",
                     "/user/get-all-authorities",
                     "/user/get-positions-authorities",
                     "/user/authorities/grouped-by-categories",
@@ -194,7 +195,6 @@ public class SecurityConfig {
                     "/user/findByUuid/external")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.POST,
-                    "/email/sendReasonOfDeactivation",
                     "/email/sendMessageOfActivation")
                 .hasAnyRole(ADMIN, UBS_EMPLOYEE, MODERATOR, EMPLOYEE)
                 .requestMatchers(HttpMethod.PATCH,
