@@ -100,6 +100,7 @@ public class SecurityConfig {
                 .requestMatchers("/static/css/**", "/static/img/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/error").permitAll()
+                .requestMatchers("/actuator/prometheus").permitAll()
                 .requestMatchers(
                     "/v2/api-docs/**",
                     "/v3/api-docs/**",
@@ -132,6 +133,9 @@ public class SecurityConfig {
                     "/api/testers/sign-in")
                 .permitAll()
                 .requestMatchers(HttpMethod.GET, "/check-auth").permitAll()
+                .requestMatchers("/actuator/**",
+                    "/metrics")
+                .hasAnyRole(ADMIN)
                 .requestMatchers(HttpMethod.GET,
                     "/user/to-do-list-items/habits/{habitId}/to-do-list",
                     "/user/{userId}/{habitId}/custom-to-do-list-items/available",

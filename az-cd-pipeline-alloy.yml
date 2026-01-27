@@ -1,0 +1,53 @@
+trigger:
+  branches:
+    include:
+      - dev
+      - master
+  paths:
+    include:
+      - greencity-alloy-chart/**
+
+pr: none
+
+pool:
+  vmImage: ubuntu-latest
+
+
+stages:
+  - stage: Deploy
+    displayName: Deploy Grafana Alloy
+    jobs:
+      - deployment: DeployAlloy
+        displayName: Deploy Alloy via Helm
+        environment: 'prod'
+        pool:
+          vmImage: ubuntu-latest
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+
+                - task: HelmInstaller@0
+                  inputs:
+                    helmVersion: '3.9.0'
+                    installKubectl: true
+
+                - script: |
+                    helm repo add grafana https://grafana.github.io/helm-charts
+                    helm repo update
+                  displayName: "Add Grafana Helm Repo"
+
+                - task: HelmDeploy@0
+                  displayName: Helm upgrade/install Alloy
+                  inputs:
+                    connectionType: 'Kubernetes Service Connection'
+                    kubernetesServiceConnection: 'k8s-stage'
+                    namespace: 'default'
+                    command: 'upgrade'
+                    install: true
+                    chartType: 'Name'
+                    chartName: 'grafana/alloy'
+                    releaseName: 'alloy'
+                    valueFile: '$(Build.SourcesDirectory)/greencity-alloy-chart/values.yaml'
+                    arguments: '--debug'
